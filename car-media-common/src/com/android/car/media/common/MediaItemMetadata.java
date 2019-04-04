@@ -21,6 +21,9 @@ import android.annotation.NonNull;
 import android.annotation.Nullable;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,8 +33,13 @@ import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+
+import androidx.annotation.VisibleForTesting;
+
+import com.android.car.apps.common.UriUtils;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
@@ -48,30 +56,39 @@ import java.util.concurrent.CompletableFuture;
  */
 public class MediaItemMetadata implements Parcelable {
     private static final String TAG = "MediaItemMetadata";
+
+    /** Can be used to tint the bitmaps in red so apps switch to content uris. */
+    // STOPSHIP(arnaudberry) decide whether to keep this or not.
+    private static final int BITMAP_WARNING_COLOR = Color.argb(0.3f, 1.0f, 0f, 0f);
+
     @NonNull
     private final MediaDescriptionCompat mMediaDescription;
     @Nullable
     private final Long mQueueId;
     private final boolean mIsBrowsable;
     private final boolean mIsPlayable;
+    private final String mAlbumTitle;
+    private final String mArtist;
 
     public MediaItemMetadata(@NonNull MediaDescriptionCompat description) {
-        this(description, null, false, false);
+        this(description, null, false, false, null, null);
     }
 
     /** Creates an instance based on a {@link MediaMetadataCompat} */
     public MediaItemMetadata(@NonNull MediaMetadataCompat metadata) {
-        this(metadata.getDescription(), null, false, false);
+        this(metadata.getDescription(), null, false, false,
+                metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM),
+                metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST));
     }
 
     /** Creates an instance based on a {@link MediaSessionCompat.QueueItem} */
     public MediaItemMetadata(@NonNull MediaSessionCompat.QueueItem queueItem) {
-        this(queueItem.getDescription(), queueItem.getQueueId(), false, true);
+        this(queueItem.getDescription(), queueItem.getQueueId(), false, true, null, null);
     }
 
     /** Creates an instance based on a {@link MediaBrowserCompat.MediaItem} */
     public MediaItemMetadata(@NonNull MediaBrowserCompat.MediaItem item) {
-        this(item.getDescription(), null, item.isBrowsable(), item.isPlayable());
+        this(item.getDescription(), null, item.isBrowsable(), item.isPlayable(), null, null);
     }
 
     /** Creates an instance based on a {@link Parcel} */
@@ -81,6 +98,8 @@ public class MediaItemMetadata implements Parcelable {
         mQueueId = in.readByte() == 0x00 ? null : in.readLong();
         mIsBrowsable = in.readByte() != 0x00;
         mIsPlayable = in.readByte() != 0x00;
+        mAlbumTitle = in.readString();
+        mArtist = in.readString();
     }
 
     /**
@@ -94,14 +113,19 @@ public class MediaItemMetadata implements Parcelable {
         mQueueId = item.mQueueId;
         mIsBrowsable = item.mIsBrowsable;
         mIsPlayable = item.mIsPlayable;
+        mAlbumTitle = item.mAlbumTitle;
+        mArtist = item.mArtist;
     }
 
-    private MediaItemMetadata(MediaDescriptionCompat description, Long queueId, boolean isBrowsable,
-                              boolean isPlayable) {
+    @VisibleForTesting
+    public MediaItemMetadata(MediaDescriptionCompat description, Long queueId, boolean isBrowsable,
+            boolean isPlayable, String albumTitle, String artist) {
         mMediaDescription = description;
         mQueueId = queueId;
         mIsPlayable = isPlayable;
         mIsBrowsable = isBrowsable;
+        mAlbumTitle = albumTitle;
+        mArtist = artist;
     }
 
     /** @return media item id */
@@ -122,10 +146,16 @@ public class MediaItemMetadata implements Parcelable {
         return mMediaDescription.getSubtitle();
     }
 
-    /** @return media item description */
+    /** @return the album title for the media */
     @Nullable
-    public CharSequence getDescription() {
-        return mMediaDescription.getSubtitle();
+    public String getAlbumTitle() {
+        return mAlbumTitle;
+    }
+
+    /** @return the artist of the media */
+    @Nullable
+    public CharSequence getArtist() {
+        return mArtist;
     }
 
     /**
@@ -188,6 +218,7 @@ public class MediaItemMetadata implements Parcelable {
     public static void updateImageView(Context context, @Nullable MediaItemMetadata metadata,
             ImageView imageView, @DrawableRes int loadingIndicator) {
         Glide.with(context).clear(imageView);
+        imageView.clearColorFilter();
         if (metadata == null) {
             imageView.setImageBitmap(null);
             imageView.setVisibility(View.GONE);
@@ -197,14 +228,30 @@ public class MediaItemMetadata implements Parcelable {
         if (image != null) {
             imageView.setImageBitmap(image);
             imageView.setVisibility(View.VISIBLE);
+            if (BITMAP_WARNING_COLOR != 0) {
+                imageView.setColorFilter(BITMAP_WARNING_COLOR);
+            }
             return;
         }
         Uri imageUri = metadata.getAlbumArtUri();
         if (imageUri != null) {
-            Glide.with(context)
-                    .load(imageUri)
-                    .apply(RequestOptions.placeholderOf(loadingIndicator))
-                    .into(imageView);
+            if (UriUtils.isAndroidResourceUri(imageUri)) {
+                // Glide doesn't support loading resources from other applications
+                Drawable pic = UriUtils.getDrawable(context, UriUtils.getIconResource(imageUri));
+                if (pic != null) {
+                    imageView.setImageDrawable(pic);
+                } else {
+                    Log.e(TAG, "Unable to load resource " + imageUri);
+                }
+            } else if (UriUtils.isContentUri(imageUri)) {
+                Glide.with(context)
+                        .load(imageUri)
+                        .apply(RequestOptions.placeholderOf(loadingIndicator))
+                        .into(imageView);
+            } else if (Log.isLoggable(TAG, Log.DEBUG)) {
+                // Most likely a web uri which is potentially unsafe to process in a system app.
+                Log.d(TAG, "unsupported uri: " + imageUri);
+            }
             imageView.setVisibility(View.VISIBLE);
             return;
         }
@@ -230,34 +277,67 @@ public class MediaItemMetadata implements Parcelable {
             boolean fit) {
         Bitmap image = getAlbumArtBitmap();
         if (image != null) {
-            return CompletableFuture.completedFuture(image);
+            if (BITMAP_WARNING_COLOR != 0) {
+                Bitmap clone = Bitmap.createBitmap(image.getWidth(), image.getHeight(),
+                        Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(clone);
+                canvas.drawBitmap(image, 0f, 0f, new Paint());
+                canvas.drawColor(BITMAP_WARNING_COLOR);
+                return CompletableFuture.completedFuture(clone);
+            } else {
+                return CompletableFuture.completedFuture(image);
+            }
         }
         Uri imageUri = getAlbumArtUri();
         if (imageUri != null) {
-            CompletableFuture<Bitmap> bitmapCompletableFuture = new CompletableFuture<>();
-            RequestBuilder<Bitmap> builder = Glide.with(context)
-                    .asBitmap()
-                    .load(getAlbumArtUri());
-            if (fit) {
-                builder = builder.apply(RequestOptions.fitCenterTransform());
-            } else {
-                builder = builder.apply(RequestOptions.centerCropTransform());
-            }
-            Target<Bitmap> target = new SimpleTarget<Bitmap>(width, height) {
-                @Override
-                public void onResourceReady(@NonNull Bitmap bitmap,
-                        @Nullable Transition<? super Bitmap> transition) {
-                    bitmapCompletableFuture.complete(bitmap);
+            if (UriUtils.isAndroidResourceUri(imageUri)) {
+                // Glide doesn't support loading resources for other applications...
+                Drawable pic = UriUtils.getDrawable(context, UriUtils.getIconResource(imageUri));
+                if (pic != null) {
+                    Bitmap bitmap = Bitmap.createBitmap(image.getWidth(), image.getHeight(),
+                            Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas(bitmap);
+                    pic.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                    pic.draw(canvas);
+                    return CompletableFuture.completedFuture(bitmap);
+                } else {
+                    String errorMessage = "Unable to load resource " + imageUri;
+                    Log.e(TAG, errorMessage);
+                    return CompletableFuture.failedFuture(new Exception(errorMessage));
                 }
+            } else if (UriUtils.isContentUri(imageUri)) {
+                CompletableFuture<Bitmap> bitmapCompletableFuture = new CompletableFuture<>();
+                RequestBuilder<Bitmap> builder = Glide.with(context)
+                        .asBitmap()
+                        .load(getAlbumArtUri());
+                if (fit) {
+                    builder = builder.apply(RequestOptions.fitCenterTransform());
+                } else {
+                    builder = builder.apply(RequestOptions.centerCropTransform());
+                }
+                Target<Bitmap> target = new SimpleTarget<Bitmap>(width, height) {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap bitmap,
+                            @Nullable Transition<? super Bitmap> transition) {
+                        bitmapCompletableFuture.complete(bitmap);
+                    }
 
-                @Override
-                public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                    bitmapCompletableFuture.completeExceptionally(
-                            new IllegalStateException("Unknown error"));
+                    @Override
+                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                        bitmapCompletableFuture.completeExceptionally(
+                                new IllegalStateException("Unknown error"));
+                    }
+                };
+                builder.into(target);
+                return bitmapCompletableFuture;
+            } else {
+                // Most likely a web uri which is potentially unsafe to process in a system app.
+                String errorMessage = "unsupported uri: \n" + imageUri;
+                if (Log.isLoggable(TAG, Log.DEBUG)) { // Use debug level to avoid log spam.
+                    Log.d(TAG, errorMessage);
                 }
-            };
-            builder.into(target);
-            return bitmapCompletableFuture;
+                return CompletableFuture.failedFuture(new Exception(errorMessage));
+            }
         }
         return CompletableFuture.completedFuture(null);
     }
@@ -330,6 +410,8 @@ public class MediaItemMetadata implements Parcelable {
                 && Objects.equals(getId(), that.getId())
                 && Objects.equals(getTitle(), that.getTitle())
                 && Objects.equals(getSubtitle(), that.getSubtitle())
+                && Objects.equals(getAlbumTitle(), that.getAlbumTitle())
+                && Objects.equals(getArtist(), that.getArtist())
                 && Objects.equals(getAlbumArtUri(), that.getAlbumArtUri())
                 && Objects.equals(mQueueId, that.mQueueId);
     }
@@ -355,6 +437,8 @@ public class MediaItemMetadata implements Parcelable {
         }
         dest.writeByte((byte) (mIsBrowsable ? 0x01 : 0x00));
         dest.writeByte((byte) (mIsPlayable ? 0x01 : 0x00));
+        dest.writeString(mAlbumTitle);
+        dest.writeString(mArtist);
     }
 
     @SuppressWarnings("unused")
@@ -378,9 +462,13 @@ public class MediaItemMetadata implements Parcelable {
                 + ", Queue Id: "
                 + (mQueueId != null ? mQueueId : "-")
                 + ", title: "
-                + (mMediaDescription != null ? mMediaDescription.getTitle() : "-")
+                + mMediaDescription != null ? mMediaDescription.getTitle().toString() : "-"
                 + ", subtitle: "
-                + (mMediaDescription != null ? mMediaDescription.getSubtitle() : "-")
+                + mMediaDescription != null ? mMediaDescription.getSubtitle().toString() : "-"
+                + ", album title: "
+                + mAlbumTitle != null ? mAlbumTitle : "-"
+                + ", artist: "
+                + mArtist != null ? mArtist : "-"
                 + ", album art URI: "
                 + (mMediaDescription != null ? mMediaDescription.getIconUri() : "-")
                 + "]";

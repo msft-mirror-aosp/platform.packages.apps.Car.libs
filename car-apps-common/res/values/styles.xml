@@ -15,38 +15,6 @@
   limitations under the License.
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- The styling for Toolbar used as action bar. -->
-    <style name="Widget.CarDefault.Toolbar" parent="android:Widget.Toolbar">
-        <item name="android:minHeight">?attr/actionBarSize</item>
-        <item name="android:background">@android:color/transparent</item>
-        <item name="android:contentInsetEnd">@dimen/car_keyline_1</item>
-        <item name="android:contentInsetStart">@dimen/car_keyline_1</item>
-        <item name="android:elevation">@dimen/control_bar_elevation</item>
-        <item name="android:subtitleTextAppearance">@style/TextAppearance.Car.Body3.Light</item>
-        <item name="android:titleTextAppearance">@style/TextAppearance.Car.Body1.Medium.Light</item>
-        <item name="android:navigationIcon">@drawable/ic_nav_arrow_back</item>
-    </style>
-
-    <!-- The styling for the navigation button in action bar. -->
-    <style name="Widget.CarDefault.Toolbar.Button.Navigation"
-        parent="android:Widget.Toolbar.Button.Navigation">
-        <item name="android:background">@drawable/car_card_ripple_background</item>
-        <item name="android:scaleType">center</item>
-        <item name="android:tint">@color/icon_tint</item>
-    </style>
-
-    <!-- The style for the menu bar (i.e. hamburger) and back arrow in the navigation drawer. -->
-    <style name="Widget.CarDefault.DrawerArrowToggle" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="color">@color/car_title2_light</item>
-        <item name="spinBars">true</item>
-        <item name="barLength">@dimen/car_menu_bar_length</item>
-        <item name="thickness">@dimen/car_arrow_thickness</item>
-        <item name="gapBetweenBars">@dimen/car_menu_bar_spacing</item>
-        <item name="arrowShaftLength">@dimen/car_arrow_shaft_length</item>
-        <item name="arrowHeadLength">@dimen/car_arrow_head_length</item>
-        <item name="drawableSize">@dimen/car_arrow_size</item>
-    </style>
-
     <!-- ================ -->
     <!-- ActionBar Themes -->
     <!-- ================ -->
@@ -57,6 +25,7 @@
         <!-- Force the vector drawables to the right size. -->
         <item name="android:layout_width">@dimen/control_bar_button_size</item>
         <item name="android:layout_height">@dimen/control_bar_button_size</item>
+        <!-- This padding is used to force resizing of provided icons. -->
         <item name="android:padding">@dimen/control_button_padding</item>
         <!-- Note: fitCenter makes icons disappear if the view is too small... -->
         <item name="android:scaleType">fitCenter</item>
@@ -72,4 +41,57 @@
         <item name="android:textColor">@color/car_tab_item_selector</item>
     </style>
 
+    <style name="CarTabItemBackground">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+    </style>
+
+    <!-- Styles for text. Sub1-3 are not included here as their use should be exceptional -->
+    <style name="TextAppearance">
+        <item name="android:fontFamily">roboto-regular</item>
+        <item name="android:textColor">@color/primary_text_color</item>
+    </style>
+
+    <style name="TextAppearance.Display1" parent="TextAppearance">
+        <item name="android:textSize">56sp</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_display1</item>
+    </style>
+
+    <style name="TextAppearance.Display2" parent="TextAppearance">
+        <item name="android:textSize">44sp</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_display2</item>
+    </style>
+
+    <style name="TextAppearance.Display3" parent="TextAppearance">
+        <item name="android:textSize">36sp</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_display3</item>
+    </style>
+
+    <style name="TextAppearance.Body1" parent="TextAppearance">
+        <item name="android:textSize">32sp</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_body1</item>
+    </style>
+
+    <style name="TextAppearance.Body2" parent="TextAppearance">
+        <item name="android:textSize">28sp</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_body2</item>
+    </style>
+
+    <style name="TextAppearance.Body3" parent="TextAppearance">
+        <item name="android:textSize">24sp</item>
+        <item name="android:letterSpacing">@dimen/letter_spacing_body3</item>
+    </style>
+
+    <style name="MinimizedControlBarTitle" parent="TextAppearance.Body1"/>
+    <style name="MinimizedControlBarSubtitle" parent="TextAppearance.Body3"/>
+
+    <!-- Styles for ControlBar -->
+    <style name="ControlBar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="MinimizedControlBar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/minimized_control_bar_height</item>
+    </style>
 </resources>
