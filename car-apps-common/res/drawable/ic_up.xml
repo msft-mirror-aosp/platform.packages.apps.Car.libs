@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2019 The Android Open Source Project
+  ~ Copyright (C) 2019 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,10 +14,12 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <style name="ControlBar">
-        <item name="android:layout_width">@dimen/control_bar_width</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-</resources>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48.0"
+    android:viewportHeight="48.0">
+  <path
+      android:pathData="M14.83,30.83L24,21.66l9.17,9.17L36,28 24,16 12,28z"
+      android:fillColor="#FFFFFF"/>
+</vector>
