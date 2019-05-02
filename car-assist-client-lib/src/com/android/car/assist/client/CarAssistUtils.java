@@ -19,6 +19,7 @@ import static android.app.Notification.Action.SEMANTIC_ACTION_MARK_AS_READ;
 import static android.app.Notification.Action.SEMANTIC_ACTION_REPLY;
 import static android.service.voice.VoiceInteractionSession.SHOW_SOURCE_NOTIFICATION;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.RemoteInput;
 import android.content.Context;
@@ -35,6 +36,7 @@ import com.android.car.assist.client.tts.TextToSpeechHelper;
 import com.android.internal.app.AssistUtils;
 import com.android.internal.app.IVoiceActionCheckCallback;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -86,6 +88,7 @@ public class CarAssistUtils {
     private final AssistUtils mAssistUtils;
     private final FallbackAssistant mFallbackAssistant;
     private final String mErrorMessage;
+    private final ActivityManager mActivityManager;
 
     /** Interface used to receive callbacks from voice action requests. */
     public interface ActionRequestCallback {
@@ -98,6 +101,7 @@ public class CarAssistUtils {
         mAssistUtils = new AssistUtils(context);
         mFallbackAssistant = new FallbackAssistant(new TextToSpeechHelper(context));
         mErrorMessage = context.getString(R.string.assist_action_failed_toast);
+        mActivityManager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
     }
 
     /**
@@ -109,8 +113,8 @@ public class CarAssistUtils {
         int slashIndex = activeComponent.indexOf("/");
         final String activePackage = activeComponent.substring(0, slashIndex);
 
-        final String listeners = Settings.Secure.getString(mContext.getContentResolver(),
-                Settings.Secure.ENABLED_NOTIFICATION_LISTENERS);
+        final String listeners = Settings.Secure.getStringForUser(mContext.getContentResolver(),
+                Settings.Secure.ENABLED_NOTIFICATION_LISTENERS, ActivityManager.getCurrentUser());
 
         if (listeners != null) {
             for (String listener : Arrays.asList(listeners.split(":"))) {
@@ -160,14 +164,24 @@ public class CarAssistUtils {
      * is returned if multiple callbacks exist for any semantic action that is supported.
      */
     private static boolean hasRequiredAssistantCallbacks(StatusBarNotification sbn) {
-        List<Integer> semanticActionList = Arrays.stream(sbn.getNotification().actions)
-                .map(Notification.Action::getSemanticAction)
+        List<Integer> semanticActionList = getAllActions(sbn.getNotification())
+                .stream()
+                .map(NotificationCompat.Action::getSemanticAction)
                 .filter(REQUIRED_SEMANTIC_ACTIONS::contains)
                 .collect(Collectors.toList());
         Set<Integer> semanticActionSet = new HashSet<>(semanticActionList);
-
         return semanticActionList.size() == semanticActionSet.size()
                 && semanticActionSet.containsAll(REQUIRED_SEMANTIC_ACTIONS);
+    }
+
+    /** Retrieves all visible and invisible {@link Action}s from the {@link #notification}. */
+    private static List<NotificationCompat.Action> getAllActions(Notification notification) {
+        List<NotificationCompat.Action> actions = new ArrayList<>();
+        actions.addAll(NotificationCompat.getInvisibleActions(notification));
+        for (int i = 0; i < NotificationCompat.getActionCount(notification); i++) {
+            actions.add(NotificationCompat.getAction(notification, i));
+        }
+        return actions;
     }
 
     /**
