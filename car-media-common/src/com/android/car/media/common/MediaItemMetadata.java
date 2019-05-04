@@ -68,7 +68,7 @@ public class MediaItemMetadata implements Parcelable {
 
     /** Can be used to tint the bitmaps in red so apps switch to content uris. */
     // STOPSHIP(arnaudberry) decide whether to keep this or not.
-    private static final int BITMAP_WARNING_COLOR = Color.argb(0.3f, 1.0f, 0f, 0f);
+    private static final int BITMAP_WARNING_COLOR = Color.argb(100, 255, 0, 0);
 
     @NonNull
     private final MediaDescriptionCompat mMediaDescription;
@@ -217,17 +217,15 @@ public class MediaItemMetadata implements Parcelable {
         return "1".equals(SystemProperties.get(FLAG_BITMAPS_KEY, "0"));
     }
 
-    private static Drawable getPlaceholderDrawable(Context context,
+    static Drawable getPlaceholderDrawable(Context context,
             @NonNull MediaItemMetadata metadata) {
         TypedArray placeholderImages = context.getResources().obtainTypedArray(
                 R.array.placeholder_images);
         if (placeholderImages != null && placeholderImages.length() > 0) {
+            // Only the title is reliably populated in metadata, since the album/artist fields
+            // aren't set in the items retrieved from the browse service (only Title/Subtitle).
             int titleHash = (metadata.getTitle() != null) ? metadata.getTitle().hashCode() : 0;
-            int artistHash = (metadata.getArtist() != null) ? metadata.getArtist().hashCode() : 0;
-            int albumHash =
-                    (metadata.getAlbumTitle() != null) ? metadata.getAlbumTitle().hashCode() : 0;
-            int random = Math.floorMod(titleHash ^ artistHash ^ albumHash,
-                    placeholderImages.length());
+            int random = Math.floorMod(titleHash, placeholderImages.length());
             Drawable placeholder = placeholderImages.getDrawable(random);
             placeholderImages.recycle();
             return placeholder;
@@ -249,9 +247,10 @@ public class MediaItemMetadata implements Parcelable {
      * @param loadingIndicator a drawable resource that would be set into the {@link ImageView}
      *                         while the image is being downloaded, or 0 if no loading indicator
      *                         is required.
+     * @param showPlaceholder  whether to show an image placeholder when the image is null.
      */
     public static void updateImageView(Context context, @Nullable MediaItemMetadata metadata,
-            ImageView imageView, @DrawableRes int loadingIndicator) {
+            ImageView imageView, @DrawableRes int loadingIndicator, boolean showPlaceholder) {
         Glide.with(context).clear(imageView);
         imageView.clearColorFilter();
         if (metadata == null) {
@@ -291,8 +290,13 @@ public class MediaItemMetadata implements Parcelable {
             return;
         }
 
-        imageView.setImageDrawable(getPlaceholderDrawable(context, metadata));
-        imageView.setVisibility(View.VISIBLE);
+        if (showPlaceholder) {
+            imageView.setImageDrawable(getPlaceholderDrawable(context, metadata));
+            imageView.setVisibility(View.VISIBLE);
+        } else {
+            imageView.setImageBitmap(null);
+            imageView.setVisibility(View.GONE);
+        }
     }
 
     /**
