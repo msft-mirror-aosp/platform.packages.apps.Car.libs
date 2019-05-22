@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2018 The Android Open Source Project
+<!-- Copyright (C) 2019 The Android Open Source Project
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,12 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/control_bar_button_slot_size"
-    android:layout_height="@dimen/control_bar_button_slot_size"
-    android:layout_gravity="center_vertical"
-    android:visibility="visible"
-    android:foregroundGravity="center"
-    android:clipChildren="false">
-</FrameLayout>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/selectable_button_background"
+          android:height="@dimen/overflow_button_icon_background_size"
+          android:width="@dimen/overflow_button_icon_background_size"/>
+    <item android:drawable="@drawable/ic_overflow"
+          android:height="@dimen/overflow_button_icon_size"
+          android:width="@dimen/overflow_button_icon_size"
+          android:gravity="center"/>
+</layer-list>
