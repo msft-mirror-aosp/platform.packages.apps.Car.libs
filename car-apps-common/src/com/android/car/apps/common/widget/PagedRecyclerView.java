@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 
 import androidx.annotation.IntDef;
@@ -243,7 +244,7 @@ public final class PagedRecyclerView extends RecyclerView {
                 R.styleable.PagedRecyclerView_scrollBarContainerWidth, carMargin);
 
         mScrollBarPosition = a.getInt(R.styleable.PagedRecyclerView_scrollBarPosition,
-                    ScrollBarPosition.START);
+                ScrollBarPosition.START);
 
         mScrollBarAboveRecyclerView = a.getBoolean(
                 R.styleable.PagedRecyclerView_scrollBarAboveRecyclerView, /* defValue= */true);
@@ -411,6 +412,25 @@ public final class PagedRecyclerView extends RecyclerView {
             return mNestedRecyclerView.findViewHolderForLayoutPosition(position);
         } else {
             return super.findViewHolderForLayoutPosition(position);
+        }
+    }
+
+    @Override
+    public ViewHolder findContainingViewHolder(View view) {
+        if (mScrollBarEnabled) {
+            return mNestedRecyclerView.findContainingViewHolder(view);
+        } else {
+            return super.findContainingViewHolder(view);
+        }
+    }
+
+    @Override
+    @Nullable
+    public View findChildViewUnder(float x, float y) {
+        if (mScrollBarEnabled) {
+            return mNestedRecyclerView.findChildViewUnder(x, y);
+        } else {
+            return super.findChildViewUnder(x, y);
         }
     }
 
