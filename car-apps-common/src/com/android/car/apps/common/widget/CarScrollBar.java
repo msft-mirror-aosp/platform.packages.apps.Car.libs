@@ -62,9 +62,6 @@ class CarScrollBar extends ScrollBarUI {
     private int mSeparatingMargin;
     private int mScrollBarThumbWidth;
 
-    private int mPaddingStart;
-    private int mPaddingEnd;
-
     /** The amount of space that the scroll thumb is allowed to roam over. */
     private int mScrollThumbTrackHeight;
 
@@ -141,9 +138,10 @@ class CarScrollBar extends ScrollBarUI {
 
             OrientationHelper orientationHelper =
                     getOrientationHelper(getRecyclerView().getLayoutManager());
+            int height = orientationHelper.getTotalSpace();
 
             // This value will keep track of the top of the current view being laid out.
-            int layoutTop = orientationHelper.getStartAfterPadding() + mPaddingStart;
+            int layoutTop = orientationHelper.getStartAfterPadding();
 
             // Lay out the up button at the top of the view.
             layoutViewCenteredFromTop(mUpButton, layoutTop, width);
@@ -154,7 +152,7 @@ class CarScrollBar extends ScrollBarUI {
             layoutViewCenteredFromTop(mScrollThumb, layoutTop, width);
 
             // Lay out the bottom button at the bottom of the view.
-            int downBottom = orientationHelper.getEndAfterPadding() - mPaddingEnd;
+            int downBottom = height + orientationHelper.getStartAfterPadding();
             layoutViewCenteredFromBottom(mDownButton, downBottom, width);
 
             mHandler.post(this::calculateScrollThumbTrackHeight);
@@ -165,13 +163,6 @@ class CarScrollBar extends ScrollBarUI {
     @Override
     public void requestLayout() {
         mScrollView.requestLayout();
-    }
-
-    @Override
-    public void setPadding(int paddingStart, int paddingEnd) {
-        mPaddingStart = paddingStart;
-        mPaddingEnd = paddingEnd;
-        requestLayout();
     }
 
     /**

@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.VectorDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,10 +43,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * This class manages the media control buttons that are added to a CarControlBar.
- *
- * It expects the icons to be {@link VectorDrawable}s (because they look better), and will flag
- * non compliant ones if {@link MediaItemMetadata#flagInvalidMediaArt} returns true.
+ * This class manages the media control buttons that are added to a CarControlBar
  */
 public class MediaButtonController {
 
@@ -135,13 +131,7 @@ public class MediaButtonController {
 
     private ImageButton createIconButton(Drawable icon) {
         ImageButton button = mControlBar.createIconButton(icon);
-        boolean flagInvalidArt = MediaItemMetadata.flagInvalidMediaArt(mContext);
-        if (flagInvalidArt && !(icon instanceof VectorDrawable)) {
-            button.setImageTintList(
-                    ColorStateList.valueOf(MediaItemMetadata.INVALID_MEDIA_ART_TINT_COLOR));
-        } else {
-            button.setImageTintList(mIconsColor);
-        }
+        button.setImageTintList(mIconsColor);
         button.setImageTintMode(PorterDuff.Mode.SRC_ATOP);
         return button;
     }
@@ -241,12 +231,6 @@ public class MediaButtonController {
                         return button;
                     })
                     .collect(Collectors.toList()));
-        }
-        if (!mSkipPrevAdded && !imageButtons.isEmpty()) {
-            mControlBar.setView(imageButtons.remove(0), CarControlBar.SLOT_LEFT);
-        }
-        if (!mSkipNextAdded && !imageButtons.isEmpty()) {
-            mControlBar.setView(imageButtons.remove(0), CarControlBar.SLOT_RIGHT);
         }
         mControlBar.setViews(imageButtons.toArray(new ImageButton[0]));
     }

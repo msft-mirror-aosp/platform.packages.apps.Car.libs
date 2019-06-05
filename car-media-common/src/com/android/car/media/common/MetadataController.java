@@ -92,14 +92,9 @@ public class MetadataController {
         playbackViewModel.getMetadata().observe(lifecycleOwner,
                 metadata -> {
                     if (metadata == null) {
-                        ViewUtils.setInvisible(title, true);
-                        ViewUtils.setInvisible(albumTitle, true);
-                        ViewUtils.setInvisible(artist, true);
-                        ViewUtils.setInvisible(albumArt, true);
                         return;
                     }
                     title.setText(metadata.getTitle());
-                    ViewUtils.setInvisible(title, false);
                     if (albumTitle != null) {
                         CharSequence albumName = metadata.getAlbumTitle();
                         albumTitle.setText(albumName);
@@ -125,7 +120,6 @@ public class MetadataController {
                                             }
                                         }
                         );
-                        ViewUtils.setInvisible(albumArt, false);
                     }
                 });
 
