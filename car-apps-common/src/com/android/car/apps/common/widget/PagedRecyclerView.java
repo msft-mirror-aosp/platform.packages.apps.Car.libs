@@ -160,8 +160,8 @@ public final class PagedRecyclerView extends RecyclerView {
      * inner recycler view within its bounds, this layout manager should always have 0 padding.
      */
     private class PagedRecyclerViewLayoutManager extends LinearLayoutManager {
-        PagedRecyclerViewLayoutManager(Context context, int orientation, boolean reverseLayout) {
-            super(context, orientation, reverseLayout);
+        PagedRecyclerViewLayoutManager(Context context) {
+            super(context);
         }
 
         @Override
@@ -182,6 +182,16 @@ public final class PagedRecyclerView extends RecyclerView {
         @Override
         public int getPaddingEnd() {
             return 0;
+        }
+
+        @Override
+        public boolean canScrollHorizontally() {
+            return false;
+        }
+
+        @Override
+        public boolean canScrollVertically() {
+            return false;
         }
     }
 
@@ -225,8 +235,7 @@ public final class PagedRecyclerView extends RecyclerView {
         mNestedRecyclerView = new RecyclerView(mContext, attrs,
                 R.style.PagedRecyclerView_NestedRecyclerView);
 
-        PagedRecyclerViewLayoutManager layoutManager = new PagedRecyclerViewLayoutManager(context,
-                LinearLayoutManager.HORIZONTAL, false);
+        PagedRecyclerViewLayoutManager layoutManager = new PagedRecyclerViewLayoutManager(context);
         super.setLayoutManager(layoutManager);
 
         PagedRecyclerViewAdapter adapter = new PagedRecyclerViewAdapter();
@@ -372,9 +381,17 @@ public final class PagedRecyclerView extends RecyclerView {
         }
     }
 
+    /**
+     * Returns the {@link LayoutManager} for the {@link RecyclerView} displaying the content.
+     *
+     * <p>In cases where the scroll bar is visible and the nested {@link RecyclerView} is
+     * displaying content, {@link #getLayoutManager()} cannot be used because it returns the
+     * {@link LayoutManager} of the outer {@link RecyclerView}. {@link #getLayoutManager()} could
+     * not be overridden to return the effective manager due to interference with accessibility
+     * node tree traversal.
+     */
     @Nullable
-    @Override
-    public LayoutManager getLayoutManager() {
+    public LayoutManager getEffectiveLayoutManager() {
         if (mScrollBarEnabled) {
             return mNestedRecyclerView.getLayoutManager();
         }
