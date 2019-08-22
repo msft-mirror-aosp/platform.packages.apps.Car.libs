@@ -14,13 +14,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<resources>
-    <dimen name="appbar_2_rows_height">192dp</dimen>
-    <dimen name="appbar_view_icon_touch_target_size">96dp</dimen>
-    <dimen name="appbar_view_icon_padding">26dp</dimen>
-    <dimen name="appbar_view_icon_background_radius">48dp</dimen>
-    <!-- negative margins to overlap icons on search bar -->
-    <dimen name="appbar_view_search_app_icon_margin">-76dp</dimen>
-    <dimen name="appbar_view_search_close_icon_margin">-96dp</dimen>
-    <dimen name="appbar_view_search_bar_end_margin">26dp</dimen>
-</resources>
+<ImageView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/search"
+    android:layout_width="@dimen/touch_target_size"
+    android:layout_height="@dimen/touch_target_size"
+    android:src="@drawable/ic_search"
+    android:scaleType="center"
+    android:background="@drawable/chassis_toolbar_button_background"/>
