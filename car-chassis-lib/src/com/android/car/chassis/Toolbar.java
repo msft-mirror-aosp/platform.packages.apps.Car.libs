@@ -18,6 +18,7 @@ package com.android.car.chassis;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,6 +47,8 @@ import java.util.Set;
  * The toolbar supports a navigation button, title, tabs, search, and custom buttons.
  */
 public class Toolbar extends FrameLayout {
+
+    private static final String TAG = "ChassisToolbar";
 
     /** Enum of states the toolbar can be in. Controls what elements of the toolbar are displayed */
     public enum State {
@@ -127,12 +130,32 @@ public class Toolbar extends FrameLayout {
         mTitle.setText(a.getString(R.styleable.ChassisToolbar_title));
         setLogo(a.getResourceId(R.styleable.ChassisToolbar_logo, 0));
         setButtons(a.getResourceId(R.styleable.ChassisToolbar_buttons, 0));
-        setBackground(context.getDrawable(R.color.toolbar_background_color));
+        setBackground(context.getDrawable(R.color.chassis_toolbar_background_color));
         mShowButtonsWhileSearching = a.getBoolean(
                 R.styleable.ChassisToolbar_showButtonsWhileSearching, false);
         String searchHint = a.getString(R.styleable.ChassisToolbar_searchHint);
         if (searchHint != null) {
             setSearchHint(searchHint);
+        }
+
+        switch (a.getInt(R.styleable.ChassisToolbar_state, 0)) {
+            case 0:
+                setState(State.HOME);
+                break;
+            case 1:
+                setState(State.SUBPAGE);
+                break;
+            case 2:
+                setState(State.SUBPAGE_CUSTOM);
+                break;
+            case 3:
+                setState(State.SEARCH);
+                break;
+            default:
+                if (Log.isLoggable(TAG, Log.WARN)) {
+                    Log.w(TAG, "Unknown initial state");
+                }
+                break;
         }
 
         a.recycle();
@@ -336,7 +359,7 @@ public class Toolbar extends FrameLayout {
 
         View.OnClickListener backClickListener = (v) -> forEachListener(Listener::onBack);
         mNavIcon.setVisibility(state != State.HOME ? VISIBLE : INVISIBLE);
-        mNavIcon.setImageResource(state != State.HOME ? R.drawable.ic_arrow_back : 0);
+        mNavIcon.setImageResource(state != State.HOME ? R.drawable.chassis_icon_arrow_back : 0);
         mLogo.setVisibility(state == State.HOME && mHasLogo ? VISIBLE : INVISIBLE);
         mNavIconContainer.setVisibility(state != State.HOME || mHasLogo ? VISIBLE : GONE);
         mNavIconContainer.setClickable(state != State.HOME);
