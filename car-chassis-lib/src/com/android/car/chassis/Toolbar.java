@@ -15,10 +15,10 @@
  */
 package com.android.car.chassis;
 
-import android.annotation.StringRes;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,13 +29,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * A toolbar for Android Automotive OS apps.
@@ -47,6 +47,8 @@ import java.util.function.Consumer;
  * The toolbar supports a navigation button, title, tabs, search, and custom buttons.
  */
 public class Toolbar extends FrameLayout {
+
+    private static final String TAG = "ChassisToolbar";
 
     /** Enum of states the toolbar can be in. Controls what elements of the toolbar are displayed */
     public enum State {
@@ -70,6 +72,13 @@ public class Toolbar extends FrameLayout {
          * In the SEARCH state, only the back button and the search bar will be visible.
          */
         SEARCH,
+    }
+
+    /**
+     * {@link java.util.function.Consumer} is not available for non-java8 enabled Android targets.
+     */
+    private interface Consumer<T> {
+        void accept(T value);
     }
 
     private ImageView mNavIcon;
@@ -121,6 +130,7 @@ public class Toolbar extends FrameLayout {
         mTitle.setText(a.getString(R.styleable.ChassisToolbar_title));
         setLogo(a.getResourceId(R.styleable.ChassisToolbar_logo, 0));
         setButtons(a.getResourceId(R.styleable.ChassisToolbar_buttons, 0));
+        setBackground(context.getDrawable(R.color.chassis_toolbar_background_color));
         mShowButtonsWhileSearching = a.getBoolean(
                 R.styleable.ChassisToolbar_showButtonsWhileSearching, false);
         String searchHint = a.getString(R.styleable.ChassisToolbar_searchHint);
@@ -128,14 +138,27 @@ public class Toolbar extends FrameLayout {
             setSearchHint(searchHint);
         }
 
-        a.recycle();
-
-        // If an android:background attribute wasn't given, set the default one
-        TypedArray viewAttributes = context.obtainStyledAttributes(
-                attrs, com.android.internal.R.styleable.View, defStyleAttr, defStyleRes);
-        if (viewAttributes.getDrawable(com.android.internal.R.styleable.View_background) == null) {
-            setBackground(context.getDrawable(R.color.toolbar_background_color));
+        switch (a.getInt(R.styleable.ChassisToolbar_state, 0)) {
+            case 0:
+                setState(State.HOME);
+                break;
+            case 1:
+                setState(State.SUBPAGE);
+                break;
+            case 2:
+                setState(State.SUBPAGE_CUSTOM);
+                break;
+            case 3:
+                setState(State.SEARCH);
+                break;
+            default:
+                if (Log.isLoggable(TAG, Log.WARN)) {
+                    Log.w(TAG, "Unknown initial state");
+                }
+                break;
         }
+
+        a.recycle();
 
         mTabLayout.addListener(new TabLayout.Listener() {
             @Override
@@ -336,7 +359,7 @@ public class Toolbar extends FrameLayout {
 
         View.OnClickListener backClickListener = (v) -> forEachListener(Listener::onBack);
         mNavIcon.setVisibility(state != State.HOME ? VISIBLE : INVISIBLE);
-        mNavIcon.setImageResource(state != State.HOME ? R.drawable.ic_arrow_back : 0);
+        mNavIcon.setImageResource(state != State.HOME ? R.drawable.chassis_icon_arrow_back : 0);
         mLogo.setVisibility(state == State.HOME && mHasLogo ? VISIBLE : INVISIBLE);
         mNavIconContainer.setVisibility(state != State.HOME || mHasLogo ? VISIBLE : GONE);
         mNavIconContainer.setClickable(state != State.HOME);
