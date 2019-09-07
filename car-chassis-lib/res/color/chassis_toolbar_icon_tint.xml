@@ -14,7 +14,8 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-<resources>
-    <!-- Margin -->
-    <dimen name="chassis_margin">148dp</dimen>
-</resources>
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/chassis_tab_selected_color" android:state_enabled="true"/>
+    <item android:color="@color/chassis_tab_unselected_color"/>
+</selector>
