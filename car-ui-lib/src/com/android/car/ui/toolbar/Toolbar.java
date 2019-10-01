@@ -23,11 +23,13 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -60,6 +62,7 @@ public class Toolbar extends FrameLayout {
     public interface OnHeightChangedListener {
         /**
          * Will be called when the height of the toolbar is changed.
+         *
          * @param height new height of the toolbar
          */
         void onHeightChanged(int height);
@@ -157,8 +160,6 @@ public class Toolbar extends FrameLayout {
         setState(getState());
     };
     private AlertDialog mOverflowDialog;
-
-
 
     public Toolbar(Context context) {
         this(context, null);
@@ -262,7 +263,15 @@ public class Toolbar extends FrameLayout {
             }
         });
 
-        handleToolbarHeightChangeListeners(getHeight());
+        getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        for (OnHeightChangedListener listener : mOnHeightChangedListeners) {
+                            listener.onHeightChanged(getHeight());
+                        }
+                    }
+                });
     }
 
     @Override
@@ -309,35 +318,47 @@ public class Toolbar extends FrameLayout {
 
         SavedState(Parcel in) {
             super(in);
-            mTitle = in.readCharSequence();
+            mTitle = readCharSequence(in);
             mNavButtonMode = NavButtonMode.valueOf(in.readString());
-            mSearchHint = in.readCharSequence();
-            mBackgroundShown = in.readBoolean();
-            mShowMenuItemsWhileSearching = in.readBoolean();
+            mSearchHint = readCharSequence(in);
+            mBackgroundShown = in.readInt() != 0;
+            mShowMenuItemsWhileSearching = in.readInt() != 0;
             mState = State.valueOf(in.readString());
         }
 
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
-            out.writeCharSequence(mTitle);
+            writeCharSequence(out, mTitle);
             out.writeString(mNavButtonMode.name());
-            out.writeCharSequence(mSearchHint);
-            out.writeBoolean(mBackgroundShown);
-            out.writeBoolean(mShowMenuItemsWhileSearching);
+            writeCharSequence(out, mSearchHint);
+            out.writeInt(mBackgroundShown ? 1 : 0);
+            out.writeInt(mShowMenuItemsWhileSearching ? 1 : 0);
             out.writeString(mState.name());
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR =
                 new Parcelable.Creator<SavedState>() {
+            @Override
             public SavedState createFromParcel(Parcel in) {
                 return new SavedState(in);
             }
 
+            @Override
             public SavedState[] newArray(int size) {
                 return new SavedState[size];
             }
         };
+
+        /** Replacement of hidden Parcel#readCharSequence(Parcel) */
+        private static CharSequence readCharSequence(Parcel in) {
+            return TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
+        }
+
+        /** Replacement of hidden Parcel#writeCharSequence(Parcel, CharSequence) */
+        private static void writeCharSequence(Parcel dest, CharSequence val) {
+            TextUtils.writeToParcel(val, dest, 0);
+        }
     }
 
     /**
@@ -642,8 +663,8 @@ public class Toolbar extends FrameLayout {
         mNavIconContainer.setOnClickListener(state != State.HOME ? backClickListener : null);
         mNavIconContainer.setClickable(state != State.HOME);
         boolean hasTabs = mTabLayout.getTabCount() > 0;
-        boolean showTitle = state == State.SUBPAGE || state == State.HOME
-                && (!mTitleAndTabsAreMutuallyExclusive || !hasTabs);
+        boolean showTitle = state == State.SUBPAGE
+                || (state == State.HOME && (!mTitleAndTabsAreMutuallyExclusive || !hasTabs));
         mTitle.setVisibility(showTitle ? VISIBLE : GONE);
         mTabLayout.setVisibility(state == State.HOME && hasTabs ? VISIBLE : GONE);
         mSearchView.setVisibility(state == State.SEARCH ? VISIBLE : GONE);
