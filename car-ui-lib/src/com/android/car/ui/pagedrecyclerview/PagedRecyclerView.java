@@ -45,6 +45,8 @@ import com.android.car.ui.pagedrecyclerview.decorations.linear.LinearDividerItem
 import com.android.car.ui.pagedrecyclerview.decorations.linear.LinearOffsetItemDecoration;
 import com.android.car.ui.pagedrecyclerview.decorations.linear.LinearOffsetItemDecoration.OffsetPosition;
 import com.android.car.ui.toolbar.Toolbar;
+import com.android.car.ui.utils.CarUxRestrictionsUtil;
+import com.android.internal.annotations.VisibleForTesting;
 
 import java.lang.annotation.Retention;
 
@@ -76,7 +78,8 @@ public final class PagedRecyclerView extends RecyclerView implements
     @Gutter
     private int mGutter;
     private int mGutterSize;
-    private RecyclerView mNestedRecyclerView;
+    @VisibleForTesting
+    RecyclerView mNestedRecyclerView;
     private Adapter<?> mAdapter;
     private ScrollBar mScrollBar;
     private int mInitialTopPadding;
@@ -375,7 +378,6 @@ public final class PagedRecyclerView extends RecyclerView implements
                                         == null) {
                                     return;
                                 }
-
                                 PagedRecyclerView.this.getViewTreeObserver()
                                         .removeOnGlobalLayoutListener(this);
                                 initNestedRecyclerView();
