@@ -17,7 +17,7 @@
 <resources>
 
     <!-- Whether to display the Scroll Bar or not. Defaults to true. If this is set to false,
-         the PagedRecyclerView will behave exactly like the RecyclerView. -->
+         the CarUiRecyclerView will behave exactly like the RecyclerView. -->
     <bool name="car_ui_scrollbar_enable">true</bool>
 
     <!-- Whether to place the scrollbar z-index above the recycler view. Defaults to
@@ -28,4 +28,7 @@
     <bool name="car_ui_preference_allow_divider_below">false</bool>
     <bool name="car_ui_preference_category_allow_divider_above">false</bool>
     <bool name="car_ui_preference_category_allow_divider_below">false</bool>
+
+    <bool name="car_ui_preference_switch_toggle_show_text">false</bool>
+    <bool name="car_ui_preference_switch_toggle_show_animation">true</bool>
 </resources>

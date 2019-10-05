@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.car.ui.pagedrecyclerview;
+package com.android.car.ui.recyclerview;
 
 import android.content.Context;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 
+import androidx.annotation.VisibleForTesting;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.ui.R;
 import com.android.car.ui.utils.ResourceUtils;
-import com.android.internal.annotations.VisibleForTesting;
-
 /**
- * Code drop from {androidx.car.widget.PagedSmoothScroller}
+ * Code drop from {androidx.car.widget.CarUiSmoothScroller}
  *
  * <p>Custom {@link LinearSmoothScroller} that has:
  *
@@ -37,7 +36,7 @@ import com.android.internal.annotations.VisibleForTesting;
  * <li>Scrolling that snaps to start of a child view.
  * </ul>
  */
-public class PagedSmoothScroller extends LinearSmoothScroller {
+public class CarUiSmoothScroller extends LinearSmoothScroller {
     @VisibleForTesting
     float mMillisecondsPerInch;
     @VisibleForTesting
@@ -49,7 +48,7 @@ public class PagedSmoothScroller extends LinearSmoothScroller {
     @VisibleForTesting
     int mDensityDpi;
 
-    public PagedSmoothScroller(Context context) {
+    public CarUiSmoothScroller(Context context) {
         super(context);
         init(context);
     }

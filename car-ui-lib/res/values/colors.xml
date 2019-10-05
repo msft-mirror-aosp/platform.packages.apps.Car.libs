@@ -37,8 +37,8 @@
     <!-- Toolbar background color -->
     <color name="car_ui_toolbar_background_color">#E0000000</color>
 
-    <!--  Paged Recycler View  -->
-    <!-- The color of the scroll bar indicator in the PagedListView. -->
+    <!--  Car UI Recycler View  -->
+    <!-- The color of the scroll bar indicator in the CarUiRecyclerView. -->
     <color name="car_ui_scrollbar_thumb">#99ffffff</color>
 
     <!-- Preferences -->
@@ -49,4 +49,7 @@
     <color name="car_ui_preference_edit_text_dialog_message_text_color">#ffdadce0</color>
 
     <color name="car_ui_preference_icon_color">@android:color/white</color>
+
+    <color name="car_ui_preference_switch_text_color">#000000</color>
+
 </resources>

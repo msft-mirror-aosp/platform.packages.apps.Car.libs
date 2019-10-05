@@ -478,16 +478,6 @@ public class Toolbar extends FrameLayout {
                         + "setBackgroundShown(boolean) or an RRO instead.");
     }
 
-    /**
-     * Invokes all OnToolbarHeightChangeListener handlers registered in {@link
-     * OnHeightChangedListener}s array.
-     */
-    private void handleToolbarHeightChangeListeners(int height) {
-        for (OnHeightChangedListener listener : mOnHeightChangedListeners) {
-            listener.onHeightChanged(height);
-        }
-    }
-
     /** Show/hide the background. When hidden, the toolbar is completely transparent. */
     public void setBackgroundShown(boolean shown) {
         if (shown) {
@@ -560,7 +550,7 @@ public class Toolbar extends FrameLayout {
     }
 
     private void createOverflowDialog() {
-        // TODO(b/140564530) Use a carui alert with a (paged)recyclerview here
+        // TODO(b/140564530) Use a carui alert with a (car ui)recyclerview here
         // TODO(b/140563930) Support enabled/disabled overflow items
 
         CharSequence[] itemTitles = new CharSequence[countVisibleOverflowItems()];
@@ -692,9 +682,9 @@ public class Toolbar extends FrameLayout {
 
     /**
      * Registers a new {@link OnHeightChangedListener} to the list of listeners. Register a
-     * {@link com.android.car.ui.pagedrecyclerview.PagedRecyclerView} only if there is a toolbar at
-     * the top and a {@link com.android.car.ui.pagedrecyclerview.PagedRecyclerView} in the view and
-     * nothing else. {@link com.android.car.ui.pagedrecyclerview.PagedRecyclerView} will
+     * {@link com.android.car.ui.recyclerview.CarUiRecyclerView} only if there is a toolbar at
+     * the top and a {@link com.android.car.ui.recyclerview.CarUiRecyclerView} in the view and
+     * nothing else. {@link com.android.car.ui.recyclerview.CarUiRecyclerView} will
      * automatically adjust its height according to the height of the Toolbar.
      */
     public void registerToolbarHeightChangeListener(
