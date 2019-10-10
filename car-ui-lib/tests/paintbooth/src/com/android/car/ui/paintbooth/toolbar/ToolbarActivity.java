@@ -128,9 +128,12 @@ public class ToolbarActivity extends Activity {
         mButtons.add(Pair.create("MenuItem: Toggle show while searching", v ->
                 toolbar.setShowMenuItemsWhileSearching(!toolbar.getShowMenuItemsWhileSearching())));
 
-        mButtons.add(Pair.create("Toggle nav button mode", v -> {
-            if (toolbar.getNavButtonMode() == Toolbar.NavButtonMode.BACK) {
+        mButtons.add(Pair.create("Cycle nav button mode", v -> {
+            Toolbar.NavButtonMode mode = toolbar.getNavButtonMode();
+            if (mode == Toolbar.NavButtonMode.BACK) {
                 toolbar.setNavButtonMode(Toolbar.NavButtonMode.CLOSE);
+            } else if (mode == Toolbar.NavButtonMode.CLOSE) {
+                toolbar.setNavButtonMode(Toolbar.NavButtonMode.DOWN);
             } else {
                 toolbar.setNavButtonMode(Toolbar.NavButtonMode.BACK);
             }
@@ -185,7 +188,8 @@ public class ToolbarActivity extends Activity {
         }
     }
 
-    private CarUiRecyclerView.Adapter mAdapter = new CarUiRecyclerView.Adapter() {
+    private CarUiRecyclerView.Adapter<ViewHolder> mAdapter =
+            new CarUiRecyclerView.Adapter<ViewHolder>() {
         @Override
         public int getItemCount() {
             return mButtons.size();
@@ -199,9 +203,9 @@ public class ToolbarActivity extends Activity {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull CarUiRecyclerView.ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Pair<CharSequence, View.OnClickListener> pair = mButtons.get(position);
-            ((ViewHolder) holder).bind(pair.first, pair.second);
+            holder.bind(pair.first, pair.second);
         }
     };
 
