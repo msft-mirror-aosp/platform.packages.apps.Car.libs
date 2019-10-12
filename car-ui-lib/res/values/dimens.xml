@@ -37,15 +37,15 @@
     <!-- Tabs -->
 
     <!-- Exact size of the tab textbox. Use @dimen/wrap_content if this must be flexible -->
-    <dimen name="car_ui_tab_text_width">135dp</dimen>
+    <dimen name="car_ui_toolbar_tab_text_width">135dp</dimen>
     <!-- Horizontal padding between tabs -->
-    <dimen name="car_ui_tab_padding_x">12dp</dimen>
+    <dimen name="car_ui_toolbar_tab_padding_x">12dp</dimen>
     <!-- Tab icon width (if icons are enabled) -->
-    <dimen name="car_ui_tab_icon_width">36dp</dimen>
+    <dimen name="car_ui_toolbar_tab_icon_width">36dp</dimen>
     <!-- Tab icon height (if icons are enabled) -->
-    <dimen name="car_ui_tab_icon_height">36dp</dimen>
+    <dimen name="car_ui_toolbar_tab_icon_height">36dp</dimen>
 
-    <!-- Car toolbar -->
+    <!-- Toolbar -->
     <dimen name="car_ui_toolbar_row_height">96dp</dimen>
     <dimen name="car_ui_toolbar_first_row_height">@dimen/car_ui_toolbar_row_height</dimen>
     <dimen name="car_ui_toolbar_second_row_height">@dimen/car_ui_toolbar_row_height</dimen>
@@ -57,10 +57,15 @@
     <dimen name="car_ui_toolbar_icon_size">@dimen/car_ui_primary_icon_size</dimen>
     <dimen name="car_ui_toolbar_title_margin_start">@dimen/car_ui_padding_2</dimen>
     <dimen name="car_ui_toolbar_menu_item_margin">@dimen/car_ui_padding_2</dimen>
-    <dimen name="car_ui_toolbar_icon_ripple_radius">48dp</dimen>
+    <dimen name="car_ui_toolbar_menu_item_icon_ripple_radius">48dp</dimen>
+    <dimen name="car_ui_toolbar_menu_item_icon_size">@dimen/car_ui_primary_icon_size</dimen>
+    <dimen name="car_ui_toolbar_menu_item_icon_background_size">54dp</dimen>
 
     <!-- Internal artifacts. Do not overlay -->
     <item name="wrap_content" format="integer" type="dimen">-2</item>
+
+    <!-- CarUiRecyclerView -->
+    <dimen name="car_ui_recyclerview_divider_height">0dp</dimen>
 
     <!-- Default Scroll Bar for CarUiRecyclerView -->
     <dimen name="car_ui_scrollbar_button_size">@dimen/car_ui_touch_target_width</dimen>
@@ -102,6 +107,11 @@
     <dimen name="car_ui_preference_edit_text_dialog_message_margin_end">24dp</dimen>
     <dimen name="car_ui_preference_edit_text_dialog_text_margin_start">24dp</dimen>
     <dimen name="car_ui_preference_edit_text_dialog_text_margin_end">24dp</dimen>
+
+    <dimen name="car_ui_preference_switch_text_size">30sp</dimen>
+    <dimen name="car_ui_preference_switch_width">288dp</dimen>
+    <dimen name="car_ui_preference_switch_width_half">144dp</dimen>
+    <dimen name="car_ui_preference_switch_height">101dp</dimen>
 
     <!-- Alert dialog   -->
 
