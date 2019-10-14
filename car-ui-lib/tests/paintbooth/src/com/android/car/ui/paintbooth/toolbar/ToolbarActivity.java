@@ -29,8 +29,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.android.car.ui.pagedrecyclerview.PagedRecyclerView;
 import com.android.car.ui.paintbooth.R;
+import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.toolbar.MenuItem;
 import com.android.car.ui.toolbar.TabLayout;
 import com.android.car.ui.toolbar.Toolbar;
@@ -46,7 +46,7 @@ public class ToolbarActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.paged_recycler_view_activity);
+        setContentView(R.layout.car_ui_recycler_view_activity);
 
         Toolbar toolbar = requireViewById(R.id.toolbar);
         toolbar.registerOnBackListener(() -> {
@@ -67,14 +67,14 @@ public class ToolbarActivity extends Activity {
         mButtons.add(Pair.create("Change title", v ->
                 toolbar.setTitle(toolbar.getTitle() + " X")));
 
-        mButtons.add(Pair.create("Add menu item", v -> {
+        mButtons.add(Pair.create("MenuItem: Add Icon", v -> {
             mMenuItems.add(MenuItem.Builder.createSettings(this, i ->
                     Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show()));
             toolbar.setMenuItems(mMenuItems);
         }));
 
         Mutable<Integer> overflowCounter = new Mutable<>(1);
-        mButtons.add(Pair.create("Add overflow menu item", v -> {
+        mButtons.add(Pair.create("MenuItem: Add Overflow", v -> {
             mMenuItems.add(new MenuItem.Builder(this)
                     .setTitle("Foo " + overflowCounter.value)
                     .setOnClickListener(i ->
@@ -85,7 +85,36 @@ public class ToolbarActivity extends Activity {
             overflowCounter.value++;
         }));
 
-        mButtons.add(Pair.create("Toggle menu item visibility", v -> {
+        mButtons.add(Pair.create("MenuItem: Add Switch", v -> {
+            mMenuItems.add(new MenuItem.Builder(this)
+                    .setCheckable()
+                    .setOnClickListener(i ->
+                            Toast.makeText(this, "Checked? " + i.isChecked(),
+                                    Toast.LENGTH_SHORT).show())
+                    .build());
+            toolbar.setMenuItems(mMenuItems);
+        }));
+
+        mButtons.add(Pair.create("MenuItem: Add text", v -> {
+            mMenuItems.add(new MenuItem.Builder(this)
+                    .setTitle("Baz")
+                    .setOnClickListener(i ->
+                            Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show())
+                    .build());
+            toolbar.setMenuItems(mMenuItems);
+        }));
+
+        mButtons.add(Pair.create("MenuItem: Add activatable", v -> {
+            mMenuItems.add(new MenuItem.Builder(this)
+                    .setIcon(R.drawable.ic_tracklist)
+                    .setActivatable()
+                    .setOnClickListener(i ->
+                            Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show())
+                    .build());
+            toolbar.setMenuItems(mMenuItems);
+        }));
+
+        mButtons.add(Pair.create("MenuItem: Toggle Visibility", v -> {
             EditText textBox = new EditText(this);
             textBox.setInputType(InputType.TYPE_CLASS_NUMBER);
             new AlertDialog.Builder(this)
@@ -98,20 +127,32 @@ public class ToolbarActivity extends Activity {
                             item.setVisible(!item.isVisible());
                         } catch (NumberFormatException | IndexOutOfBoundsException e) {
                             Toast.makeText(this, "Invalid index \""
-                                    + textBox.getText().toString()
-                                    + "\", valid range is 0 to " + (mMenuItems.size() - 1),
+                                            + textBox.getText().toString()
+                                            + "\", valid range is 0 to " + (mMenuItems.size() - 1),
                                     Toast.LENGTH_LONG).show();
                         }
                     })
                     .show();
         }));
 
-        mButtons.add(Pair.create("Toggle nav button mode", v -> {
-            if (toolbar.getNavButtonMode() == Toolbar.NavButtonMode.BACK) {
+        mButtons.add(Pair.create("MenuItem: Toggle show while searching", v ->
+                toolbar.setShowMenuItemsWhileSearching(!toolbar.getShowMenuItemsWhileSearching())));
+
+        mButtons.add(Pair.create("Cycle nav button mode", v -> {
+            Toolbar.NavButtonMode mode = toolbar.getNavButtonMode();
+            if (mode == Toolbar.NavButtonMode.BACK) {
                 toolbar.setNavButtonMode(Toolbar.NavButtonMode.CLOSE);
+            } else if (mode == Toolbar.NavButtonMode.CLOSE) {
+                toolbar.setNavButtonMode(Toolbar.NavButtonMode.DOWN);
             } else {
                 toolbar.setNavButtonMode(Toolbar.NavButtonMode.BACK);
             }
+        }));
+
+        Mutable<Boolean> hasLogo = new Mutable<>(true);
+        mButtons.add(Pair.create("Toggle logo", v -> {
+            toolbar.setLogo(hasLogo.value ? 0 : R.drawable.ic_launcher);
+            hasLogo.value = !hasLogo.value;
         }));
 
         mButtons.add(Pair.create("Toggle state", v -> {
@@ -123,7 +164,7 @@ public class ToolbarActivity extends Activity {
         }));
 
         mButtons.add(Pair.create("Toggle search hint", v -> {
-            if (toolbar.getSearchHint().equals("Foo")) {
+            if (toolbar.getSearchHint().toString().contentEquals("Foo")) {
                 toolbar.setSearchHint("Bar");
             } else {
                 toolbar.setSearchHint("Foo");
@@ -133,20 +174,17 @@ public class ToolbarActivity extends Activity {
         mButtons.add(Pair.create("Toggle background", v ->
                 toolbar.setBackgroundShown(!toolbar.getBackgroundShown())));
 
-        mButtons.add(Pair.create("Toggle show menu items while searching", v ->
-                toolbar.setShowMenuItemsWhileSearching(!toolbar.getShowMenuItemsWhileSearching())));
-
         mButtons.add(Pair.create("Show custom view", v ->
                 toolbar.setCustomView(R.layout.toolbar_custom_view)));
 
         mButtons.add(Pair.create("Add tab", v ->
                 toolbar.addTab(new TabLayout.Tab(getDrawable(R.drawable.ic_launcher), "Foo"))));
 
-        PagedRecyclerView prv = requireViewById(R.id.list);
+        CarUiRecyclerView prv = requireViewById(R.id.list);
         prv.setAdapter(mAdapter);
     }
 
-    private static class ViewHolder extends PagedRecyclerView.ViewHolder {
+    private static class ViewHolder extends CarUiRecyclerView.ViewHolder {
         private final Button mButton;
 
         ViewHolder(View itemView) {
@@ -160,7 +198,8 @@ public class ToolbarActivity extends Activity {
         }
     }
 
-    private PagedRecyclerView.Adapter mAdapter = new PagedRecyclerView.Adapter() {
+    private CarUiRecyclerView.Adapter<ViewHolder> mAdapter =
+            new CarUiRecyclerView.Adapter<ViewHolder>() {
         @Override
         public int getItemCount() {
             return mButtons.size();
@@ -174,9 +213,9 @@ public class ToolbarActivity extends Activity {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull PagedRecyclerView.ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Pair<CharSequence, View.OnClickListener> pair = mButtons.get(position);
-            ((ViewHolder) holder).bind(pair.first, pair.second);
+            holder.bind(pair.first, pair.second);
         }
     };
 

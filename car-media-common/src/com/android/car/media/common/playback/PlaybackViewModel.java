@@ -335,7 +335,9 @@ public class PlaybackViewModel extends AndroidViewModel {
 
         /** Returns true if there's enough information in the state to show a UI for it. */
         public boolean shouldDisplay() {
-            return (mMetadata != null) || (getMainAction() != ACTION_DISABLED);
+            // STATE_NONE means no content to play.
+            return mState.getState() != PlaybackStateCompat.STATE_NONE && ((mMetadata != null) || (
+                    getMainAction() != ACTION_DISABLED));
         }
 
         /** Returns the main action. */
@@ -370,6 +372,13 @@ public class PlaybackViewModel extends AndroidViewModel {
                     Log.w(TAG, String.format("Unknown PlaybackState: %d", mState.getState()));
                     return ACTION_DISABLED;
             }
+        }
+
+        /**
+         * Returns the currently supported playback actions
+         */
+        public long getSupportedActions() {
+            return mState.getActions();
         }
 
         /**

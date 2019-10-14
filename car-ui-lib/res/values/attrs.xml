@@ -36,24 +36,25 @@
         <attr name="navButtonMode" format="enum">
             <enum name="back" value="0"/>
             <enum name="close" value="1"/>
+            <enum name="down" value="2"/>
         </attr>
     </declare-styleable>
 
     <!-- Theme attribute to specifying a default style for all CarUiToolbars -->
     <attr name="CarUiToolbarStyle" format="reference"/>
 
-    <declare-styleable name="PagedRecyclerView">
-        <!-- Whether to enable the car_ui_pagedrecyclerview_divider for linear layout or not. -->
+    <declare-styleable name="CarUiRecyclerView">
+        <!-- Whether to enable the car_ui_recyclerview_divider for linear layout or not. -->
         <attr name="enableDivider" format="boolean" />
-        <!-- Top offset for paged recycler view. -->
+        <!-- Top offset for car ui recycler view. -->
         <attr name="startOffset" format="integer" />
-        <!-- Bottom offset for paged recycler view for linear layout. -->
+        <!-- Bottom offset for car ui recycler view for linear layout. -->
         <attr name="endOffset" format="integer" />
 
         <!-- Number of columns in a grid layout. -->
         <attr name="numOfColumns" format="integer" />
 
-        <!-- Paged recycler view layout. -->
+        <!-- car ui recycler view layout. -->
         <attr name="layoutStyle" format="enum">
             <!-- linear layout -->
             <enum name="linear" value="0" />
@@ -62,7 +63,20 @@
         </attr>
     </declare-styleable>
 
-    <declare-styleable name="PagedRecyclerViewTheme">
-        <attr name="pagedRecyclerViewStyle" format="reference" />
+    <!-- Theme attribute to specify a default style for all CarUiRecyclerViews -->
+    <attr name="carUiRecyclerViewStyle" format="reference" />
+
+    <!-- TODO: Replace this with the Android default text styleable -->
+    <declare-styleable name="CarUiTextDrawable">
+        <!-- Text to be rendered by the drawable -->
+        <attr name="text" format="string" />
+        <!-- Font size -->
+        <attr name="textSize" format="dimension" />
+        <!-- Text color -->
+        <attr name="textColor" format="color" />
+        <!-- Type face to use -->
+        <attr name="typeface" format="string" />
     </declare-styleable>
+
+    <attr name="state_ux_restricted" format="boolean" />
 </resources>

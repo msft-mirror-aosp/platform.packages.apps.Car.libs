@@ -17,6 +17,7 @@ package com.android.car.ui.toolbar;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.car.drivingstate.CarUxRestrictions;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.TypedArray;
@@ -29,7 +30,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -40,6 +40,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
 import com.android.car.ui.R;
+import com.android.car.ui.utils.CarUxRestrictionsUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -137,28 +138,12 @@ public class Toolbar extends FrameLayout {
     private SearchView mSearchView;
     private boolean mHasLogo = false;
     private boolean mShowMenuItemsWhileSearching;
-    private MenuItem mSearchMenuItem;
     private State mState = State.HOME;
     private NavButtonMode mNavButtonMode = NavButtonMode.BACK;
     @NonNull
     private List<MenuItem> mMenuItems = Collections.emptyList();
     private List<MenuItem> mOverflowItems = new ArrayList<>();
-    private MenuItem.Listener mMenuItemListener = (item) -> {
-        if (item.getDisplayBehavior() == MenuItem.DisplayBehavior.NEVER) {
-            createOverflowDialog();
-        } else {
-            View view = item.getView();
-            if (view != null) {
-                if (item.getId() == R.id.search) {
-                    view.setVisibility(mState != State.SEARCH && item.isVisible() ? VISIBLE : GONE);
-                } else {
-                    view.setVisibility(item.isVisible() ? VISIBLE : GONE);
-                }
-            }
-        }
-
-        setState(getState());
-    };
+    private List<MenuItemRenderer> mMenuItemRenderers = new ArrayList<>();
     private AlertDialog mOverflowDialog;
 
     public Toolbar(Context context) {
@@ -178,16 +163,16 @@ public class Toolbar extends FrameLayout {
 
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.car_ui_toolbar, this, true);
+        inflater.inflate(getToolbarLayout(), this, true);
 
-        mTabLayout = requireViewById(R.id.tabs);
-        mNavIcon = requireViewById(R.id.nav_icon);
-        mLogo = requireViewById(R.id.logo);
-        mNavIconContainer = requireViewById(R.id.nav_icon_container);
-        mMenuItemsContainer = requireViewById(R.id.menu_items_container);
-        mTitle = requireViewById(R.id.title);
-        mSearchView = requireViewById(R.id.search_view);
-        mCustomViewContainer = requireViewById(R.id.custom_view_container);
+        mTabLayout = requireViewById(R.id.car_ui_toolbar_tabs);
+        mNavIcon = requireViewById(R.id.car_ui_toolbar_nav_icon);
+        mLogo = requireViewById(R.id.car_ui_toolbar_logo);
+        mNavIconContainer = requireViewById(R.id.car_ui_toolbar_nav_icon_container);
+        mMenuItemsContainer = requireViewById(R.id.car_ui_toolbar_menu_items_container);
+        mTitle = requireViewById(R.id.car_ui_toolbar_title);
+        mSearchView = requireViewById(R.id.car_ui_toolbar_search_view);
+        mCustomViewContainer = requireViewById(R.id.car_ui_toolbar_custom_view_container);
         mOverflowButton = requireViewById(R.id.car_ui_toolbar_overflow_button);
 
         TypedArray a = context.obtainStyledAttributes(
@@ -234,6 +219,9 @@ public class Toolbar extends FrameLayout {
                 case 1:
                     setNavButtonMode(NavButtonMode.CLOSE);
                     break;
+                case 2:
+                    setNavButtonMode(NavButtonMode.DOWN);
+                    break;
                 default:
                     if (Log.isLoggable(TAG, Log.WARN)) {
                         Log.w(TAG, "Unknown navigation button style");
@@ -263,15 +251,20 @@ public class Toolbar extends FrameLayout {
             }
         });
 
-        getViewTreeObserver().addOnGlobalLayoutListener(
-                new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        for (OnHeightChangedListener listener : mOnHeightChangedListeners) {
-                            listener.onHeightChanged(getHeight());
-                        }
-                    }
-                });
+        getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            for (OnHeightChangedListener listener : mOnHeightChangedListeners) {
+                listener.onHeightChanged(getHeight());
+            }
+        });
+    }
+
+    /**
+     * Override this in a subclass to allow for different toolbar layouts within a single app.
+     *
+     * <p>Non-system apps should not use this, as customising the layout isn't possible with RROs
+     */
+    protected int getToolbarLayout() {
+        return R.layout.car_ui_toolbar;
     }
 
     @Override
@@ -359,6 +352,26 @@ public class Toolbar extends FrameLayout {
         private static void writeCharSequence(Parcel dest, CharSequence val) {
             TextUtils.writeToParcel(val, dest, 0);
         }
+    }
+
+    private void onCarUxRestrictionsChanged(CarUxRestrictions restrictions) {
+        for (MenuItemRenderer renderer : mMenuItemRenderers) {
+            renderer.setUxRestrictions(restrictions);
+        }
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        CarUxRestrictionsUtil.getInstance(getContext())
+                .register(this::onCarUxRestrictionsChanged);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        CarUxRestrictionsUtil.getInstance(getContext())
+                .unregister(this::onCarUxRestrictionsChanged);
     }
 
     /**
@@ -449,10 +462,12 @@ public class Toolbar extends FrameLayout {
      * {@link OnBackListener#onBack()}.
      */
     public enum NavButtonMode {
-        /** Display the nav button as a back button */
+        /** A back button */
         BACK,
-        /** Display the nav button as a close button */
-        CLOSE
+        /** A close button */
+        CLOSE,
+        /** A down button, used to indicate that the page will animate down when navigating away */
+        DOWN
     }
 
     /** Sets the {@link NavButtonMode} */
@@ -478,20 +493,10 @@ public class Toolbar extends FrameLayout {
                         + "setBackgroundShown(boolean) or an RRO instead.");
     }
 
-    /**
-     * Invokes all OnToolbarHeightChangeListener handlers registered in {@link
-     * OnHeightChangedListener}s array.
-     */
-    private void handleToolbarHeightChangeListeners(int height) {
-        for (OnHeightChangedListener listener : mOnHeightChangedListeners) {
-            listener.onHeightChanged(height);
-        }
-    }
-
     /** Show/hide the background. When hidden, the toolbar is completely transparent. */
     public void setBackgroundShown(boolean shown) {
         if (shown) {
-            super.setBackground(getContext().getDrawable(R.color.car_ui_toolbar_background_color));
+            super.setBackground(getContext().getDrawable(R.drawable.car_ui_toolbar_background));
         } else {
             super.setBackground(null);
         }
@@ -519,22 +524,34 @@ public class Toolbar extends FrameLayout {
         mMenuItems = new ArrayList<>(items);
 
         mOverflowItems.clear();
+        mMenuItemRenderers.clear();
         mMenuItemsContainer.removeAllViews();
-        mSearchMenuItem = null;
 
         for (MenuItem item : items) {
-            item.setListener(mMenuItemListener);
             if (item.getDisplayBehavior() == MenuItem.DisplayBehavior.NEVER) {
                 mOverflowItems.add(item);
+                item.setListener(new MenuItem.Listener() {
+                    @Override
+                    public void onMenuItemChanged() {
+                        createOverflowDialog();
+                        setState(getState());
+                    }
+
+                    @Override
+                    public void performClick() {
+                        Log.w(TAG, "performClick on overflow MenuItems not yet implemented");
+                    }
+
+                    @Override
+                    public View getView() {
+                        return null;
+                    }
+                });
             } else {
-                View menuItemView = item.createView(mMenuItemsContainer);
+                MenuItemRenderer renderer = new MenuItemRenderer(item, mMenuItemsContainer);
+                mMenuItemRenderers.add(renderer);
 
-                // Add views with index 0 so that they are added right-to-left
-                mMenuItemsContainer.addView(menuItemView, 0);
-
-                if (item.getId() == R.id.search) {
-                    mSearchMenuItem = item;
-                }
+                mMenuItemsContainer.addView(renderer.createView());
             }
         }
 
@@ -560,7 +577,7 @@ public class Toolbar extends FrameLayout {
     }
 
     private void createOverflowDialog() {
-        // TODO(b/140564530) Use a carui alert with a (paged)recyclerview here
+        // TODO(b/140564530) Use a carui alert with a (car ui)recyclerview here
         // TODO(b/140563930) Support enabled/disabled overflow items
 
         CharSequence[] itemTitles = new CharSequence[countVisibleOverflowItems()];
@@ -639,6 +656,10 @@ public class Toolbar extends FrameLayout {
     public void setState(State state) {
         mState = state;
 
+        for (MenuItemRenderer renderer : mMenuItemRenderers) {
+            renderer.setToolbarState(mState);
+        }
+
         View.OnClickListener backClickListener = (v) -> {
             boolean absorbed = false;
             List<OnBackListener> listenersCopy = new ArrayList<>(mOnBackListeners);
@@ -654,10 +675,19 @@ public class Toolbar extends FrameLayout {
             }
         };
 
+        switch (mNavButtonMode) {
+            case CLOSE:
+                mNavIcon.setImageResource(R.drawable.car_ui_icon_close);
+                break;
+            case DOWN:
+                mNavIcon.setImageResource(R.drawable.car_ui_icon_down);
+                break;
+            default:
+                mNavIcon.setImageResource(R.drawable.car_ui_icon_arrow_back);
+                break;
+        }
+
         mNavIcon.setVisibility(state != State.HOME ? VISIBLE : INVISIBLE);
-        mNavIcon.setImageResource(mNavButtonMode == NavButtonMode.BACK
-                ? R.drawable.car_ui_icon_arrow_back
-                : R.drawable.car_ui_icon_close);
         mLogo.setVisibility(state == State.HOME && mHasLogo ? VISIBLE : INVISIBLE);
         mNavIconContainer.setVisibility(state != State.HOME || mHasLogo ? VISIBLE : GONE);
         mNavIconContainer.setOnClickListener(state != State.HOME ? backClickListener : null);
@@ -672,13 +702,6 @@ public class Toolbar extends FrameLayout {
         mMenuItemsContainer.setVisibility(showButtons ? VISIBLE : GONE);
         mOverflowButton.setVisibility(showButtons && countVisibleOverflowItems() > 0
                 ? VISIBLE : GONE);
-        if (mSearchMenuItem != null) {
-            View searchView = mSearchMenuItem.getView();
-            if (searchView != null) {
-                searchView.setVisibility(mState != State.SEARCH && mSearchMenuItem.isVisible()
-                        ? VISIBLE : GONE);
-            }
-        }
         mCustomViewContainer.setVisibility(state == State.SUBPAGE_CUSTOM ? VISIBLE : GONE);
         if (state != State.SUBPAGE_CUSTOM) {
             mCustomViewContainer.removeAllViews();
@@ -692,9 +715,9 @@ public class Toolbar extends FrameLayout {
 
     /**
      * Registers a new {@link OnHeightChangedListener} to the list of listeners. Register a
-     * {@link com.android.car.ui.pagedrecyclerview.PagedRecyclerView} only if there is a toolbar at
-     * the top and a {@link com.android.car.ui.pagedrecyclerview.PagedRecyclerView} in the view and
-     * nothing else. {@link com.android.car.ui.pagedrecyclerview.PagedRecyclerView} will
+     * {@link com.android.car.ui.recyclerview.CarUiRecyclerView} only if there is a toolbar at
+     * the top and a {@link com.android.car.ui.recyclerview.CarUiRecyclerView} in the view and
+     * nothing else. {@link com.android.car.ui.recyclerview.CarUiRecyclerView} will
      * automatically adjust its height according to the height of the Toolbar.
      */
     public void registerToolbarHeightChangeListener(
