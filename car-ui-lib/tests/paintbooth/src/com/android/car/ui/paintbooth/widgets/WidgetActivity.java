@@ -14,8 +14,21 @@
  * limitations under the License.
  */
 
-include ':PaintBooth'
-project(':PaintBooth').projectDir = new File('./tests/paintbooth')
-include ':RoboTests'
-project(':RoboTests').projectDir = new File('./tests/robotests')
-rootProject.name='Chassis'
+package com.android.car.ui.paintbooth.widgets;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+import com.android.car.ui.paintbooth.R;
+
+/**
+ * Activity that shows different widgets from the device default theme.
+ */
+public class WidgetActivity extends Activity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.widgets_activity);
+    }
+}
