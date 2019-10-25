@@ -35,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -112,25 +113,21 @@ public class Toolbar extends FrameLayout {
          */
         SUBPAGE,
         /**
-         * In the SUBPAGE_CUSTOM state, everything is the same as SUBPAGE except the title will
-         * be hidden and the custom view will be shown.
-         */
-        SUBPAGE_CUSTOM,
-        /**
          * In the SEARCH state, only the back button and the search bar will be visible.
          */
         SEARCH,
     }
 
-    private final boolean mTitleAndTabsAreMutuallyExclusive;
+    private final boolean mIsTabsInSecondRow;
 
     private ImageView mNavIcon;
     private ImageView mLogo;
     private ViewGroup mNavIconContainer;
     private TextView mTitle;
+    private ImageView mTitleLogo;
+    private ViewGroup mTitleLogoContainer;
     private TabLayout mTabLayout;
     private LinearLayout mMenuItemsContainer;
-    private FrameLayout mCustomViewContainer;
     private View mOverflowButton;
     private final Set<OnBackListener> mOnBackListeners = new HashSet<>();
     private final Set<OnTabSelectedListener> mOnTabSelectedListeners = new HashSet<>();
@@ -161,26 +158,28 @@ public class Toolbar extends FrameLayout {
     public Toolbar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
-        LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(getToolbarLayout(), this, true);
-
-        mTabLayout = requireViewById(R.id.car_ui_toolbar_tabs);
-        mNavIcon = requireViewById(R.id.car_ui_toolbar_nav_icon);
-        mLogo = requireViewById(R.id.car_ui_toolbar_logo);
-        mNavIconContainer = requireViewById(R.id.car_ui_toolbar_nav_icon_container);
-        mMenuItemsContainer = requireViewById(R.id.car_ui_toolbar_menu_items_container);
-        mTitle = requireViewById(R.id.car_ui_toolbar_title);
-        mSearchView = requireViewById(R.id.car_ui_toolbar_search_view);
-        mCustomViewContainer = requireViewById(R.id.car_ui_toolbar_custom_view_container);
-        mOverflowButton = requireViewById(R.id.car_ui_toolbar_overflow_button);
-
         TypedArray a = context.obtainStyledAttributes(
                 attrs, R.styleable.CarUiToolbar, defStyleAttr, defStyleRes);
 
         try {
-            mTitleAndTabsAreMutuallyExclusive = context.getResources().getBoolean(
-                    R.bool.car_ui_toolbar_title_and_tabs_are_mutually_exclusive);
+
+            mIsTabsInSecondRow = context.getResources().getBoolean(
+                    R.bool.car_ui_toolbar_tabs_on_second_row);
+
+            LayoutInflater inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            inflater.inflate(getToolbarLayout(), this, true);
+
+            mTabLayout = requireViewById(R.id.car_ui_toolbar_tabs);
+            mNavIcon = requireViewById(R.id.car_ui_toolbar_nav_icon);
+            mLogo = requireViewById(R.id.car_ui_toolbar_logo);
+            mNavIconContainer = requireViewById(R.id.car_ui_toolbar_nav_icon_container);
+            mMenuItemsContainer = requireViewById(R.id.car_ui_toolbar_menu_items_container);
+            mTitle = requireViewById(R.id.car_ui_toolbar_title);
+            mTitleLogoContainer = requireViewById(R.id.car_ui_toolbar_title_logo_container);
+            mTitleLogo = requireViewById(R.id.car_ui_toolbar_title_logo);
+            mSearchView = requireViewById(R.id.car_ui_toolbar_search_view);
+            mOverflowButton = requireViewById(R.id.car_ui_toolbar_overflow_button);
 
             mTitle.setText(a.getString(R.styleable.CarUiToolbar_title));
             setLogo(a.getResourceId(R.styleable.CarUiToolbar_logo, 0));
@@ -200,9 +199,6 @@ public class Toolbar extends FrameLayout {
                     setState(State.SUBPAGE);
                     break;
                 case 2:
-                    setState(State.SUBPAGE_CUSTOM);
-                    break;
-                case 3:
                     setState(State.SEARCH);
                     break;
                 default:
@@ -264,7 +260,18 @@ public class Toolbar extends FrameLayout {
      * <p>Non-system apps should not use this, as customising the layout isn't possible with RROs
      */
     protected int getToolbarLayout() {
+        if (mIsTabsInSecondRow) {
+            return R.layout.car_ui_toolbar_two_row;
+        }
+
         return R.layout.car_ui_toolbar;
+    }
+
+    /**
+     * Returns {@code true} if a two row layout in enabled for the toolbar.
+     */
+    public boolean isTabsInSecondRow() {
+        return mIsTabsInSecondRow;
     }
 
     @Override
@@ -332,16 +339,16 @@ public class Toolbar extends FrameLayout {
 
         public static final Parcelable.Creator<SavedState> CREATOR =
                 new Parcelable.Creator<SavedState>() {
-            @Override
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
+                    @Override
+                    public SavedState createFromParcel(Parcel in) {
+                        return new SavedState(in);
+                    }
 
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
+                    @Override
+                    public SavedState[] newArray(int size) {
+                        return new SavedState[size];
+                    }
+                };
 
         /** Replacement of hidden Parcel#readCharSequence(Parcel) */
         private static CharSequence readCharSequence(Parcel in) {
@@ -377,19 +384,21 @@ public class Toolbar extends FrameLayout {
     /**
      * Sets the title of the toolbar to a string resource.
      *
-     * <p>The title may not always be shown, for example in landscape with tabs.
+     * <p>The title may not always be shown, for example with one row layout with tabs.
      */
     public void setTitle(@StringRes int title) {
         mTitle.setText(title);
+        setState(getState());
     }
 
     /**
      * Sets the title of the toolbar to a CharSequence.
      *
-     * <p>The title may not always be shown, for example in landscape with tabs.
+     * <p>The title may not always be shown, for example with one row layout with tabs.
      */
     public void setTitle(CharSequence title) {
         mTitle.setText(title);
+        setState(getState());
     }
 
     public CharSequence getTitle() {
@@ -429,12 +438,21 @@ public class Toolbar extends FrameLayout {
     }
 
     /**
-     * Sets the logo to display in this toolbar.
-     * Will not be displayed if a navigation icon is currently being displayed.
+     * Sets the logo to display in this toolbar. If navigation icon is being displayed, this logo
+     * will be displayed next to the title.
      */
-    public void setLogo(int resId) {
-        if (resId != 0) {
-            mLogo.setImageResource(resId);
+    public void setLogo(@DrawableRes int resId) {
+        setLogo(resId != 0 ? getContext().getDrawable(resId) : null);
+    }
+
+    /**
+     * Sets the logo to display in this toolbar. If navigation icon is being displayed, this logo
+     * will be displayed next to the title.
+     */
+    public void setLogo(Drawable drawable) {
+        if (drawable != null) {
+            mLogo.setImageDrawable(drawable);
+            mTitleLogo.setImageDrawable(drawable);
             mHasLogo = true;
         } else {
             mHasLogo = false;
@@ -622,22 +640,6 @@ public class Toolbar extends FrameLayout {
         mSearchView.setSearchQuery(query);
     }
 
-    /**
-     * Sets a custom view to display, and sets the current state to {@link State#SUBPAGE_CUSTOM}.
-     *
-     * @param resId A layout id of the view to display.
-     * @return The inflated custom view.
-     */
-    public View setCustomView(int resId) {
-        mCustomViewContainer.removeAllViews();
-        LayoutInflater inflater = (LayoutInflater) getContext()
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View v = inflater.inflate(resId, mCustomViewContainer, false);
-        mCustomViewContainer.addView(v);
-        setState(State.SUBPAGE_CUSTOM);
-        return v;
-    }
-
     private Activity getActivity() {
         Context context = getContext();
         while (context instanceof ContextWrapper) {
@@ -689,12 +691,13 @@ public class Toolbar extends FrameLayout {
 
         mNavIcon.setVisibility(state != State.HOME ? VISIBLE : INVISIBLE);
         mLogo.setVisibility(state == State.HOME && mHasLogo ? VISIBLE : INVISIBLE);
+        mTitleLogoContainer.setVisibility(state == State.SUBPAGE && mHasLogo ? VISIBLE : GONE);
         mNavIconContainer.setVisibility(state != State.HOME || mHasLogo ? VISIBLE : GONE);
         mNavIconContainer.setOnClickListener(state != State.HOME ? backClickListener : null);
         mNavIconContainer.setClickable(state != State.HOME);
         boolean hasTabs = mTabLayout.getTabCount() > 0;
         boolean showTitle = state == State.SUBPAGE
-                || (state == State.HOME && (!mTitleAndTabsAreMutuallyExclusive || !hasTabs));
+                || (state == State.HOME && (!hasTabs || mIsTabsInSecondRow));
         mTitle.setVisibility(showTitle ? VISIBLE : GONE);
         mTabLayout.setVisibility(state == State.HOME && hasTabs ? VISIBLE : GONE);
         mSearchView.setVisibility(state == State.SEARCH ? VISIBLE : GONE);
@@ -702,10 +705,6 @@ public class Toolbar extends FrameLayout {
         mMenuItemsContainer.setVisibility(showButtons ? VISIBLE : GONE);
         mOverflowButton.setVisibility(showButtons && countVisibleOverflowItems() > 0
                 ? VISIBLE : GONE);
-        mCustomViewContainer.setVisibility(state == State.SUBPAGE_CUSTOM ? VISIBLE : GONE);
-        if (state != State.SUBPAGE_CUSTOM) {
-            mCustomViewContainer.removeAllViews();
-        }
     }
 
     /** Gets the current {@link State} of the toolbar. */
