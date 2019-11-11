@@ -16,6 +16,7 @@
 package com.android.car.ui.paintbooth.toolbar;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -37,7 +38,9 @@ import com.android.car.ui.toolbar.TabLayout;
 import com.android.car.ui.toolbar.Toolbar;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ToolbarActivity extends Activity {
 
@@ -68,9 +71,24 @@ public class ToolbarActivity extends Activity {
         mButtons.add(Pair.create("Change title", v ->
                 toolbar.setTitle(toolbar.getTitle() + " X")));
 
+        mButtons.add(Pair.create("MenuItem: Set to XML source", v -> {
+            mMenuItems.clear();
+            toolbar.setMenuItems(R.xml.menuitems);
+        }));
+
         mButtons.add(Pair.create("MenuItem: Add Icon", v -> {
             mMenuItems.add(MenuItem.Builder.createSettings(this, i ->
                     Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show()));
+            toolbar.setMenuItems(mMenuItems);
+        }));
+
+        mButtons.add(Pair.create("MenuItem: Add untinted icon", v -> {
+            mMenuItems.add(new MenuItem.Builder(this)
+                    .setIcon(R.drawable.ic_tracklist)
+                    .setTinted(false)
+                    .setOnClickListener(i ->
+                            Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show())
+                    .build());
             toolbar.setMenuItems(mMenuItems);
         }));
 
@@ -105,6 +123,29 @@ public class ToolbarActivity extends Activity {
             toolbar.setMenuItems(mMenuItems);
         }));
 
+        mButtons.add(Pair.create("MenuItem: Add icon and text", v -> {
+            mMenuItems.add(new MenuItem.Builder(this)
+                    .setIcon(R.drawable.ic_tracklist)
+                    .setTitle("Bar")
+                    .setShowIconAndTitle(true)
+                    .setOnClickListener(i ->
+                            Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show())
+                    .build());
+            toolbar.setMenuItems(mMenuItems);
+        }));
+
+        mButtons.add(Pair.create("MenuItem: Add untinted icon and text", v -> {
+            mMenuItems.add(new MenuItem.Builder(this)
+                    .setIcon(R.drawable.ic_tracklist)
+                    .setTitle("Bar")
+                    .setShowIconAndTitle(true)
+                    .setTinted(false)
+                    .setOnClickListener(i ->
+                            Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show())
+                    .build());
+            toolbar.setMenuItems(mMenuItems);
+        }));
+
         mButtons.add(Pair.create("MenuItem: Add activatable", v -> {
             mMenuItems.add(new MenuItem.Builder(this)
                     .setIcon(R.drawable.ic_tracklist)
@@ -115,24 +156,24 @@ public class ToolbarActivity extends Activity {
             toolbar.setMenuItems(mMenuItems);
         }));
 
-        mButtons.add(Pair.create("MenuItem: Toggle Visibility", v -> {
-            SimpleTextWatcher textWatcher = new SimpleTextWatcher();
-            new AlertDialogBuilder(this)
-                    .setEditBox("", textWatcher, null, InputType.TYPE_CLASS_NUMBER)
-                    .setTitle("Enter the index of the MenuItem to toggle")
-                    .setPositiveButton("Ok", (dialog, which) -> {
-                        try {
-                            MenuItem item = mMenuItems.get(Integer.parseInt(textWatcher.getText()));
-                            item.setVisible(!item.isVisible());
-                        } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                            Toast.makeText(this, "Invalid index \""
-                                            + textWatcher.getText()
-                                            + "\", valid range is 0 to " + (mMenuItems.size() - 1),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    })
-                    .show();
-        }));
+        mButtons.add(Pair.create("MenuItem: Toggle Visibility", v ->
+                getMenuItem(item -> item.setVisible(!item.isVisible()))));
+
+        mButtons.add(Pair.create("MenuItem: Toggle Enabled", v ->
+                getMenuItem(item -> item.setEnabled(!item.isEnabled()))));
+
+        final Drawable altIcon = getDrawable(R.drawable.ic_cut);
+        Map<MenuItem, Drawable> iconBackups = new HashMap<>();
+        mButtons.add(Pair.create("MenuItem: Toggle Icon", v ->
+                getMenuItem(item -> {
+                    Drawable currentIcon = item.getIcon();
+                    Drawable newIcon = altIcon;
+                    if (iconBackups.containsKey(item)) {
+                        newIcon = iconBackups.get(item);
+                    }
+                    item.setIcon(newIcon);
+                    iconBackups.put(item, currentIcon);
+                })));
 
         mButtons.add(Pair.create("MenuItem: Toggle show while searching", v ->
                 toolbar.setShowMenuItemsWhileSearching(!toolbar.getShowMenuItemsWhileSearching())));
@@ -182,13 +223,52 @@ public class ToolbarActivity extends Activity {
                     .setEditBox(null, textWatcher, null)
                     .setTitle("Enter the text for the title")
                     .setPositiveButton("Ok", (dialog, which) ->
-                        toolbar.addTab(new TabLayout.Tab(getDrawable(R.drawable.ic_launcher),
-                                textWatcher.getText())))
+                            toolbar.addTab(new TabLayout.Tab(getDrawable(R.drawable.ic_launcher),
+                                    textWatcher.getText())))
                     .show();
+        }));
+
+        Mutable<Boolean> showingLauncherIcon = new Mutable<>(false);
+        mButtons.add(Pair.create("Toggle search icon", v -> {
+            if (showingLauncherIcon.value) {
+                toolbar.setSearchIcon(0);
+            } else {
+                toolbar.setSearchIcon(R.drawable.ic_launcher);
+            }
+            showingLauncherIcon.value = !showingLauncherIcon.value;
         }));
 
         CarUiRecyclerView prv = requireViewById(R.id.list);
         prv.setAdapter(mAdapter);
+    }
+
+    public void xmlMenuItemClicked(MenuItem item) {
+        Toast.makeText(this, "Xml item clicked! " + item.getTitle(),
+                Toast.LENGTH_SHORT).show();
+    }
+
+    private void getMenuItem(MenuItem.OnClickListener listener) {
+        if (mMenuItems.size() == 1) {
+            listener.onClick(mMenuItems.get(0));
+            return;
+        }
+
+        SimpleTextWatcher textWatcher = new SimpleTextWatcher();
+        new AlertDialogBuilder(this)
+                .setEditBox("", textWatcher, null, InputType.TYPE_CLASS_NUMBER)
+                .setTitle("Enter the index of the MenuItem")
+                .setPositiveButton("Ok", (dialog, which) -> {
+                    try {
+                        MenuItem item = mMenuItems.get(Integer.parseInt(textWatcher.getText()));
+                        listener.onClick(item);
+                    } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                        Toast.makeText(this, "Invalid index \""
+                                        + textWatcher.getText()
+                                        + "\", valid range is 0 to " + (mMenuItems.size() - 1),
+                                Toast.LENGTH_LONG).show();
+                    }
+                })
+                .show();
     }
 
     private static class ViewHolder extends CarUiRecyclerView.ViewHolder {

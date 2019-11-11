@@ -79,6 +79,7 @@ public final class CarUiRecyclerView extends RecyclerView implements
     private int mGutterSize;
     @VisibleForTesting
     RecyclerView mNestedRecyclerView;
+    private boolean mIsNestedRecyclerViewInitialized;
     private Adapter<?> mAdapter;
     private ScrollBar mScrollBar;
     private int mInitialTopPadding;
@@ -602,6 +603,15 @@ public final class CarUiRecyclerView extends RecyclerView implements
     }
 
     @Override
+    public ViewHolder findViewHolderForAdapterPosition(int position) {
+        if (mScrollBarEnabled && mIsNestedRecyclerViewInitialized) {
+            return mNestedRecyclerView.findViewHolderForAdapterPosition(position);
+        } else {
+            return super.findViewHolderForAdapterPosition(position);
+        }
+    }
+
+    @Override
     public ViewHolder findContainingViewHolder(View view) {
         if (mScrollBarEnabled) {
             return mNestedRecyclerView.findContainingViewHolder(view);
@@ -676,6 +686,7 @@ public final class CarUiRecyclerView extends RecyclerView implements
         }
 
         vh.frameLayout.addView(mNestedRecyclerView);
+        mIsNestedRecyclerViewInitialized = true;
     }
 
     private void createScrollBarFromConfig() {
@@ -720,6 +731,17 @@ public final class CarUiRecyclerView extends RecyclerView implements
             if (mScrollBar != null) {
                 mScrollBar.setPadding(paddingStart, paddingEnd);
             }
+        }
+    }
+
+    /**
+     * Calls {@link #layout(int, int, int, int)} for both this RecyclerView and the nested one.
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    public void layoutBothForTesting(int l, int t, int r, int b) {
+        super.layout(l, t, r, b);
+        if (mScrollBarEnabled) {
+            mNestedRecyclerView.layout(l, t, r, b);
         }
     }
 
@@ -794,7 +816,6 @@ public final class CarUiRecyclerView extends RecyclerView implements
             mNestedRecyclerViewState = new SparseArray<>();
         }
 
-        @SuppressWarnings("unchecked")
         private SavedState(Parcel in, ClassLoader classLoader) {
             super(in, classLoader);
             mNestedRecyclerViewState = in.readSparseArray(classLoader);
