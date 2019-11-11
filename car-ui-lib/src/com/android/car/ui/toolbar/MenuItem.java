@@ -45,8 +45,9 @@ public class MenuItem {
     private final Context mContext;
     private final boolean mIsCheckable;
     private final boolean mIsActivatable;
-    final int mCustomLayoutId;
     private final boolean mIsSearch;
+    private final boolean mShowIconAndTitle;
+    private final boolean mIsTinted;
     @CarUxRestrictions.CarUxRestrictionsInfo
     private final int mUxRestrictions;
 
@@ -64,7 +65,6 @@ public class MenuItem {
         mContext = builder.mContext;
         mIsCheckable = builder.mIsCheckable;
         mIsActivatable = builder.mIsActivatable;
-        mCustomLayoutId = builder.mCustomLayoutId;
         mTitle = builder.mTitle;
         mIcon = builder.mIcon;
         mOnClickListener = builder.mOnClickListener;
@@ -74,6 +74,8 @@ public class MenuItem {
         mIsVisible = builder.mIsVisible;
         mIsActivated = builder.mIsActivated;
         mIsSearch = builder.mIsSearch;
+        mShowIconAndTitle = builder.mShowIconAndTitle;
+        mIsTinted = builder.mIsTinted;
         mUxRestrictions = builder.mUxRestrictions;
     }
 
@@ -120,6 +122,10 @@ public class MenuItem {
         mIsChecked = checked;
 
         update();
+    }
+
+    public boolean isTinted() {
+        return mIsTinted;
     }
 
     /** Returns whether or not the MenuItem is visible */
@@ -186,6 +192,10 @@ public class MenuItem {
         return mOnClickListener;
     }
 
+    public boolean isShowingIconAndTitle() {
+        return mShowIconAndTitle;
+    }
+
     /** Sets the {@link OnClickListener} */
     public void setOnClickListener(OnClickListener listener) {
         mOnClickListener = listener;
@@ -210,17 +220,18 @@ public class MenuItem {
         return mIcon;
     }
 
-    /**
-     * Gets the custom view specified by {@link Builder#setCustomLayout(int)}
-     *
-     * @return null if {@link Builder#setCustomLayout(int)} was not used when
-     * building this MenuItem.
-     */
-    public View getView() {
-        if (mListener != null) {
-            return mListener.getView();
-        }
-        return null;
+    /** Sets the Icon of this MenuItem. */
+    public void setIcon(Drawable icon) {
+        mIcon = icon;
+
+        update();
+    }
+
+    /** Sets the Icon of this MenuItem to a drawable resource. */
+    public void setIcon(int resId) {
+        setIcon(resId == 0
+                ? null
+                : mContext.getDrawable(resId));
     }
 
     /** Returns if this is the search MenuItem, which has special behavior when searching */
@@ -242,13 +253,14 @@ public class MenuItem {
         private Drawable mIcon;
         private OnClickListener mOnClickListener;
         private DisplayBehavior mDisplayBehavior = DisplayBehavior.ALWAYS;
+        private boolean mIsTinted = true;
+        private boolean mShowIconAndTitle = false;
         private boolean mIsEnabled = true;
         private boolean mIsCheckable = false;
         private boolean mIsChecked = false;
         private boolean mIsVisible = true;
         private boolean mIsActivatable = false;
         private boolean mIsActivated = false;
-        private int mCustomLayoutId;
         private boolean mIsSearch = false;
         @CarUxRestrictions.CarUxRestrictionsInfo
         private int mUxRestrictions = CarUxRestrictions.UX_RESTRICTIONS_BASELINE;
@@ -259,6 +271,16 @@ public class MenuItem {
 
         /** Builds a {@link MenuItem} from the current state of the Builder */
         public MenuItem build() {
+            if (mIsActivatable && (mShowIconAndTitle || mIcon == null)) {
+                throw new IllegalStateException("Only simple icons can be activatable");
+            }
+            if (mIsCheckable
+                    && (mDisplayBehavior == DisplayBehavior.NEVER
+                    || mShowIconAndTitle
+                    || mIsActivatable)) {
+                throw new IllegalStateException("Unsupported options for a checkable MenuItem");
+            }
+
             return new MenuItem(this);
         }
 
@@ -280,7 +302,30 @@ public class MenuItem {
          * <p>The icon's color and size will be changed to match the other MenuItems.
          */
         public Builder setIcon(int resId) {
-            mIcon = mContext.getDrawable(resId);
+            mIcon = resId == 0
+                    ? null
+                    : mContext.getDrawable(resId);
+            return this;
+        }
+
+        /**
+         * Sets the icon to a drawable.
+         *
+         * <p>The icon's color and size will be changed to match the other MenuItems.
+         */
+        public Builder setIcon(Drawable icon) {
+            mIcon = icon;
+            return this;
+        }
+
+        /**
+         * Sets whether to tint the icon, true by default.
+         *
+         * <p>Try not to use this, it should only be used if the MenuItem is displaying some
+         * kind of logo or avatar and should be colored.
+         */
+        public Builder setTinted(boolean tinted) {
+            mIsTinted = tinted;
             return this;
         }
 
@@ -292,7 +337,7 @@ public class MenuItem {
 
         /**
          * Makes the MenuItem activatable, which means it will toggle it's visual state after
-         *  every click.
+         * every click.
          */
         public Builder setActivatable() {
             mIsActivatable = true;
@@ -309,24 +354,21 @@ public class MenuItem {
             return this;
         }
 
-        /**
-         * Sets a custom layout to use for this MenuItem.
-         *
-         * <p>Should not be used in non-system (GAS) apps, as the OEM will not be able to
-         * customize the layout.
-         */
-        public Builder setCustomLayout(int resId) {
-            if (mIsCheckable) {
-                throw new IllegalStateException("Cannot have a checkable custom layout MenuItem");
-            }
-
-            mCustomLayoutId = resId;
-            return this;
-        }
-
         /** Sets the {@link OnClickListener} */
         public Builder setOnClickListener(OnClickListener listener) {
             mOnClickListener = listener;
+            return this;
+        }
+
+        /**
+         * Used to show both the icon and title when displayed on the toolbar. If this
+         * is false, only the icon while be displayed when the MenuItem is in the toolbar
+         * and only the title will be displayed when the MenuItem is in the overflow menu.
+         *
+         * <p>Defaults to false.
+         */
+        public Builder setShowIconAndTitle(boolean showIconAndTitle) {
+            mShowIconAndTitle = showIconAndTitle;
             return this;
         }
 
@@ -337,10 +379,6 @@ public class MenuItem {
          * {@link #setCheckable() checkable}.
          */
         public Builder setDisplayBehavior(DisplayBehavior behavior) {
-            if (behavior == DisplayBehavior.NEVER && mIsCheckable) {
-                throw new IllegalStateException(
-                        "Currently we don't support a checkable overflow item");
-            }
             mDisplayBehavior = behavior;
             return this;
         }
@@ -358,15 +396,6 @@ public class MenuItem {
          * <p>The MenuItem is not checkable by default.
          */
         public Builder setCheckable() {
-            if (mDisplayBehavior == DisplayBehavior.NEVER) {
-                throw new IllegalStateException(
-                        "Currently we don't support a checkable overflow item");
-            }
-
-            if (mCustomLayoutId != 0) {
-                throw new IllegalStateException("Cannot have a checkable custom layout MenuItem");
-            }
-
             mIsCheckable = true;
             return this;
         }
@@ -454,9 +483,6 @@ public class MenuItem {
 
         /** Called when {@link MenuItem#performClick()} is called */
         void performClick();
-
-        /** Used to get the custom view, if there is one */
-        View getView();
     }
 
     void setListener(Listener listener) {
