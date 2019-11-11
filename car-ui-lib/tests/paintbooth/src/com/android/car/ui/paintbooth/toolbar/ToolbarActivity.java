@@ -71,6 +71,11 @@ public class ToolbarActivity extends Activity {
         mButtons.add(Pair.create("Change title", v ->
                 toolbar.setTitle(toolbar.getTitle() + " X")));
 
+        mButtons.add(Pair.create("MenuItem: Set to XML source", v -> {
+            mMenuItems.clear();
+            toolbar.setMenuItems(R.xml.menuitems);
+        }));
+
         mButtons.add(Pair.create("MenuItem: Add Icon", v -> {
             mMenuItems.add(MenuItem.Builder.createSettings(this, i ->
                     Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show()));
@@ -154,6 +159,9 @@ public class ToolbarActivity extends Activity {
         mButtons.add(Pair.create("MenuItem: Toggle Visibility", v ->
                 getMenuItem(item -> item.setVisible(!item.isVisible()))));
 
+        mButtons.add(Pair.create("MenuItem: Toggle Enabled", v ->
+                getMenuItem(item -> item.setEnabled(!item.isEnabled()))));
+
         final Drawable altIcon = getDrawable(R.drawable.ic_cut);
         Map<MenuItem, Drawable> iconBackups = new HashMap<>();
         mButtons.add(Pair.create("MenuItem: Toggle Icon", v ->
@@ -232,6 +240,11 @@ public class ToolbarActivity extends Activity {
 
         CarUiRecyclerView prv = requireViewById(R.id.list);
         prv.setAdapter(mAdapter);
+    }
+
+    public void xmlMenuItemClicked(MenuItem item) {
+        Toast.makeText(this, "Xml item clicked! " + item.getTitle(),
+                Toast.LENGTH_SHORT).show();
     }
 
     private void getMenuItem(MenuItem.OnClickListener listener) {
