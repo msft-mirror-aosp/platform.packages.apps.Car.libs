@@ -20,11 +20,11 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.car.ui.paintbooth.R;
-import com.android.car.ui.preference.PreferenceFragment;
-
-/** Displays samples of all types of Preferences to help with verifying style changes. */
+/**
+ * Displays samples of all types of Preferences to help with verifying style changes.
+ */
 public class PreferenceActivity extends AppCompatActivity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,17 +33,8 @@ public class PreferenceActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(android.R.id.content, new DemoFragment())
-                    .commit();
-        }
-    }
-
-    /** PreferenceFragment that sets the preference hierarchy from XML */
-    public static class DemoFragment extends PreferenceFragment {
-        @Override
-        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-            // Load the preferences from an XML resource
-            setPreferencesFromResource(R.xml.preference_samples, rootKey);
+                    .replace(android.R.id.content, new PreferenceDemoFragment())
+                    .commitNow();
         }
     }
 }
