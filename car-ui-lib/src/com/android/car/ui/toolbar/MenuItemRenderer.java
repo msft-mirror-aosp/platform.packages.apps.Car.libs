@@ -44,7 +44,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 class MenuItemRenderer implements MenuItem.Listener {
@@ -181,7 +180,7 @@ class MenuItemRenderer implements MenuItem.Listener {
 
     static List<MenuItem> readMenuItemList(Context c, @XmlRes int resId) {
         if (resId == 0) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         try (XmlResourceParser parser = c.getResources().getXml(resId)) {
@@ -208,6 +207,7 @@ class MenuItemRenderer implements MenuItem.Listener {
 
         TypedArray a = c.obtainStyledAttributes(attrs, R.styleable.CarUiToolbarMenuItem);
         try {
+            int id = a.getInt(R.styleable.CarUiToolbarMenuItem_id, 0);
             String title = a.getString(R.styleable.CarUiToolbarMenuItem_title);
             Drawable icon = a.getDrawable(R.styleable.CarUiToolbarMenuItem_icon);
             boolean tinted = a.getBoolean(R.styleable.CarUiToolbarMenuItem_tinted, true);
@@ -253,7 +253,8 @@ class MenuItemRenderer implements MenuItem.Listener {
             parser.next();
             parser.require(XmlPullParser.END_TAG, null, "MenuItem");
 
-            MenuItem.Builder builder = new MenuItem.Builder(c)
+            MenuItem.Builder builder = MenuItem.builder(c)
+                    .setId(id)
                     .setTitle(title)
                     .setIcon(icon)
                     .setOnClickListener(onClickListener)
