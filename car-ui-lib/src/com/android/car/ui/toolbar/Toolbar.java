@@ -396,7 +396,7 @@ public class Toolbar extends FrameLayout {
     private final CarUxRestrictionsUtil.OnUxRestrictionsChangedListener
             mOnUxRestrictionsChangedListener = restrictions -> {
                 for (MenuItemRenderer renderer : mMenuItemRenderers) {
-                    renderer.setUxRestrictions(restrictions);
+                    renderer.setCarUxRestrictions(restrictions);
                 }
             };
 
@@ -522,6 +522,15 @@ public class Toolbar extends FrameLayout {
      */
     public void setSearchIcon(int resId) {
         mSearchView.setIcon(resId);
+    }
+
+    /**
+     * Sets the visibility state for the search icon.
+     *
+     * @param visibility One of VISIBLE, INVISIBLE, GONE
+     */
+    public void setSearchIconVisibility(int visibility) {
+        mSearchView.setIconVisibility(visibility);
     }
 
     /**
