@@ -85,7 +85,10 @@ public class ConnectedDeviceStorage {
     public ConnectedDeviceStorage(@NonNull Context context) {
         mContext = context;
         mAssociatedDeviceDatabase = Room.databaseBuilder(context, ConnectedDeviceDatabase.class,
-                DATABASE_NAME).build().associatedDeviceDao();
+                DATABASE_NAME)
+                .fallbackToDestructiveMigration()
+                .build()
+                .associatedDeviceDao();
     }
 
     /**
@@ -361,6 +364,23 @@ public class ConnectedDeviceStorage {
             @NonNull byte[] encryptionKey) {
         AssociatedDeviceEntity entity = new AssociatedDeviceEntity(userId, device);
         entity.encryptedKey = encryptWithKeyStore(KEY_ALIAS, encryptionKey);
+        mAssociatedDeviceDatabase.addOrUpdateAssociatedDevice(entity);
+    }
+
+    /**
+     * Update the name for an associated device.
+     *
+     * @param deviceId The id of the associated device.
+     * @param name The name to replace with.
+     */
+    public void updateAssociatedDeviceName(@NonNull String deviceId, @NonNull String name) {
+        AssociatedDeviceEntity entity = mAssociatedDeviceDatabase.getAssociatedDevice(deviceId);
+        if (entity == null) {
+            logw(TAG, "Attempt to update name on an unrecognized device " + deviceId
+                    + ". Ignoring.");
+            return;
+        }
+        entity.name = name;
         mAssociatedDeviceDatabase.addOrUpdateAssociatedDevice(entity);
     }
 
