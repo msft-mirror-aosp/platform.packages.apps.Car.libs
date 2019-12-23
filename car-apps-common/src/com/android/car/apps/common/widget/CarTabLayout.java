@@ -59,7 +59,9 @@ import java.util.Set;
  * <p>Touch feedback is using @android:attr/selectableItemBackground.
  *
  * @param <T> Presents a CarTab entity
+ * @deprecated Use {@link com.android.car.ui.TabLayout} instead
  */
+@Deprecated
 public class CarTabLayout<T extends CarTabLayout.CarTab> extends LinearLayout {
 
     /**
@@ -359,7 +361,7 @@ public class CarTabLayout<T extends CarTabLayout.CarTab> extends LinearLayout {
             textView.setText(mText);
         }
 
-        /** Set icon drawable. */
+        /** Set icon drawable. TODO(b/139444064): revise this api. */
         protected void bindIcon(ImageView imageView) {
             imageView.setImageDrawable(mIcon);
         }

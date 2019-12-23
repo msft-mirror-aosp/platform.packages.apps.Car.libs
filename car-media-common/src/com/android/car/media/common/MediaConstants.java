@@ -16,8 +16,6 @@
 
 package com.android.car.media.common;
 
-import android.net.Uri;
-
 /**
  * Holds constants used when dealing with MediaBrowserServices that support the
  * content style API for media.
@@ -122,25 +120,35 @@ public final class MediaConstants {
     /**
      * These constants are from
      * @see <a href=https://developer.android.com/training/auto/audio/#required-actions></a>
+     *
+     * @deprecated this flag has been replaced by {@link #PLAYBACK_SLOT_RESERVATION_SKIP_TO_NEXT}
      */
+    @Deprecated
     public static final String SLOT_RESERVATION_SKIP_TO_NEXT =
             "com.google.android.gms.car.media.ALWAYS_RESERVE_SPACE_FOR.ACTION_SKIP_TO_NEXT";
+    /**
+     * @deprecated this flag has been replaced by {@link #PLAYBACK_SLOT_RESERVATION_SKIP_TO_NEXT}
+     */
+    @Deprecated
     public static final String SLOT_RESERVATION_SKIP_TO_PREV =
             "com.google.android.gms.car.media.ALWAYS_RESERVE_SPACE_FOR.ACTION_SKIP_TO_PREVIOUS";
+    /**
+     * @deprecated this flag has been replaced by {@link #PLAYBACK_SLOT_RESERVATION_SKIP_TO_NEXT}
+     */
+    @Deprecated
     public static final String SLOT_RESERVATION_QUEUE =
             "com.google.android.gms.car.media.ALWAYS_RESERVE_SPACE_FOR.ACTION_QUEUE";
 
     /**
-     * Constants for MediaSourceContentProvider
+     * These constants are from
+     * @see <a href=https://developer.android.com/training/auto/audio/#required-actions></a>
      */
-    public static final String AUTHORITY_MEDIA_SOURCE = "com.android.car.media.provider";
-    public static final Uri URI_MEDIA_SOURCE =
-            Uri.parse("content://com.android.car.media.provider/media_source");
-    public static final String KEY_PACKAGE_NAME = "package_name";
-
-    /**
-     * Constants for playable status
-     */
+    public static final String PLAYBACK_SLOT_RESERVATION_SKIP_TO_NEXT =
+            "android.media.playback.ALWAYS_RESERVE_SPACE_FOR.ACTION_SKIP_TO_NEXT";
+    public static final String PLAYBACK_SLOT_RESERVATION_SKIP_TO_PREV =
+            "android.media.playback.ALWAYS_RESERVE_SPACE_FOR.ACTION_SKIP_TO_PREVIOUS";
+    public static final String PLAYBACK_SLOT_RESERVATION_QUEUE =
+            "android.media.playback.ALWAYS_RESERVE_SPACE_FOR.ACTION_QUEUE";
 
     /**
      * Bundle extra of type 'boolean' indicating that an item should show the 'explicit' symbol.
