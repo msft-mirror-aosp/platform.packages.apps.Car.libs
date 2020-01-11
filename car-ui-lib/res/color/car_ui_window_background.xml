@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2019 The Android Open Source Project
+  ~ Copyright (C) 2019 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,12 +14,8 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:insetLeft="@dimen/car_ui_recyclerview_divider_start_margin"
-    android:insetRight="@dimen/car_ui_recyclerview_divider_end_margin">
-    <shape android:shape="rectangle">
-        <size android:height="@dimen/car_ui_recyclerview_divider_height" />
-        <solid android:color="@color/car_ui_recyclerview_divider_color" />
-    </shape>
-</inset>
+<!-- We need this to be a selector instead of a straight reference or else the
+     app will crash when using it under certain circumstances. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?android:attr/windowBackground"/>
+</selector>
