@@ -17,6 +17,7 @@
   <public type="bool" name="car_ui_toolbar_tabs_on_second_row"/>
   <public type="color" name="car_ui_activity_background_color"/>
   <public type="color" name="car_ui_color_accent"/>
+  <public type="color" name="car_ui_dialog_icon_color"/>
   <public type="color" name="car_ui_list_item_divider"/>
   <public type="color" name="car_ui_preference_icon_color"/>
   <public type="color" name="car_ui_preference_two_action_divider_color"/>
@@ -148,6 +149,8 @@
   <public type="drawable" name="car_ui_icon_search"/>
   <public type="drawable" name="car_ui_icon_search_nav_icon"/>
   <public type="drawable" name="car_ui_icon_settings"/>
+  <public type="drawable" name="car_ui_list_header_background"/>
+  <public type="drawable" name="car_ui_list_item_background"/>
   <public type="drawable" name="car_ui_list_item_divider"/>
   <public type="drawable" name="car_ui_preference_icon_chevron"/>
   <public type="drawable" name="car_ui_recyclerview_button_ripple_background"/>
