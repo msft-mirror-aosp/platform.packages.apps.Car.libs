@@ -26,10 +26,8 @@ import android.car.Car;
 import android.car.CarNotConnectedException;
 import android.car.media.CarMediaManager;
 import android.content.ComponentName;
-import android.content.ContentValues;
 import android.media.session.MediaController;
 import android.os.Handler;
-import android.os.RemoteException;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -39,8 +37,6 @@ import androidx.annotation.VisibleForTesting;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-
-import com.android.car.media.common.MediaConstants;
 
 import java.util.Objects;
 
@@ -79,7 +75,7 @@ public class MediaSourceViewModel extends AndroidViewModel {
 
         CarMediaManager getCarMediaManager(Car carApi) throws CarNotConnectedException;
 
-        MediaSource getMediaSource(String packageName);
+        MediaSource getMediaSource(ComponentName componentName);
     }
 
     /** Returns the MediaSourceViewModel singleton tied to the application. */
@@ -107,13 +103,7 @@ public class MediaSourceViewModel extends AndroidViewModel {
             @Override
             public MediaControllerCompat getControllerForSession(
                     @Nullable MediaSessionCompat.Token token) {
-                if (token == null) return null;
-                try {
-                    return new MediaControllerCompat(application, token);
-                } catch (RemoteException e) {
-                    Log.e(TAG, "Couldn't get MediaControllerCompat", e);
-                    return null;
-                }
+                return token == null ? null : new MediaControllerCompat(application, token);
             }
 
             @Override
@@ -127,8 +117,9 @@ public class MediaSourceViewModel extends AndroidViewModel {
             }
 
             @Override
-            public MediaSource getMediaSource(String packageName) {
-                return packageName == null ? null : new MediaSource(application, packageName);
+            public MediaSource getMediaSource(ComponentName componentName) {
+                return componentName == null ? null : MediaSource.create(application,
+                        componentName);
             }
         });
     }
@@ -149,7 +140,7 @@ public class MediaSourceViewModel extends AndroidViewModel {
             if (browser != null) {
                 if (!browser.isConnected()) {
                     Log.e(TAG, "Browser is NOT connected !! "
-                            + mPrimaryMediaSource.getValue().getPackageName() + idHash(browser));
+                            + mPrimaryMediaSource.getValue().toString() + idHash(browser));
                     mMediaController.setValue(null);
                 } else {
                     mMediaController.setValue(mInputFactory.getControllerForSession(
@@ -163,8 +154,8 @@ public class MediaSourceViewModel extends AndroidViewModel {
                 mConnectedBrowserCallback);
 
         mHandler = new Handler(application.getMainLooper());
-        mMediaSourceListener = packageName -> mHandler.post(
-                () -> updateModelState(mInputFactory.getMediaSource(packageName)));
+        mMediaSourceListener = componentName -> mHandler.post(
+                () -> updateModelState(mInputFactory.getMediaSource(componentName)));
 
         try {
             mCarMediaManager = mInputFactory.getCarMediaManager(mCar);
@@ -188,13 +179,10 @@ public class MediaSourceViewModel extends AndroidViewModel {
     }
 
     /**
-     * Updates the primary media source, and notifies content provider of new source
+     * Updates the primary media source.
      */
-    public void setPrimaryMediaSource(MediaSource mediaSource) {
-        ContentValues values = new ContentValues();
-        values.put(MediaConstants.KEY_PACKAGE_NAME, mediaSource.getPackageName());
-
-        mCarMediaManager.setMediaSource(mediaSource.getPackageName());
+    public void setPrimaryMediaSource(@NonNull MediaSource mediaSource) {
+        mCarMediaManager.setMediaSource(mediaSource.getBrowseServiceComponentName());
     }
 
     /**
@@ -236,9 +224,6 @@ public class MediaSourceViewModel extends AndroidViewModel {
         }
 
         ComponentName browseService = newMediaSource.getBrowseServiceComponentName();
-        if (browseService == null) {
-            Log.e(TAG, "No browseService for source: " + newMediaSource.getPackageName());
-        }
         mBrowserConnector.connectTo(browseService);
     }
 }
