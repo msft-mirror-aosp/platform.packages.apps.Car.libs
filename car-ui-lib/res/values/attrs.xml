@@ -14,6 +14,12 @@
  limitations under the License.
 -->
 <resources>
+    <!-- Global theme options for CarUi -->
+    <declare-styleable name="CarUi">
+        <!-- When set to true, a CarUi Toolbar will be provided in the window decor -->
+        <attr name="carUiActionBar" format="boolean"/>
+    </declare-styleable>
+
     <declare-styleable name="CarUiToolbar">
         <!-- Title of the toolbar, only displayed in certain conditions -->
         <attr name="title" format="string"/>
@@ -39,6 +45,8 @@
         </attr>
         <!-- XML resource of MenuItems. See Toolbar.setMenuItems(int) for more information. -->
         <attr name="menuItems" format="reference"/>
+        <!-- Whether or not to show tabs in the SUBPAGE state. Default false -->
+        <attr name="showTabsInSubpage" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="CarUiToolbarMenuItem">
@@ -116,6 +124,8 @@
     <declare-styleable name="CarUiPreference">
         <!-- Toggle for showing chevron -->
         <attr name="showChevron" format="boolean" />
+        <!-- Show ripple when disabled preference is clicked -->
+        <attr name="showRippleOnDisabledPreference" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="CarUiTwoActionPreference">
