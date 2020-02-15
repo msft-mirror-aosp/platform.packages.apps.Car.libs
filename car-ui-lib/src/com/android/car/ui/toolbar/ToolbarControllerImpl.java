@@ -29,7 +29,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -66,7 +65,7 @@ public class ToolbarControllerImpl implements ToolbarController {
     private ImageView mTitleLogo;
     private ViewGroup mTitleLogoContainer;
     private TabLayout mTabLayout;
-    private LinearLayout mMenuItemsContainer;
+    private ViewGroup mMenuItemsContainer;
     private FrameLayout mSearchViewContainer;
     private SearchView mSearchView;
 
@@ -638,7 +637,8 @@ public class ToolbarControllerImpl implements ToolbarController {
         // Show logo next to the title if we're in the subpage state or we're configured to not show
         // the logo in the nav icon space.
         mTitleLogoContainer.setVisibility(mHasLogo
-                && (state == Toolbar.State.SUBPAGE || !mLogoFillsNavIconSpace)
+                && (state == Toolbar.State.SUBPAGE
+                || (state == Toolbar.State.HOME && !mLogoFillsNavIconSpace))
                 ? VISIBLE : GONE);
 
         // Show the nav icon container if we're not in the home space or the logo fills the nav icon

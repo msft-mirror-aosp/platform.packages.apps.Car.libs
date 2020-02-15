@@ -35,6 +35,7 @@ import android.os.ParcelUuid;
 import com.android.car.connecteddevice.AssociationCallback;
 import com.android.car.connecteddevice.model.AssociatedDevice;
 import com.android.car.connecteddevice.storage.ConnectedDeviceStorage;
+import com.android.car.connecteddevice.util.EventLog;
 import com.android.internal.annotations.VisibleForTesting;
 
 import java.util.UUID;
@@ -123,6 +124,15 @@ public class CarBlePeripheralManager extends CarBleManager {
         reset();
     }
 
+    @Override
+    public void disconnectDevice(@NonNull String deviceId) {
+        BleDevice connectedDevice = getConnectedDevice();
+        if (connectedDevice == null || !deviceId.equals(connectedDevice.mDeviceId)) {
+            return;
+        }
+        reset();
+    }
+
     private void reset() {
         resetBluetoothAdapterName();
         mClientDeviceAddress = null;
@@ -152,6 +162,7 @@ public class CarBlePeripheralManager extends CarBleManager {
                 logd(TAG, "Successfully started advertising for device " + deviceId + ".");
             }
         };
+        mBlePeripheralManager.unregisterCallback(mAssociationPeripheralCallback);
         mBlePeripheralManager.registerCallback(mReconnectPeripheralCallback);
         startAdvertising(deviceId, mAdvertiseCallback, /* includeDeviceName = */ false);
     }
@@ -181,6 +192,7 @@ public class CarBlePeripheralManager extends CarBleManager {
         adapter.setName(nameForAssociation);
         logd(TAG, "Changing bluetooth adapter name from " + mOriginalBluetoothName + " to "
                 + nameForAssociation + ".");
+        mBlePeripheralManager.unregisterCallback(mReconnectPeripheralCallback);
         mBlePeripheralManager.registerCallback(mAssociationPeripheralCallback);
         mAdvertiseCallback = new AdvertiseCallback() {
             @Override
@@ -299,6 +311,7 @@ public class CarBlePeripheralManager extends CarBleManager {
     }
 
     private void addConnectedDevice(BluetoothDevice device, boolean isReconnect) {
+        EventLog.onDeviceConnected();
         mBlePeripheralManager.stopAdvertising(mAdvertiseCallback);
         mClientDeviceAddress = device.getAddress();
         mClientDeviceName = device.getName();
