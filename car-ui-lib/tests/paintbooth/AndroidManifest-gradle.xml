@@ -21,7 +21,7 @@
   <application
       android:icon="@drawable/ic_launcher"
       android:label="@string/app_name"
-      android:theme="@style/CarUiTheme">
+      android:theme="@style/Theme.CarUi">
     <activity
         android:name=".MainActivity"
         android:exported="true">
@@ -32,8 +32,30 @@
     </activity>
 
     <activity
-        android:name=".DialogsActivity"
+        android:name=".dialogs.DialogsActivity"
         android:exported="false"
         android:parentActivityName=".MainActivity"/>
+    <activity
+        android:name=".caruirecyclerview.CarUiRecyclerViewActivity"
+        android:exported="false"
+        android:parentActivityName=".MainActivity"/>
+    <activity
+        android:name=".caruirecyclerview.CarUiListItemActivity"
+        android:exported="false"
+        android:parentActivityName=".MainActivity"/>
+    <activity
+        android:name=".caruirecyclerview.GridCarUiRecyclerViewActivity"
+        android:exported="false"
+        android:parentActivityName=".MainActivity"/>
+    <activity
+        android:name=".preferences.PreferenceActivity"
+        android:exported="false"
+        android:parentActivityName=".MainActivity"/>
+    <activity
+        android:name=".toolbar.ToolbarActivity"
+        android:exported="false"
+        android:parentActivityName=".MainActivity">
+      <meta-data android:name="distractionOptimized" android:value="true"/>
+    </activity>
   </application>
 </manifest>
