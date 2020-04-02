@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2019 The Android Open Source Project
+  ~ Copyright (C) 2020 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,17 +15,15 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/car_ui_activity_background">
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:height="100dp"
+        android:width="100dp"
+        android:viewportHeight="100"
+        android:viewportWidth="100">
 
-    <com.android.car.ui.recyclerview.CarUiRecyclerView
-        android:id="@+id/list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:enableDivider="true" />
+    <path
+        android:strokeWidth="1"
+        android:strokeColor="#0f0"
+        android:pathData="M 0,0 L 100,0 100,100 0,100 z" />
 
-</FrameLayout>
+</vector>
