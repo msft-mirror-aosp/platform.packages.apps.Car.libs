@@ -14,6 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <resources>
+    <!--
+    Configuration for a default scrollbar for the CarUiRecyclerView. This component must inherit
+    abstract class ScrollBar. If the ScrollBar is enabled, the component will be initialized from
+    CarUiRecyclerView#createScrollBarFromConfig(). If no component is provided,
+    {@link DefaultScrollbar} class will be used.
+    -->
+    <string name="car_ui_scrollbar_component" translatable="false"/>
     <!-- Search hint, displayed inside the search box [CHAR LIMIT=50] -->
     <string name="car_ui_toolbar_default_search_hint">Search&#8230;</string>
     <!-- CarUxRestrictions Utility -->
@@ -26,6 +33,8 @@ limitations under the License.
     <string name="car_ui_toolbar_menu_item_search_title">Search</string>
     <!-- Title of the settings menu item. Will be displayed if the button is in the overflow menu. [CHAR_LIMIT=50] -->
     <string name="car_ui_toolbar_menu_item_settings_title">Settings</string>
+    <!-- Title of the overflow menu item. Only used for content descriptions. [CHAR_LIMIT=50] -->
+    <string name="car_ui_toolbar_menu_item_overflow_title">Overflow</string>
 
     <!-- Positive option for a preference dialog. [CHAR_LIMIT=30] -->
     <string name="car_ui_dialog_preference_positive">Ok</string>
@@ -37,6 +46,9 @@ limitations under the License.
     <string name="car_ui_preference_switch_off">Off</string>
     <!-- Font family to use for preference category titles. [CHAR_LIMIT=NONE] -->
     <string name="car_ui_preference_category_title_font_family" translatable="false">sans-serif-medium</string>
+
+    <!-- Font family to use for list item headers. [CHAR_LIMIT=NONE] -->
+    <string name="car_ui_list_item_header_font_family" translatable="false">sans-serif-medium</string>
 
     <!-- Text to show when no button is provided and a default button is used. -->
     <string name="car_ui_alert_dialog_default_button" translatable="false">Close</string>

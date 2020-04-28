@@ -14,6 +14,14 @@
  limitations under the License.
 -->
 <resources>
+    <!-- Global theme options for CarUi -->
+    <declare-styleable name="CarUi">
+        <!-- When set to true, the window decor will contain an OEM-customizable layout -->
+        <attr name="carUiBaseLayout" format="boolean"/>
+        <!-- When set to true, a CarUi Toolbar will be provided in the window decor -->
+        <attr name="carUiToolbar" format="boolean"/>
+    </declare-styleable>
+
     <declare-styleable name="CarUiToolbar">
         <!-- Title of the toolbar, only displayed in certain conditions -->
         <attr name="title" format="string"/>
@@ -39,13 +47,21 @@
         </attr>
         <!-- XML resource of MenuItems. See Toolbar.setMenuItems(int) for more information. -->
         <attr name="menuItems" format="reference"/>
+        <!-- Whether or not to show tabs in the SUBPAGE state. Default false -->
+        <attr name="showTabsInSubpage" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="CarUiToolbarMenuItem">
+        <!-- Id of MenuItem, used to differentiate them -->
+        <attr name="id" format="reference"/>
         <!-- Show/hide the MenuItem -->
         <attr name="visible" format="boolean"/>
+        <!-- Set this to true to make a search MenuItem. This will override every other property except id, visible, and onclick. -->
+        <attr name="search" format="boolean"/>
+        <!-- Set this to true to make a settings MenuItem. This will override every other property except id, visible, and onclick. -->
+        <attr name="settings" format="boolean"/>
         <!-- Title -->
-        <attr name="title" format="string"/>
+        <attr name="title"/>
         <!-- Icon -->
         <attr name="icon" format="reference"/>
         <!-- True to tint the icon to a consistent color. Default true, all the other booleans default to false -->
@@ -107,20 +123,16 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="CarUiPreference">
+        <!-- Toggle for showing chevron -->
+        <attr name="showChevron" format="boolean" />
+    </declare-styleable>
+
+    <!-- Theme attribute to specify a default style for all CarUiPreferences -->
+    <attr name="carUiPreferenceStyle" format="reference" />
+
     <!-- Theme attribute to specify a default style for all CarUiRecyclerViews -->
     <attr name="carUiRecyclerViewStyle" format="reference" />
-
-    <!-- TODO: Replace this with the Android default text styleable -->
-    <declare-styleable name="CarUiTextDrawable">
-        <!-- Text to be rendered by the drawable -->
-        <attr name="renderedText" format="string" />
-        <!-- Font size -->
-        <attr name="textSize" format="dimension" />
-        <!-- Text color -->
-        <attr name="textColor" format="color" />
-        <!-- Type face to use -->
-        <attr name="typeface" format="string" />
-    </declare-styleable>
 
     <attr name="state_ux_restricted" format="boolean" />
 </resources>

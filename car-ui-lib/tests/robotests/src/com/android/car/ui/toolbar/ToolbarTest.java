@@ -18,7 +18,6 @@ package com.android.car.ui.toolbar;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
@@ -27,14 +26,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.car.ui.CarUiRobolectricTestRunner;
+import com.android.car.ui.CarUiTestUtil;
 import com.android.car.ui.R;
+import com.android.car.ui.TestConfig;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
-import org.robolectric.RuntimeEnvironment;
-import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 
 import java.util.Arrays;
@@ -42,23 +40,18 @@ import java.util.Collections;
 import java.util.List;
 
 @RunWith(CarUiRobolectricTestRunner.class)
-@Config(qualifiers = "land")
+@Config(manifest = TestConfig.MANIFEST_PATH, sdk = TestConfig.SDK_VERSION,
+        shadows = {ExtendedShadowTypeface.class, ShadowAsyncLayoutInflater.class})
 public class ToolbarTest {
-
     private Context mContext;
     private Resources mResources;
-    private ActivityController<TestActivity> mActivityController;
-    private TestActivity mActivity;
     private Toolbar mToolbar;
 
     @Before
     public void setUp() {
-        mContext = RuntimeEnvironment.application;
+        mContext = CarUiTestUtil.getMockContext();
         mResources = mContext.getResources();
-        mActivityController = Robolectric.buildActivity(TestActivity.class);
-        mActivityController.setup();
-        mActivity = mActivityController.get();
-        mToolbar = mActivity.findViewById(R.id.toolbar);
+        mToolbar = new Toolbar(mContext);
     }
 
     @Test
@@ -78,19 +71,13 @@ public class ToolbarTest {
     }
 
     @Test
-    public void configurationChange_shouldNotLoseProperties() {
+    public void setters_and_getters_test() {
         mToolbar.setTitle("Foo");
         mToolbar.setSearchHint("Foo2");
         mToolbar.setBackgroundShown(false);
         mToolbar.setShowMenuItemsWhileSearching(true);
         mToolbar.setState(Toolbar.State.SUBPAGE);
         mToolbar.setNavButtonMode(Toolbar.NavButtonMode.CLOSE);
-
-        // TODO this is supposed to change the configuration, but doesn't
-        RuntimeEnvironment.setQualifiers("+port");
-        mActivityController.configurationChange();
-        mActivity = mActivityController.get();
-        mToolbar = mActivity.findViewById(R.id.toolbar);
 
         assertThat(mToolbar.getTitle().toString()).isEqualTo("Foo");
         assertThat(mToolbar.getSearchHint().toString()).isEqualTo("Foo2");
@@ -106,8 +93,26 @@ public class ToolbarTest {
         mToolbar.setState(Toolbar.State.HOME);
         mToolbar.setLogo(R.drawable.test_ic_launcher);
 
-        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_logo).isShown()).isTrue();
-        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_title_logo).isShown()).isFalse();
+        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_nav_icon_container).getVisibility())
+                .isEqualTo(View.VISIBLE);
+        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_logo).getVisibility())
+                .isEqualTo(View.VISIBLE);
+        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_title_logo_container).getVisibility())
+                .isNotEqualTo(View.VISIBLE);
+    }
+
+    @Test
+    public void hideLogo_andTitleLogo_whenSet_andStateIsHome_andLogoIsDisabled() {
+        when(mResources.getBoolean(R.bool.car_ui_toolbar_show_logo)).thenReturn(false);
+
+        Toolbar toolbar = new Toolbar(mContext);
+        toolbar.setState(Toolbar.State.HOME);
+        toolbar.setLogo(R.drawable.test_ic_launcher);
+
+        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_nav_icon_container).getVisibility())
+                .isNotEqualTo(View.VISIBLE);
+        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_title_logo_container).getVisibility())
+                .isNotEqualTo(View.VISIBLE);
     }
 
     @Test
@@ -115,8 +120,12 @@ public class ToolbarTest {
         mToolbar.setState(Toolbar.State.SUBPAGE);
         mToolbar.setLogo(R.drawable.test_ic_launcher);
 
-        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_logo).isShown()).isFalse();
-        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_title_logo).isShown()).isTrue();
+        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_nav_icon_container).getVisibility())
+                .isEqualTo(View.VISIBLE);
+        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_title_logo_container).getVisibility())
+                .isEqualTo(View.VISIBLE);
+        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_title_logo).getVisibility())
+                .isEqualTo(View.VISIBLE);
     }
 
     @Test
@@ -124,17 +133,20 @@ public class ToolbarTest {
         mToolbar.setState(Toolbar.State.HOME);
         mToolbar.setLogo(0);
 
-        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_logo).isShown()).isFalse();
-        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_title_logo).isShown()).isFalse();
-    }
+        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_nav_icon_container).getVisibility())
+                .isNotEqualTo(View.VISIBLE);
+        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_title_logo_container).getVisibility())
+                .isNotEqualTo(View.VISIBLE);    }
 
     @Test
     public void hideLogo_andTitleLogo_whenNotSet_andStateIsNotHome() {
         mToolbar.setState(Toolbar.State.SUBPAGE);
         mToolbar.setLogo(0);
 
-        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_logo).isShown()).isFalse();
-        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_title_logo).isShown()).isFalse();
+        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_logo).getVisibility())
+                .isNotEqualTo(View.VISIBLE);
+        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_title_logo_container).getVisibility())
+                .isNotEqualTo(View.VISIBLE);
     }
 
     @Test
@@ -150,24 +162,10 @@ public class ToolbarTest {
         pressBack();
 
         assertThat(timesBackPressed.value).isEqualTo(1);
-        assertThat(mActivity.getTimesBackPressed()).isEqualTo(1);
-    }
-
-    @Test
-    public void registerOnBackListener_whenAListenerReturnsTrue_shouldSuppressBack() {
-        mToolbar.setState(Toolbar.State.SUBPAGE);
-
-        mToolbar.registerOnBackListener(() -> true);
-        pressBack();
-        mToolbar.registerOnBackListener(() -> false);
-        pressBack();
-
-        assertThat(mActivity.getTimesBackPressed()).isEqualTo(0);
     }
 
     @Test
     public void testState_twoRow_withTitle_withTabs() {
-        mockResources();
         when(mResources.getBoolean(R.bool.car_ui_toolbar_tabs_on_second_row)).thenReturn(true);
 
         Toolbar toolbar = new Toolbar(mContext);
@@ -186,8 +184,7 @@ public class ToolbarTest {
     }
 
     @Test
-    public void testState_twoRow_withTitle()  {
-        mockResources();
+    public void testState_twoRow_withTitle() {
         when(mResources.getBoolean(R.bool.car_ui_toolbar_tabs_on_second_row)).thenReturn(true);
 
         Toolbar toolbar = new Toolbar(mContext);
@@ -204,7 +201,6 @@ public class ToolbarTest {
 
     @Test
     public void testState_twoRow_withTabs() {
-        mockResources();
         when(mResources.getBoolean(R.bool.car_ui_toolbar_tabs_on_second_row)).thenReturn(true);
 
         Toolbar toolbar = new Toolbar(mContext);
@@ -221,7 +217,6 @@ public class ToolbarTest {
 
     @Test
     public void testState_oneRow_withTitle_withTabs() {
-        mockResources();
         when(mResources.getBoolean(R.bool.car_ui_toolbar_tabs_on_second_row)).thenReturn(false);
 
         Toolbar toolbar = new Toolbar(mContext);
@@ -241,9 +236,7 @@ public class ToolbarTest {
 
     @Test
     public void testState_oneRow_withTitle() {
-        mockResources();
         when(mResources.getBoolean(R.bool.car_ui_toolbar_tabs_on_second_row)).thenReturn(false);
-
 
         Toolbar toolbar = new Toolbar(mContext);
         assertThat(toolbar.isTabsInSecondRow()).isFalse();
@@ -259,7 +252,6 @@ public class ToolbarTest {
 
     @Test
     public void testState_oneRow_withTabs() {
-        mockResources();
         when(mResources.getBoolean(R.bool.car_ui_toolbar_tabs_on_second_row)).thenReturn(false);
 
 
@@ -310,8 +302,28 @@ public class ToolbarTest {
     }
 
     @Test
+    public void menuItems_builder_id() {
+        MenuItem item = MenuItem.builder(mContext)
+                .setId(5)
+                .build();
+
+        assertThat(item.getId()).isEqualTo(5);
+    }
+
+    @Test
+    public void menuItems_setId_shouldWork() {
+        MenuItem item = MenuItem.builder(mContext).build();
+
+        assertThat(item.getId()).isEqualTo(View.NO_ID);
+
+        item.setId(7);
+
+        assertThat(item.getId()).isEqualTo(7);
+    }
+
+    @Test
     public void menuItems_whenClicked_shouldCallListener() {
-        assertThat(getMenuItemViewCount()).isEqualTo(0);
+        assertThat(getMenuItemCount()).isEqualTo(0);
 
         Mutable<Boolean> button1Clicked = new Mutable<>(false);
         Mutable<Boolean> button2Clicked = new Mutable<>(false);
@@ -319,7 +331,7 @@ public class ToolbarTest {
                 createMenuItem(i -> button1Clicked.value = true),
                 createMenuItem(i -> button2Clicked.value = true)));
 
-        assertThat(getMenuItemViewCount()).isEqualTo(2);
+        assertThat(getMenuItemCount()).isEqualTo(2);
 
         getMenuItemView(0).performClick();
 
@@ -338,11 +350,11 @@ public class ToolbarTest {
                 createMenuItem(i -> {
                 })));
 
-        assertThat(getMenuItemViewCount()).isEqualTo(2);
+        assertThat(getMenuItemCount()).isEqualTo(2);
 
         mToolbar.setMenuItems(null);
 
-        assertThat(getMenuItemViewCount()).isEqualTo(0);
+        assertThat(getMenuItemCount()).isEqualTo(0);
     }
 
     @Test
@@ -351,7 +363,7 @@ public class ToolbarTest {
         });
         mToolbar.setMenuItems(Collections.singletonList(item));
 
-        assertThat(getMenuItemView(0).isShown()).isTrue();
+        assertThat(getMenuItemView(0).getVisibility()).isEqualTo(View.VISIBLE);
     }
 
     @Test
@@ -361,7 +373,7 @@ public class ToolbarTest {
         mToolbar.setMenuItems(Collections.singletonList(item));
 
         item.setVisible(false);
-        assertThat(getMenuItemView(0).isShown()).isFalse();
+        assertThat(getMenuItemView(0).getVisibility()).isNotEqualTo(View.VISIBLE);
     }
 
     @Test
@@ -372,7 +384,7 @@ public class ToolbarTest {
 
         item.setVisible(false);
         item.setVisible(true);
-        assertThat(getMenuItemView(0).isShown()).isTrue();
+        assertThat(getMenuItemView(0).getVisibility()).isEqualTo(View.VISIBLE);
     }
 
     @Test
@@ -384,7 +396,7 @@ public class ToolbarTest {
                 }));
         mToolbar.setMenuItems(menuItems);
 
-        assertThat(getMenuItemViewCount()).isEqualTo(2);
+        assertThat(getMenuItemCount()).isEqualTo(2);
 
         View firstMenuItemView = getMenuItemView(0);
 
@@ -396,50 +408,42 @@ public class ToolbarTest {
     @Test
     public void menuItems_searchScreen_shouldHideMenuItems() {
         mToolbar.setMenuItems(Arrays.asList(
-                MenuItem.Builder.createSearch(mContext, i -> {
-                }),
+                MenuItem.builder(mContext).setToSearch().build(),
                 createMenuItem(i -> {
                 })));
 
         mToolbar.setShowMenuItemsWhileSearching(false);
         mToolbar.setState(Toolbar.State.SEARCH);
 
-        assertThat(getMenuItemView(0).isShown()).isFalse();
-        assertThat(getMenuItemView(1).isShown()).isFalse();
+        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_menu_items_container).getVisibility())
+                .isNotEqualTo(View.VISIBLE);
     }
 
     @Test
     public void menuItems_showMenuItemsWhileSearching() {
         mToolbar.setMenuItems(Arrays.asList(
-                MenuItem.Builder.createSearch(mContext, i -> {
-                }),
+                MenuItem.builder(mContext).setToSearch().build(),
                 createMenuItem(i -> {
                 })));
 
         mToolbar.setShowMenuItemsWhileSearching(true);
         mToolbar.setState(Toolbar.State.SEARCH);
 
-        assertThat(getMenuItemView(0).isShown()).isFalse();
-        assertThat(getMenuItemView(1).isShown()).isTrue();
+        assertThat(mToolbar.findViewById(R.id.car_ui_toolbar_menu_items_container).getVisibility())
+                .isEqualTo(View.VISIBLE);
+        assertThat(getMenuItemView(0).getVisibility()).isNotEqualTo(View.VISIBLE);
+        assertThat(getMenuItemView(1).getVisibility()).isEqualTo(View.VISIBLE);
     }
 
     private MenuItem createMenuItem(MenuItem.OnClickListener listener) {
-        return new MenuItem.Builder(mContext)
+        return MenuItem.builder(mContext)
                 .setTitle("Button!")
                 .setOnClickListener(listener)
                 .build();
     }
 
-    private void mockResources() {
-        mContext = spy(RuntimeEnvironment.application);
-        mResources = spy(mContext.getResources());
-        when(mContext.getResources()).thenReturn(mResources);
-    }
-
-    private int getMenuItemViewCount() {
-        return ((ViewGroup) mToolbar
-                .findViewById(R.id.car_ui_toolbar_menu_items_container))
-                .getChildCount();
+    private int getMenuItemCount() {
+        return mToolbar.getMenuItems().size();
     }
 
     private View getMenuItemView(int index) {

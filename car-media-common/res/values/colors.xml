@@ -18,12 +18,6 @@
     <!-- Album art scrim -->
     <color name="album_art_scrim">#000000</color>
 
-    <!-- app_switch_widget.xml -->
-    <color name="app_switch_widget_icon_tint">@color/primary_app_icon_color</color>
-
-    <!-- App selection background -->
-    <color name="app_selection_border">#40000000</color>
-    <color name="app_selection_background">#ff000000</color>
     <!-- App icons selection background -->
     <color name="appbar_view_icon_background_color">#66ffffff</color>
 
@@ -45,6 +39,9 @@
     <!-- Color used on the fab spinner -->
     <color name="fab_spinner_indeterminate_color">@color/media_source_default_color</color>
 
+    <!-- Color used on media control buttons -->
+    <color name="media_button_tint">#FFFFFFFF</color>
+    <color name="media_button_tint_disabled">#80FFFFFF</color>
 
     <color name="placeholder_color_0">#669DF6</color>
     <color name="placeholder_color_1">#667EF6</color>

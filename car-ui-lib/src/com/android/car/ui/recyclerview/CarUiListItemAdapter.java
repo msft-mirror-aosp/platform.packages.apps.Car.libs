@@ -16,17 +16,22 @@
 
 package com.android.car.ui.recyclerview;
 
+import static com.android.car.ui.utils.CarUiUtils.findViewByRefId;
+
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.ui.R;
@@ -34,30 +39,42 @@ import com.android.car.ui.R;
 import java.util.List;
 
 /**
- * Adapter for {@link CarUiRecyclerView} to display {@link CarUiListItem}.
+ * Adapter for {@link CarUiRecyclerView} to display {@link CarUiContentListItem} and {@link
+ * CarUiHeaderListItem}.
  *
  * <ul>
  * <li> Implements {@link CarUiRecyclerView.ItemCap} - defaults to unlimited item count.
  * </ul>
  */
-public class CarUiListItemAdapter extends
-        RecyclerView.Adapter<CarUiListItemAdapter.ViewHolder> implements
+public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
         CarUiRecyclerView.ItemCap {
 
-    private List<CarUiListItem> mItems;
+    static final int VIEW_TYPE_LIST_ITEM = 1;
+    static final int VIEW_TYPE_LIST_HEADER = 2;
+
+    private List<? extends CarUiListItem> mItems;
     private int mMaxItems = CarUiRecyclerView.ItemCap.UNLIMITED;
 
-    public CarUiListItemAdapter(List<CarUiListItem> items) {
+    public CarUiListItemAdapter(List<? extends CarUiListItem> items) {
         this.mItems = items;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(
+    public RecyclerView.ViewHolder onCreateViewHolder(
             @NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.car_ui_list_item, parent, false);
-        return new ViewHolder(view);
+
+        switch (viewType) {
+            case VIEW_TYPE_LIST_ITEM:
+                return new ListItemViewHolder(
+                        inflater.inflate(R.layout.car_ui_list_item, parent, false));
+            case VIEW_TYPE_LIST_HEADER:
+                return new HeaderViewHolder(
+                        inflater.inflate(R.layout.car_ui_header_list_item, parent, false));
+            default:
+                throw new IllegalStateException("Unknown item type.");
+        }
     }
 
     /**
@@ -67,77 +84,54 @@ public class CarUiListItemAdapter extends
      * appropriate notify method for the adapter.
      */
     @NonNull
-    public List<CarUiListItem> getItems() {
+    public List<? extends CarUiListItem> getItems() {
         return mItems;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        CarUiListItem item = mItems.get(position);
-        CharSequence title = item.getTitle();
-        CharSequence body = item.getBody();
-        Drawable icon = item.getIcon();
-
-        if (!TextUtils.isEmpty(title)) {
-            holder.getTitle().setText(title);
-            holder.getTitle().setVisibility(View.VISIBLE);
-        } else {
-            holder.getTitle().setVisibility(View.GONE);
+    public int getItemViewType(int position) {
+        if (mItems.get(position) instanceof CarUiContentListItem) {
+            return VIEW_TYPE_LIST_ITEM;
+        } else if (mItems.get(position) instanceof CarUiHeaderListItem) {
+            return VIEW_TYPE_LIST_HEADER;
         }
 
-        if (!TextUtils.isEmpty(body)) {
-            holder.getBody().setText(body);
-        } else {
-            holder.getBody().setVisibility(View.GONE);
-        }
+        throw new IllegalStateException("Unknown view type.");
+    }
 
-        if (icon != null) {
-            holder.getIcon().setImageDrawable(icon);
-            holder.getIconContainer().setVisibility(View.VISIBLE);
-        } else {
-            holder.getIconContainer().setVisibility(View.GONE);
-        }
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        switch (holder.getItemViewType()) {
+            case VIEW_TYPE_LIST_ITEM:
+                if (!(holder instanceof ListItemViewHolder)) {
+                    throw new IllegalStateException("Incorrect view holder type for list item.");
+                }
 
-        Switch switchWidget = holder.getSwitch();
-        CheckBox checkBox = holder.getCheckBox();
-        ViewGroup actionContainer = holder.getActionContainer();
+                CarUiListItem item = mItems.get(position);
+                if (!(item instanceof CarUiContentListItem)) {
+                    throw new IllegalStateException(
+                            "Expected item to be bound to viewholder to be instance of "
+                                    + "CarUiContentListItem.");
+                }
 
-        switch (item.getAction()) {
-            case NONE:
-                holder.getActionContainer().setVisibility(View.GONE);
+                ((ListItemViewHolder) holder).bind((CarUiContentListItem) item);
                 break;
-            case SWITCH:
-                switchWidget.setVisibility(View.VISIBLE);
-                switchWidget.setChecked(item.isChecked());
-                switchWidget.setOnCheckedChangeListener(
-                        (buttonView, isChecked) -> {
-                            item.setChecked(isChecked);
-                            CarUiListItem.OnCheckedChangedListener itemListener =
-                                    item.getOnCheckedChangedListener();
-                            if (itemListener != null) {
-                                itemListener.onCheckedChanged(isChecked);
-                            }
-                        });
-                checkBox.setVisibility(View.GONE);
-                actionContainer.setVisibility(View.VISIBLE);
-                break;
-            case CHECK_BOX:
-                checkBox.setVisibility(View.VISIBLE);
-                checkBox.setChecked(item.isChecked());
-                checkBox.setOnCheckedChangeListener(
-                        (buttonView, isChecked) -> {
-                            item.setChecked(isChecked);
-                            CarUiListItem.OnCheckedChangedListener itemListener =
-                                    item.getOnCheckedChangedListener();
-                            if (itemListener != null) {
-                                itemListener.onCheckedChanged(isChecked);
-                            }
-                        });
-                switchWidget.setVisibility(View.GONE);
-                actionContainer.setVisibility(View.VISIBLE);
+            case VIEW_TYPE_LIST_HEADER:
+                if (!(holder instanceof HeaderViewHolder)) {
+                    throw new IllegalStateException("Incorrect view holder type for list item.");
+                }
+
+                CarUiListItem header = mItems.get(position);
+                if (!(header instanceof CarUiHeaderListItem)) {
+                    throw new IllegalStateException(
+                            "Expected item to be bound to viewholder to be instance of "
+                                    + "CarUiHeaderListItem.");
+                }
+
+                ((HeaderViewHolder) holder).bind((CarUiHeaderListItem) header);
                 break;
             default:
-                throw new IllegalStateException("Unknown secondary action type.");
+                throw new IllegalStateException("Unknown item view type.");
         }
     }
 
@@ -154,62 +148,230 @@ public class CarUiListItemAdapter extends
     }
 
     /**
-     * Holds views of {@link CarUiListItem}.
+     * Holds views of {@link CarUiContentListItem}.
      */
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ListItemViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView mTitle;
-        private TextView mBody;
-        private ImageView mIcon;
-        private ViewGroup mIconContainer;
-        private ViewGroup mActionContainer;
-        private Switch mSwitch;
-        private CheckBox mCheckBox;
+        final TextView mTitle;
+        final TextView mBody;
+        final ImageView mIcon;
+        final ImageView mContentIcon;
+        final ImageView mAvatarIcon;
+        final ViewGroup mIconContainer;
+        final ViewGroup mActionContainer;
+        final View mActionDivider;
+        final Switch mSwitch;
+        final CheckBox mCheckBox;
+        final RadioButton mRadioButton;
+        final ImageView mSupplementalIcon;
+        final View mTouchInterceptor;
+        final View mReducedTouchInterceptor;
+        final View mActionContainerTouchInterceptor;
 
-        ViewHolder(@NonNull View itemView) {
+        ListItemViewHolder(@NonNull View itemView) {
             super(itemView);
-            mTitle = itemView.requireViewById(R.id.title);
-            mBody = itemView.requireViewById(R.id.body);
-            mIcon = itemView.requireViewById(R.id.icon);
-            mIconContainer = itemView.requireViewById(R.id.icon_container);
-            mActionContainer = itemView.requireViewById(R.id.action_container);
-            mSwitch = itemView.requireViewById(R.id.switch_widget);
-            mCheckBox = itemView.requireViewById(R.id.checkbox_widget);
+            mTitle = findViewByRefId(itemView, R.id.title);
+            mBody = findViewByRefId(itemView, R.id.body);
+            mIcon = findViewByRefId(itemView, R.id.icon);
+            mContentIcon = findViewByRefId(itemView, R.id.content_icon);
+            mAvatarIcon = findViewByRefId(itemView, R.id.avatar_icon);
+            mIconContainer = findViewByRefId(itemView, R.id.icon_container);
+            mActionContainer = findViewByRefId(itemView, R.id.action_container);
+            mActionDivider = findViewByRefId(itemView, R.id.action_divider);
+            mSwitch = findViewByRefId(itemView, R.id.switch_widget);
+            mCheckBox = findViewByRefId(itemView, R.id.checkbox_widget);
+            mRadioButton = findViewByRefId(itemView, R.id.radio_button_widget);
+            mSupplementalIcon = findViewByRefId(itemView, R.id.supplemental_icon);
+            mReducedTouchInterceptor = findViewByRefId(itemView, R.id.reduced_touch_interceptor);
+            mTouchInterceptor = findViewByRefId(itemView, R.id.touch_interceptor);
+            mActionContainerTouchInterceptor = findViewByRefId(itemView,
+                    R.id.action_container_touch_interceptor);
         }
 
-        @NonNull
-        TextView getTitle() {
-            return mTitle;
+        void bind(@NonNull CarUiContentListItem item) {
+            CharSequence title = item.getTitle();
+            CharSequence body = item.getBody();
+            Drawable icon = item.getIcon();
+
+            if (!TextUtils.isEmpty(title)) {
+                mTitle.setText(title);
+                mTitle.setVisibility(View.VISIBLE);
+            } else {
+                mTitle.setVisibility(View.GONE);
+            }
+
+            if (!TextUtils.isEmpty(body)) {
+                mBody.setText(body);
+                mBody.setVisibility(View.VISIBLE);
+            } else {
+                mBody.setVisibility(View.GONE);
+            }
+
+            mIcon.setVisibility(View.GONE);
+            mContentIcon.setVisibility(View.GONE);
+            mAvatarIcon.setVisibility(View.GONE);
+
+            if (icon != null) {
+                mIconContainer.setVisibility(View.VISIBLE);
+
+                switch (item.getPrimaryIconType()) {
+                    case CONTENT:
+                        mContentIcon.setVisibility(View.VISIBLE);
+                        mContentIcon.setImageDrawable(icon);
+                        break;
+                    case STANDARD:
+                        mIcon.setVisibility(View.VISIBLE);
+                        mIcon.setImageDrawable(icon);
+                        break;
+                    case AVATAR:
+                        mAvatarIcon.setVisibility(View.VISIBLE);
+                        mAvatarIcon.setImageDrawable(icon);
+                        mAvatarIcon.setClipToOutline(true);
+                        break;
+                }
+            } else {
+                mIconContainer.setVisibility(View.GONE);
+            }
+
+            mActionDivider.setVisibility(
+                    item.isActionDividerVisible() ? View.VISIBLE : View.GONE);
+            mSwitch.setVisibility(View.GONE);
+            mCheckBox.setVisibility(View.GONE);
+            mRadioButton.setVisibility(View.GONE);
+            mSupplementalIcon.setVisibility(View.GONE);
+
+            CarUiContentListItem.OnClickListener itemOnClickListener = item.getOnClickListener();
+
+            switch (item.getAction()) {
+                case NONE:
+                    mActionContainer.setVisibility(View.GONE);
+
+                    // Display ripple effects across entire item when clicked by using full-sized
+                    // touch interceptor.
+                    mTouchInterceptor.setVisibility(View.VISIBLE);
+                    mTouchInterceptor.setOnClickListener(v -> {
+                        if (itemOnClickListener != null) {
+                            itemOnClickListener.onClick(item);
+                        }
+                    });
+                    mReducedTouchInterceptor.setVisibility(View.GONE);
+                    mActionContainerTouchInterceptor.setVisibility(View.GONE);
+                    break;
+                case SWITCH:
+                    bindCompoundButton(item, mSwitch, itemOnClickListener);
+                    break;
+                case CHECK_BOX:
+                    bindCompoundButton(item, mCheckBox, itemOnClickListener);
+                    break;
+                case RADIO_BUTTON:
+                    bindCompoundButton(item, mRadioButton, itemOnClickListener);
+                    break;
+                case ICON:
+                    mSupplementalIcon.setVisibility(View.VISIBLE);
+                    mSupplementalIcon.setImageDrawable(item.getSupplementalIcon());
+                    mActionContainer.setVisibility(View.VISIBLE);
+                    mActionContainerTouchInterceptor.setOnClickListener(
+                            (container) -> {
+                                if (item.getSupplementalIconOnClickListener() != null) {
+                                    item.getSupplementalIconOnClickListener().onClick(mIcon);
+                                }
+                                if (itemOnClickListener != null) {
+                                    itemOnClickListener.onClick(item);
+                                }
+                            });
+
+                    // If the icon has a click listener, use a reduced touch interceptor to create
+                    // two distinct touch area; the action container and the remainder of the list
+                    // item. Each touch area will have its own ripple effect. If the icon has no
+                    // click listener, it shouldn't be clickable.
+                    if (item.getSupplementalIconOnClickListener() == null) {
+                        mTouchInterceptor.setVisibility(View.VISIBLE);
+                        mTouchInterceptor.setOnClickListener(v -> {
+                            if (itemOnClickListener != null) {
+                                itemOnClickListener.onClick(item);
+                            }
+                        });
+                        mReducedTouchInterceptor.setVisibility(View.GONE);
+                        mActionContainerTouchInterceptor.setVisibility(View.GONE);
+                    } else {
+                        mReducedTouchInterceptor.setVisibility(View.VISIBLE);
+                        mReducedTouchInterceptor.setOnClickListener(v -> {
+                            if (itemOnClickListener != null) {
+                                itemOnClickListener.onClick(item);
+                            }
+                        });
+                        mActionContainerTouchInterceptor.setVisibility(View.VISIBLE);
+                        mTouchInterceptor.setVisibility(View.GONE);
+                    }
+                    break;
+                default:
+                    throw new IllegalStateException("Unknown secondary action type.");
+            }
+
+            itemView.setActivated(item.isActivated());
+            setEnabled(itemView, item.isEnabled());
         }
 
-        @NonNull
-        TextView getBody() {
-            return mBody;
+        void setEnabled(View view, boolean enabled) {
+            view.setEnabled(enabled);
+            if (view instanceof ViewGroup) {
+                ViewGroup group = (ViewGroup) view;
+
+                for (int i = 0; i < group.getChildCount(); i++) {
+                    setEnabled(group.getChildAt(i), enabled);
+                }
+            }
         }
 
-        @NonNull
-        ImageView getIcon() {
-            return mIcon;
+        void bindCompoundButton(@NonNull CarUiContentListItem item,
+                @NonNull CompoundButton compoundButton,
+                @Nullable CarUiContentListItem.OnClickListener itemOnClickListener) {
+            compoundButton.setVisibility(View.VISIBLE);
+            compoundButton.setOnCheckedChangeListener(null);
+            compoundButton.setChecked(item.isChecked());
+            compoundButton.setOnCheckedChangeListener(
+                    (buttonView, isChecked) -> item.setChecked(isChecked));
+
+            // Clicks anywhere on the item should toggle the checkbox state. Use full touch
+            // interceptor.
+            mTouchInterceptor.setVisibility(View.VISIBLE);
+            mTouchInterceptor.setOnClickListener(v -> {
+                compoundButton.toggle();
+                if (itemOnClickListener != null) {
+                    itemOnClickListener.onClick(item);
+                }
+            });
+            mReducedTouchInterceptor.setVisibility(View.GONE);
+            mActionContainerTouchInterceptor.setVisibility(View.GONE);
+
+            mActionContainer.setVisibility(View.VISIBLE);
+            mActionContainer.setClickable(false);
+        }
+    }
+
+    /**
+     * Holds views of {@link CarUiHeaderListItem}.
+     */
+    static class HeaderViewHolder extends RecyclerView.ViewHolder {
+
+        private final TextView mTitle;
+        private final TextView mBody;
+
+        HeaderViewHolder(@NonNull View itemView) {
+            super(itemView);
+            mTitle = findViewByRefId(itemView, R.id.title);
+            mBody = findViewByRefId(itemView, R.id.body);
         }
 
-        @NonNull
-        ViewGroup getIconContainer() {
-            return mIconContainer;
-        }
+        private void bind(@NonNull CarUiHeaderListItem item) {
+            mTitle.setText(item.getTitle());
 
-        @NonNull
-        ViewGroup getActionContainer() {
-            return mActionContainer;
-        }
-
-        @NonNull
-        Switch getSwitch() {
-            return mSwitch;
-        }
-
-        @NonNull
-        CheckBox getCheckBox() {
-            return mCheckBox;
+            CharSequence body = item.getBody();
+            if (!TextUtils.isEmpty(body)) {
+                mBody.setText(body);
+            } else {
+                mBody.setVisibility(View.GONE);
+            }
         }
     }
 }

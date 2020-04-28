@@ -15,9 +15,12 @@
   ~ limitations under the License.
   -->
 <MenuItems xmlns:app="http://schemas.android.com/apk/res-auto">
+    <MenuItem app:search="true"/>
+    <MenuItem app:settings="true"/>
     <MenuItem
         app:title="@string/preferences_screen_title"/>
     <MenuItem
+        app:id="@+id/menu_bar"
         app:title="Bar"
         app:icon="@drawable/ic_tracklist"
         app:onClick="xmlMenuItemClicked"/>

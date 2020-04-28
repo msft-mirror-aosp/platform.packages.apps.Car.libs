@@ -24,27 +24,26 @@ import android.view.View;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.ui.CarUiRobolectricTestRunner;
 import com.android.car.ui.R;
+import com.android.car.ui.TestConfig;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
 
 @RunWith(CarUiRobolectricTestRunner.class)
+@Config(manifest = TestConfig.MANIFEST_PATH, sdk = TestConfig.SDK_VERSION)
 public class CarUiRecyclerViewTest {
 
     private Context mContext;
     private View mView;
     private CarUiRecyclerView mCarUiRecyclerView;
-
-    @Mock
-    private RecyclerView.Adapter mAdapter;
 
     @Before
     public void setUp() {
@@ -96,12 +95,20 @@ public class CarUiRecyclerViewTest {
     }
 
     @Test
-    public void init_shouldContainNestedRecyclerView() {
+    public void init_shouldContainRecyclerView() {
         mView = LayoutInflater.from(mContext)
                 .inflate(R.layout.test_grid_car_ui_recycler_view, null);
 
         mCarUiRecyclerView = mView.findViewById(R.id.test_prv);
 
-        assertThat(mCarUiRecyclerView.mNestedRecyclerView).isNotNull();
+        assertThat(mCarUiRecyclerView).isNotNull();
+    }
+
+    @Test
+    public void init_shouldHaveGridLayout() {
+        mCarUiRecyclerView = new CarUiRecyclerView(mContext,
+                Robolectric.buildAttributeSet().addAttribute(R.attr.layoutStyle, "grid").build());
+        assertThat(mCarUiRecyclerView.getEffectiveLayoutManager()).isInstanceOf(
+                GridLayoutManager.class);
     }
 }

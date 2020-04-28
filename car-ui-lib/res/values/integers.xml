@@ -15,8 +15,6 @@
 -->
 
 <resources>
-
     <!-- Default max string length -->
     <integer name="car_ui_default_max_string_length">120</integer>
-
 </resources>

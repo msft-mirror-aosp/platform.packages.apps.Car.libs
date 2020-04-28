@@ -15,27 +15,29 @@
  */
 package com.android.car.ui.toolbar;
 
+import static com.android.car.ui.utils.CarUiUtils.requireViewByRefId;
+
 import android.app.Activity;
 import android.car.drivingstate.CarUxRestrictions;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.content.res.XmlResourceParser;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Xml;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.XmlRes;
+import androidx.asynclayoutinflater.view.AsyncLayoutInflater;
+import androidx.core.util.Consumer;
 
 import com.android.car.ui.R;
 import com.android.car.ui.utils.CarUiUtils;
-import com.android.car.ui.utils.CarUxRestrictionsUtil;
 import com.android.car.ui.uxr.DrawableStateView;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -45,27 +47,32 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 class MenuItemRenderer implements MenuItem.Listener {
 
     private static final int[] RESTRICTED_STATE = new int[] {R.attr.state_ux_restricted};
 
+    private final int mMenuItemIconSize;
+
     private Toolbar.State mToolbarState;
-    private CarUxRestrictions mUxRestrictions;
 
     private final MenuItem mMenuItem;
     private final ViewGroup mParentView;
     private View mView;
-    private boolean mPreviouslySetOnClickListener = false;
+    private View mIconContainer;
+    private ImageView mIconView;
+    private Switch mSwitch;
+    private TextView mTextView;
+    private TextView mTextWithIconView;
 
     MenuItemRenderer(MenuItem item, ViewGroup parentView) {
         mMenuItem = item;
         mParentView = parentView;
-        mUxRestrictions = CarUxRestrictionsUtil.getInstance(parentView.getContext())
-                .getCurrentRestrictions();
         mMenuItem.setListener(this);
+
+        mMenuItemIconSize = parentView.getContext().getResources()
+                .getDimensionPixelSize(R.dimen.car_ui_toolbar_menu_item_icon_size);
     }
 
     void setToolbarState(Toolbar.State state) {
@@ -76,19 +83,8 @@ class MenuItemRenderer implements MenuItem.Listener {
         }
     }
 
-    void setUxRestrictions(CarUxRestrictions restrictions) {
-        mUxRestrictions = restrictions;
-
-        if (mMenuItem.getUxRestrictions() != CarUxRestrictions.UX_RESTRICTIONS_BASELINE) {
-            updateView();
-        }
-    }
-
-    @Override
-    public void performClick() {
-        if (!isRestricted() && mView != null) {
-            mView.performClick();
-        }
+    void setCarUxRestrictions(CarUxRestrictions restrictions) {
+        mMenuItem.setCarUxRestrictions(restrictions);
     }
 
     @Override
@@ -96,26 +92,22 @@ class MenuItemRenderer implements MenuItem.Listener {
         updateView();
     }
 
-    View createView() {
-        LayoutInflater inflater = (LayoutInflater) mParentView.getContext().getSystemService(
-                Context.LAYOUT_INFLATER_SERVICE);
+    void createView(Consumer<View> callback) {
+        AsyncLayoutInflater inflater = new AsyncLayoutInflater(mParentView.getContext());
+        inflater.inflate(R.layout.car_ui_toolbar_menu_item, mParentView, (View view, int resid,
+                ViewGroup parent) -> {
+            mView = view;
 
-        if (mMenuItem.isCheckable()) {
-            mView = inflater.inflate(
-                    R.layout.car_ui_toolbar_menu_item_switch, mParentView, false);
-        } else if (mMenuItem.isShowingIconAndTitle()) {
-            mView = inflater.inflate(
-                    R.layout.car_ui_toolbar_menu_item_icon_and_text, mParentView, false);
-        } else if (mMenuItem.getIcon() != null) {
-            mView = inflater.inflate(
-                    R.layout.car_ui_toolbar_menu_item_icon, mParentView, false);
-        } else {
-            mView = inflater.inflate(
-                    R.layout.car_ui_toolbar_menu_item_text, mParentView, false);
-        }
-
-        updateView();
-        return mView;
+            mIconContainer =
+                    requireViewByRefId(mView, R.id.car_ui_toolbar_menu_item_icon_container);
+            mIconView = requireViewByRefId(mView, R.id.car_ui_toolbar_menu_item_icon);
+            mSwitch = requireViewByRefId(mView, R.id.car_ui_toolbar_menu_item_switch);
+            mTextView = requireViewByRefId(mView, R.id.car_ui_toolbar_menu_item_text);
+            mTextWithIconView =
+                    requireViewByRefId(mView, R.id.car_ui_toolbar_menu_item_text_with_icon);
+            updateView();
+            callback.accept(mView);
+        });
     }
 
     private void updateView() {
@@ -123,83 +115,67 @@ class MenuItemRenderer implements MenuItem.Listener {
             return;
         }
 
+        mView.setId(mMenuItem.getId());
+
+        boolean hasIcon = mMenuItem.getIcon() != null;
+        boolean hasText = !TextUtils.isEmpty(mMenuItem.getTitle());
+        boolean textAndIcon = mMenuItem.isShowingIconAndTitle();
+        boolean checkable = mMenuItem.isCheckable();
+
         if (!mMenuItem.isVisible()
-                || (mMenuItem.isSearch() && mToolbarState == Toolbar.State.SEARCH)) {
+                || (mMenuItem.isSearch() && mToolbarState == Toolbar.State.SEARCH)
+                || (!checkable && !hasIcon && !hasText)) {
             mView.setVisibility(View.GONE);
             return;
         }
-
         mView.setVisibility(View.VISIBLE);
+        mView.setContentDescription(mMenuItem.getTitle());
 
-        ImageView imageView = mView.findViewById(R.id.car_ui_toolbar_menu_item_icon);
-        if (imageView != null) {
-            imageView.setImageDrawable(mMenuItem.getIcon());
+        mIconContainer.setVisibility(View.GONE);
+        mTextView.setVisibility(View.GONE);
+        mTextWithIconView.setVisibility(View.GONE);
+        mSwitch.setVisibility(View.GONE);
+        if (checkable) {
+            mSwitch.setChecked(mMenuItem.isChecked());
+            mSwitch.setVisibility(View.VISIBLE);
+        } else if (hasText && hasIcon && textAndIcon) {
+            mMenuItem.getIcon().setBounds(0, 0, mMenuItemIconSize, mMenuItemIconSize);
+            mTextWithIconView.setCompoundDrawables(mMenuItem.getIcon(), null, null, null);
+            mTextWithIconView.setText(mMenuItem.getTitle());
+            mTextWithIconView.setVisibility(View.VISIBLE);
+        } else if (hasIcon) {
+            mIconView.setImageDrawable(mMenuItem.getIcon());
+            mIconContainer.setVisibility(View.VISIBLE);
+        } else { // hasText will be true
+            mTextView.setText(mMenuItem.getTitle());
+            mTextView.setVisibility(View.VISIBLE);
         }
 
-        TextView textView = mView.findViewById(R.id.car_ui_toolbar_menu_item_text);
-        if (textView != null) {
-            textView.setText(mMenuItem.getTitle());
-
-            if (mMenuItem.isShowingIconAndTitle() && imageView == null) {
-                int menuItemIconSize = mView.getContext().getResources()
-                        .getDimensionPixelSize(R.dimen.car_ui_toolbar_menu_item_icon_size);
-
-                mMenuItem.getIcon().setBounds(0, 0, menuItemIconSize, menuItemIconSize);
-
-                textView.setCompoundDrawables(mMenuItem.getIcon(), null, null, null);
-            }
-        }
-
-        Switch s = mView.findViewById(R.id.car_ui_toolbar_menu_item_switch);
-        if (s != null) {
-            s.setChecked(mMenuItem.isChecked());
-        }
-
-        if (!mMenuItem.isTinted()) {
+        if (!mMenuItem.isTinted() && hasIcon) {
             mMenuItem.getIcon().setTintList(null);
         }
 
         recursiveSetEnabledAndDrawableState(mView);
         mView.setActivated(mMenuItem.isActivated());
 
-        MenuItem.OnClickListener onClickListener = mMenuItem.getOnClickListener();
-        if (onClickListener != null || mMenuItem.isCheckable()) {
-            if (isRestricted()) {
-                mView.setOnClickListener(v -> Toast.makeText(mView.getContext(),
-                        R.string.car_ui_restricted_while_driving, Toast.LENGTH_LONG).show());
-            } else {
-                mView.setOnClickListener(v -> {
-                    if (mMenuItem.isActivatable()) {
-                        mMenuItem.setActivated(!mMenuItem.isActivated());
-                    }
-
-                    if (mMenuItem.isCheckable()) {
-                        mMenuItem.setChecked(!mMenuItem.isChecked());
-                    }
-
-                    if (onClickListener != null) {
-                        onClickListener.onClick(mMenuItem);
-                    }
-                });
-            }
-
-            mPreviouslySetOnClickListener = true;
-        } else if (mPreviouslySetOnClickListener) {
-            // We should only set this stuff to null if we had previously set our own listener
-            // to avoid overwriting a custom view's onClickListener
+        if (mMenuItem.getOnClickListener() != null
+                || mMenuItem.isCheckable()
+                || mMenuItem.isActivatable()) {
+            mView.setOnClickListener(v -> mMenuItem.performClick());
+        } else {
             mView.setOnClickListener(null);
             mView.setClickable(false);
-            mPreviouslySetOnClickListener = false;
         }
     }
 
     private void recursiveSetEnabledAndDrawableState(View view) {
         view.setEnabled(mMenuItem.isEnabled());
 
+        int[] drawableState = mMenuItem.isRestricted() ? RESTRICTED_STATE : null;
         if (view instanceof ImageView) {
-            ((ImageView) view).setImageState(isRestricted() ? RESTRICTED_STATE : null, true);
+            ((ImageView) view).setImageState(drawableState, true);
         } else if (view instanceof DrawableStateView) {
-            ((DrawableStateView) view).setDrawableState(isRestricted() ? RESTRICTED_STATE : null);
+            ((DrawableStateView) view).setDrawableState(drawableState);
         }
 
         if (view instanceof ViewGroup) {
@@ -210,13 +186,9 @@ class MenuItemRenderer implements MenuItem.Listener {
         }
     }
 
-    private boolean isRestricted() {
-        return CarUxRestrictionsUtil.isRestricted(mMenuItem.getUxRestrictions(), mUxRestrictions);
-    }
-
     static List<MenuItem> readMenuItemList(Context c, @XmlRes int resId) {
         if (resId == 0) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         try (XmlResourceParser parser = c.getResources().getXml(resId)) {
@@ -243,8 +215,11 @@ class MenuItemRenderer implements MenuItem.Listener {
 
         TypedArray a = c.obtainStyledAttributes(attrs, R.styleable.CarUiToolbarMenuItem);
         try {
+            int id = a.getResourceId(R.styleable.CarUiToolbarMenuItem_id, View.NO_ID);
             String title = a.getString(R.styleable.CarUiToolbarMenuItem_title);
             Drawable icon = a.getDrawable(R.styleable.CarUiToolbarMenuItem_icon);
+            boolean isSearch = a.getBoolean(R.styleable.CarUiToolbarMenuItem_search, false);
+            boolean isSettings = a.getBoolean(R.styleable.CarUiToolbarMenuItem_settings, false);
             boolean tinted = a.getBoolean(R.styleable.CarUiToolbarMenuItem_tinted, true);
             boolean visible = a.getBoolean(R.styleable.CarUiToolbarMenuItem_visible, true);
             boolean showIconAndTitle = a.getBoolean(
@@ -288,7 +263,8 @@ class MenuItemRenderer implements MenuItem.Listener {
             parser.next();
             parser.require(XmlPullParser.END_TAG, null, "MenuItem");
 
-            MenuItem.Builder builder = new MenuItem.Builder(c)
+            MenuItem.Builder builder = MenuItem.builder(c)
+                    .setId(id)
                     .setTitle(title)
                     .setIcon(icon)
                     .setOnClickListener(onClickListener)
@@ -297,6 +273,14 @@ class MenuItemRenderer implements MenuItem.Listener {
                     .setVisible(visible)
                     .setShowIconAndTitle(showIconAndTitle)
                     .setDisplayBehavior(displayBehavior);
+
+            if (isSearch) {
+                builder.setToSearch();
+            }
+
+            if (isSettings) {
+                builder.setToSettings();
+            }
 
             if (checkable || checkedExists) {
                 builder.setChecked(checked);

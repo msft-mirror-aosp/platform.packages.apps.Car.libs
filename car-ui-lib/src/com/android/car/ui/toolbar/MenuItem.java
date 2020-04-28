@@ -19,8 +19,14 @@ import android.car.drivingstate.CarUxRestrictions;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.View;
+import android.widget.Toast;
+
+import androidx.annotation.VisibleForTesting;
 
 import com.android.car.ui.R;
+import com.android.car.ui.utils.CarUxRestrictionsUtil;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Represents a button to display in the {@link Toolbar}.
@@ -34,8 +40,8 @@ import com.android.car.ui.R;
  * itself, or it's overflow menu.
  *
  * <p>If you require a search or settings button, you should use
- * {@link Builder#createSearch(Context, OnClickListener)} or
- * {@link Builder#createSettings(Context, OnClickListener)}.
+ * {@link Builder#setToSearch()} or
+ * {@link Builder#setToSettings()}.
  *
  * <p>Some properties can be changed after the creating a MenuItem, but others require being set
  * with a {@link Builder}.
@@ -49,13 +55,18 @@ public class MenuItem {
     private final boolean mShowIconAndTitle;
     private final boolean mIsTinted;
     @CarUxRestrictions.CarUxRestrictionsInfo
-    private final int mUxRestrictions;
 
-    private Listener mListener;
+    private int mId;
+    private CarUxRestrictions mCurrentRestrictions;
+    // This is a WeakReference to allow the Toolbar (and by extension, the whole screen
+    // the toolbar is on) to be garbage-collected if the MenuItem is held past the
+    // lifecycle of the toolbar.
+    private WeakReference<Listener> mListener = new WeakReference<>(null);
     private CharSequence mTitle;
     private Drawable mIcon;
     private OnClickListener mOnClickListener;
     private DisplayBehavior mDisplayBehavior;
+    private int mUxRestrictions;
     private boolean mIsEnabled;
     private boolean mIsChecked;
     private boolean mIsVisible;
@@ -63,6 +74,7 @@ public class MenuItem {
 
     private MenuItem(Builder builder) {
         mContext = builder.mContext;
+        mId = builder.mId;
         mIsCheckable = builder.mIsCheckable;
         mIsActivatable = builder.mIsActivatable;
         mTitle = builder.mTitle;
@@ -77,12 +89,26 @@ public class MenuItem {
         mShowIconAndTitle = builder.mShowIconAndTitle;
         mIsTinted = builder.mIsTinted;
         mUxRestrictions = builder.mUxRestrictions;
+
+        mCurrentRestrictions = CarUxRestrictionsUtil.getInstance(mContext).getCurrentRestrictions();
     }
 
     private void update() {
-        if (mListener != null) {
-            mListener.onMenuItemChanged();
+        Listener listener = mListener.get();
+        if (listener != null) {
+            listener.onMenuItemChanged();
         }
+    }
+
+    /** Sets the id, which is purely for the client to distinguish MenuItems with.  */
+    public void setId(int id) {
+        mId = id;
+        update();
+    }
+
+    /** Gets the id, which is purely for the client to distinguish MenuItems with. */
+    public int getId() {
+        return mId;
     }
 
     /** Returns whether the MenuItem is enabled */
@@ -182,6 +208,14 @@ public class MenuItem {
         setTitle(mContext.getString(resId));
     }
 
+    /** Sets the UxRestrictions of this MenuItem. */
+    public void setUxRestrictions(@CarUxRestrictions.CarUxRestrictionsInfo int uxRestrictions) {
+        if (mUxRestrictions != uxRestrictions) {
+            mUxRestrictions = uxRestrictions;
+            update();
+        }
+    }
+
     @CarUxRestrictions.CarUxRestrictionsInfo
     public int getUxRestrictions() {
         return mUxRestrictions;
@@ -203,10 +237,42 @@ public class MenuItem {
         update();
     }
 
+    /* package */ void setCarUxRestrictions(CarUxRestrictions restrictions) {
+        boolean wasRestricted = isRestricted();
+        mCurrentRestrictions = restrictions;
+
+        if (isRestricted() != wasRestricted) {
+            update();
+        }
+    }
+
+    /* package */ boolean isRestricted() {
+        return CarUxRestrictionsUtil.isRestricted(mUxRestrictions, mCurrentRestrictions);
+    }
+
     /** Calls the {@link OnClickListener}. */
+    @VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
     public void performClick() {
-        if (mListener != null) {
-            mListener.performClick();
+        if (!isEnabled() || !isVisible()) {
+            return;
+        }
+
+        if (isRestricted()) {
+            Toast.makeText(mContext,
+                    R.string.car_ui_restricted_while_driving, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (isActivatable()) {
+            setActivated(!isActivated());
+        }
+
+        if (isCheckable()) {
+            setChecked(!isChecked());
+        }
+
+        if (mOnClickListener != null) {
+            mOnClickListener.onClick(this);
         }
     }
 
@@ -239,16 +305,16 @@ public class MenuItem {
         return mIsSearch;
     }
 
-    /**
-     * Builder class.
-     *
-     * <p>Use the static {@link #createSearch(Context, OnClickListener)} or
-     * {@link #createSettings(Context, OnClickListener)} if you want one of those specialized
-     * buttons.
-     */
+    /** Builder class */
     public static final class Builder {
-        private Context mContext;
+        private final Context mContext;
 
+        private String mSearchTitle;
+        private String mSettingsTitle;
+        private Drawable mSearchIcon;
+        private Drawable mSettingsIcon;
+
+        private int mId = View.NO_ID;
         private CharSequence mTitle;
         private Drawable mIcon;
         private OnClickListener mOnClickListener;
@@ -262,11 +328,14 @@ public class MenuItem {
         private boolean mIsActivatable = false;
         private boolean mIsActivated = false;
         private boolean mIsSearch = false;
+        private boolean mIsSettings = false;
         @CarUxRestrictions.CarUxRestrictionsInfo
         private int mUxRestrictions = CarUxRestrictions.UX_RESTRICTIONS_BASELINE;
 
         public Builder(Context c) {
-            mContext = c;
+            // Must use getApplicationContext to avoid leaking activities when the MenuItem
+            // is held onto for longer than the Activity's lifecycle
+            mContext = c.getApplicationContext();
         }
 
         /** Builds a {@link MenuItem} from the current state of the Builder */
@@ -280,8 +349,37 @@ public class MenuItem {
                     || mIsActivatable)) {
                 throw new IllegalStateException("Unsupported options for a checkable MenuItem");
             }
+            if (mIsSearch && mIsSettings) {
+                throw new IllegalStateException("Can't have both a search and settings MenuItem");
+            }
+
+            if (mIsSearch && (!mSearchTitle.contentEquals(mTitle)
+                    || !mSearchIcon.equals(mIcon)
+                    || mIsCheckable
+                    || mIsActivatable
+                    || !mIsTinted
+                    || mShowIconAndTitle
+                    || mDisplayBehavior != DisplayBehavior.ALWAYS)) {
+                throw new IllegalStateException("Invalid search MenuItem");
+            }
+
+            if (mIsSettings && (!mSettingsTitle.contentEquals(mTitle)
+                    || !mSettingsIcon.equals(mIcon)
+                    || mIsCheckable
+                    || mIsActivatable
+                    || !mIsTinted
+                    || mShowIconAndTitle
+                    || mDisplayBehavior != DisplayBehavior.ALWAYS)) {
+                throw new IllegalStateException("Invalid settings MenuItem");
+            }
 
             return new MenuItem(this);
+        }
+
+        /** Sets the id, which is purely for the client to distinguish MenuItems with. */
+        public Builder setId(int id) {
+            mId = id;
+            return this;
         }
 
         /** Sets the title to a string resource id */
@@ -419,26 +517,22 @@ public class MenuItem {
             return this;
         }
 
-        /** Sets that this is the search MenuItem, which has special behavior while searching */
-        private Builder setSearch() {
-            mIsSearch = true;
-            return this;
-        }
-
         /**
          * Creates a search MenuItem.
          *
          * <p>The advantage of using this over creating your own is getting an OEM-styled search
          * icon, and this button will always disappear while searching, even when the
          * {@link Toolbar Toolbar's} showMenuItemsWhileSearching is true.
+         *
+         * <p>If using this, you should only change the id, visibility, or onClickListener.
          */
-        public static MenuItem createSearch(Context c, OnClickListener listener) {
-            return new Builder(c)
-                    .setTitle(R.string.car_ui_toolbar_menu_item_search_title)
-                    .setIcon(R.drawable.car_ui_icon_search)
-                    .setOnClickListener(listener)
-                    .setSearch()
-                    .build();
+        public Builder setToSearch() {
+            mSearchTitle = mContext.getString(R.string.car_ui_toolbar_menu_item_search_title);
+            mSearchIcon = mContext.getDrawable(R.drawable.car_ui_icon_search);
+            mIsSearch = true;
+            setTitle(mSearchTitle);
+            setIcon(mSearchIcon);
+            return this;
         }
 
         /**
@@ -447,15 +541,41 @@ public class MenuItem {
          * <p>The advantage of this over creating your own is getting an OEM-styled settings icon,
          * and that the MenuItem will be restricted based on
          * {@link CarUxRestrictions#UX_RESTRICTIONS_NO_SETUP}
+         *
+         * <p>If using this, you should only change the id, visibility, or onClickListener.
          */
-        public static MenuItem createSettings(Context c, OnClickListener listener) {
-            return new Builder(c)
-                    .setTitle(R.string.car_ui_toolbar_menu_item_settings_title)
-                    .setIcon(R.drawable.car_ui_icon_settings)
+        public Builder setToSettings() {
+            mSettingsTitle = mContext.getString(R.string.car_ui_toolbar_menu_item_settings_title);
+            mSettingsIcon = mContext.getDrawable(R.drawable.car_ui_icon_settings);
+            mIsSettings = true;
+            setTitle(mSettingsTitle);
+            setIcon(mSettingsIcon);
+            setUxRestrictions(CarUxRestrictions.UX_RESTRICTIONS_NO_SETUP);
+            return this;
+        }
+
+        /** @deprecated Use {@link #setToSearch()} instead. */
+        @Deprecated
+        public static MenuItem createSearch(Context c, OnClickListener listener) {
+            return MenuItem.builder(c)
+                    .setToSearch()
                     .setOnClickListener(listener)
-                    .setUxRestrictions(CarUxRestrictions.UX_RESTRICTIONS_NO_SETUP)
                     .build();
         }
+
+        /** @deprecated Use {@link #setToSettings()} instead. */
+        @Deprecated
+        public static MenuItem createSettings(Context c, OnClickListener listener) {
+            return MenuItem.builder(c)
+                    .setToSettings()
+                    .setOnClickListener(listener)
+                    .build();
+        }
+    }
+
+    /** Get a new {@link Builder}. */
+    public static Builder builder(Context context) {
+        return new Builder(context);
     }
 
     /**
@@ -480,12 +600,14 @@ public class MenuItem {
     interface Listener {
         /** Called when the MenuItem is changed. For use only by {@link Toolbar} */
         void onMenuItemChanged();
-
-        /** Called when {@link MenuItem#performClick()} is called */
-        void performClick();
     }
 
+    /**
+     * Sets a listener for changes to this MenuItem. Note that the MenuItem will only hold
+     * weak references to the Listener, so that the listener is not held if the MenuItem
+     * outlives the toolbar.
+     */
     void setListener(Listener listener) {
-        mListener = listener;
+        mListener = new WeakReference<>(listener);
     }
 }
