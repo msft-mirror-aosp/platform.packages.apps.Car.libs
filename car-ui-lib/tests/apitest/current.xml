@@ -5,6 +5,8 @@
   <public type="attr" name="carUiPreferenceStyle"/>
   <public type="attr" name="carUiRecyclerViewStyle"/>
   <public type="attr" name="state_ux_restricted"/>
+  <public type="bool" name="car_ui_enable_focus_area_background_highlight"/>
+  <public type="bool" name="car_ui_enable_focus_area_foreground_highlight"/>
   <public type="bool" name="car_ui_list_item_single_line_title"/>
   <public type="bool" name="car_ui_preference_list_show_full_screen"/>
   <public type="bool" name="car_ui_preference_show_chevron"/>
@@ -144,6 +146,8 @@
   <public type="dimen" name="wrap_content"/>
   <public type="drawable" name="car_ui_activity_background"/>
   <public type="drawable" name="car_ui_divider"/>
+  <public type="drawable" name="car_ui_focus_area_background_highlight"/>
+  <public type="drawable" name="car_ui_focus_area_foreground_highlight"/>
   <public type="drawable" name="car_ui_icon_add"/>
   <public type="drawable" name="car_ui_icon_arrow_back"/>
   <public type="drawable" name="car_ui_icon_close"/>
@@ -292,6 +296,7 @@
   <public type="string" name="car_ui_alert_dialog_default_button"/>
   <public type="string" name="car_ui_dialog_preference_negative"/>
   <public type="string" name="car_ui_dialog_preference_positive"/>
+  <public type="string" name="car_ui_direct_manipulation"/>
   <public type="string" name="car_ui_ellipsis"/>
   <public type="string" name="car_ui_preference_switch_off"/>
   <public type="string" name="car_ui_preference_switch_on"/>
