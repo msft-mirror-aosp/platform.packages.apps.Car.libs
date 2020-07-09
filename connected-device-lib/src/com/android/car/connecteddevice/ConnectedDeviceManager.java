@@ -382,6 +382,7 @@ public class ConnectedDeviceManager {
             logd(TAG, "Stop association called with unrecognized callback. Ignoring.");
             return;
         }
+        logd(TAG, "Stopping association.");
         mAssociationCallback = null;
         mPeripheralManager.stopAssociation(mInternalAssociationCallback);
         if (mOobChannel != null) {
@@ -465,7 +466,7 @@ public class ConnectedDeviceManager {
                 + recipientId);
         String deviceId = device.getDeviceId();
         Map<UUID, ThreadSafeCallbacks<DeviceCallback>> recipientCallbacks =
-                mDeviceCallbacks.computeIfAbsent(deviceId, key -> new HashMap<>());
+                mDeviceCallbacks.computeIfAbsent(deviceId, key -> new ConcurrentHashMap<>());
 
         // Device already has a callback registered with this recipient UUID. For the
         // protection of the user, this UUID is now blacklisted from future subscriptions
