@@ -91,10 +91,6 @@ public class BleDeviceMessageStream extends DeviceMessageStream {
 
     private final BluetoothGattCharacteristic mReadCharacteristic;
 
-    private MessageReceivedListener mMessageReceivedListener;
-
-    private MessageReceivedErrorListener mMessageReceivedErrorListener;
-
     private int mMaxWriteSize;
 
     BleDeviceMessageStream(@NonNull BlePeripheralManager blePeripheralManager,
@@ -222,9 +218,7 @@ public class BleDeviceMessageStream extends DeviceMessageStream {
             packet = BlePacket.parseFrom(value);
         } catch (InvalidProtocolBufferException e) {
             loge(TAG, "Can not parse Ble packet from client.", e);
-            if (mMessageReceivedErrorListener != null) {
-                mMessageReceivedErrorListener.onMessageReceivedError(e);
-            }
+            notifyMessageReceivedErrorListener(e);
             return;
         }
         processPacket(packet);
@@ -236,9 +230,8 @@ public class BleDeviceMessageStream extends DeviceMessageStream {
             versionExchange = BleVersionExchange.parseFrom(value);
         } catch (InvalidProtocolBufferException e) {
             loge(TAG, "Could not parse version exchange message", e);
-            if (mMessageReceivedErrorListener != null) {
-                mMessageReceivedErrorListener.onMessageReceivedError(e);
-            }
+            notifyMessageReceivedErrorListener(e);
+
             return;
         }
         int minMessagingVersion = versionExchange.getMinSupportedMessagingVersion();
@@ -250,10 +243,7 @@ public class BleDeviceMessageStream extends DeviceMessageStream {
             loge(TAG, "Unsupported message version for min " + minMessagingVersion + " and max "
                     + maxMessagingVersion + " or security version for " + minSecurityVersion
                     + " and max " + maxSecurityVersion + ".");
-            if (mMessageReceivedErrorListener != null) {
-                mMessageReceivedErrorListener.onMessageReceivedError(
-                        new IllegalStateException("Unsupported version."));
-            }
+            notifyMessageReceivedErrorListener(new IllegalStateException("Unsupported version."));
             return;
         }
 
@@ -287,10 +277,8 @@ public class BleDeviceMessageStream extends DeviceMessageStream {
         if (packetNumber != expectedPacket) {
             loge(TAG, "Received unexpected packet " + packetNumber + " for message "
                     + messageId + ".");
-            if (mMessageReceivedErrorListener != null) {
-                mMessageReceivedErrorListener.onMessageReceivedError(
-                        new IllegalStateException("Packet received out of order."));
-            }
+            notifyMessageReceivedErrorListener(
+                    new IllegalStateException("Packet received out of order."));
             return;
         }
         mPendingPacketNumber.put(messageId, packetNumber + 1);
@@ -304,9 +292,7 @@ public class BleDeviceMessageStream extends DeviceMessageStream {
             currentPayloadStream.write(payload);
         } catch (IOException e) {
             loge(TAG, "Error writing packet to stream.", e);
-            if (mMessageReceivedErrorListener != null) {
-                mMessageReceivedErrorListener.onMessageReceivedError(e);
-            }
+            notifyMessageReceivedErrorListener(e);
             return;
         }
         logd(TAG, "Parsed packet " + packet.getPacketNumber() + " of "
@@ -331,18 +317,14 @@ public class BleDeviceMessageStream extends DeviceMessageStream {
             message = BleDeviceMessage.parseFrom(messageBytes);
         } catch (InvalidProtocolBufferException e) {
             loge(TAG, "Cannot parse device message from client.", e);
-            if (mMessageReceivedErrorListener != null) {
-                mMessageReceivedErrorListener.onMessageReceivedError(e);
-            }
+            notifyMessageReceivedErrorListener(e);
             return;
         }
 
         DeviceMessage deviceMessage = new DeviceMessage(
                 ByteUtils.bytesToUUID(message.getRecipient().toByteArray()),
                 message.getIsPayloadEncrypted(), message.getPayload().toByteArray());
-        if (mMessageReceivedListener != null) {
-            mMessageReceivedListener.onMessageReceived(deviceMessage, message.getOperation());
-        }
+        notifyMessageReceivedListener(deviceMessage, message.getOperation());
     }
 
     /** The maximum amount of bytes that can be written over BLE. */
