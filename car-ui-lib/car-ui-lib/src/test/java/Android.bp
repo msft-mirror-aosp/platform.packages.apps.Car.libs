@@ -13,24 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-android_library {
 
-    name: "car-uxr-client-lib",
-
-    srcs: ["src/**/*.java"],
-
-    optimize: {
-        enabled: false,
-    },
-
+//###############################################
+// Car Ui Robolectric test target. #
+//###############################################
+android_robolectric_test {
+    name: "CarUiRoboTests",
+    srcs: ["**/*.java"],
     libs: [
-        "android.car-system-stubs",
+        "android.car",
+        "testng",
     ],
-    sdk_version: "system_current",
-
-    static_libs: [
-        "androidx.recyclerview_recyclerview",
-        "androidx.lifecycle_lifecycle-common-java8",
-        "car-ui-lib",
-    ],
+    instrumentation_for: "CarUiRobolectricTestApp",
 }
