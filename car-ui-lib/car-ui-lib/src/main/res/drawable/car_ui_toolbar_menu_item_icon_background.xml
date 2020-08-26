@@ -23,5 +23,3 @@
         android:height="@dimen/car_ui_toolbar_menu_item_icon_background_size"/>
     <solid android:color="@color/car_ui_toolbar_menu_item_icon_background_color"/>
 </shape>
-
-

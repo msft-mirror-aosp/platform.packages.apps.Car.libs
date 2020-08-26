@@ -402,10 +402,13 @@ public class CarUiRecyclerViewTest {
 
         View trackView = mActivity.requireViewById(R.id.car_ui_scrollbar_track);
         View thumbView = mActivity.requireViewById(R.id.car_ui_scrollbar_thumb);
+        // if you drag too far in a single step you'll stop selecting the thumb view
+        int numSteps = (int) Math.ceil(
+                trackView.getHeight() / (float) thumbView.getHeight() * 1.1f);
         // drag and scroll to the middle
         onView(withId(R.id.car_ui_scrollbar_track)).perform(
                 performDrag(0f, (thumbView.getHeight() / 2f), 0,
-                        (thumbView.getHeight() / 2f) - 1, 10, Float.MAX_VALUE,
+                    (trackView.getHeight() / 2f) / numSteps, numSteps, Float.MAX_VALUE,
                         trackView.getHeight() / 2f));
         onView(withText(adapter.getItemText(25))).check(matches(isDisplayed()));
     }
@@ -418,7 +421,8 @@ public class CarUiRecyclerViewTest {
         onView(withId(R.id.list)).check(matches(isDisplayed()));
 
         CarUiRecyclerView carUiRecyclerView = mActivity.requireViewById(R.id.list);
-        TestAdapter adapter = new TestAdapter(15);
+        //  50, because needs to be big enough to make sure content is scrollable.
+        TestAdapter adapter = new TestAdapter(50);
         mActivity.runOnUiThread(() -> {
             carUiRecyclerView.setAdapter(adapter);
         });
@@ -429,6 +433,7 @@ public class CarUiRecyclerViewTest {
         onView(withId(R.id.car_ui_scrollbar_page_up)).check(matches(not(isEnabled())));
 
         // Moving down, should enable the up bottom.
+        onView(withId(R.id.car_ui_scrollbar_page_down)).check(matches(isEnabled()));
         onView(withId(R.id.car_ui_scrollbar_page_down)).perform(click());
         onView(withId(R.id.car_ui_scrollbar_page_up)).check(matches(isEnabled()));
 
