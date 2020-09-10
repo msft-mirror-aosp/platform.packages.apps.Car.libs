@@ -36,6 +36,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -81,13 +82,13 @@ public final class CarUiRecyclerView extends RecyclerView {
     @Nullable
     private ScrollBar mScrollBar;
 
-    @Nullable
+    @NonNull
     private GridOffsetItemDecoration mTopOffsetItemDecorationGrid;
-    @Nullable
+    @NonNull
     private GridOffsetItemDecoration mBottomOffsetItemDecorationGrid;
-    @Nullable
+    @NonNull
     private RecyclerView.ItemDecoration mTopOffsetItemDecorationLinear;
-    @Nullable
+    @NonNull
     private RecyclerView.ItemDecoration mBottomOffsetItemDecorationLinear;
     @NonNull
     private GridDividerItemDecoration mDividerItemDecorationGrid;
@@ -106,6 +107,17 @@ public final class CarUiRecyclerView extends RecyclerView {
     private boolean mEnableDividers;
     private int mTopOffset;
     private int mBottomOffset;
+
+    private ViewTreeObserver.OnGlobalLayoutListener mOnGlobalLayoutListener = () -> {
+        if (!mHasScrolledToTop && getLayoutManager() != null) {
+            // Scroll to the top after the first global layout, so that
+            // we can set padding for the insets and still have the
+            // recyclerview start at the top.
+            new Handler(Objects.requireNonNull(Looper.myLooper())).post(() ->
+                    getLayoutManager().scrollToPosition(0));
+            mHasScrolledToTop = true;
+        }
+    };
 
 
     /**
@@ -225,17 +237,6 @@ public final class CarUiRecyclerView extends RecyclerView {
 
         a.recycle();
 
-        this.getViewTreeObserver()
-                .addOnGlobalLayoutListener(() -> {
-                    if (!mHasScrolledToTop && getLayoutManager() != null) {
-                        // Scroll to the top after the first global layout, so that
-                        // we can set padding for the insets and still have the
-                        // recyclerview start at the top.
-                        new Handler(Objects.requireNonNull(Looper.myLooper())).post(() ->
-                                getLayoutManager().scrollToPosition(0));
-                        mHasScrolledToTop = true;
-                    }
-                });
 
         if (!mScrollBarEnabled) {
             return;
@@ -254,23 +255,26 @@ public final class CarUiRecyclerView extends RecyclerView {
     }
 
     private void addItemDecorations(LayoutManager layout) {
+        // remove existing Item decorations
+        removeItemDecoration(mDividerItemDecorationGrid);
+        removeItemDecoration(mTopOffsetItemDecorationGrid);
+        removeItemDecoration(mBottomOffsetItemDecorationGrid);
+        removeItemDecoration(mDividerItemDecorationLinear);
+        removeItemDecoration(mTopOffsetItemDecorationLinear);
+        removeItemDecoration(mBottomOffsetItemDecorationLinear);
+
         if (layout instanceof GridLayoutManager) {
             if (mEnableDividers) {
-                removeItemDecoration(mDividerItemDecorationGrid);
                 addItemDecoration(mDividerItemDecorationGrid);
             }
-            removeItemDecoration(mTopOffsetItemDecorationGrid);
             addItemDecoration(mTopOffsetItemDecorationGrid);
-            removeItemDecoration(mBottomOffsetItemDecorationGrid);
             addItemDecoration(mBottomOffsetItemDecorationGrid);
             setNumOfColumns(((GridLayoutManager) layout).getSpanCount());
         } else {
             if (mEnableDividers) {
                 addItemDecoration(mDividerItemDecorationLinear);
             }
-            removeItemDecoration(mTopOffsetItemDecorationLinear);
             addItemDecoration(mTopOffsetItemDecorationLinear);
-            removeItemDecoration(mBottomOffsetItemDecorationLinear);
             addItemDecoration(mBottomOffsetItemDecorationLinear);
         }
     }
@@ -365,6 +369,7 @@ public final class CarUiRecyclerView extends RecyclerView {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         mCarUxRestrictionsUtil.register(mListener);
+        this.getViewTreeObserver().addOnGlobalLayoutListener(mOnGlobalLayoutListener);
         if (mInstallingExtScrollBar || !mScrollBarEnabled) {
             return;
         }
@@ -442,6 +447,7 @@ public final class CarUiRecyclerView extends RecyclerView {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mCarUxRestrictionsUtil.unregister(mListener);
+        this.getViewTreeObserver().removeOnGlobalLayoutListener(mOnGlobalLayoutListener);
     }
 
     @Override
