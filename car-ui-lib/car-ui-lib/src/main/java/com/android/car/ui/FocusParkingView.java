@@ -19,26 +19,24 @@ import static android.view.accessibility.AccessibilityNodeInfo.ACTION_FOCUS;
 
 import static com.android.car.ui.utils.RotaryConstants.ACTION_HIDE_IME;
 import static com.android.car.ui.utils.RotaryConstants.ACTION_RESTORE_DEFAULT_FOCUS;
-import static com.android.car.ui.utils.RotaryConstants.ROTARY_HORIZONTALLY_SCROLLABLE;
-import static com.android.car.ui.utils.RotaryConstants.ROTARY_VERTICALLY_SCROLLABLE;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.android.car.ui.utils.ViewUtils;
 
 /**
  * A transparent {@link View} that can take focus. It's used by {@link
  * com.android.car.rotary.RotaryService} to support rotary controller navigation. Each {@link
- * android.view.Window} must have at least one FocusParkingView. The {@link FocusParkingView} must
- * be the first in Tab order, and outside of all {@link FocusArea}s.
- *
+ * android.view.Window} should have one FocusParkingView as the first focusable view in the view
+ * tree, and outside of all {@link FocusArea}s. If multiple FocusParkingView are added in the
+ * window, only the first one will be focusable.
  * <p>
  * Android doesn't clear focus automatically when focus is set in another window. If we try to clear
  * focus in the previous window, Android will re-focus a view in that window, resulting in two
@@ -58,6 +56,7 @@ import androidx.annotation.Nullable;
  * Then it will avoid the wrap-around by not moving focus.
  */
 public class FocusParkingView extends View {
+    private static final String TAG = "FocusParkingView";
 
     public FocusParkingView(Context context) {
         super(context);
@@ -130,25 +129,15 @@ public class FocusParkingView extends View {
                 View root = getRootView();
 
                 // If there is a view focused by default and it can take focus, move focus to it.
-                View defaultFocus = depthFirstSearch(root,
-                        v -> v.isFocusedByDefault() && canTakeFocus(v));
+                View defaultFocus = ViewUtils.findFocusedByDefaultView(root);
                 if (defaultFocus != null) {
                     return defaultFocus.requestFocus();
                 }
 
-                // If there is a scrollable container with at least one descendant that can take
-                // focus, move focus to its first descendant that can take focus.
-                View scrollableContainer = depthFirstSearch(root, v -> {
-                    CharSequence contentDescription = v.getContentDescription();
-                    return TextUtils.equals(contentDescription, ROTARY_VERTICALLY_SCROLLABLE)
-                            || TextUtils.equals(contentDescription, ROTARY_HORIZONTALLY_SCROLLABLE);
-                });
-                if (scrollableContainer != null) {
-                    View focusable = depthFirstSearch(scrollableContainer,
-                            v -> v != scrollableContainer && canTakeFocus(v));
-                    if (focusable != null) {
-                        return focusable.requestFocus();
-                    }
+                // If there is a primary focus view, move focus to it.
+                View primaryFocus = ViewUtils.findPrimaryFocusView(root);
+                if (primaryFocus != null) {
+                    return primaryFocus.requestFocus();
                 }
 
                 return false;
@@ -167,31 +156,26 @@ public class FocusParkingView extends View {
         return super.performAccessibilityAction(action, arguments);
     }
 
-    private static boolean canTakeFocus(@NonNull View view) {
-        return view.isFocusable() && view.isEnabled() && view.getVisibility() == VISIBLE
-                && view.getWidth() > 0 && view.getHeight() > 0;
-    }
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
 
-    @Nullable
-    private View depthFirstSearch(@NonNull View view, @NonNull Predicate predicate) {
-        if (predicate.isTarget(view)) {
-            return view;
-        }
-        if (view instanceof ViewGroup) {
-            ViewGroup parent = (ViewGroup) view;
-            for (int i = 0; i < parent.getChildCount(); i++) {
-                View child = parent.getChildAt(i);
-                View target = depthFirstSearch(child, predicate);
-                if (target != null) {
-                    return target;
-                }
+        // If there is a FocusParkingView already, make the one after in the view tree
+        // non-focusable.
+        boolean []isBefore = new boolean[1];
+        View anotherFpv = ViewUtils.depthFirstSearch(getRootView(), v -> {
+            if (this == v) {
+                isBefore[0] = true;
+            }
+            return v != this && v instanceof FocusParkingView && v.isFocusable();
+        });
+        if (anotherFpv != null) {
+            Log.w(TAG, "There should be only one FocusParkingView in the window");
+            if (isBefore[0]) {
+                anotherFpv.setFocusable(false);
+            } else {
+                setFocusable(false);
             }
         }
-        return null;
-    }
-
-    /** A function that takes a {@code view} and returns a {@code boolean}. */
-    private interface Predicate {
-        boolean isTarget(@NonNull View view);
     }
 }

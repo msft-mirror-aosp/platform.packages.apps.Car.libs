@@ -31,7 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
  *
  * @param <T> type of the {@link RecyclerView.ViewHolder} objects used by the delegate.
  */
-public final class DelegatingContentLimitingAdapter<T extends RecyclerView.ViewHolder>
+public class DelegatingContentLimitingAdapter<T extends RecyclerView.ViewHolder>
         extends ContentLimitingAdapter<T> {
     private static final int SCROLLING_LIMITED_MESSAGE_VIEW_TYPE = Integer.MAX_VALUE;
     private static final int SCROLLING_LIMITED_MESSAGE_DEFAULT_POSITION_OFFSET = -1;
@@ -41,6 +41,21 @@ public final class DelegatingContentLimitingAdapter<T extends RecyclerView.ViewH
     private final int mScrollingLimitedMessagePositionOffset;
     @IdRes
     private final int mConfigId;
+
+    /**
+     * Provides the abilities to delegate {@link ContentLimitingAdapter} callback functions.
+     */
+    public interface ContentLimiting {
+        /**
+         * @see ContentLimitingAdapter#getScrollToPositionWhenRestricted()
+         */
+        int getScrollToPositionWhenRestricted();
+
+        /**
+         * @see ContentLimitingAdapter#computeAnchorIndexWhenRestricting()
+         */
+        int computeAnchorIndexWhenRestricting();
+    }
 
     /**
      * Constructs a {@link DelegatingContentLimitingAdapter} that uses {@link Integer#MAX_VALUE}
@@ -76,7 +91,9 @@ public final class DelegatingContentLimitingAdapter<T extends RecyclerView.ViewH
      *                 indexed at 0 means the very last item. Positive values will be treated as
      *                 "top offset", so an offset of 0 will put the scrolling limited message at the
      *                 very top of the list.
+     * @deprecated offset is not supported in the {@link ContentLimitingAdapter} any more.
      */
+    @Deprecated
     public DelegatingContentLimitingAdapter(RecyclerView.Adapter<T> delegate,
             @IdRes int configId,
             int viewType,
@@ -173,12 +190,34 @@ public final class DelegatingContentLimitingAdapter<T extends RecyclerView.ViewH
 
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
         mDelegate.onAttachedToRecyclerView(recyclerView);
     }
 
     @Override
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
         mDelegate.onDetachedFromRecyclerView(recyclerView);
+    }
+
+    @Override
+    protected int computeAnchorIndexWhenRestricting() {
+        if (mDelegate instanceof DelegatingContentLimitingAdapter.ContentLimiting) {
+            return ((DelegatingContentLimitingAdapter.ContentLimiting) mDelegate)
+                    .computeAnchorIndexWhenRestricting();
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    protected int getScrollToPositionWhenRestricted() {
+        if (mDelegate instanceof DelegatingContentLimitingAdapter.ContentLimiting) {
+            return ((DelegatingContentLimitingAdapter.ContentLimiting) mDelegate)
+                    .getScrollToPositionWhenRestricted();
+        } else {
+            return -1;
+        }
     }
 
     @Override
