@@ -14,16 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<FrameLayout
+
+<shape
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/car_ui_activity_background">
-    <com.android.car.ui.recyclerview.CarUiRecyclerView
-        android:id="@+id/list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:numOfColumns="4"
-        app:layoutStyle="grid"/>
-</FrameLayout>
+    android:shape="rectangle">
+    <solid android:color="@color/car_ui_scrollbar_thumb" />
+    <corners android:radius="@dimen/car_ui_scrollbar_thumb_radius"/>
+</shape>
