@@ -19,6 +19,7 @@ package com.android.car.ui.paintbooth.caruirecyclerview;
 import android.app.Activity;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.android.car.ui.baselayout.Insets;
@@ -32,7 +33,7 @@ import com.android.car.ui.toolbar.ToolbarController;
 import java.util.ArrayList;
 
 /**
- * Activity that shows CarUiRecyclerView example with dummy data.
+ * Activity that shows CarUiRecyclerView example with sample data.
  */
 public class CarUiRecyclerViewActivity extends Activity implements InsetsChangedListener {
     private final ArrayList<String> mData = new ArrayList<>();
@@ -50,11 +51,11 @@ public class CarUiRecyclerViewActivity extends Activity implements InsetsChanged
         CarUiRecyclerView recyclerView = findViewById(R.id.list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(generateDummyData());
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(generateSampleData());
         recyclerView.setAdapter(adapter);
     }
 
-    private ArrayList<String> generateDummyData() {
+    private ArrayList<String> generateSampleData() {
         for (int i = 0; i <= mDataToGenerate; i++) {
             mData.add("data" + i);
         }
@@ -62,7 +63,7 @@ public class CarUiRecyclerViewActivity extends Activity implements InsetsChanged
     }
 
     @Override
-    public void onCarUiInsetsChanged(Insets insets) {
+    public void onCarUiInsetsChanged(@NonNull Insets insets) {
         requireViewById(R.id.list)
                 .setPadding(0, insets.getTop(), 0, insets.getBottom());
         requireViewById(android.R.id.content)
