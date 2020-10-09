@@ -188,41 +188,6 @@ public class CarUiSnapHelper extends LinearSnapHelper {
     }
 
     /**
-     * Finds the view to snap to. The view to snap to is the child of the LayoutManager that is
-     * closest to the start of the RecyclerView. The "start" depends on if the LayoutManager is
-     * scrolling horizontally or vertically. If it is horizontally scrolling, then the start is the
-     * view on the left (right if RTL). Otherwise, it is the top-most view.
-     *
-     * @param layoutManager The current {@link RecyclerView.LayoutManager} for the attached
-     *                      RecyclerView.
-     * @return The View closest to the start of the RecyclerView.
-     */
-    private static View findTopView(LayoutManager layoutManager, OrientationHelper helper) {
-        int childCount = layoutManager.getChildCount();
-        if (childCount == 0) {
-            return null;
-        }
-
-        View closestChild = null;
-        int absClosest = Integer.MAX_VALUE;
-
-        for (int i = 0; i < childCount; i++) {
-            View child = layoutManager.getChildAt(i);
-            if (child == null) {
-                continue;
-            }
-            int absDistance = Math.abs(distanceToTopMargin(child, helper));
-
-            /* if child top is closer than previous closest, set it as closest */
-            if (absDistance < absClosest) {
-                absClosest = absDistance;
-                closestChild = child;
-            }
-        }
-        return closestChild;
-    }
-
-    /**
      * Returns whether or not the given View is a valid snapping view. A view is considered valid
      * for snapping if it can fit entirely within the height of the RecyclerView it is contained
      * within.
@@ -246,7 +211,7 @@ public class CarUiSnapHelper extends LinearSnapHelper {
      * @param helper An {@link OrientationHelper} to aid with calculation.
      * @return A float indicating the percentage of the given view that is visible.
      */
-    private static float getPercentageVisible(View view, OrientationHelper helper) {
+    static float getPercentageVisible(View view, OrientationHelper helper) {
         int start = helper.getStartAfterPadding();
         int end = helper.getEndAfterPadding();
 
@@ -337,6 +302,80 @@ public class CarUiSnapHelper extends LinearSnapHelper {
         outDist[1] = clamp(outDist[1], minDistance, maxDistance);
 
         return outDist;
+    }
+
+    /**
+     * Estimates a position to which CarUiSnapHelper will try to snap to for a requested scroll
+     * distance.
+     *
+     * @param helper         The {@link OrientationHelper} that is created from the LayoutManager.
+     * @param scrollDistance The intended scroll distance.
+     *
+     * @return The diff between the target snap position and the current position.
+     */
+    public int estimateNextPositionDiffForScrollDistance(OrientationHelper helper,
+            int scrollDistance) {
+        float distancePerChild = computeDistancePerChild(helper.getLayoutManager(), helper);
+        if (distancePerChild <= 0) {
+            return 0;
+        }
+        return (int) Math.round(scrollDistance / distancePerChild);
+    }
+
+    /**
+     * This method is taken verbatim from the [androidx] {@link LinearSnapHelper} private method
+     * implementation.
+     *
+     * Computes an average pixel value to pass a single child.
+     * <p>
+     * Returns a negative value if it cannot be calculated.
+     *
+     * @param layoutManager The {@link RecyclerView.LayoutManager} associated with the attached
+     *                      {@link RecyclerView}.
+     * @param helper        The relevant {@link OrientationHelper} for the attached
+     *                      {@link RecyclerView.LayoutManager}.
+     *
+     * @return A float value that is the average number of pixels needed to scroll by one view in
+     * the relevant direction.
+     */
+    private float computeDistancePerChild(RecyclerView.LayoutManager layoutManager,
+            OrientationHelper helper) {
+        View minPosView = null;
+        View maxPosView = null;
+        int minPos = Integer.MAX_VALUE;
+        int maxPos = Integer.MIN_VALUE;
+        int childCount = layoutManager.getChildCount();
+        if (childCount == 0) {
+            return 1;
+        }
+
+        for (int i = 0; i < childCount; i++) {
+            View child = layoutManager.getChildAt(i);
+            final int pos = layoutManager.getPosition(child);
+            if (pos == RecyclerView.NO_POSITION) {
+                continue;
+            }
+            if (pos < minPos) {
+                minPos = pos;
+                minPosView = child;
+            }
+            if (pos > maxPos) {
+                maxPos = pos;
+                maxPosView = child;
+            }
+        }
+        if (minPosView == null || maxPosView == null) {
+            return 1;
+        }
+        int start = Math.min(helper.getDecoratedStart(minPosView),
+                helper.getDecoratedStart(maxPosView));
+        int end = Math.max(helper.getDecoratedEnd(minPosView),
+                helper.getDecoratedEnd(maxPosView));
+        int distance = end - start;
+        if (distance == 0) {
+            return 0;
+        }
+        return 1f * distance / ((maxPos - minPos) + 1);
     }
 
     /**
