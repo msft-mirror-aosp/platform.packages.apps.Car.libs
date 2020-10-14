@@ -30,7 +30,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.XmlRes;
 
+import com.android.car.ui.CarUiEditText;
 import com.android.car.ui.R;
+import com.android.car.ui.recyclerview.CarUiListItem;
 
 import java.util.List;
 
@@ -43,7 +45,7 @@ import java.util.List;
  *
  * <p>The toolbar supports a navigation button, title, tabs, search, and {@link MenuItem MenuItems}
  */
-public class Toolbar extends FrameLayout implements ToolbarController {
+public final class Toolbar extends FrameLayout implements ToolbarController {
 
     /** Callback that will be issued whenever the height of toolbar is changed. */
     public interface OnHeightChangedListener {
@@ -645,6 +647,36 @@ public class Toolbar extends FrameLayout implements ToolbarController {
     @Override
     public boolean unregisterOnSearchListener(OnSearchListener listener) {
         return mController.unregisterOnSearchListener(listener);
+    }
+
+    /**
+     * Registers a new {@link CarUiEditText.PrivateImeCommandCallback} to the list of
+     * listeners.
+     */
+    @Override
+    public void registerOnPrivateImeCommandListener(
+            CarUiEditText.PrivateImeCommandCallback listener) {
+        mController.registerOnPrivateImeCommandListener(listener);
+    }
+
+    /**
+     * Unregisters an existing {@link CarUiEditText.PrivateImeCommandCallback} from the list
+     * of listeners.
+     */
+    @Override
+    public boolean unregisterOnPrivateImeCommandListener(
+            CarUiEditText.PrivateImeCommandCallback listener) {
+        return mController.unregisterOnPrivateImeCommandListener(listener);
+    }
+
+    /**
+     * Sets a list of search items to be displayed in the IME window when running as a wide screen
+     * mode. This should be called each time the list is updated. For example, when a user is typing
+     * in the input field and the list gets filtered this method should be invoked each time.
+     */
+    @Override
+    public void setSearchItemsForWideScreen(List<CarUiListItem> searchItems) {
+        mController.setSearchItemsForWideScreen(searchItems);
     }
 
     /** Registers a new {@link OnSearchCompletedListener} to the list of listeners. */
