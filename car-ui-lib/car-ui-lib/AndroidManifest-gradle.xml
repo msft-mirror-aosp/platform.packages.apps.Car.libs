@@ -22,5 +22,9 @@
             android:name="com.android.car.ui.core.CarUiInstaller"
             android:authorities="${applicationId}.CarUiInstaller"
             android:exported="false"/>
+        <!-- Commented out until we're ready to ship the shared library feature -->
+        <!-- <uses-library
+            android:name="com.android.car.ui.sharedlibrary"
+            android:required="false"/> -->
     </application>
 </manifest>

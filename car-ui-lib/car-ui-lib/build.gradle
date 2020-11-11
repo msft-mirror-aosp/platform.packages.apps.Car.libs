@@ -52,6 +52,7 @@ android {
 }
 
 dependencies {
+    compileOnly project(':oem-apis')
     api 'androidx.annotation:annotation:1.1.0'
     api 'androidx.appcompat:appcompat:1.1.0'
     api 'androidx.constraintlayout:constraintlayout:2.0.1'
