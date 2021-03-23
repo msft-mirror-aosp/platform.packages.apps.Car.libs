@@ -77,7 +77,6 @@ public final class CarUiRecyclerView extends RecyclerView {
     private String mScrollBarClass;
     private int mScrollBarPaddingTop;
     private int mScrollBarPaddingBottom;
-
     @Nullable
     private ScrollBar mScrollBar;
 
@@ -101,7 +100,7 @@ public final class CarUiRecyclerView extends RecyclerView {
     @Nullable
     private Rect mContainerPaddingRelative;
     @Nullable
-    private LinearLayout mContainer;
+    private ViewGroup mContainer;
 
     // Set to true when when styled attributes are read and initialized.
     private boolean mIsInitialized;
@@ -249,7 +248,7 @@ public final class CarUiRecyclerView extends RecyclerView {
             return;
         }
 
-        mContainer = new LinearLayout(getContext());
+        mContainer = new FrameLayout(getContext());
 
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
@@ -302,7 +301,8 @@ public final class CarUiRecyclerView extends RecyclerView {
         boolean rotaryScrollEnabled = styledAttributes != null && styledAttributes.getBoolean(
                 R.styleable.CarUiRecyclerView_rotaryScrollEnabled, /* defValue=*/ false);
         if (rotaryScrollEnabled) {
-            int orientation = styledAttributes.getInt(R.styleable.RecyclerView_android_orientation,
+            int orientation = styledAttributes.getInt(
+                    R.styleable.CarUiRecyclerView_android_orientation,
                     LinearLayout.VERTICAL);
             CarUiUtils.setRotaryScrollEnabled(
                     this, /* isVertical= */ orientation == LinearLayout.VERTICAL);
@@ -408,6 +408,15 @@ public final class CarUiRecyclerView extends RecyclerView {
      * the recycler view was set with the same layout params.
      */
     private void installExternalScrollBar() {
+        if (mContainer.getParent() != null) {
+            // We've already installed the parent container.
+            // onAttachToWindow() can be called multiple times, but on the second time
+            // we will crash if we try to add mContainer as a child of a view again while
+            // it already has a parent.
+            return;
+        }
+
+        mContainer.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(R.layout.car_ui_recycler_view, mContainer, true);
         mContainer.setVisibility(mContainerVisibility);
