@@ -85,6 +85,12 @@
         android:parentActivityName=".MainActivity">
     </activity>
     <activity
+        android:name=".widescreenime.WideScreenTestView"
+        android:windowSoftInputMode="stateHidden|adjustNothing"
+        android:exported="false"
+        android:parentActivityName=".MainActivity">
+    </activity>
+    <activity
         android:name=".toolbar.ToolbarActivity"
         android:exported="false"
         android:parentActivityName=".MainActivity">
@@ -112,6 +118,10 @@
         android:parentActivityName=".MainActivity"/>
     <activity
         android:name=".caruirecyclerview.CarUiListItemActivity"
+        android:exported="false"
+        android:parentActivityName=".MainActivity"/>
+    <activity
+        android:name=".button.CarUiButtonActivity"
         android:exported="false"
         android:parentActivityName=".MainActivity"/>
 

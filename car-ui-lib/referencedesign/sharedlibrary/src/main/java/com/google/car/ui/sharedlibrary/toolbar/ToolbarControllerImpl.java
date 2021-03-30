@@ -141,25 +141,6 @@ class ToolbarControllerImpl implements ToolbarControllerOEMV1 {
     }
 
     @Override
-    public void setBackButtonVisible(boolean visible) {
-        if (visible != mBackButtonVisible) {
-            mBackButtonVisible = visible;
-            mBackButtonView.setOnClickListener(mBackButtonVisible ? v -> {
-                if (mBackListener != null) {
-                    mBackListener.run();
-                }
-            } : null);
-            mBackButtonView.setClickable(mBackButtonVisible);
-            update();
-        }
-    }
-
-    @Override
-    public boolean isBackButtonVisible() {
-        return mBackButtonVisible;
-    }
-
-    @Override
     public void setSearchIcon(Drawable d) {
 
     }
@@ -193,6 +174,11 @@ class ToolbarControllerImpl implements ToolbarControllerOEMV1 {
     }
 
     @Override
+    public void setSearchResultsInputViewIcon(Drawable view) {
+        // Intentional no-op as canShowSearchResultsView returns false
+    }
+
+    @Override
     public void setSearchResultItems(List<? extends SearchItemOEMV1> searchItems) {
         // Intentional no-op as canShowSearchResultItems returns false
     }
@@ -200,6 +186,18 @@ class ToolbarControllerImpl implements ToolbarControllerOEMV1 {
     @Override
     public void setNavButtonMode(int mode) {
         mNavButtonMode = mode;
+        boolean visible = mode != NAV_BUTTON_MODE_DISABLED;
+        if (visible != mBackButtonVisible) {
+            mBackButtonVisible = visible;
+            mBackButtonView.setOnClickListener(mBackButtonVisible ? v -> {
+                if (mBackListener != null) {
+                    mBackListener.run();
+                }
+            } : null);
+            mBackButtonView.setClickable(mBackButtonVisible);
+            update();
+        }
+
         switch (mNavButtonMode) {
             case ToolbarControllerOEMV1.NAV_BUTTON_MODE_CLOSE:
                 mBackButtonView.setImageResource(R.drawable.icon_close);
@@ -211,11 +209,6 @@ class ToolbarControllerImpl implements ToolbarControllerOEMV1 {
                 mBackButtonView.setImageResource(R.drawable.icon_back);
                 break;
         }
-    }
-
-    @Override
-    public int getNavButtonMode() {
-        return mNavButtonMode;
     }
 
     @Override
@@ -244,11 +237,6 @@ class ToolbarControllerImpl implements ToolbarControllerOEMV1 {
                             LinearLayout.LayoutParams.WRAP_CONTENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT));
         }
-    }
-
-    @Override
-    public List<? extends MenuItemOEMV1> getMenuItems() {
-        return null;
     }
 
     @Override

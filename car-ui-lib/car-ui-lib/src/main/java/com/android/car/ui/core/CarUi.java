@@ -50,8 +50,11 @@ public class CarUi {
      * @return The component found, or null.
      */
     @Nullable
-    @SuppressWarnings("unchecked")
-    public static <T> T findCarUiComponentById(View view, int id) {
+    @SuppressWarnings({"unchecked", "TypeParameterUnusedInFormals"})
+    public static <T> T findCarUiComponentById(@Nullable View view, int id) {
+        if (view == null) {
+            return null;
+        }
         View componentView = view.findViewById(id);
         return componentView != null
                 ? (T) componentView.getTag(R.id.car_ui_component_reference)
