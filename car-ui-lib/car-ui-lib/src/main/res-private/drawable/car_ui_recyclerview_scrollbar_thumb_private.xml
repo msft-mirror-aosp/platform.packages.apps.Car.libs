@@ -14,14 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<FrameLayout
+
+<shape
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="72dp"
-    android:layout_height="72dp"
-    android:tag="car_ui_button_background_view">
-    <ImageView
-        android:id="@+id/car_ui_button_image_view"
-        android:layout_height="32dp"
-        android:layout_width="32dp"
-        android:layout_gravity="center"/>
-</FrameLayout>
+    android:shape="rectangle">
+    <solid android:color="#99ffffff" />
+    <corners android:radius="100dp"/>
+</shape>

@@ -14,18 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<FrameLayout
+
+<ripple
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
-    <TextView
-        android:id="@+id/car_ui_button_text_view"
-        android:layout_height="72dp"
-        android:layout_width="wrap_content"
-        android:minWidth="72dp"
-        android:background="@drawable/car_ui_button_floating_background"
-        android:textAppearance="@style/TextAppearance.CarUi.Body3"
-        android:elevation="10dp"
-        android:drawableTint="?android:attr/colorForeground"
-        android:gravity="center"/>
-</FrameLayout>
+    android:color="#27ffffff" />

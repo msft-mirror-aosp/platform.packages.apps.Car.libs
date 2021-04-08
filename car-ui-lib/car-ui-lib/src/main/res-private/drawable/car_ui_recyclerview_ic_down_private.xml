@@ -14,14 +14,13 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="72dp"
-    android:layout_height="72dp"
-    android:tag="car_ui_button_background_view">
-    <ImageView
-        android:id="@+id/car_ui_button_image_view"
-        android:layout_height="32dp"
-        android:layout_width="32dp"
-        android:layout_gravity="center"/>
-</FrameLayout>
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="48dp"
+        android:height="48dp"
+        android:viewportWidth="48.0"
+        android:viewportHeight="48.0">
+    <path
+        android:pathData="M14.83,16.42L24,25.59l9.17,-9.17L36,19.25l-12,12 -12,-12z"
+        android:fillColor="#FFFFFF"/>
+</vector>
