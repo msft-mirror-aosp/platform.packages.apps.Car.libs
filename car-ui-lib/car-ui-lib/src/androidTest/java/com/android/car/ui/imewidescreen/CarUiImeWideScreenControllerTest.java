@@ -96,7 +96,6 @@ import com.android.car.ui.utils.CarUiUtils;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -159,11 +158,6 @@ public class CarUiImeWideScreenControllerTest {
         });
     }
 
-    @After
-    public void destroy() {
-        mActivity.finish();
-    }
-
     @Test
     public void createWideScreenImeView_shouldWrapTheViewInTemplate() {
         // make sure view is wrapped in the template.
@@ -211,12 +205,12 @@ public class CarUiImeWideScreenControllerTest {
     public void onComputeInsets_hideContentArea_shouldUpdateRegionAsTouchable() {
         when(mInputMethodServiceMock.getWindow()).thenReturn(mDialogMock);
         when(mDialogMock.getWindow()).thenReturn(mWindowMock);
-        View view = new FrameLayout(mContext);
+        View view = new FrameLayout(mActivity);
         view.setTop(0);
         view.setBottom(200);
         when(mWindowMock.getDecorView()).thenReturn(view);
 
-        View imeInputView = LayoutInflater.from(mContext)
+        View imeInputView = LayoutInflater.from(mActivity)
                 .inflate(R.layout.test_ime_input_view, null, false);
         CarUiImeWideScreenController carUiImeWideScreenController = getController();
         carUiImeWideScreenController.createWideScreenImeView(imeInputView);
@@ -512,7 +506,7 @@ public class CarUiImeWideScreenControllerTest {
     }
 
     private CarUiImeWideScreenController getController() {
-        return new CarUiImeWideScreenController(mContext, mInputMethodServiceMock) {
+        return new CarUiImeWideScreenController(mActivity, mInputMethodServiceMock) {
             @Override
             public boolean isWideScreenMode() {
                 return true;

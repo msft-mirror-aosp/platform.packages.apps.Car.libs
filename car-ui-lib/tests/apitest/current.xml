@@ -138,6 +138,8 @@
   <public type="dimen" name="car_ui_padding_4"/>
   <public type="dimen" name="car_ui_padding_5"/>
   <public type="dimen" name="car_ui_padding_6"/>
+  <public type="dimen" name="car_ui_padding_7"/>
+  <public type="dimen" name="car_ui_padding_8"/>
   <public type="dimen" name="car_ui_preference_category_icon_margin_end"/>
   <public type="dimen" name="car_ui_preference_category_icon_size"/>
   <public type="dimen" name="car_ui_preference_category_min_height"/>
@@ -288,7 +290,6 @@
   <public type="id" name="car_ui_list_limiting_message"/>
   <public type="id" name="car_ui_preference_container_without_widget"/>
   <public type="id" name="car_ui_recycler_view"/>
-  <public type="id" name="car_ui_recycler_view_container"/>
   <public type="id" name="car_ui_scroll_bar"/>
   <public type="id" name="car_ui_scrollbar_page_down"/>
   <public type="id" name="car_ui_scrollbar_page_up"/>

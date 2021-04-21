@@ -13,10 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.car.ui.button;
+package com.android.car.ui.toolbar;
 
-public enum CarUiButtonStyle {
-    PRIMARY,
-    SECONDARY,
-    FLOATING
+/**
+ * An enum describing the possible search states a toolbar could be in.
+ * See {@link ToolbarController}.
+ */
+public enum SearchMode {
+    /** Don't show a search bar */
+    DISABLED,
+    /** Show a search bar */
+    SEARCH,
+    /**
+     * Show a search bar, but don't include any visual indication it's for searching.
+     * It could just be for editing text.
+     */
+    EDIT,
 }

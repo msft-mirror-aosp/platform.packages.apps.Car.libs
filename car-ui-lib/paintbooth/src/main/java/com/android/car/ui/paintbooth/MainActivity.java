@@ -39,11 +39,11 @@ import androidx.annotation.NonNull;
 import androidx.core.util.Supplier;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.car.ui.FocusArea;
 import com.android.car.ui.baselayout.Insets;
 import com.android.car.ui.baselayout.InsetsChangedListener;
 import com.android.car.ui.core.CarUi;
 import com.android.car.ui.paintbooth.appstyledview.AppStyledViewSampleActivity;
-import com.android.car.ui.paintbooth.button.CarUiButtonActivity;
 import com.android.car.ui.paintbooth.caruirecyclerview.CarUiListItemActivity;
 import com.android.car.ui.paintbooth.caruirecyclerview.CarUiRecyclerViewActivity;
 import com.android.car.ui.paintbooth.caruirecyclerview.GridCarUiRecyclerViewActivity;
@@ -94,7 +94,6 @@ public class MainActivity extends Activity implements InsetsChangedListener {
             new ActivityElement("Widget sample", WidgetActivity.class),
             new ActivityElement("Wide Screen IME", WideScreenImeActivity.class),
             new ActivityElement("Wide Screen View IME", WideScreenTestView.class),
-            new ActivityElement("CarUiButton sample", CarUiButtonActivity.class),
             new ActivityElement("ListItem sample", CarUiListItemActivity.class));
 
     private abstract static class ViewHolder extends RecyclerView.ViewHolder {
@@ -306,6 +305,9 @@ public class MainActivity extends Activity implements InsetsChangedListener {
 
     @Override
     public void onCarUiInsetsChanged(@NonNull Insets insets) {
+        FocusArea focusArea = requireViewById(R.id.focus_area);
+        focusArea.setBoundsOffset(0, insets.getTop(), 0, insets.getBottom());
+        focusArea.setHighlightPadding(0, insets.getTop(), 0, insets.getBottom());
         requireViewById(R.id.list)
                 .setPadding(0, insets.getTop(), 0, insets.getBottom());
         requireViewById(android.R.id.content)

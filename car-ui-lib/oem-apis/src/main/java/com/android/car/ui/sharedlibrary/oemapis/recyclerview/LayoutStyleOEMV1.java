@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 The Android Open Source Project
+ * Copyright (C) 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,24 @@ package com.android.car.ui.sharedlibrary.oemapis.recyclerview;
  */
 public interface LayoutStyleOEMV1 {
 
-    /** Returns number of recyclerview columns */
-    int getNumOfColumns();
+    int LAYOUT_TYPE_LINEAR = 0;
+    int LAYOUT_TYPE_GRID = 1;
 
-    /** Returns linear vs grid */
-    int getLayoutStyle();
+    int ORIENTATION_HORIZONTAL = 0;
+    int ORIENTATION_VERTICAL = 1;
+
+    /** Returns number of recyclerview spans */
+    int getSpanCount();
+
+    /** Returns LAYOUT_TYPE_LINEAR vs LAYOUT_TYPE_GRID */
+    int getLayoutType();
 
     /** Returns layout direction 0 for VERTICAL, 1 for HORIZONTAL */
     int getOrientation();
+
+    /** Returns true if layout is reversed */
+    boolean getReverseLayout();
+
+    /** Returns a wrapper {@link androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup} */
+    SpanSizeLookupOEMV1 getSpanSizeLookup();
 }

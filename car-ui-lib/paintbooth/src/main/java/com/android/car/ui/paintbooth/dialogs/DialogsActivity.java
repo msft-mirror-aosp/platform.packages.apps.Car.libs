@@ -32,6 +32,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.ui.AlertDialogBuilder;
+import com.android.car.ui.FocusArea;
 import com.android.car.ui.baselayout.Insets;
 import com.android.car.ui.baselayout.InsetsChangedListener;
 import com.android.car.ui.core.CarUi;
@@ -60,7 +61,7 @@ public class DialogsActivity extends Activity implements InsetsChangedListener {
         setContentView(R.layout.car_ui_recycler_view_activity);
         ToolbarController toolbar = CarUi.requireToolbar(this);
         toolbar.setTitle(getTitle());
-        toolbar.setState(Toolbar.State.SUBPAGE);
+        toolbar.setNavButtonMode(Toolbar.NavButtonMode.BACK);
 
         mButtons.add(Pair.create(R.string.dialog_show_dialog,
                 v -> showDialog()));
@@ -147,6 +148,7 @@ public class DialogsActivity extends Activity implements InsetsChangedListener {
         new AlertDialogBuilder(this)
                 .setTitle(R.string.standard_alert_dialog)
                 .setEditBox(getString(R.string.edit_me_please), null, null)
+                .setAutoDescUpdateForWidescreen(true)
                 .setEditTextTitleAndDescForWideScreen("title", "desc from app")
                 .setPositiveButton("OK", (dialogInterface, i) -> {
                 })
@@ -337,6 +339,9 @@ public class DialogsActivity extends Activity implements InsetsChangedListener {
 
     @Override
     public void onCarUiInsetsChanged(@NonNull Insets insets) {
+        FocusArea focusArea = requireViewById(R.id.focus_area);
+        focusArea.setBoundsOffset(0, insets.getTop(), 0, insets.getBottom());
+        focusArea.setHighlightPadding(0, insets.getTop(), 0, insets.getBottom());
         requireViewById(R.id.list)
                 .setPadding(0, insets.getTop(), 0, insets.getBottom());
         requireViewById(android.R.id.content)

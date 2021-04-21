@@ -203,6 +203,8 @@ limitations under the License.-->
       <item type="dimen" name="car_ui_padding_4"/>
       <item type="dimen" name="car_ui_padding_5"/>
       <item type="dimen" name="car_ui_padding_6"/>
+      <item type="dimen" name="car_ui_padding_7"/>
+      <item type="dimen" name="car_ui_padding_8"/>
       <item type="dimen" name="car_ui_preference_category_icon_margin_end"/>
       <item type="dimen" name="car_ui_preference_category_icon_size"/>
       <item type="dimen" name="car_ui_preference_category_min_height"/>
@@ -353,7 +355,6 @@ limitations under the License.-->
       <item type="id" name="car_ui_list_limiting_message"/>
       <item type="id" name="car_ui_preference_container_without_widget"/>
       <item type="id" name="car_ui_recycler_view"/>
-      <item type="id" name="car_ui_recycler_view_container"/>
       <item type="id" name="car_ui_scroll_bar"/>
       <item type="id" name="car_ui_scrollbar_page_down"/>
       <item type="id" name="car_ui_scrollbar_page_up"/>
