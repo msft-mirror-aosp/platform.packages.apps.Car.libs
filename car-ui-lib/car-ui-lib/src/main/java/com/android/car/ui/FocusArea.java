@@ -25,8 +25,6 @@ import static com.android.car.ui.utils.RotaryConstants.FOCUS_AREA_LEFT_BOUND_OFF
 import static com.android.car.ui.utils.RotaryConstants.FOCUS_AREA_RIGHT_BOUND_OFFSET;
 import static com.android.car.ui.utils.RotaryConstants.FOCUS_AREA_TOP_BOUND_OFFSET;
 import static com.android.car.ui.utils.RotaryConstants.NUDGE_DIRECTION;
-import static com.android.car.ui.utils.ViewUtils.NO_FOCUS;
-import static com.android.car.ui.utils.ViewUtils.REGULAR_FOCUS;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -38,9 +36,11 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.FocusFinder;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver.OnGlobalFocusChangeListener;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.LinearLayout;
 
@@ -137,8 +137,8 @@ public class FocusArea extends LinearLayout {
     private View mDefaultFocusView;
 
     /**
-     * Whether to focus on the {@code app:defaultFocus} view when nudging to the FocusArea, even if
-     * there was another view in the FocusArea focused before.
+     * Whether to focus on the default focus view when nudging to the FocusArea, even if there was
+     * another view in the FocusArea focused before.
      */
     private boolean mDefaultFocusOverridesHistory;
 
@@ -159,6 +159,9 @@ public class FocusArea extends LinearLayout {
 
     /** Map of specified nudge target FocusAreas. */
     private Map<Integer, FocusArea> mSpecifiedNudgeFocusAreaMap;
+
+    /** Whether wrap-around is enabled. */
+    private boolean mWrapAround;
 
     /**
      * Cache of focus history and nudge history of the rotary controller.
@@ -193,6 +196,16 @@ public class FocusArea extends LinearLayout {
     /** The focused view in this FocusArea, if any. */
     private View mFocusedView;
 
+    private final OnGlobalFocusChangeListener mFocusChangeListener =
+            (oldFocus, newFocus) -> {
+                boolean hasFocus = hasFocus();
+                saveFocusHistory(hasFocus);
+                maybeUpdatePreviousFocusArea(hasFocus, oldFocus);
+                maybeClearFocusAreaHistory(hasFocus, oldFocus);
+                maybeUpdateFocusAreaHighlight(hasFocus);
+                mHasFocus = hasFocus;
+            };
+
     public FocusArea(Context context) {
         super(context);
         init(context, null);
@@ -225,8 +238,6 @@ public class FocusArea extends LinearLayout {
         mBackgroundHighlight = resources.getDrawable(
                 R.drawable.car_ui_focus_area_background_highlight, getContext().getTheme());
 
-        mDefaultFocusOverridesHistory = resources.getBoolean(
-                R.bool.car_ui_focus_area_default_focus_overrides_history);
         mClearFocusAreaHistoryWhenRotating = resources.getBoolean(
                 R.bool.car_ui_clear_focus_area_history_when_rotating);
 
@@ -249,29 +260,20 @@ public class FocusArea extends LinearLayout {
         // should enable it since we override these methods.
         setWillNotDraw(false);
 
-        registerFocusChangeListener();
-
         initAttrs(context, attrs);
     }
 
-    private void registerFocusChangeListener() {
-        getViewTreeObserver().addOnGlobalFocusChangeListener(
-                (oldFocus, newFocus) -> {
-                    boolean hasFocus = hasFocus();
-                    saveFocusHistory(hasFocus);
-                    maybeUpdatePreviousFocusArea(hasFocus, oldFocus);
-                    maybeClearFocusAreaHistory(hasFocus, oldFocus);
-                    maybeUpdateFocusAreaHighlight(hasFocus);
-                    mHasFocus = hasFocus;
-                });
-    }
-
     private void saveFocusHistory(boolean hasFocus) {
+        // Save focus history and clear mFocusedView if focus is leaving this FocusArea.
         if (!hasFocus) {
-            mRotaryCache.saveFocusedView(mFocusedView, SystemClock.uptimeMillis());
-            mFocusedView = null;
+            if (mHasFocus) {
+                mRotaryCache.saveFocusedView(mFocusedView, SystemClock.uptimeMillis());
+                mFocusedView = null;
+            }
             return;
         }
+
+        // Update mFocusedView if a view inside this FocusArea is focused.
         View v = getFocusedChild();
         while (v != null) {
             if (v.isFocused()) {
@@ -425,6 +427,11 @@ public class FocusArea extends LinearLayout {
                     a.getResourceId(R.styleable.FocusArea_nudgeUp, View.NO_ID));
             mSpecifiedNudgeIdMap.put(FOCUS_DOWN,
                     a.getResourceId(R.styleable.FocusArea_nudgeDown, View.NO_ID));
+
+            mDefaultFocusOverridesHistory = a.getBoolean(
+                    R.styleable.FocusArea_defaultFocusOverridesHistory, false);
+
+            mWrapAround = a.getBoolean(R.styleable.FocusArea_wrapAround, false);
         } finally {
             a.recycle();
         }
@@ -459,18 +466,40 @@ public class FocusArea extends LinearLayout {
     }
 
     @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        getViewTreeObserver().addOnGlobalFocusChangeListener(mFocusChangeListener);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        getViewTreeObserver().removeOnGlobalFocusChangeListener(mFocusChangeListener);
+        super.onDetachedFromWindow();
+    }
+
+    @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         // To ensure the focus is initialized properly in rotary mode when there is a window focus
-        // change, this FocusArea will grab the focus from the currently focused view if one of this
-        // FocusArea's descendants is a better focus candidate than the currently focused view.
+        // change, this FocusArea will grab the focus if nothing is focused or the currently
+        // focused view's FocusLevel is lower than REGULAR_FOCUS.
         if (hasWindowFocus && !isInTouchMode()) {
-            maybeAdjustFocus();
+            maybeInitFocus();
         }
         super.onWindowFocusChanged(hasWindowFocus);
     }
 
     /**
-     * Focuses on another view in this FocusArea if the view is a better focus candidate than the
+     * Focuses on another view in this FocusArea if nothing is focused or the currently focused
+     * view's FocusLevel is lower than REGULAR_FOCUS.
+     */
+    private boolean maybeInitFocus() {
+        View root = getRootView();
+        View focus = root.findFocus();
+        return ViewUtils.initFocus(root, focus);
+    }
+
+    /**
+     * Focuses on a view in this FocusArea if the view is a better focus candidate than the
      * currently focused view.
      */
     private boolean maybeAdjustFocus() {
@@ -505,22 +534,8 @@ public class FocusArea extends LinearLayout {
     }
 
     private boolean focusOnDescendant() {
-        if (mDefaultFocusOverridesHistory) {
-            // Check mDefaultFocus before last focused view.
-            if (focusDefaultFocusView() || focusOnLastFocusedView()) {
-                return true;
-            }
-        } else {
-            // Check last focused view before mDefaultFocus.
-            if (focusOnLastFocusedView() || focusDefaultFocusView()) {
-                return true;
-            }
-        }
-        return focusOnFirstFocusableView();
-    }
-
-    private boolean focusDefaultFocusView() {
-        return ViewUtils.adjustFocus(this, /* currentLevel= */ REGULAR_FOCUS);
+        View lastFocusedView = mRotaryCache.getFocusedView(SystemClock.uptimeMillis());
+        return ViewUtils.adjustFocus(this, lastFocusedView, mDefaultFocusOverridesHistory);
     }
 
     /**
@@ -530,15 +545,6 @@ public class FocusArea extends LinearLayout {
      */
     public View getDefaultFocusView() {
         return mDefaultFocusView;
-    }
-
-    private boolean focusOnLastFocusedView() {
-        View lastFocusedView = mRotaryCache.getFocusedView(SystemClock.uptimeMillis());
-        return ViewUtils.requestFocus(lastFocusedView);
-    }
-
-    private boolean focusOnFirstFocusableView() {
-        return ViewUtils.adjustFocus(this, /* currentLevel= */ NO_FOCUS);
     }
 
     private boolean nudgeToShortcutView(Bundle arguments) {
@@ -720,9 +726,28 @@ public class FocusArea extends LinearLayout {
         mBottomOffset = bottom;
     }
 
+    /** Sets whether wrap-around is enabled for this FocusArea. */
+    public void setWrapAround(boolean wrapAround) {
+        mWrapAround = wrapAround;
+    }
+
     /** Sets the default focus view in this FocusArea. */
     public void setDefaultFocus(@NonNull View defaultFocus) {
         mDefaultFocusView = defaultFocus;
+    }
+
+    /**
+     * @inheritDoc
+     * <p>
+     * When {@link #mWrapAround} is true, the search is restricted to descendants of this
+     * {@link FocusArea}.
+     */
+    @Override
+    public View focusSearch(View focused, int direction) {
+        if (mWrapAround) {
+            return FocusFinder.getInstance().findNextFocus(/* root= */ this, focused, direction);
+        }
+        return super.focusSearch(focused, direction);
     }
 
     @VisibleForTesting
