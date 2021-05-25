@@ -19,7 +19,7 @@ import android.content.Context;
 
 import com.android.car.ui.sharedlibrary.oemapis.SharedLibraryVersionProviderOEMV1;
 
-import com.google.car.ui.sharedlibrary.SharedLibraryFactoryImpl;
+import com.chassis.car.ui.sharedlibrary.SharedLibraryFactoryImpl;
 
 /**
  * An implementation of {@link SharedLibraryVersionProviderOEMV1} for the reference design

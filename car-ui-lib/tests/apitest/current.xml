@@ -43,7 +43,9 @@
   <public type="color" name="car_ui_rotary_focus_fill_color"/>
   <public type="color" name="car_ui_rotary_focus_fill_secondary_color"/>
   <public type="color" name="car_ui_rotary_focus_pressed_fill_color"/>
+  <public type="color" name="car_ui_rotary_focus_pressed_fill_secondary_color"/>
   <public type="color" name="car_ui_rotary_focus_pressed_stroke_color"/>
+  <public type="color" name="car_ui_rotary_focus_pressed_stroke_secondary_color"/>
   <public type="color" name="car_ui_rotary_focus_stroke_color"/>
   <public type="color" name="car_ui_rotary_focus_stroke_secondary_color"/>
   <public type="color" name="car_ui_scrollbar_thumb"/>
@@ -87,8 +89,8 @@
   <public type="dimen" name="car_ui_ime_wide_screen_error_text_padding_start"/>
   <public type="dimen" name="car_ui_ime_wide_screen_error_text_size"/>
   <public type="dimen" name="car_ui_ime_wide_screen_input_area_height"/>
-  <public type="dimen" name="car_ui_ime_wide_screen_input_area_margin_top"/>
   <public type="dimen" name="car_ui_ime_wide_screen_input_area_padding_end"/>
+  <public type="dimen" name="car_ui_ime_wide_screen_input_area_padding_top"/>
   <public type="dimen" name="car_ui_ime_wide_screen_input_edit_text_padding_left"/>
   <public type="dimen" name="car_ui_ime_wide_screen_input_edit_text_padding_right"/>
   <public type="dimen" name="car_ui_ime_wide_screen_input_edit_text_size"/>
