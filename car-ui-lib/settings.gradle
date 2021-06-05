@@ -24,3 +24,4 @@ include ':shared-library'
 project(':shared-library').projectDir = new File('./referencedesign/sharedlibrary')
 
 rootProject.name='Chassis'
+include ':car-rotary-lib'
