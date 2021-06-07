@@ -41,11 +41,6 @@ import java.util.function.Supplier;
 public interface ToolbarController {
 
     /**
-     * Returns {@code true} if a two row layout in enabled for the toolbar.
-     */
-    boolean isTabsInSecondRow();
-
-    /**
      * Sets the title of the toolbar to a string resource.
      *
      * <p>The title may not always be shown, for example with one row layout with tabs.
@@ -313,6 +308,14 @@ public interface ToolbarController {
      */
     @Deprecated
     Toolbar.State getState();
+
+    /**
+     * Returns whether or not the state of the toolbar was previously set.
+     *
+     * @deprecated See {@link #setState(Toolbar.State)} for details.
+     */
+    @Deprecated
+    boolean isStateSet();
 
     /**
      * Registers a new {@link Toolbar.OnTabSelectedListener} to the list of listeners.
