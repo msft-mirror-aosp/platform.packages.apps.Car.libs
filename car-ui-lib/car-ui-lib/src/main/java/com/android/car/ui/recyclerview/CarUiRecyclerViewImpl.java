@@ -15,7 +15,7 @@
  */
 package com.android.car.ui.recyclerview;
 
-import static com.android.car.ui.utils.CarUiUtils.findViewByRefId;
+import static com.android.car.ui.utils.CarUiUtils.requireViewByRefId;
 import static com.android.car.ui.utils.RotaryConstants.ROTARY_CONTAINER;
 import static com.android.car.ui.utils.RotaryConstants.ROTARY_HORIZONTALLY_SCROLLABLE;
 import static com.android.car.ui.utils.RotaryConstants.ROTARY_VERTICALLY_SCROLLABLE;
@@ -223,8 +223,11 @@ public final class CarUiRecyclerViewImpl extends CarUiRecyclerView {
                     layoutStyle.getSpanCount(),
                     layoutStyle.getOrientation(),
                     layoutStyle.getReverseLayout());
-            ((GridLayoutManager) layoutManager).setSpanSizeLookup(
-                    ((CarUiGridLayoutStyle) layoutStyle).getSpanSizeLookup());
+            // TODO(b/190444037): revisit usage of LayoutStyles and their casting
+            if (layoutStyle instanceof CarUiGridLayoutStyle) {
+                ((GridLayoutManager) layoutManager).setSpanSizeLookup(
+                        ((CarUiGridLayoutStyle) layoutStyle).getSpanSizeLookup());
+            }
         }
         setLayoutManager(layoutManager);
     }
@@ -308,6 +311,12 @@ public final class CarUiRecyclerViewImpl extends CarUiRecyclerView {
         // Disable the default focus highlight. No highlight should appear when this view is
         // focused.
         setDefaultFocusHighlightEnabled(false);
+
+        // If rotary scrolling is enabled, set a focus change listener to highlight the scrollbar
+        // thumb when this recycler view is focused, i.e. when no focusable descendant is visible.
+        setOnFocusChangeListener(rotaryScrollEnabled ? (v, hasFocus) -> {
+            if (mScrollBar != null) mScrollBar.setHighlightThumb(hasFocus);
+        } : null);
 
         // This view is a rotary container if it's not a scrollable container.
         if (!rotaryScrollEnabled) {
@@ -427,15 +436,14 @@ public final class CarUiRecyclerViewImpl extends CarUiRecyclerView {
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        ((CarUiRecyclerViewContainer) Objects.requireNonNull(
-                findViewByRefId(mContainer, R.id.car_ui_recycler_view)))
+        ((CarUiRecyclerViewContainer) requireViewByRefId(mContainer, R.id.car_ui_recycler_view))
                 .addRecyclerView(this, params);
         parent.addView(mContainer, index);
 
-        createScrollBarFromConfig(findViewByRefId(mContainer, R.id.car_ui_scroll_bar));
+        createScrollBarFromConfig(requireViewByRefId(mContainer, R.id.car_ui_scroll_bar));
     }
 
-    private void createScrollBarFromConfig(View scrollView) {
+    private void createScrollBarFromConfig(@NonNull View scrollView) {
         Class<?> cls;
         try {
             cls = !TextUtils.isEmpty(mScrollBarClass)
