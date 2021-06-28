@@ -35,6 +35,8 @@ import androidx.annotation.VisibleForTesting;
 
 import com.android.car.ui.FocusArea;
 import com.android.car.ui.FocusParkingView;
+import com.android.car.ui.R;
+import com.android.car.ui.uxr.DrawableStateView;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -47,31 +49,39 @@ import java.lang.annotation.RetentionPolicy;
  */
 public final class ViewUtils {
 
+    private static int[] sRestrictedState;
+
     /**
      * No view is focused, the focused view is not shown, or the focused view is a FocusParkingView.
      */
-    public static final int NO_FOCUS = 1;
+    @VisibleForTesting
+    static final int NO_FOCUS = 1;
 
     /** A scrollable container is focused. */
-    public static final int SCROLLABLE_CONTAINER_FOCUS = 2;
+    @VisibleForTesting
+    static final int SCROLLABLE_CONTAINER_FOCUS = 2;
 
     /**
      * A regular view is focused. A regular View is a View that is neither a FocusParkingView nor a
      * scrollable container.
      */
-    public static final int REGULAR_FOCUS = 3;
+    @VisibleForTesting
+    static final int REGULAR_FOCUS = 3;
 
     /**
-     * An implicit default focus view (i.e., the first focusable item in a scrollable container) is
-     * focused.
+     * An implicit default focus view (i.e., the selected item or the first focusable item in a
+     * scrollable container) is focused.
      */
-    public static final int IMPLICIT_DEFAULT_FOCUS = 4;
+    @VisibleForTesting
+    static final int IMPLICIT_DEFAULT_FOCUS = 4;
 
     /** The {@code app:defaultFocus} view is focused. */
-    public static final int DEFAULT_FOCUS = 5;
+    @VisibleForTesting
+    static final int DEFAULT_FOCUS = 5;
 
     /** The {@code android:focusedByDefault} view is focused. */
-    public static final int FOCUSED_BY_DEFAULT = 6;
+    @VisibleForTesting
+    static final int FOCUSED_BY_DEFAULT = 6;
 
     /**
      * Focus level of a view. When adjusting the focus, the view with the highest focus level will
@@ -80,7 +90,7 @@ public final class ViewUtils {
     @IntDef(flag = true, value = {NO_FOCUS, SCROLLABLE_CONTAINER_FOCUS, REGULAR_FOCUS,
             IMPLICIT_DEFAULT_FOCUS, DEFAULT_FOCUS, FOCUSED_BY_DEFAULT})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface FocusLevel {
+    private @interface FocusLevel {
     }
 
     /** This is a utility class. */
@@ -158,8 +168,24 @@ public final class ViewUtils {
      * @return whether the view is focused
      */
     public static boolean adjustFocus(@NonNull View root, @Nullable View currentFocus) {
-        @FocusLevel int level = getFocusLevel(currentFocus);
-        return adjustFocus(root, level);
+        @FocusLevel int currentLevel = getFocusLevel(currentFocus);
+        return adjustFocus(root, currentLevel, /* cachedFocusedView= */ null,
+                /* defaultFocusOverridesHistory= */ false);
+    }
+
+    /**
+     * If the {@code currentFocus}'s FocusLevel is lower than REGULAR_FOCUS, adjusts focus within
+     * {@code root}. See {@link #adjustFocus(View, int)}. Otherwise no-op.
+     *
+     * @return whether the focus has changed
+     */
+    public static boolean initFocus(@NonNull View root, @Nullable View currentFocus) {
+        @FocusLevel int currentLevel = getFocusLevel(currentFocus);
+        if (currentLevel >= REGULAR_FOCUS) {
+            return false;
+        }
+        return adjustFocus(root, currentLevel, /* cachedFocusedView= */ null,
+                /* defaultFocusOverridesHistory= */ false);
     }
 
     /**
@@ -168,7 +194,42 @@ public final class ViewUtils {
      *
      * @return whether the view is focused
      */
-    public static boolean adjustFocus(@NonNull View root, @FocusLevel int currentLevel) {
+    @VisibleForTesting
+    static boolean adjustFocus(@NonNull View root, @FocusLevel int currentLevel) {
+        return adjustFocus(root, currentLevel, /* cachedFocusedView= */ null,
+                /* defaultFocusOverridesHistory= */ false);
+    }
+
+    /**
+     * Searches the {@code root}'s descendants for a view with the highest {@link FocusLevel} and
+     * focuses on it or the {@code cachedFocusedView}.
+     *
+     * @return whether the view is focused
+     */
+    public static boolean adjustFocus(@NonNull View root,
+            @Nullable View cachedFocusedView,
+            boolean defaultFocusOverridesHistory) {
+        return adjustFocus(root, NO_FOCUS, cachedFocusedView, defaultFocusOverridesHistory);
+    }
+
+    /**
+     * Searches the {@code root}'s descendants for a view with the highest {@link FocusLevel}. If
+     * the view's FocusLevel is higher than {@code currentLevel}, focuses on the view or {@code
+     * cachedFocusedView}.
+     *
+     * @return whether the view is focused
+     */
+    private static boolean adjustFocus(@NonNull View root,
+            @FocusLevel int currentLevel,
+            @Nullable View cachedFocusedView,
+            boolean defaultFocusOverridesHistory) {
+        // If the previously focused view has higher priority than the default focus, try to focus
+        // on the previously focused view.
+        if (!defaultFocusOverridesHistory && requestFocus(cachedFocusedView)) {
+            return true;
+        }
+
+        // Try to focus on the default focus view.
         if (currentLevel < FOCUSED_BY_DEFAULT && focusOnFocusedByDefaultView(root)) {
             return true;
         }
@@ -178,6 +239,14 @@ public final class ViewUtils {
         if (currentLevel < IMPLICIT_DEFAULT_FOCUS && focusOnImplicitDefaultFocusView(root)) {
             return true;
         }
+
+        // If the previously focused view has lower priority than the default focus, try to focus
+        // on the previously focused view.
+        if (defaultFocusOverridesHistory && requestFocus(cachedFocusedView)) {
+            return true;
+        }
+
+        // Try to focus on other views with low focus levels.
         if (currentLevel < REGULAR_FOCUS && focusOnFirstRegularView(root)) {
             return true;
         }
@@ -215,8 +284,8 @@ public final class ViewUtils {
     }
 
     /**
-     * Returns whether the {@code view} is an implicit default focus view, i.e., the first focusable
-     * item in a rotary container.
+     * Returns whether the {@code view} is an implicit default focus view, i.e., the selected
+     * item or the first focusable item in a rotary container.
      */
     @VisibleForTesting
     static boolean isImplicitDefaultFocusView(@NonNull View view) {
@@ -233,7 +302,8 @@ public final class ViewUtils {
         if (rotaryContainer == null) {
             return false;
         }
-        return findFirstFocusableDescendant(rotaryContainer) == view;
+        return findFirstSelectedFocusableDescendant(rotaryContainer) == view
+                || findFirstFocusableDescendant(rotaryContainer) == view;
     }
 
     private static boolean isRotaryContainer(@NonNull View view) {
@@ -358,15 +428,21 @@ public final class ViewUtils {
 
     /**
      * Searches the {@code view} and its descendants in depth first order, and returns the first
-     * implicit default focus view, i.e., the first focusable item in the first rotary container.
-     * Returns null if not found.
+     * implicit default focus view, i.e., the selected item or the first focusable item in the
+     * first rotary container. Returns null if not found.
      */
     @VisibleForTesting
     @Nullable
     static View findImplicitDefaultFocusView(@NonNull View view) {
         View rotaryContainer = findRotaryContainer(view);
-        return rotaryContainer == null
-                ? null
+        if (rotaryContainer == null) {
+            return null;
+        }
+
+        View selectedItem = findFirstSelectedFocusableDescendant(rotaryContainer);
+
+        return selectedItem != null
+                ? selectedItem
                 : findFirstFocusableDescendant(rotaryContainer);
     }
 
@@ -379,6 +455,18 @@ public final class ViewUtils {
     static View findFirstFocusableDescendant(@NonNull View view) {
         return depthFirstSearch(view,
                 /* targetPredicate= */ v -> v != view && canTakeFocus(v),
+                /* skipPredicate= */ v -> !v.isShown());
+    }
+
+    /**
+     * Searches the {@code view}'s descendants in depth first order, and returns the first view
+     * that is selected and can take focus, or null if not found.
+     */
+    @VisibleForTesting
+    @Nullable
+    static View findFirstSelectedFocusableDescendant(@NonNull View view) {
+        return depthFirstSearch(view,
+                /* targetPredicate= */ v -> v != view && v.isSelected() && canTakeFocus(v),
                 /* skipPredicate= */ v -> !v.isShown());
     }
 
@@ -430,5 +518,40 @@ public final class ViewUtils {
                 // If it's a scrollable container, it can be focused only when it has no focusable
                 // descendants. We focus on it so that the rotary controller can scroll it.
                 && (!isScrollableContainer(view) || findFirstFocusableDescendant(view) == null);
+    }
+
+    /**
+     * Traverses the view hierarchy, and whenever it sees a {@link DrawableStateView}, adds
+     * state_ux_restricted to it.
+     *
+     * Note that this will remove any other drawable states added by other calls to
+     * {@link DrawableStateView#setExtraDrawableState(int[], int[])}
+     */
+    public static void makeAllViewsUxRestricted(@Nullable View view, boolean restricted) {
+        if (view instanceof DrawableStateView) {
+            if (sRestrictedState == null) {
+                int androidStateUxRestricted = view.getResources()
+                            .getIdentifier("state_ux_restricted", "attr", "android");
+
+                if (androidStateUxRestricted == 0) {
+                    sRestrictedState = new int[] { R.attr.state_ux_restricted };
+                } else {
+                    sRestrictedState = new int[] {
+                        R.attr.state_ux_restricted,
+                        androidStateUxRestricted
+                    };
+                }
+            }
+
+            ((DrawableStateView) view).setExtraDrawableState(
+                    restricted ? sRestrictedState : null, null);
+        }
+
+        if (view instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) view;
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                makeAllViewsUxRestricted(vg.getChildAt(i), restricted);
+            }
+        }
     }
 }
