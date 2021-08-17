@@ -57,7 +57,7 @@ public class CarUiInstaller extends ContentProvider {
     @Override
     public boolean onCreate() {
         Context context = getContext();
-        if (context == null) {
+        if (context == null || !(context.getApplicationContext() instanceof Application)) {
             Log.e(TAG, "CarUiInstaller had a null context!");
             return false;
         }
