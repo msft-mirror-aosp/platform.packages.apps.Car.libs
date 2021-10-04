@@ -34,6 +34,7 @@ import androidx.annotation.Nullable;
 import com.android.car.ui.baselayout.Insets;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Locale;
 
 /**
@@ -54,16 +55,41 @@ public class CarUiInstaller extends ContentProvider {
             Build.TYPE.toLowerCase(Locale.ROOT).contains("debug")
                     || Build.TYPE.toLowerCase(Locale.ROOT).equals("eng");
 
+    // applications against which we have already called register
+    private static final HashSet<Application> sAppsRegistered = new HashSet<Application>();
+
+    private static boolean hasAlreadyRegistered(Application application) {
+        synchronized(sAppsRegistered) {
+            return !sAppsRegistered.add(application);
+        }
+    }
+
     @Override
     public boolean onCreate() {
         Context context = getContext();
         if (context == null || !(context.getApplicationContext() instanceof Application)) {
-            Log.e(TAG, "CarUiInstaller had a null context!");
+            Log.e(TAG, "CarUiInstaller had a null context, unable to call register!"
+                        + " Need app to call register by itself");
             return false;
         }
         Log.i(TAG, "CarUiInstaller started for " + context.getPackageName());
 
         Application application = (Application) context.getApplicationContext();
+        register(application);
+
+        return true;
+    }
+
+    /**
+     * In some cases {@link CarUiInstaller#onCreate} is called before the {@link Application}
+     * instance is created. In those cases applications have to call this method separately
+     * after the Application instance is fully initialized.
+     */
+    public static void register(@NonNull Application application) {
+        if (hasAlreadyRegistered(application)) {
+            return;
+        }
+
         application.registerActivityLifecycleCallbacks(
                 new Application.ActivityLifecycleCallbacks() {
                     private Insets mInsets = null;
@@ -143,8 +169,6 @@ public class CarUiInstaller extends ContentProvider {
             CheckCarUiComponents checkCarUiComponents = new CheckCarUiComponents(application);
             application.registerActivityLifecycleCallbacks(checkCarUiComponents);
         }
-
-        return true;
     }
 
     @Nullable
