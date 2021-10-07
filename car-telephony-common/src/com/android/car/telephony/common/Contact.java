@@ -688,7 +688,7 @@ public class Contact implements Parcelable, Comparable<Contact> {
             return Integer.compare(type, otherType);
         }
         Locale currentLocale = Locale.getDefault();
-        if (mCollator == null || mLocale.equals(currentLocale)) {
+        if (mCollator == null || mLocale == null || !mLocale.equals(currentLocale)) {
             mCollator = Collator.getInstance(currentLocale);
             mLocale = currentLocale;
         }
