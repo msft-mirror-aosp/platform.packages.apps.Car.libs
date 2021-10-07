@@ -30,7 +30,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/car_ui_list_item_background"
-        android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -42,7 +41,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/car_ui_list_item_background"
-        android:clickable="true"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/car_ui_list_item_action_container"
@@ -70,7 +68,7 @@
             android:layout_height="@dimen/car_ui_list_item_icon_size"
             android:layout_gravity="center"
             android:visibility="gone"
-            android:scaleType="fitXY" />
+            android:scaleType="fitCenter" />
 
         <ImageView
             android:id="@+id/car_ui_list_item_content_icon"
@@ -78,7 +76,7 @@
             android:layout_height="@dimen/car_ui_list_item_content_icon_height"
             android:layout_gravity="center"
             android:visibility="gone"
-            android:scaleType="fitXY" />
+            android:scaleType="fitCenter" />
 
         <ImageView
             android:id="@+id/car_ui_list_item_avatar_icon"
@@ -87,38 +85,35 @@
             android:layout_height="@dimen/car_ui_list_item_avatar_icon_height"
             android:layout_gravity="center"
             android:visibility="gone"
-            android:scaleType="fitXY" />
+            android:scaleType="fitCenter" />
     </FrameLayout>
 
-    <!-- Use nested layout as a workaround for a regression in constraintlayout where chains not
-    are not rendered correctly when the tail is gone (b/168627311).-->
-    <LinearLayout
-        android:id="@+id/car_ui_list_item_text_container"
+    <CarUiTextView
+        android:id="@+id/car_ui_list_item_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/car_ui_list_item_action_container"
-        app:layout_constraintStart_toEndOf="@id/car_ui_list_item_icon_container"
         android:layout_marginStart="@dimen/car_ui_list_item_text_start_margin"
-        app:layout_goneMarginStart="@dimen/car_ui_list_item_text_no_icon_start_margin"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/car_ui_list_item_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:singleLine="@bool/car_ui_list_item_single_line_title"
-            android:textDirection="locale"
-            android:textAppearance="@style/TextAppearance.CarUi.ListItem" />
-
-        <TextView
-            android:id="@+id/car_ui_list_item_body"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textDirection="locale"
-            android:textAppearance="@style/TextAppearance.CarUi.ListItem.Body" />
-    </LinearLayout>
+        android:singleLine="@bool/car_ui_list_item_single_line_title"
+        android:textAppearance="@style/TextAppearance.CarUi.ListItem"
+        android:textAlignment="viewStart"
+        app:layout_constraintBottom_toTopOf="@+id/car_ui_list_item_body"
+        app:layout_constraintEnd_toStartOf="@+id/car_ui_list_item_action_container"
+        app:layout_constraintStart_toEndOf="@+id/car_ui_list_item_icon_container"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_goneMarginStart="@dimen/car_ui_list_item_text_no_icon_start_margin" />
+    <CarUiTextView
+        android:id="@+id/car_ui_list_item_body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/car_ui_list_item_text_start_margin"
+        android:textAppearance="@style/TextAppearance.CarUi.ListItem.Body"
+        android:textAlignment="viewStart"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/car_ui_list_item_action_container"
+        app:layout_constraintStart_toEndOf="@+id/car_ui_list_item_icon_container"
+        app:layout_constraintTop_toBottomOf="@+id/car_ui_list_item_title"
+        app:layout_goneMarginStart="@dimen/car_ui_list_item_text_no_icon_start_margin" />
 
     <!-- This touch interceptor is sized and positioned to encompass the action container   -->
     <View
@@ -126,7 +121,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/car_ui_list_item_background"
-        android:clickable="true"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/car_ui_list_item_action_container"
         app:layout_constraintEnd_toEndOf="@id/car_ui_list_item_action_container"
@@ -178,7 +172,7 @@
             android:layout_width="@dimen/car_ui_list_item_supplemental_icon_size"
             android:layout_height="@dimen/car_ui_list_item_supplemental_icon_size"
             android:layout_gravity="center"
-            android:scaleType="fitXY" />
+            android:scaleType="fitCenter" />
     </FrameLayout>
 
     <androidx.constraintlayout.widget.Guideline

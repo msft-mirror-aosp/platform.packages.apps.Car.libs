@@ -30,11 +30,11 @@ import androidx.preference.PreferenceViewHolder;
 
 import com.android.car.ui.R;
 import com.android.car.ui.utils.CarUiUtils;
-import com.android.car.ui.utils.ViewUtils;
 
 import java.util.function.Consumer;
 
 /** A class implements some basic methods of a seekbar dialog preference. */
+@SuppressWarnings("AndroidJdkLibsChecker")
 public class CarUiSeekBarDialogPreference extends DialogPreference
         implements DialogFragmentCallbacks, UxRestrictablePreference {
 
@@ -278,7 +278,7 @@ public class CarUiSeekBarDialogPreference extends DialogPreference
     public void onBindViewHolder(PreferenceViewHolder holder) {
         super.onBindViewHolder(holder);
 
-        ViewUtils.makeAllViewsUxRestricted(holder.itemView, isUxRestricted());
+        CarUiUtils.makeAllViewsUxRestricted(holder.itemView, isUxRestricted());
     }
 
     @Override

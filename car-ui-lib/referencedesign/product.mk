@@ -1,9 +1,30 @@
 # Inherit from this product to include the "Reference Design" RROs for CarUi
 
+#############################################
+#                  WARNING                  #
+#############################################
+# The OEM APIs as they appear on this       #
+# branch of android are not finalized!      #
+# If a shared library is built using them,  #
+# it will cause apps to crash!              #
+#                                           #
+# Please only use a shared library with     #
+# a later version of car-ui-lib.            #
+#############################################
+#PRODUCT_PACKAGES += \
+#   car-ui-lib-sharedlibrary \
+
+PRODUCT_PRODUCT_PROPERTIES += ro.build.automotive.car.ui.shared.library.package.name=com.chassis.car.ui.sharedlibrary
+
+PRODUCT_COPY_FILES += \
+    packages/apps/Car/libs/car-ui-lib/referencedesign/car-ui-lib-preinstalled-packages.xml:system/etc/sysconfig/car-ui-lib-preinstalled-packages.xml \
+
+
 # Include generated RROs
 PRODUCT_PACKAGES += \
     googlecarui-com-android-car-ui-paintbooth \
     googlecarui-com-google-android-car-ui-paintbooth \
+    googlecarui-com-google-android-carui-ats \
     googlecarui-com-android-car-rotaryplayground \
     googlecarui-com-android-car-themeplayground \
     googlecarui-com-android-car-carlauncher \
@@ -18,6 +39,7 @@ PRODUCT_PACKAGES += \
     googlecarui-com-android-car-settings \
     googlecarui-com-android-car-voicecontrol \
     googlecarui-com-android-car-faceenroll \
+    googlecarui-com-android-managedprovisioning \
     googlecarui-com-android-settings-intelligence \
     googlecarui-com-google-android-apps-automotive-inputmethod \
     googlecarui-com-google-android-apps-automotive-inputmethod-dev \
@@ -26,25 +48,11 @@ PRODUCT_PACKAGES += \
     googlecarui-com-google-android-gms \
     googlecarui-com-google-android-gsf \
     googlecarui-com-google-android-packageinstaller \
+    googlecarui-com-google-android-permissioncontroller \
     googlecarui-com-google-android-carassistant \
     googlecarui-com-google-android-tts \
-    googlecarui-com-android-managedprovisioning \
+    googlecarui-com-android-htmlviewer \
     googlecarui-com-android-vending \
-
-
-# Include generated RROs that that use targetName
-PRODUCT_PACKAGES += \
-    googlecarui-overlayable-com-google-android-apps-automotive-inputmethod \
-    googlecarui-overlayable-com-google-android-apps-automotive-inputmethod-dev \
-    googlecarui-overlayable-com-google-android-apps-automotive-templates-host \
-    googlecarui-overlayable-com-google-android-embedded-projection \
-    googlecarui-overlayable-com-google-android-gms \
-    googlecarui-overlayable-com-google-android-gsf \
-    googlecarui-overlayable-com-google-android-packageinstaller \
-    googlecarui-overlayable-com-google-android-permissioncontroller \
-    googlecarui-overlayable-com-google-android-carassistant \
-    googlecarui-overlayable-com-google-android-tts \
-    googlecarui-overlayable-com-android-vending \
 
 # This system property is used to enable the RROs on startup via
 # the requiredSystemPropertyName/Value attributes in the manifest

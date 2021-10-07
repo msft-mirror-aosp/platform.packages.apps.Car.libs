@@ -16,7 +16,10 @@
 
 package com.android.car.ui.preference;
 
+import static com.android.car.ui.utils.CarUiUtils.getAttr;
+
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -28,7 +31,6 @@ import androidx.preference.PreferenceViewHolder;
 
 import com.android.car.ui.R;
 import com.android.car.ui.utils.CarUiUtils;
-import com.android.car.ui.utils.ViewUtils;
 
 import java.util.function.Consumer;
 
@@ -36,28 +38,44 @@ import java.util.function.Consumer;
  * This class extends the base {@link EditTextPreference} class. Adds the drawable icon to
  * the preference.
  */
+@SuppressWarnings("AndroidJdkLibsChecker")
 public class CarUiEditTextPreference extends EditTextPreference
         implements UxRestrictablePreference {
 
     private Consumer<Preference> mRestrictedClickListener;
-    private boolean mUxRestricted = false;
-    private boolean mShowChevron = true;
+    private boolean mUxRestricted;
+    private boolean mShowChevron;
 
     public CarUiEditTextPreference(Context context, AttributeSet attrs,
             int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        init(attrs, defStyleAttr, defStyleRes);
     }
 
     public CarUiEditTextPreference(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+        this(context, attrs, defStyleAttr, 0);
     }
 
     public CarUiEditTextPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, getAttr(context, R.attr.editTextPreferenceStyle,
+                android.R.attr.editTextPreferenceStyle));
     }
 
     public CarUiEditTextPreference(Context context) {
-        super(context);
+        this(context, null);
+    }
+
+    private void init(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        TypedArray a = getContext().obtainStyledAttributes(
+                attrs,
+                R.styleable.CarUiPreference,
+                defStyleAttr,
+                defStyleRes);
+
+        mShowChevron = a.getBoolean(R.styleable.CarUiPreference_showChevron, true);
+        mUxRestricted = a.getBoolean(R.styleable.CarUiPreference_car_ui_ux_restricted, false);
+
+        a.recycle();
     }
 
     protected void setTwoActionLayout() {
@@ -94,7 +112,7 @@ public class CarUiEditTextPreference extends EditTextPreference
     public void onBindViewHolder(PreferenceViewHolder holder) {
         super.onBindViewHolder(holder);
 
-        ViewUtils.makeAllViewsUxRestricted(holder.itemView, isUxRestricted());
+        CarUiUtils.makeAllViewsUxRestricted(holder.itemView, isUxRestricted());
     }
 
     @Override

@@ -17,6 +17,7 @@
 package com.android.car.ui.preference;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
 
 import androidx.annotation.Nullable;
@@ -25,7 +26,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 
 import com.android.car.ui.R;
-import com.android.car.ui.utils.ViewUtils;
+import com.android.car.ui.utils.CarUiUtils;
 
 import java.util.function.Consumer;
 
@@ -33,6 +34,7 @@ import java.util.function.Consumer;
  * This class extends the base {@link ListPreference} class. Adds the drawable icon to
  * the preference.
  */
+@SuppressWarnings("AndroidJdkLibsChecker")
 public class CarUiListPreference extends ListPreference implements UxRestrictablePreference {
 
     private Consumer<Preference> mRestrictedClickListener;
@@ -41,18 +43,30 @@ public class CarUiListPreference extends ListPreference implements UxRestrictabl
     public CarUiListPreference(Context context, AttributeSet attrs,
             int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        init(attrs, defStyleAttr, defStyleRes);
     }
 
     public CarUiListPreference(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+        this(context, attrs, defStyleAttr, R.style.Preference_CarUi_Preference);
     }
 
     public CarUiListPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, R.attr.carUiPreferenceStyle);
     }
 
     public CarUiListPreference(Context context) {
-        super(context);
+        this(context, null);
+    }
+
+    private void init(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        TypedArray a = getContext().obtainStyledAttributes(
+                attrs,
+                R.styleable.CarUiPreference,
+                defStyleAttr,
+                defStyleRes);
+
+        mUxRestricted = a.getBoolean(R.styleable.CarUiPreference_car_ui_ux_restricted, false);
+        a.recycle();
     }
 
     @Override
@@ -73,7 +87,7 @@ public class CarUiListPreference extends ListPreference implements UxRestrictabl
     public void onBindViewHolder(PreferenceViewHolder holder) {
         super.onBindViewHolder(holder);
 
-        ViewUtils.makeAllViewsUxRestricted(holder.itemView, isUxRestricted());
+        CarUiUtils.makeAllViewsUxRestricted(holder.itemView, isUxRestricted());
     }
 
     @Override

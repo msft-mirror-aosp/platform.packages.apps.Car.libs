@@ -21,18 +21,17 @@ import android.util.AttributeSet;
 import android.widget.RadioButton;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.res.TypedArrayUtils;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 import androidx.preference.TwoStatePreference;
 
 import com.android.car.ui.R;
 import com.android.car.ui.utils.CarUiUtils;
-import com.android.car.ui.utils.ViewUtils;
 
 import java.util.function.Consumer;
 
 /** A preference which shows a radio button at the start of the preference. */
+@SuppressWarnings("AndroidJdkLibsChecker")
 public class CarUiRadioButtonPreference extends TwoStatePreference
         implements UxRestrictablePreference {
 
@@ -52,7 +51,7 @@ public class CarUiRadioButtonPreference extends TwoStatePreference
     public CarUiRadioButtonPreference(Context context, AttributeSet attrs) {
         // Reusing preferenceStyle since there is no separate style for TwoStatePreference or
         // CarUiRadioButtonPreference.
-        this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.preferenceStyle,
+        this(context, attrs, CarUiUtils.getAttr(context, R.attr.preferenceStyle,
                 android.R.attr.preferenceStyle));
     }
 
@@ -85,7 +84,7 @@ public class CarUiRadioButtonPreference extends TwoStatePreference
                 R.id.radio_button);
         radioButton.setChecked(isChecked());
 
-        ViewUtils.makeAllViewsUxRestricted(holder.itemView, mUxRestricted);
+        CarUiUtils.makeAllViewsUxRestricted(holder.itemView, mUxRestricted);
     }
 
     @Override

@@ -17,13 +17,18 @@
 import argparse
 import os
 import sys
+import re
 from resource_utils import get_all_resources, get_resources_from_single_file, add_resource_to_set, Resource
 from git_utils import has_chassis_changes
-from datetime import date
+from datetime import datetime
+
+if sys.version_info[0] != 3:
+    print("Must use python 3")
+    sys.exit(1)
 
 # path to 'packages/apps/Car/libs/car-ui-lib/'
-ROOT_FOLDER = os.path.dirname(os.path.abspath(__file__)) + '/../..'
-OUTPUT_FILE_PATH = ROOT_FOLDER + '/tests/apitest/'
+ROOT_FOLDER = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../'))
+OUTPUT_FILE_PATH = os.path.join(ROOT_FOLDER, 'tests/apitest/')
 
 
 COPYRIGHT_STR = """Copyright (C) %s The Android Open Source Project
@@ -38,8 +43,10 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations under the License.""" % (date.today().strftime("%Y"))
+limitations under the License.""" % (datetime.today().strftime("%Y"))
 
+
+AUTOGENERATION_NOTICE_STR = """ THIS FILE WAS AUTO GENERATED, DO NOT EDIT MANUALLY. """
 
 """
 Script used to update the 'current.xml' file. This is being used as part of pre-submits to
@@ -60,15 +67,23 @@ def main():
         # Don't run because there were no chassis changes
         return
 
+    resources = get_all_resources(os.path.join(ROOT_FOLDER, 'car-ui-lib/src/main/res'))
+    check_resource_names(resources, get_resources_from_single_file(os.path.join(OUTPUT_FILE_PATH, 'resource_name_allowed.xml')))
+
+    OVERLAYABLE_OUTPUT_FILE_PATH = os.path.join(ROOT_FOLDER, 'car-ui-lib/src/main/res-overlayable/values/overlayable.xml')
     output_file = args.file or 'current.xml'
     if args.compare:
-        compare_resources(ROOT_FOLDER+'/car-ui-lib/src/main/res', OUTPUT_FILE_PATH + 'current.xml')
-    else:
-        generate_current_file(ROOT_FOLDER+'/car-ui-lib/src/main/res', output_file)
-        generate_overlayable_file(ROOT_FOLDER+'/car-ui-lib/src/main/res')
+        old_mapping = get_resources_from_single_file(os.path.join(OUTPUT_FILE_PATH, 'current.xml'))
+        compare_resources(old_mapping, resources, os.path.join(OUTPUT_FILE_PATH, 'current.xml'))
 
-def generate_current_file(res_folder, output_file='current.xml'):
-    resources = get_all_resources(res_folder)
+        old_mapping = get_resources_from_single_file(OVERLAYABLE_OUTPUT_FILE_PATH)
+        add_constraintlayout_resources(resources)
+        compare_resources(old_mapping, resources, OVERLAYABLE_OUTPUT_FILE_PATH)
+    else:
+        generate_current_file(resources, output_file)
+        generate_overlayable_file(resources, OVERLAYABLE_OUTPUT_FILE_PATH)
+
+def generate_current_file(resources, output_file='current.xml'):
     resources = sorted(resources, key=lambda x: x.type + x.name)
 
     # defer importing lxml to here so that people who aren't editing chassis don't have to have
@@ -77,7 +92,7 @@ def generate_current_file(res_folder, output_file='current.xml'):
 
     root = etree.Element('resources')
 
-    root.addprevious(etree.Comment('This file is AUTO GENERATED, DO NOT EDIT MANUALLY.'))
+    root.addprevious(etree.Comment(AUTOGENERATION_NOTICE_STR))
     for resource in resources:
         item = etree.SubElement(root, 'public')
         item.set('type', resource.type)
@@ -85,11 +100,39 @@ def generate_current_file(res_folder, output_file='current.xml'):
 
     data = etree.ElementTree(root)
 
-    with open(OUTPUT_FILE_PATH + output_file, 'wb') as f:
+    with open(os.path.join(OUTPUT_FILE_PATH, output_file), 'wb') as f:
         data.write(f, pretty_print=True, xml_declaration=True, encoding='utf-8')
 
-def generate_overlayable_file(res_folder):
-    resources = get_all_resources(res_folder)
+def generate_overlayable_file(resources, output_file='overlayable.xml'):
+    add_constraintlayout_resources(resources)
+    resources = sorted(resources, key=lambda x: x.type + x.name)
+
+    # defer importing lxml to here so that people who aren't editing chassis don't have to have
+    # lxml installed
+    import lxml.etree as etree
+
+    root = etree.Element('resources')
+
+    root.addprevious(etree.Comment(COPYRIGHT_STR))
+    root.addprevious(etree.Comment(AUTOGENERATION_NOTICE_STR))
+
+    overlayable = etree.SubElement(root, 'overlayable')
+    overlayable.set('name', 'car-ui-lib')
+
+    policy = etree.SubElement(overlayable, 'policy')
+    policy.set('type', 'public')
+
+    for resource in resources:
+        item = etree.SubElement(policy, 'item')
+        item.set('type', resource.type)
+        item.set('name', resource.name)
+
+    data = etree.ElementTree(root)
+
+    with open(output_file, 'wb') as f:
+        data.write(f, pretty_print=True, xml_declaration=True, encoding='utf-8')
+
+def add_constraintlayout_resources(resources):
     # We need these to be able to use base layouts in RROs
     # This should become unnecessary in S
     # source: https://android.googlesource.com/platform/frameworks/opt/sherpa/+/studio-3.0/constraintlayout/src/main/res/values/attrs.xml
@@ -143,39 +186,26 @@ def generate_overlayable_file(res_folder):
     add_resource_to_set(resources, Resource('layout_constraintVertical_chainStyle', 'attr'))
     add_resource_to_set(resources, Resource('layout_editor_absoluteX', 'attr'))
     add_resource_to_set(resources, Resource('layout_editor_absoluteY', 'attr'))
-    resources = sorted(resources, key=lambda x: x.type + x.name)
 
-    # defer importing lxml to here so that people who aren't editing chassis don't have to have
-    # lxml installed
-    import lxml.etree as etree
+def check_resource_names(resources, allowed):
+    newlist = resources.difference(allowed)
+    failed=False
+    for resource in newlist:
+        resourceType= resource.type
+        resourceName = resource.name
+        if resourceType == 'attr' and not re.match("^CarUi", resourceName, re.IGNORECASE):
+            print(f"Please consider changing {resourceType}/{resourceName} to something like CarUi{resourceName}")
+            failed=True
+        elif resourceType == 'style' and not re.search("CarUi", resourceName, re.IGNORECASE):
+            print(f"Please consider changing {resourceType}/{resourceName} to something like CarUi{resourceName}")
+            failed=True
+        elif resourceType != 'attr' and resourceType != 'style' and not re.match("^car_ui_", resourceName, re.IGNORECASE):
+            print(f"Please consider changing {resourceType}/{resourceName} to something like car_ui_{resourceName}")
+            failed=True
+    if failed:
+        sys.exit(1)
 
-    root = etree.Element('resources')
-
-    root.addprevious(etree.Comment(COPYRIGHT_STR))
-    root.addprevious(etree.Comment('THIS FILE IS AUTO GENERATED, DO NOT EDIT MANUALLY.'))
-
-    overlayable = etree.SubElement(root, 'overlayable')
-    overlayable.set('name', 'car-ui-lib')
-
-    policy = etree.SubElement(overlayable, 'policy')
-    policy.set('type', 'public')
-
-    for resource in resources:
-        item = etree.SubElement(policy, 'item')
-        item.set('type', resource.type)
-        item.set('name', resource.name)
-
-    data = etree.ElementTree(root)
-
-    output_file=ROOT_FOLDER+'/car-ui-lib/src/main/res-overlayable/values/overlayable.xml'
-    with open(output_file, 'wb') as f:
-        data.write(f, pretty_print=True, xml_declaration=True, encoding='utf-8')
-
-def compare_resources(res_folder, res_public_file):
-    old_mapping = get_resources_from_single_file(res_public_file)
-
-    new_mapping = get_all_resources(res_folder)
-
+def compare_resources(old_mapping, new_mapping, res_public_file):
     removed = old_mapping.difference(new_mapping)
     added = new_mapping.difference(old_mapping)
     if len(removed) > 0:
@@ -185,7 +215,8 @@ def compare_resources(res_folder, res_public_file):
 
     if len(added) + len(removed) > 0:
         print("Some resource have been modified. If this is intentional please " +
-              "run 'python auto-generate-resources.py' again and submit the new current.xml")
+              "run 'python3 $ANDROID_BUILD_TOP/packages/apps/Car/libs/car-ui-lib/tests/apitest/" +
+              "auto-generate-resources.py' again and submit the new %s" % res_public_file)
         sys.exit(1)
 
 if __name__ == '__main__':

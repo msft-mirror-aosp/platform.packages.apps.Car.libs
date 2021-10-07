@@ -39,6 +39,27 @@ android_library {
         "libphonenumber",
     ],
 
-    libs: ["android.car"],
+    libs: ["android.car-system-stubs"],
+}
 
+// Used by instrumented test
+android_app {
+    name: "CarTelephonyLibTestsApp",
+
+    resource_dirs: ["res"],
+
+    srcs: ["src/**/*.java"],
+
+    static_libs: [
+        "androidx.legacy_legacy-support-v4",
+        "car-apps-common",
+        "glide-prebuilt",
+        "libphonenumber",
+    ],
+
+    optimize: {
+        enabled: false,
+    },
+
+    sdk_version: "system_current",
 }
