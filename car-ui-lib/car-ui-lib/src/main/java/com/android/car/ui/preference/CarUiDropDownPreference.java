@@ -25,7 +25,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 
 import com.android.car.ui.R;
-import com.android.car.ui.utils.ViewUtils;
+import com.android.car.ui.utils.CarUiUtils;
 
 import java.util.function.Consumer;
 
@@ -33,6 +33,7 @@ import java.util.function.Consumer;
  * This class extends the base {@link DropDownPreference} class. Adds the drawable icon to
  * the preference.
  */
+@SuppressWarnings("AndroidJdkLibsChecker")
 public class CarUiDropDownPreference extends DropDownPreference
         implements UxRestrictablePreference {
 
@@ -83,7 +84,7 @@ public class CarUiDropDownPreference extends DropDownPreference
     public void onBindViewHolder(PreferenceViewHolder holder) {
         super.onBindViewHolder(holder);
 
-        ViewUtils.makeAllViewsUxRestricted(holder.itemView, isUxRestricted());
+        CarUiUtils.makeAllViewsUxRestricted(holder.itemView, isUxRestricted());
     }
 
     @Override

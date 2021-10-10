@@ -21,6 +21,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
 import com.android.car.ui.R;
@@ -66,7 +67,7 @@ public class MenuItem {
     private CharSequence mTitle;
     private Drawable mIcon;
     private OnClickListener mOnClickListener;
-    private DisplayBehavior mDisplayBehavior;
+    private final DisplayBehavior mDisplayBehavior;
     private int mUxRestrictions;
     private boolean mIsEnabled;
     private boolean mIsChecked;
@@ -250,7 +251,7 @@ public class MenuItem {
         update();
     }
 
-    /* package */ boolean isRestricted() {
+    public boolean isRestricted() {
         return CarUxRestrictionsUtil.isRestricted(mUxRestrictions, mCurrentRestrictions);
     }
 
@@ -312,8 +313,8 @@ public class MenuItem {
         return mIsPrimary;
     }
 
-    /** Returns if this is the search MenuItem, which has special behavior when searching */
-    boolean isSearch() {
+    /** Returns if this is the search MenuItem, which is not shown while searching */
+    public boolean isSearch() {
         return mIsSearch;
     }
 
@@ -617,8 +618,13 @@ public class MenuItem {
         NEVER
     }
 
-    /** Listener for {@link Toolbar} to update when this MenuItem changes */
-    interface Listener {
+    /**
+     * Listener for {@link Toolbar} to update when this MenuItem changes.
+     *
+     * Do not use from client apps, for car-ui-lib internal use only.
+     */
+    //TODO(b/179092760) Find a way to prevent apps from using this
+    public interface Listener {
         /** Called when the MenuItem is changed. For use only by {@link Toolbar} */
         void onMenuItemChanged(MenuItem item);
     }
@@ -627,8 +633,11 @@ public class MenuItem {
      * Sets a listener for changes to this MenuItem. Note that the MenuItem will only hold
      * weak references to the Listener, so that the listener is not held if the MenuItem
      * outlives the toolbar.
+     *
+     * Do not use from client apps, for car-ui-lib internal use only.
      */
-    void setListener(Listener listener) {
+    //TODO(b/179092760) Find a way to prevent apps from using this
+    public void setListener(@Nullable Listener listener) {
         mListener = new WeakReference<>(listener);
     }
 }

@@ -15,9 +15,6 @@
  */
 package com.android.car.ui.utils;
 
-import static com.android.car.ui.utils.RotaryConstants.ROTARY_HORIZONTALLY_SCROLLABLE;
-import static com.android.car.ui.utils.RotaryConstants.ROTARY_VERTICALLY_SCROLLABLE;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -33,6 +30,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.DimenRes;
 import androidx.annotation.IdRes;
@@ -41,17 +39,26 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.annotation.UiThread;
 
+import com.android.car.ui.R;
+import com.android.car.ui.uxr.DrawableStateView;
+
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * Collection of utility methods
  */
+@SuppressWarnings("AndroidJdkLibsChecker")
 public final class CarUiUtils {
 
     private static final String TAG = "CarUiUtils";
     private static final String READ_ONLY_SYSTEM_PROPERTY_PREFIX = "ro.";
     /** A map to cache read-only system properties. */
     private static final SparseArray<String> READ_ONLY_SYSTEM_PROPERTY_MAP = new SparseArray<>();
+
+    private static int[] sRestrictedState;
 
     /** This is a utility class */
     private CarUiUtils() {
@@ -93,7 +100,7 @@ public final class CarUiUtils {
      * this method will return null.
      */
     @Nullable
-    public static Activity getActivity(Context context) {
+    public static Activity getActivity(@Nullable Context context) {
         while (context instanceof ContextWrapper) {
             if (context instanceof Activity) {
                 return (Activity) context;
@@ -101,19 +108,6 @@ public final class CarUiUtils {
             context = ((ContextWrapper) context).getBaseContext();
         }
         return null;
-    }
-
-    /**
-     * Enables rotary scrolling for {@code view}, either vertically (if {@code isVertical} is true)
-     * or horizontally (if {@code isVertical} is false). With rotary scrolling enabled, rotating the
-     * rotary controller will scroll rather than moving the focus when moving the focus would cause
-     * a lot of scrolling. Rotary scrolling should be enabled for scrolling views which contain
-     * content which the user may want to see but can't interact with, either alone or along with
-     * interactive (focusable) content.
-     */
-    public static void setRotaryScrollEnabled(@NonNull View view, boolean isVertical) {
-        view.setContentDescription(
-                isVertical ? ROTARY_VERTICALLY_SCROLLABLE : ROTARY_HORIZONTALLY_SCROLLABLE);
     }
 
     /**
@@ -263,5 +257,81 @@ public final class CarUiUtils {
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
         return bitmap;
+    }
+
+    /**
+     * Exact copy from Androidx.TypedArrayUtils class
+     * @return The resource ID value in the {@code context} specified by {@code attr}. If it does
+     * not exist, {@code fallbackAttr}.
+     */
+    public static int getAttr(@NonNull Context context, int attr, int fallbackAttr) {
+        TypedValue value = new TypedValue();
+        context.getTheme().resolveAttribute(attr, value, true);
+        if (value.resourceId != 0) {
+            return attr;
+        }
+        return fallbackAttr;
+    }
+
+    /**
+     * Converts a {@link CharSequence} to a {@link String}.
+     *
+     * This is the same as calling {@link CharSequence#toString()}, except it will handle
+     * null CharSequences, returning a null string.
+     */
+    public static String charSequenceToString(@Nullable CharSequence charSequence) {
+        return charSequence == null ? null : charSequence.toString();
+    }
+
+    /**
+     * Given a list of T and a function to convert from T to U, return a list of U.
+     *
+     * This will create a new list.
+     */
+    public static <T, U> List<U> convertList(List<T> list, Function<T, U> f) {
+        if (list == null) {
+            return null;
+        }
+
+        List<U> result = new ArrayList<>();
+        for (T item : list) {
+            result.add(f.apply(item));
+        }
+        return result;
+    }
+
+    /**
+     * Traverses the view hierarchy, and whenever it sees a {@link DrawableStateView}, adds
+     * state_ux_restricted to it.
+     *
+     * Note that this will remove any other drawable states added by other calls to
+     * {@link DrawableStateView#setExtraDrawableState(int[], int[])}
+     */
+    public static void makeAllViewsUxRestricted(@Nullable View view, boolean restricted) {
+        if (view instanceof DrawableStateView) {
+            if (sRestrictedState == null) {
+                int androidStateUxRestricted = view.getResources()
+                        .getIdentifier("state_ux_restricted", "attr", "android");
+
+                if (androidStateUxRestricted == 0) {
+                    sRestrictedState = new int[] { R.attr.state_ux_restricted };
+                } else {
+                    sRestrictedState = new int[] {
+                            R.attr.state_ux_restricted,
+                            androidStateUxRestricted
+                    };
+                }
+            }
+
+            ((DrawableStateView) view).setExtraDrawableState(
+                    restricted ? sRestrictedState : null, null);
+        }
+
+        if (view instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) view;
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                makeAllViewsUxRestricted(vg.getChildAt(i), restricted);
+            }
+        }
     }
 }

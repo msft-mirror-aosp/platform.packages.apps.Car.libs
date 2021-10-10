@@ -20,6 +20,8 @@ import android.Manifest;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds;
+import android.provider.ContactsContract.Data;
 import android.text.TextUtils;
 import android.util.ArrayMap;
 
@@ -30,6 +32,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
 
 import com.android.car.apps.common.log.L;
+import com.android.car.telephony.common.QueryParam.QueryBuilder.Condition;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -109,19 +112,16 @@ public class InMemoryPhoneBook implements Observer<List<Contact>> {
 
     private InMemoryPhoneBook(Context context) {
         mContext = context;
+        QueryParam contactListQueryParam = new QueryParam.QueryBuilder(Data.CONTENT_URI)
+                .projectAll()
+                .where(Condition
+                        .is(Data.MIMETYPE, "=", CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                        .or(Data.MIMETYPE, "=", CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                        .or(Data.MIMETYPE, "=", CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE))
+                .orderAscBy(ContactsContract.Contacts.DISPLAY_NAME)
+                .checkPermission(Manifest.permission.READ_CONTACTS)
+                .toQueryParam();
 
-        QueryParam contactListQueryParam = new QueryParam(
-                ContactsContract.Data.CONTENT_URI,
-                null,
-                ContactsContract.Data.MIMETYPE + " = ? OR "
-                        + ContactsContract.Data.MIMETYPE + " = ? OR "
-                        + ContactsContract.Data.MIMETYPE + " = ?",
-                new String[]{
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
-                        ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE,
-                        ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE},
-                ContactsContract.Contacts.DISPLAY_NAME + " ASC ",
-                Manifest.permission.READ_CONTACTS);
         mContactListAsyncQueryLiveData = new AsyncQueryLiveData<List<Contact>>(mContext,
                 QueryParam.of(contactListQueryParam), Executors.newSingleThreadExecutor()) {
             @Override
@@ -239,7 +239,7 @@ public class InMemoryPhoneBook implements Observer<List<Contact>> {
         while (cursor.moveToNext()) {
             int accountNameColumn = cursor.getColumnIndex(
                     ContactsContract.RawContacts.ACCOUNT_NAME);
-            int lookupKeyColumn = cursor.getColumnIndex(ContactsContract.Data.LOOKUP_KEY);
+            int lookupKeyColumn = cursor.getColumnIndex(Data.LOOKUP_KEY);
             String accountName = cursor.getString(accountNameColumn);
             String lookupKey = cursor.getString(lookupKeyColumn);
 

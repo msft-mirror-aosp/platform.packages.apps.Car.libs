@@ -33,14 +33,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.ui.AlertDialogBuilder;
+import com.android.car.ui.FocusArea;
 import com.android.car.ui.baselayout.Insets;
 import com.android.car.ui.baselayout.InsetsChangedListener;
 import com.android.car.ui.core.CarUi;
 import com.android.car.ui.paintbooth.R;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.toolbar.MenuItem;
+import com.android.car.ui.toolbar.NavButtonMode;
+import com.android.car.ui.toolbar.SearchMode;
 import com.android.car.ui.toolbar.TabLayout;
 import com.android.car.ui.toolbar.Toolbar;
+import com.android.car.ui.toolbar.Toolbar.State;
 import com.android.car.ui.toolbar.ToolbarController;
 
 import java.util.ArrayList;
@@ -50,27 +54,28 @@ import java.util.Map;
 
 public class ToolbarActivity extends AppCompatActivity implements InsetsChangedListener {
 
-    private List<MenuItem> mMenuItems = new ArrayList<>();
-    private List<Pair<CharSequence, View.OnClickListener>> mButtons = new ArrayList<>();
+    private final List<MenuItem> mMenuItems = new ArrayList<>();
+    private final List<Pair<CharSequence, View.OnClickListener>> mButtons = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(getLayout());
+        setContentView(R.layout.car_ui_recycler_view_activity);
 
-        ToolbarController toolbarNonFinal = CarUi.getToolbar(this);
-        if (toolbarNonFinal == null) {
-            toolbarNonFinal = requireViewById(R.id.toolbar);
-        }
-        ToolbarController toolbar = toolbarNonFinal;
+        ToolbarController toolbar = CarUi.requireToolbar(this);
         toolbar.setTitle(getTitle());
-        toolbar.setState(Toolbar.State.SUBPAGE);
+        toolbar.setNavButtonMode(NavButtonMode.BACK);
         toolbar.setLogo(R.drawable.ic_launcher);
-        toolbar.registerOnBackListener(
+        boolean[] isSearching = new boolean[] { false };
+        toolbar.registerBackListener(
                 () -> {
                     if (toolbar.getState() == Toolbar.State.SEARCH
                             || toolbar.getState() == Toolbar.State.EDIT) {
                         toolbar.setState(Toolbar.State.SUBPAGE);
+                        return true;
+                    } else if (isSearching[0]) {
+                        toolbar.setSearchMode(SearchMode.DISABLED);
+                        isSearching[0] = false;
                         return true;
                     }
                     return false;
@@ -78,7 +83,10 @@ public class ToolbarActivity extends AppCompatActivity implements InsetsChangedL
 
         mMenuItems.add(MenuItem.builder(this)
                 .setToSearch()
-                .setOnClickListener(i -> toolbar.setState(Toolbar.State.SEARCH))
+                .setOnClickListener(i -> {
+                    isSearching[0] = true;
+                    toolbar.setSearchMode(SearchMode.SEARCH);
+                })
                 .build());
 
         toolbar.setMenuItems(mMenuItems);
@@ -97,6 +105,74 @@ public class ToolbarActivity extends AppCompatActivity implements InsetsChangedL
             } else {
                 toolbar.setSubtitle(subtitle + " X");
             }
+        }));
+
+        mButtons.add(Pair.create(getString(R.string.toolbar_cycle_nav_button), v -> {
+            Toolbar.NavButtonMode mode = toolbar.getNavButtonMode();
+            if (mode == Toolbar.NavButtonMode.DISABLED) {
+                toolbar.setNavButtonMode(NavButtonMode.BACK);
+            } else if (mode == Toolbar.NavButtonMode.BACK) {
+                toolbar.setNavButtonMode(NavButtonMode.CLOSE);
+            } else if (mode == Toolbar.NavButtonMode.CLOSE) {
+                toolbar.setNavButtonMode(NavButtonMode.DOWN);
+            } else {
+                toolbar.setNavButtonMode(NavButtonMode.DISABLED);
+            }
+        }));
+
+        Mutable<Boolean> hasLogo = new Mutable<>(true);
+        mButtons.add(Pair.create(getString(R.string.toolbar_toggle_logo), v -> {
+            toolbar.setLogo(hasLogo.value ? 0 : R.drawable.ic_launcher);
+            hasLogo.value = !hasLogo.value;
+        }));
+
+        mButtons.add(Pair.create(getString(R.string.toolbar_cycle_state), v -> {
+            if (toolbar.getState() == State.HOME) {
+                toolbar.setState(State.SUBPAGE);
+            } else if (toolbar.getState() == State.SUBPAGE) {
+                toolbar.setState(State.EDIT);
+            } else {
+                toolbar.setState(State.HOME);
+            }
+        }));
+
+        mButtons.add(Pair.create(getString(R.string.toolbar_show_tabs_in_subpage), v ->
+                toolbar.setShowTabsInSubpage(!toolbar.getShowTabsInSubpage())));
+
+        mButtons.add(Pair.create(getString(R.string.toolbar_toggle_search_hint), v -> {
+            if (toolbar.getSearchHint().toString().contentEquals("Foo")) {
+                toolbar.setSearchHint("Bar");
+            } else {
+                toolbar.setSearchHint("Foo");
+            }
+        }));
+
+        mButtons.add(Pair.create(getString(R.string.toolbar_toggle_background),
+                v -> toolbar.setBackgroundShown(!toolbar.getBackgroundShown())));
+
+        mButtons.add(Pair.create(getString(R.string.toolbar_add_tab), v -> toolbar.addTab(
+                new TabLayout.Tab(getDrawable(R.drawable.ic_launcher), "Foo"))));
+
+        mButtons.add(Pair.create(getString(R.string.toolbar_add_tab_with_custom_text), v -> {
+            SimpleTextWatcher textWatcher = new SimpleTextWatcher();
+            new AlertDialogBuilder(this)
+                    .setEditBox(null, textWatcher, null)
+                    .setTitle("Enter the text for the title")
+                    .setPositiveButton(getString(R.string.ok), (dialog, which) ->
+                            toolbar.addTab(new TabLayout.Tab(
+                                    getDrawable(R.drawable.ic_launcher),
+                                    textWatcher.getText())))
+                    .show();
+        }));
+
+        Mutable<Boolean> showingLauncherIcon = new Mutable<>(false);
+        mButtons.add(Pair.create(getString(R.string.toolbar_toggle_search_icon), v -> {
+            if (showingLauncherIcon.value) {
+                toolbar.setSearchIcon(null);
+            } else {
+                toolbar.setSearchIcon(R.drawable.ic_launcher);
+            }
+            showingLauncherIcon.value = !showingLauncherIcon.value;
         }));
 
         mButtons.add(Pair.create(getString(R.string.toolbar_set_xml_resource), v -> {
@@ -283,85 +359,15 @@ public class ToolbarActivity extends AppCompatActivity implements InsetsChangedL
                 toolbar.setShowMenuItemsWhileSearching(
                         !toolbar.getShowMenuItemsWhileSearching())));
 
-        mButtons.add(Pair.create(getString(R.string.toolbar_cycle_nav_button), v -> {
-            Toolbar.NavButtonMode mode = toolbar.getNavButtonMode();
-            if (mode == Toolbar.NavButtonMode.BACK) {
-                toolbar.setNavButtonMode(Toolbar.NavButtonMode.CLOSE);
-            } else if (mode == Toolbar.NavButtonMode.CLOSE) {
-                toolbar.setNavButtonMode(Toolbar.NavButtonMode.DOWN);
-            } else {
-                toolbar.setNavButtonMode(Toolbar.NavButtonMode.BACK);
-            }
-        }));
-
-        Mutable<Boolean> hasLogo = new Mutable<>(true);
-        mButtons.add(Pair.create(getString(R.string.toolbar_toggle_logo), v -> {
-            toolbar.setLogo(hasLogo.value ? 0 : R.drawable.ic_launcher);
-            hasLogo.value = !hasLogo.value;
-        }));
-
-        mButtons.add(Pair.create(getString(R.string.toolbar_cycle_state), v -> {
-            if (toolbar.getState() == Toolbar.State.SUBPAGE) {
-                toolbar.setState(Toolbar.State.HOME);
-            } else if (toolbar.getState() == Toolbar.State.HOME) {
-                toolbar.setState(Toolbar.State.EDIT);
-            } else {
-                toolbar.setState(Toolbar.State.SUBPAGE);
-            }
-        }));
-
-        mButtons.add(Pair.create(getString(R.string.toolbar_toggle_search_hint), v -> {
-            if (toolbar.getSearchHint().toString().contentEquals("Foo")) {
-                toolbar.setSearchHint("Bar");
-            } else {
-                toolbar.setSearchHint("Foo");
-            }
-        }));
-
-        mButtons.add(Pair.create(getString(R.string.toolbar_toggle_background),
-                v -> toolbar.setBackgroundShown(!toolbar.getBackgroundShown())));
-
-        mButtons.add(Pair.create(getString(R.string.toolbar_add_tab), v -> toolbar.addTab(
-                new TabLayout.Tab(getDrawable(R.drawable.ic_launcher), "Foo"))));
-
-        mButtons.add(Pair.create(getString(R.string.toolbar_add_tab_with_custom_text), v -> {
-            SimpleTextWatcher textWatcher = new SimpleTextWatcher();
-            new AlertDialogBuilder(this)
-                    .setEditBox(null, textWatcher, null)
-                    .setTitle("Enter the text for the title")
-                    .setPositiveButton("Ok", (dialog, which) ->
-                            toolbar.addTab(
-                                    new TabLayout.Tab(
-                                            getDrawable(
-                                                    R.drawable.ic_launcher),
-                                            textWatcher.getText())))
-                    .show();
-        }));
-
-        mButtons.add(Pair.create(getString(R.string.toolbar_show_tabs_in_subpage), v ->
-                toolbar.setShowTabsInSubpage(!toolbar.getShowTabsInSubpage())));
-
-        Mutable<Boolean> showingLauncherIcon = new Mutable<>(false);
-        mButtons.add(Pair.create(getString(R.string.toolbar_toggle_search_icon), v -> {
-            if (showingLauncherIcon.value) {
-                toolbar.setSearchIcon(null);
-            } else {
-                toolbar.setSearchIcon(R.drawable.ic_launcher);
-            }
-            showingLauncherIcon.value = !showingLauncherIcon.value;
-        }));
-
         CarUiRecyclerView prv = requireViewById(R.id.list);
         prv.setAdapter(mAdapter);
     }
 
-    /** Override in subclasses to change the layout */
-    protected int getLayout() {
-        return R.layout.car_ui_recycler_view_activity;
-    }
-
     @Override
     public void onCarUiInsetsChanged(@NonNull Insets insets) {
+        FocusArea focusArea = requireViewById(R.id.focus_area);
+        focusArea.setBoundsOffset(0, insets.getTop(), 0, insets.getBottom());
+        focusArea.setHighlightPadding(0, insets.getTop(), 0, insets.getBottom());
         requireViewById(R.id.list)
                 .setPadding(0, insets.getTop(), 0, insets.getBottom());
         requireViewById(android.R.id.content)
@@ -383,7 +389,7 @@ public class ToolbarActivity extends AppCompatActivity implements InsetsChangedL
         new AlertDialogBuilder(this)
                 .setEditBox("", textWatcher, null, InputType.TYPE_CLASS_NUMBER)
                 .setTitle("Enter the index of the MenuItem")
-                .setPositiveButton("Ok", (dialog, which) -> {
+                .setPositiveButton(getString(R.string.ok), (dialog, which) -> {
                     try {
                         MenuItem item = mMenuItems.get(
                                 Integer.parseInt(textWatcher.getText()));

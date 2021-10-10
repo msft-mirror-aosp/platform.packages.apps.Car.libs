@@ -35,6 +35,12 @@ To launch paintbooth, start a car emulator or connect a device, make sure the Pa
 
 If it launches a LeakCanary activity instead of PaintBooth, either exit LeakCanary and launch PaintBooth as normal through the car's launcher, or click on the PaintBooth module > Edit configurations > Change "Launch: Default Activity" to "Specified Activity", and enter `com.android.car.ui.paintbooth.MainActivity`.
 
+### Building and running the shared library
+
+Setting up the shared library is mostly the same as setting up paintbooth. However, when you attempt to install the shared library, Android Studio will complain it can't launch any activity (despite the installation succeeding), and your changes won't properly show up. To fix these issues, edit the shared library configuration, change the "Launch:" option to launch nothing, and check the "Always install with package manager (disables deployment optimizations on Android 11 and higher)" button. This checkbox shouldn't be required after b/188220380 is fixed.
+
+![Shared library setup](documentation/images/shared_library_setup.png)
+
 ### Running tests
 
 Once you've set up paintbooth as described above, just open one of the test classes in car-ui-lib > java > com.android.car.ui (androidTest) and click the green arrow next to one of the tests to run it:
@@ -42,6 +48,12 @@ Once you've set up paintbooth as described above, just open one of the test clas
 ![Running tests](documentation/images/running_tests.png)
 
 The tests can also be run from the command line via `atest CarUILibUnitTests`, but that's much slower than running them through Android Studio.
+
+### Getting coverage reports
+
+Coverage reports must be generated from the command line as opposed to Android Studio. Run `./gradlew createDebugCoverageReport` to generate a coverate report under `packages/apps/Car/libs/car-ui-lib/car-ui-lib/build/reports/coverage/debug/index.html`. Currently, you must first run `adb shell am switch-user 0` due to b/183903243
+
+To only run certain tests, run `./gradlew clean createDebugCoverageReport -Pandroid.testInstrumentationRunnerArguments.tests_regex=CarUiIme*`, changing the regex as necessary.
 
 ## Updating Google3
 

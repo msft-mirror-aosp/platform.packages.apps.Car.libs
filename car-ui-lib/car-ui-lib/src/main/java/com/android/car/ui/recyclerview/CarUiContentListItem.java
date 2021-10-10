@@ -21,6 +21,11 @@ import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.android.car.ui.CarUiText;
+
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Definition of list items that can be inserted into {@link CarUiListItemAdapter}.
  */
@@ -76,7 +81,8 @@ public class CarUiContentListItem extends CarUiListItem {
          */
         NONE,
         /**
-         * For an action value of SWITCH, a switch is shown for the action element of the list item.
+         * For an action value of SWITCH, a switch is shown for the action element of the list
+         * item.
          */
         SWITCH,
         /**
@@ -94,29 +100,35 @@ public class CarUiContentListItem extends CarUiListItem {
          */
         ICON,
         /**
-         * For an action value CHEVRON, a chevron is shown for the action element of the list
-         * item.
+         * For an action value CHEVRON, a chevron is shown for the action element of the list item.
          */
         CHEVRON
     }
 
+    @Nullable
     private Drawable mIcon;
     @Nullable
     private Drawable mSupplementalIcon;
-    private CharSequence mTitle;
-    private CharSequence mBody;
+    @Nullable
+    private CarUiText mTitle;
+    @Nullable
+    private List<CarUiText> mBody;
+    @NonNull
     private final Action mAction;
+    @NonNull
     private IconType mPrimaryIconType;
     private boolean mIsActionDividerVisible;
     private boolean mIsChecked;
     private boolean mIsEnabled = true;
     private boolean mIsActivated;
+    @Nullable
     private OnClickListener mOnClickListener;
+    @Nullable
     private OnCheckedChangeListener mOnCheckedChangeListener;
+    @Nullable
     private OnClickListener mSupplementalIconOnClickListener;
 
-
-    public CarUiContentListItem(Action action) {
+    public CarUiContentListItem(@NonNull Action action) {
         mAction = action;
         mPrimaryIconType = IconType.STANDARD;
     }
@@ -125,7 +137,7 @@ public class CarUiContentListItem extends CarUiListItem {
      * Returns the title of the item.
      */
     @Nullable
-    public CharSequence getTitle() {
+    public CarUiText getTitle() {
         return mTitle;
     }
 
@@ -134,15 +146,24 @@ public class CarUiContentListItem extends CarUiListItem {
      *
      * @param title text to display as title.
      */
-    public void setTitle(@NonNull CharSequence title) {
-        mTitle = title;
+    public void setTitle(@Nullable CharSequence title) {
+        mTitle = new CarUiText.Builder(title).build();
     }
 
     /**
-     * Returns the body text of the item.
+     * Sets the title of the item.
+     *
+     * @param text text to display as title
+     */
+    public void setTitle(@Nullable CarUiText text) {
+        mTitle = text;
+    }
+
+    /**
+     * Returns the body of the item.
      */
     @Nullable
-    public CharSequence getBody() {
+    public List<CarUiText> getBody() {
         return mBody;
     }
 
@@ -151,8 +172,37 @@ public class CarUiContentListItem extends CarUiListItem {
      *
      * @param body text to display as body text.
      */
-    public void setBody(@NonNull CharSequence body) {
-        mBody = body;
+    public void setBody(@Nullable CharSequence body) {
+        if (body == null) {
+            mBody = null;
+            return;
+        }
+
+        mBody = Collections.singletonList(new CarUiText.Builder(body).build());
+    }
+
+    /**
+     * Sets the body of the item.
+     *
+     * @param body text to display as body text.
+     */
+    public void setBody(@Nullable CarUiText body) {
+        if (body == null) {
+            mBody = null;
+            return;
+        }
+
+        mBody = Collections.singletonList(body);
+    }
+
+    /**
+     * Sets the body of the item.
+     *
+     * @param textList list of text to display as body text. Each {@link CarUiText} in the list will
+     *                 be rendered on a new line, separated by a line break.
+     */
+    public void setBody(@Nullable List<CarUiText> textList) {
+        mBody = textList;
     }
 
     /**
@@ -175,6 +225,7 @@ public class CarUiContentListItem extends CarUiListItem {
     /**
      * Returns the primary icon type for the item.
      */
+    @NonNull
     public IconType getPrimaryIconType() {
         return mPrimaryIconType;
     }
@@ -184,7 +235,7 @@ public class CarUiContentListItem extends CarUiListItem {
      *
      * @param icon the icon type for the item.
      */
-    public void setPrimaryIconType(IconType icon) {
+    public void setPrimaryIconType(@NonNull IconType icon) {
         mPrimaryIconType = icon;
     }
 
@@ -268,6 +319,7 @@ public class CarUiContentListItem extends CarUiListItem {
     /**
      * Returns the action type for the item.
      */
+    @NonNull
     public Action getAction() {
         return mAction;
     }
@@ -341,8 +393,7 @@ public class CarUiContentListItem extends CarUiListItem {
      *
      * @param listener callback to be invoked when the checked state shown in the UI changes.
      */
-    public void setOnCheckedChangeListener(
-            @Nullable OnCheckedChangeListener listener) {
+    public void setOnCheckedChangeListener(@Nullable OnCheckedChangeListener listener) {
         mOnCheckedChangeListener = listener;
     }
 

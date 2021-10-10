@@ -39,8 +39,7 @@
     </style>
 
     <style name="Widget.CarUi.Toolbar.ProgressBar"
-           parent="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal">
-    </style>
+           parent="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"/>
 
     <style name="Widget.CarUi.Toolbar.NavIcon">
         <item name="android:tint">@color/car_ui_toolbar_nav_icon_color</item>
@@ -102,7 +101,9 @@
 
     <!-- Style applied to the edit box inside the toolbar search area -->
     <style name="Widget.CarUi.Toolbar.Search.EditText"
-        parent="android:Widget.DeviceDefault.EditText"/>
+        parent="android:Widget.DeviceDefault.EditText">
+        <item name="android:textColor">@color/car_ui_text_color_primary</item>
+    </style>
 
     <style name="Widget.CarUi.Toolbar.Search.SearchIcon" parent="Widget.CarUi.Toolbar"/>
 
@@ -226,11 +227,6 @@
     <style name="PreferenceFragment.CarUi">
         <item name="android:divider">?android:attr/listDivider</item>
         <!-- TODO(b/150230923) change this to car_ui_preference_fragment -->
-        <item name="android:layout">@layout/car_ui_preference_fragment_with_toolbar</item>
-    </style>
-
-    <!-- TODO(b/150230923) remove this when other apps are ready -->
-    <style name="PreferenceFragment.CarUi.WithToolbar">
         <item name="android:layout">@layout/car_ui_preference_fragment</item>
     </style>
 
@@ -247,7 +243,6 @@
 
     <style name="TextAppearance.CarUi" parent="android:TextAppearance.DeviceDefault">
         <item name="android:textColor">@color/car_ui_text_color_primary</item>
-        <item name="android:textAlignment">viewStart</item>
     </style>
 
     <style name="TextAppearance.CarUi.Body1">
@@ -290,9 +285,7 @@
     <style name="TextAppearance.CarUi.AlertDialog.Title" parent="TextAppearance.CarUi.Body3"/>
     <style name="TextAppearance.CarUi.AlertDialog.Subtitle" parent="TextAppearance.CarUi.Sub3"/>
 
-    <style name="TextAppearance.CarUi.Widget" parent="android:TextAppearance.DeviceDefault.Widget">
-        <item name="android:textAlignment">viewStart</item>
-    </style>
+    <style name="TextAppearance.CarUi.Widget" parent="android:TextAppearance.DeviceDefault.Widget"/>
 
     <style name="TextAppearance.CarUi.Widget.Toolbar"/>
 

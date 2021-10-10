@@ -16,31 +16,24 @@
 
 package com.android.car.ui.toolbar;
 
-import static com.android.car.ui.imewidescreen.CarUiImeWideScreenController.CONTENT_AREA_SURFACE_DISPLAY_ID;
-import static com.android.car.ui.imewidescreen.CarUiImeWideScreenController.CONTENT_AREA_SURFACE_HEIGHT;
-import static com.android.car.ui.imewidescreen.CarUiImeWideScreenController.CONTENT_AREA_SURFACE_HOST_TOKEN;
-import static com.android.car.ui.imewidescreen.CarUiImeWideScreenController.CONTENT_AREA_SURFACE_WIDTH;
-import static com.android.car.ui.imewidescreen.CarUiImeWideScreenController.SEARCH_RESULT_ITEM_ID_LIST;
-import static com.android.car.ui.imewidescreen.CarUiImeWideScreenController.SEARCH_RESULT_SUPPLEMENTAL_ICON_ID_LIST;
-import static com.android.car.ui.imewidescreen.CarUiImeWideScreenController.WIDE_SCREEN_CLEAR_DATA_ACTION;
-import static com.android.car.ui.imewidescreen.CarUiImeWideScreenController.WIDE_SCREEN_POST_LOAD_SEARCH_RESULTS_ACTION;
-
 import android.content.Context;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.AttributeSet;
 import android.widget.EditText;
 
-import java.util.HashSet;
-import java.util.Set;
+import androidx.annotation.Nullable;
+
+import java.util.function.BiConsumer;
 
 /**
  * Edit text supporting the callbacks from the IMS. This will be useful in widescreen IME mode to
  * allow car-ui-lib to receive responses (like onClick events) from the IMS
  */
+@SuppressWarnings("AndroidJdkLibsChecker")
 class CarUiEditText extends EditText {
 
-    private final Set<PrivateImeCommandCallback> mPrivateImeCommandCallback = new HashSet<>();
+    @Nullable
+    private BiConsumer<String, Bundle> mOnAppPrivateCommandListener = null;
 
     // These need to be public for the layout inflater to inflate them, but
     // checkstyle complains about a public constructor on a package-private class
@@ -65,62 +58,16 @@ class CarUiEditText extends EditText {
 
     @Override
     public boolean onPrivateIMECommand(String action, Bundle data) {
-
-        if (WIDE_SCREEN_CLEAR_DATA_ACTION.equals(action)) {
-            // clear the text.
-            setText("");
+        if (mOnAppPrivateCommandListener != null) {
+            mOnAppPrivateCommandListener.accept(action, data);
         }
-
-        if (WIDE_SCREEN_POST_LOAD_SEARCH_RESULTS_ACTION.equals(action)) {
-            for (PrivateImeCommandCallback listener : mPrivateImeCommandCallback) {
-                listener.onPostLoadSearchResults();
-            }
-        }
-
-        if (data == null || mPrivateImeCommandCallback == null) {
-            return false;
-        }
-
-        if (data.getString(SEARCH_RESULT_ITEM_ID_LIST) != null) {
-            for (PrivateImeCommandCallback listener : mPrivateImeCommandCallback) {
-                listener.onItemClicked(data.getString(SEARCH_RESULT_ITEM_ID_LIST));
-            }
-        }
-
-        if (data.getString(SEARCH_RESULT_SUPPLEMENTAL_ICON_ID_LIST) != null) {
-            for (PrivateImeCommandCallback listener : mPrivateImeCommandCallback) {
-                listener.onSecondaryImageClicked(
-                        data.getString(SEARCH_RESULT_SUPPLEMENTAL_ICON_ID_LIST));
-            }
-        }
-
-        int displayId = data.getInt(CONTENT_AREA_SURFACE_DISPLAY_ID);
-        int height = data.getInt(CONTENT_AREA_SURFACE_HEIGHT);
-        int width = data.getInt(CONTENT_AREA_SURFACE_WIDTH);
-        IBinder binder = data.getBinder(CONTENT_AREA_SURFACE_HOST_TOKEN);
-
-        if (binder != null) {
-            for (PrivateImeCommandCallback listener : mPrivateImeCommandCallback) {
-                listener.onSurfaceInfo(displayId, binder, height, width);
-            }
-        }
-
         return false;
     }
 
     /**
-     * Registers a new {@link PrivateImeCommandCallback} to the list of
-     * listeners.
+     * Sets a listener to be called when {@link #onPrivateIMECommand(String, Bundle)} is called.
      */
-    public void registerOnPrivateImeCommandListener(PrivateImeCommandCallback listener) {
-        mPrivateImeCommandCallback.add(listener);
-    }
-
-    /**
-     * Unregisters an existing {@link PrivateImeCommandCallback} from the list
-     * of listeners.
-     */
-    public boolean unregisterOnPrivateImeCommandListener(PrivateImeCommandCallback listener) {
-        return mPrivateImeCommandCallback.remove(listener);
+    public void setOnPrivateImeCommandListener(BiConsumer<String, Bundle> listener) {
+        mOnAppPrivateCommandListener = listener;
     }
 }

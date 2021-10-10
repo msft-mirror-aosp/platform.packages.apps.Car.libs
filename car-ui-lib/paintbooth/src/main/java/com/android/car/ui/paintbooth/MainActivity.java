@@ -16,6 +16,9 @@
 
 package com.android.car.ui.paintbooth;
 
+import static com.android.car.ui.paintbooth.PaintBoothApplication.SHARED_PREFERENCES_FILE;
+import static com.android.car.ui.paintbooth.PaintBoothApplication.SHARED_PREFERENCES_SHARED_LIB_DENYLIST;
+
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Service;
@@ -27,15 +30,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.util.Supplier;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.car.ui.FocusArea;
 import com.android.car.ui.baselayout.Insets;
 import com.android.car.ui.baselayout.InsetsChangedListener;
 import com.android.car.ui.core.CarUi;
+import com.android.car.ui.paintbooth.appstyledview.AppStyledViewSampleActivity;
 import com.android.car.ui.paintbooth.caruirecyclerview.CarUiListItemActivity;
 import com.android.car.ui.paintbooth.caruirecyclerview.CarUiRecyclerViewActivity;
 import com.android.car.ui.paintbooth.caruirecyclerview.GridCarUiRecyclerViewActivity;
@@ -43,16 +51,18 @@ import com.android.car.ui.paintbooth.currentactivity.CurrentActivityService;
 import com.android.car.ui.paintbooth.dialogs.DialogsActivity;
 import com.android.car.ui.paintbooth.overlays.OverlayActivity;
 import com.android.car.ui.paintbooth.preferences.PreferenceActivity;
+import com.android.car.ui.paintbooth.preferences.SplitPreferenceActivity;
 import com.android.car.ui.paintbooth.toolbar.NoCarUiToolbarActivity;
-import com.android.car.ui.paintbooth.toolbar.OldToolbarActivity;
 import com.android.car.ui.paintbooth.toolbar.ToolbarActivity;
 import com.android.car.ui.paintbooth.widescreenime.WideScreenImeActivity;
+import com.android.car.ui.paintbooth.widescreenime.WideScreenTestView;
 import com.android.car.ui.paintbooth.widgets.WidgetActivity;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.toolbar.ToolbarController;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -68,16 +78,20 @@ public class MainActivity extends Activity implements InsetsChangedListener {
     private final List<ListElement> mActivities = Arrays.asList(
             new ServiceElement("Show foreground activities", CurrentActivityService.class),
             new ServiceElement("Simulate Screen Bounds", VisibleBoundsSimulator.class),
+            new SwitchElement("Enable shared library", this::isSharedLibEnabled,
+                    this::onSharedLibSwitchChanged),
             new ActivityElement("Dialogs sample", DialogsActivity.class),
+            new ActivityElement("App Styled View Modal", AppStyledViewSampleActivity.class),
             new ActivityElement("List sample", CarUiRecyclerViewActivity.class),
             new ActivityElement("Grid sample", GridCarUiRecyclerViewActivity.class),
             new ActivityElement("Preferences sample", PreferenceActivity.class),
+            new ActivityElement("Split preferences sample", SplitPreferenceActivity.class),
             new ActivityElement("Overlays", OverlayActivity.class),
             new ActivityElement("Toolbar sample", ToolbarActivity.class),
-            new ActivityElement("Old toolbar sample", OldToolbarActivity.class),
             new ActivityElement("No CarUiToolbar sample", NoCarUiToolbarActivity.class),
             new ActivityElement("Widget sample", WidgetActivity.class),
             new ActivityElement("Wide Screen IME", WideScreenImeActivity.class),
+            new ActivityElement("Wide Screen View IME", WideScreenTestView.class),
             new ActivityElement("ListItem sample", CarUiListItemActivity.class));
 
     private abstract static class ViewHolder extends RecyclerView.ViewHolder {
@@ -109,29 +123,23 @@ public class MainActivity extends Activity implements InsetsChangedListener {
         }
     }
 
-    private class ServiceViewHolder extends ViewHolder {
+    private static class SwitchViewHolder extends ViewHolder {
         private final Switch mSwitch;
 
-        ServiceViewHolder(@NonNull View itemView) {
+        SwitchViewHolder(@NonNull View itemView) {
             super(itemView);
             mSwitch = itemView.requireViewById(R.id.button);
         }
 
         @Override
         public void bind(ListElement e) {
-            if (!(e instanceof ServiceElement)) {
+            if (!(e instanceof SwitchElement)) {
                 throw new IllegalArgumentException("Expected an ActivityElement");
             }
-            ServiceElement element = (ServiceElement) e;
-            mSwitch.setChecked(isServiceRunning(element.getService()));
+            SwitchElement element = (SwitchElement) e;
+            mSwitch.setChecked(element.isChecked());
             mSwitch.setText(element.getText());
-            mSwitch.setOnClickListener(v -> {
-                Intent intent = new Intent(itemView.getContext(), element.getService());
-                if (isServiceRunning(element.getService())) {
-                    intent.setAction(STOP_SERVICE);
-                }
-                startForegroundService(intent);
-            });
+            mSwitch.setOnCheckedChangeListener(element.getOnCheckedChangedListener());
         }
     }
 
@@ -140,12 +148,12 @@ public class MainActivity extends Activity implements InsetsChangedListener {
                 @NonNull
                 @Override
                 public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                    LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+                    LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
                     if (viewType == ListElement.TYPE_ACTIVITY) {
                         return new ActivityViewHolder(
                                 inflater.inflate(R.layout.list_item, parent, false));
-                    } else if (viewType == ListElement.TYPE_SERVICE) {
-                        return new ServiceViewHolder(
+                    } else if (viewType == ListElement.TYPE_SWITCH) {
+                        return new SwitchViewHolder(
                                 inflater.inflate(R.layout.list_item_switch, parent, false));
                     } else {
                         throw new IllegalArgumentException("Unknown viewType: " + viewType);
@@ -271,8 +279,33 @@ public class MainActivity extends Activity implements InsetsChangedListener {
         return false;
     }
 
+    private void setServiceRunning(Class<? extends Service> serviceClass, boolean running) {
+        Intent intent = new Intent(this, serviceClass);
+        if (!running) {
+            intent.setAction(STOP_SERVICE);
+        }
+        startForegroundService(intent);
+    }
+
+    private boolean isSharedLibEnabled() {
+        return getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE)
+                .getStringSet(SHARED_PREFERENCES_SHARED_LIB_DENYLIST, null) == null;
+    }
+
+    private void onSharedLibSwitchChanged(CompoundButton unused, boolean checked) {
+        getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE)
+                .edit()
+                .putStringSet(SHARED_PREFERENCES_SHARED_LIB_DENYLIST,
+                        checked ? null : Collections.singleton("com.chassis.car.ui.sharedlibrary"))
+                .apply();
+        Toast.makeText(this, "Relaunch PaintBooth to see effects", Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     public void onCarUiInsetsChanged(@NonNull Insets insets) {
+        FocusArea focusArea = requireViewById(R.id.focus_area);
+        focusArea.setBoundsOffset(0, insets.getTop(), 0, insets.getBottom());
+        focusArea.setHighlightPadding(0, insets.getTop(), 0, insets.getBottom());
         requireViewById(R.id.list)
                 .setPadding(0, insets.getTop(), 0, insets.getBottom());
         requireViewById(android.R.id.content)
@@ -281,7 +314,7 @@ public class MainActivity extends Activity implements InsetsChangedListener {
 
     private abstract static class ListElement {
         static final int TYPE_ACTIVITY = 0;
-        static final int TYPE_SERVICE = 1;
+        static final int TYPE_SWITCH = 1;
 
         private final String mText;
 
@@ -314,21 +347,36 @@ public class MainActivity extends Activity implements InsetsChangedListener {
         }
     }
 
-    private static class ServiceElement extends ListElement {
-        private final Class<? extends Service> mServiceClass;
+    private static class SwitchElement extends ListElement {
+        private final Supplier<Boolean> mIsCheckedSupplier;
+        private final OnCheckedChangeListener mOnCheckedChanged;
 
-        ServiceElement(String text, Class<? extends Service> serviceClass) {
+        private SwitchElement(String text, Supplier<Boolean> isCheckedSupplier,
+                OnCheckedChangeListener onCheckedChanged) {
             super(text);
-            mServiceClass = serviceClass;
+            mIsCheckedSupplier = isCheckedSupplier;
+            mOnCheckedChanged = onCheckedChanged;
         }
 
-        Class<? extends Service> getService() {
-            return mServiceClass;
+        public boolean isChecked() {
+            return mIsCheckedSupplier.get();
+        }
+
+        public OnCheckedChangeListener getOnCheckedChangedListener() {
+            return mOnCheckedChanged;
         }
 
         @Override
         int getType() {
-            return TYPE_SERVICE;
+            return TYPE_SWITCH;
+        }
+    }
+
+    private class ServiceElement extends SwitchElement {
+        ServiceElement(String text, Class<? extends Service> serviceClass) {
+            super(text,
+                    () -> isServiceRunning(serviceClass),
+                    (v, checked) -> setServiceRunning(serviceClass, checked));
         }
     }
 }

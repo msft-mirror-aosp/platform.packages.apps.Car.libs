@@ -35,6 +35,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.ui.R;
+import com.android.car.ui.widget.CarUiTextView;
 
 import java.util.List;
 
@@ -53,10 +54,16 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
     static final int VIEW_TYPE_LIST_HEADER = 2;
 
     private final List<? extends CarUiListItem> mItems;
+    private final boolean mCompactLayout;
     private int mMaxItems = CarUiRecyclerView.ItemCap.UNLIMITED;
 
     public CarUiListItemAdapter(List<? extends CarUiListItem> items) {
+        this(items, false);
+    }
+
+    public CarUiListItemAdapter(List<? extends CarUiListItem> items, boolean useCompactLayout) {
         this.mItems = items;
+        this.mCompactLayout = useCompactLayout;
     }
 
     @NonNull
@@ -67,6 +74,10 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
 
         switch (viewType) {
             case VIEW_TYPE_LIST_ITEM:
+                if (mCompactLayout) {
+                    return new ListItemViewHolder(
+                            inflater.inflate(R.layout.car_ui_list_item_compact, parent, false));
+                }
                 return new ListItemViewHolder(
                         inflater.inflate(R.layout.car_ui_list_item, parent, false));
             case VIEW_TYPE_LIST_HEADER:
@@ -152,8 +163,8 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
      */
     static class ListItemViewHolder extends RecyclerView.ViewHolder {
 
-        final TextView mTitle;
-        final TextView mBody;
+        final CarUiTextView mTitle;
+        final CarUiTextView mBody;
         final ImageView mIcon;
         final ImageView mContentIcon;
         final ImageView mAvatarIcon;
@@ -192,19 +203,15 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
 
         void bind(@NonNull CarUiContentListItem item) {
-            CharSequence title = item.getTitle();
-            CharSequence body = item.getBody();
-            Drawable icon = item.getIcon();
-
-            if (!TextUtils.isEmpty(title)) {
-                mTitle.setText(title);
+            if (item.getTitle() != null) {
+                mTitle.setText(item.getTitle());
                 mTitle.setVisibility(View.VISIBLE);
             } else {
                 mTitle.setVisibility(View.GONE);
             }
 
-            if (!TextUtils.isEmpty(body)) {
-                mBody.setText(body);
+            if (item.getBody() != null) {
+                mBody.setText(item.getBody());
                 mBody.setVisibility(View.VISIBLE);
             } else {
                 mBody.setVisibility(View.GONE);
@@ -214,6 +221,7 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
             mContentIcon.setVisibility(View.GONE);
             mAvatarIcon.setVisibility(View.GONE);
 
+            Drawable icon = item.getIcon();
             if (icon != null) {
                 mIconContainer.setVisibility(View.VISIBLE);
 
@@ -257,6 +265,7 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
                             itemOnClickListener.onClick(item);
                         }
                     });
+                    mTouchInterceptor.setClickable(itemOnClickListener != null);
                     mReducedTouchInterceptor.setVisibility(View.GONE);
                     mActionContainerTouchInterceptor.setVisibility(View.GONE);
                     break;
@@ -280,6 +289,7 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
                             itemOnClickListener.onClick(item);
                         }
                     });
+                    mTouchInterceptor.setClickable(itemOnClickListener != null);
                     mReducedTouchInterceptor.setVisibility(View.GONE);
                     mActionContainerTouchInterceptor.setVisibility(View.GONE);
                     break;
@@ -300,6 +310,7 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
                                 itemOnClickListener.onClick(item);
                             }
                         });
+                        mTouchInterceptor.setClickable(itemOnClickListener != null);
                         mReducedTouchInterceptor.setVisibility(View.GONE);
                         mActionContainerTouchInterceptor.setVisibility(View.GONE);
                     } else {
@@ -309,6 +320,7 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
                                 itemOnClickListener.onClick(item);
                             }
                         });
+                        mReducedTouchInterceptor.setClickable(itemOnClickListener != null);
                         mActionContainerTouchInterceptor.setVisibility(View.VISIBLE);
                         mActionContainerTouchInterceptor.setOnClickListener(
                                 (container) -> {
@@ -316,6 +328,8 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
                                         item.getSupplementalIconOnClickListener().onClick(item);
                                     }
                                 });
+                        mActionContainerTouchInterceptor.setClickable(
+                                item.getSupplementalIconOnClickListener() != null);
                         mTouchInterceptor.setVisibility(View.GONE);
                     }
                     break;
@@ -356,6 +370,8 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
                     itemOnClickListener.onClick(item);
                 }
             });
+            // Compound button list items should always be clickable
+            mTouchInterceptor.setClickable(true);
             mReducedTouchInterceptor.setVisibility(View.GONE);
             mActionContainerTouchInterceptor.setVisibility(View.GONE);
 
