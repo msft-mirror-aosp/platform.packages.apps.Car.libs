@@ -21,13 +21,13 @@ import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
 import static com.android.car.ui.utils.CarUiUtils.findViewByRefId;
-import static com.android.car.ui.utils.CarUiUtils.getBooleanSystemProperty;
 import static com.android.car.ui.utils.CarUiUtils.requireViewByRefId;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.text.PrecomputedText;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -41,6 +41,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.XmlRes;
+import androidx.core.content.ContextCompat;
 
 import com.android.car.ui.AlertDialogBuilder;
 import com.android.car.ui.R;
@@ -50,19 +51,23 @@ import com.android.car.ui.recyclerview.CarUiListItem;
 import com.android.car.ui.recyclerview.CarUiListItemAdapter;
 import com.android.car.ui.utils.CarUiUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * The implementation of {@link ToolbarController}. This class takes a ViewGroup, and looks
  * in the ViewGroup to find all the toolbar-related views to control.
  */
+@SuppressWarnings("AndroidJdkLibsChecker")
 public final class ToolbarControllerImpl implements ToolbarController {
     private static final String TAG = "CarUiToolbarController";
 
@@ -73,27 +78,33 @@ public final class ToolbarControllerImpl implements ToolbarController {
     private ViewGroup mNavIconContainer;
     private ViewGroup mTitleContainer;
     private TextView mTitle;
+    @NonNull
+    private CharSequence mTitleText = "";
     private TextView mSubtitle;
+    @NonNull
+    private CharSequence mSubtitleText = "";
     private ImageView mTitleLogo;
     private ViewGroup mTitleLogoContainer;
     private TabLayout mTabLayout;
     private ViewGroup mMenuItemsContainer;
-    private FrameLayout mSearchViewContainer;
+    private SearchConfig.SearchConfigBuilder mSearchConfigBuilder;
+    private final FrameLayout mSearchViewContainer;
     private SearchView mSearchView;
-
 
     // Cached values that we will send to views when they are inflated
     private CharSequence mSearchHint;
     private Drawable mSearchIcon;
     private String mSearchQuery;
     private final Context mContext;
-    private final Set<Toolbar.OnSearchListener> mOnSearchListeners = new HashSet<>();
-    private final Set<Toolbar.OnSearchCompletedListener> mOnSearchCompletedListeners =
+    private final Set<Consumer<String>> mOnSearchListeners = new HashSet<>();
+    private final Set<Runnable> mOnSearchCompletedListeners = new HashSet<>();
+    private final Set<Toolbar.OnSearchListener> mDeprecatedSearchListeners = new HashSet<>();
+    private final Set<Toolbar.OnSearchCompletedListener> mDeprecatedSearchCompletedListeners =
             new HashSet<>();
 
-    private final Set<Toolbar.OnBackListener> mOnBackListeners = new HashSet<>();
+    private final Set<Toolbar.OnBackListener> mDeprecatedBackListeners = new HashSet<>();
+    private final Set<Supplier<Boolean>> mBackListeners = new HashSet<>();
     private final Set<Toolbar.OnTabSelectedListener> mOnTabSelectedListeners = new HashSet<>();
-    private final Set<Toolbar.OnHeightChangedListener> mOnHeightChangedListeners = new HashSet<>();
 
     private final MenuItem mOverflowButton;
     private final boolean mIsTabsInSecondRow;
@@ -101,25 +112,27 @@ public final class ToolbarControllerImpl implements ToolbarController {
     private boolean mHasLogo = false;
     private boolean mShowMenuItemsWhileSearching;
     private Toolbar.State mState = Toolbar.State.HOME;
-    private Toolbar.NavButtonMode mNavButtonMode = Toolbar.NavButtonMode.BACK;
+    private boolean mStateSet = false;
+    private NavButtonMode mNavButtonMode = NavButtonMode.DISABLED;
+    private SearchMode mSearchMode = SearchMode.DISABLED;
     @NonNull
     private List<MenuItem> mMenuItems = Collections.emptyList();
     private List<MenuItem> mOverflowItems = new ArrayList<>();
     private final List<CarUiListItem> mUiOverflowItems = new ArrayList<>();
     private final CarUiListItemAdapter mOverflowAdapter;
     private final List<MenuItemRenderer> mMenuItemRenderers = new ArrayList<>();
+    private final List<DeprecatedTabWrapper> mDeprecatedTabs = new ArrayList<>();
     private View[] mMenuItemViews;
     private int mMenuItemsXmlId = 0;
     private AlertDialog mOverflowDialog;
-    private boolean mNavIconSpaceReserved;
-    private boolean mLogoFillsNavIconSpace;
-    private View mViewForContentAreaInWideScreenMode;
-    private boolean mShowLogo;
-    private List<? extends CarUiImeSearchListItem> mSearchItems;
+    private final boolean mNavIconSpaceReserved;
+    private final boolean mLogoFillsNavIconSpace;
+    private final boolean mShowLogo;
+    private SearchConfig mSearchConfigForWidescreen;
     private final ProgressBarController mProgressBar;
     private final MenuItem.Listener mOverflowItemListener = item -> {
         updateOverflowDialog(item);
-        setState(getState());
+        update();
     };
 
 
@@ -163,26 +176,7 @@ public final class ToolbarControllerImpl implements ToolbarController {
         mSearchViewContainer = requireViewByRefId(view, R.id.car_ui_toolbar_search_view_container);
         mProgressBar = new ProgressBarControllerImpl(
                 requireViewByRefId(view, R.id.car_ui_toolbar_progress_bar));
-
-        mTabLayout.addListener(new TabLayout.Listener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                for (Toolbar.OnTabSelectedListener listener : mOnTabSelectedListeners) {
-                    listener.onTabSelected(tab);
-                }
-            }
-        });
-
-        if (mBackground != null) {
-            mBackground.addOnLayoutChangeListener((v, left, top, right, bottom,
-                    oldLeft, oldTop, oldRight, oldBottom) -> {
-                if (oldBottom - oldTop != bottom - top) {
-                    for (Toolbar.OnHeightChangedListener listener : mOnHeightChangedListeners) {
-                        listener.onHeightChanged(mBackground.getHeight());
-                    }
-                }
-            });
-        }
+        mSearchConfigBuilder = SearchConfig.builder();
 
         setBackgroundShown(true);
 
@@ -193,12 +187,12 @@ public final class ToolbarControllerImpl implements ToolbarController {
         return mContext;
     }
 
-    /**
-     * Returns {@code true} if a two row layout in enabled for the toolbar.
-     */
-    @Override
-    public boolean isTabsInSecondRow() {
-        return mIsTabsInSecondRow;
+    private Drawable getDrawable(@DrawableRes int resId) {
+        if (resId == 0) {
+            return null;
+        } else {
+            return ContextCompat.getDrawable(getContext(), resId);
+        }
     }
 
     /**
@@ -208,8 +202,7 @@ public final class ToolbarControllerImpl implements ToolbarController {
      */
     @Override
     public void setTitle(@StringRes int title) {
-        mTitle.setText(title);
-        setState(getState());
+        setTitle(title == 0 ? null : getContext().getString(title));
     }
 
     /**
@@ -219,13 +212,39 @@ public final class ToolbarControllerImpl implements ToolbarController {
      */
     @Override
     public void setTitle(CharSequence title) {
-        mTitle.setText(title);
-        setState(getState());
+        mTitleText = title == null ? "" : title;
+        asyncSetText(mTitle, mTitleText, Runnable::run);
+        update();
+    }
+
+    private void asyncSetText(TextView textView, @NonNull CharSequence title, Executor bgExecutor) {
+        // construct precompute related parameters using the TextView that we will set the text on.
+        PrecomputedText.Params params = textView.getTextMetricsParams();
+        WeakReference<TextView> textViewRef = new WeakReference<>(textView);
+        bgExecutor.execute(() -> {
+            // background thread
+            TextView tv = textViewRef.get();
+            if (tv == null) {
+                return;
+            }
+            PrecomputedText precomputedText = PrecomputedText.create(title, params);
+            tv.post(() -> {
+                // UI thread
+                TextView tvUi = textViewRef.get();
+                if (tvUi == null) return;
+                try {
+                    tvUi.setTextMetricsParams(precomputedText.getParams());
+                    tvUi.setText(precomputedText);
+                } catch (IllegalArgumentException e) {
+                    tvUi.setText(title);
+                }
+            });
+        });
     }
 
     @Override
     public CharSequence getTitle() {
-        return mTitle.getText();
+        return mTitleText;
     }
 
     /**
@@ -234,9 +253,8 @@ public final class ToolbarControllerImpl implements ToolbarController {
      * <p>The title may not always be shown, for example with one row layout with tabs.
      */
     @Override
-    public void setSubtitle(@StringRes int title) {
-        mSubtitle.setText(title);
-        setState(getState());
+    public void setSubtitle(@StringRes int subTitle) {
+        setSubtitle(subTitle == 0 ? null : getContext().getString(subTitle));
     }
 
     /**
@@ -245,25 +263,41 @@ public final class ToolbarControllerImpl implements ToolbarController {
      * <p>The title may not always be shown, for example with one row layout with tabs.
      */
     @Override
-    public void setSubtitle(CharSequence title) {
-        mSubtitle.setText(title);
-        setState(getState());
+    public void setSubtitle(CharSequence subTitle) {
+        mSubtitleText = subTitle == null ? "" : subTitle;
+        asyncSetText(mSubtitle, mSubtitleText, Runnable::run);
+        update();
     }
 
     @Override
     public CharSequence getSubtitle() {
-        return mSubtitle.getText();
+        return mSubtitleText;
     }
 
-    /**
-     * Gets the {@link TabLayout} for this toolbar.
-     *
-     * @deprecated Use other tab-related functions in the ToolbarController interface.
-     */
-    @Deprecated
     @Override
-    public TabLayout getTabLayout() {
-        return mTabLayout;
+    public void setTabs(@Nullable List<Tab> tabs) {
+        setTabs(tabs, 0);
+    }
+
+    @Override
+    public void setTabs(@Nullable List<Tab> tabs, int selectedTab) {
+        mDeprecatedTabs.clear();
+        setTabsInternal(tabs, selectedTab);
+    }
+
+    @Override
+    public List<Tab> getTabs() {
+        return mTabLayout.getTabs();
+    }
+
+    private void setTabsInternal(@Nullable List<Tab> tabs, int selectedTab) {
+        if (tabs == null || tabs.isEmpty()) {
+            selectedTab = -1;
+        } else if (selectedTab < 0 || selectedTab >= tabs.size()) {
+            throw new IllegalArgumentException("Tab position is invalid: " + selectedTab);
+        }
+        mTabLayout.setTabs(tabs, selectedTab);
+        update();
     }
 
     /**
@@ -272,41 +306,49 @@ public final class ToolbarControllerImpl implements ToolbarController {
      */
     @Override
     public int getTabCount() {
-        return mTabLayout.getTabCount();
+        return mDeprecatedTabs.size();
     }
 
-    /**
-     * Gets the index of the tab.
-     */
     @Override
     public int getTabPosition(TabLayout.Tab tab) {
-        return mTabLayout.getTabPosition(tab);
+        for (int i = 0; i < mDeprecatedTabs.size(); i++) {
+            if (mDeprecatedTabs.get(i).getDeprecatedTab() == tab) {
+                return i;
+            }
+        }
+        return -1;
     }
 
-    /**
-     * Adds a tab to this toolbar. You can listen for when it is selected via
-     * {@link #registerOnTabSelectedListener(Toolbar.OnTabSelectedListener)}.
-     */
     @Override
-    public void addTab(TabLayout.Tab tab) {
-        mTabLayout.addTab(tab);
-        setState(getState());
+    public void addTab(TabLayout.Tab newTab) {
+        mDeprecatedTabs.add(new DeprecatedTabWrapper(getContext(), newTab,
+                this::updateModernTabsFromDeprecatedOnes, (tab) -> {
+            for (Toolbar.OnTabSelectedListener listener : mOnTabSelectedListeners) {
+                listener.onTabSelected(newTab);
+            }
+        }));
+        updateModernTabsFromDeprecatedOnes();
     }
 
-    /** Removes all the tabs. */
+    private void updateModernTabsFromDeprecatedOnes() {
+        List<Tab> modernTabs = new ArrayList<>();
+
+        for (DeprecatedTabWrapper tab : mDeprecatedTabs) {
+            modernTabs.add(tab.getModernTab());
+        }
+
+        setTabsInternal(modernTabs, 0);
+    }
+
     @Override
     public void clearAllTabs() {
-        mTabLayout.clearAllTabs();
-        setState(getState());
+        mDeprecatedTabs.clear();
+        setTabs(null);
     }
 
-    /**
-     * Gets a tab added to this toolbar. See
-     * {@link #addTab(TabLayout.Tab)}.
-     */
     @Override
     public TabLayout.Tab getTab(int position) {
-        return mTabLayout.get(position);
+        return mDeprecatedTabs.get(position).getDeprecatedTab();
     }
 
     /**
@@ -318,6 +360,11 @@ public final class ToolbarControllerImpl implements ToolbarController {
         mTabLayout.selectTab(position);
     }
 
+    @Override
+    public int getSelectedTab() {
+        return mTabLayout.getSelectedTab();
+    }
+
     /**
      * Sets whether or not tabs should also be shown in the SUBPAGE {@link Toolbar.State}.
      */
@@ -325,7 +372,7 @@ public final class ToolbarControllerImpl implements ToolbarController {
     public void setShowTabsInSubpage(boolean showTabs) {
         if (showTabs != mShowTabsInSubpage) {
             mShowTabsInSubpage = showTabs;
-            setState(getState());
+            update();
         }
     }
 
@@ -343,7 +390,29 @@ public final class ToolbarControllerImpl implements ToolbarController {
      */
     @Override
     public void setLogo(@DrawableRes int resId) {
-        setLogo(resId != 0 ? getContext().getDrawable(resId) : null);
+        asyncSetLogo(resId, Runnable::run);
+    }
+
+    private void asyncSetLogo(int resId, Executor bgExecutor) {
+        if (!mShowLogo) {
+            // If no logo should be shown then we act as if we never received one.
+            return;
+        }
+        if (resId != 0) {
+            bgExecutor.execute(() -> {
+                // load resource on background thread.
+                Drawable drawable = getDrawable(resId);
+                mTitleLogo.post(() -> {
+                    // UI thread.
+                    mLogoInNavIconSpace.setImageDrawable(drawable);
+                    mTitleLogo.setImageDrawable(drawable);
+                });
+            });
+            mHasLogo = true;
+        } else {
+            mHasLogo = false;
+        }
+        update();
     }
 
     /**
@@ -363,16 +432,21 @@ public final class ToolbarControllerImpl implements ToolbarController {
         } else {
             mHasLogo = false;
         }
-        setState(mState);
+
+        update();
     }
 
-    /** Sets the hint for the search bar. */
+    /**
+     * Sets the hint for the search bar.
+     */
     @Override
     public void setSearchHint(@StringRes int resId) {
         setSearchHint(getContext().getString(resId));
     }
 
-    /** Sets the hint for the search bar. */
+    /**
+     * Sets the hint for the search bar.
+     */
     public void setSearchHint(CharSequence hint) {
         mSearchHint = hint;
         if (mSearchView != null) {
@@ -380,7 +454,9 @@ public final class ToolbarControllerImpl implements ToolbarController {
         }
     }
 
-    /** Gets the search hint */
+    /**
+     * Gets the search hint
+     */
     @Override
     public CharSequence getSearchHint() {
         return mSearchHint;
@@ -394,7 +470,7 @@ public final class ToolbarControllerImpl implements ToolbarController {
      */
     @Override
     public void setSearchIcon(@DrawableRes int resId) {
-        setSearchIcon(getContext().getDrawable(resId));
+        setSearchIcon(getDrawable(resId));
     }
 
     /**
@@ -414,22 +490,63 @@ public final class ToolbarControllerImpl implements ToolbarController {
     }
 
 
-    /** Sets the {@link Toolbar.NavButtonMode} */
+    /**
+     * Sets the {@link Toolbar.NavButtonMode}
+     */
     @Override
-    public void setNavButtonMode(Toolbar.NavButtonMode style) {
-        if (style != mNavButtonMode) {
-            mNavButtonMode = style;
-            setState(mState);
+    public void setNavButtonMode(Toolbar.NavButtonMode mode) {
+        NavButtonMode modernMode;
+        switch (mode) {
+            case BACK:
+                modernMode = NavButtonMode.BACK;
+                break;
+            case DOWN:
+                modernMode = NavButtonMode.DOWN;
+                break;
+            case CLOSE:
+                modernMode = NavButtonMode.CLOSE;
+                break;
+            case DISABLED:
+            default:
+                modernMode = NavButtonMode.DISABLED;
+                break;
+        }
+        setNavButtonMode(modernMode);
+    }
+
+    @Override
+    public void setNavButtonMode(NavButtonMode mode) {
+        if (mode != mNavButtonMode) {
+            mNavButtonMode = mode;
+            update();
         }
     }
 
-    /** Gets the {@link Toolbar.NavButtonMode} */
+    /**
+     * Gets the {@link Toolbar.NavButtonMode}
+     */
     @Override
     public Toolbar.NavButtonMode getNavButtonMode() {
-        return mNavButtonMode;
+        if (mStateSet && mNavButtonMode == NavButtonMode.DISABLED
+                && mState != Toolbar.State.HOME) {
+            return Toolbar.NavButtonMode.BACK;
+        }
+        switch (mNavButtonMode) {
+            case BACK:
+                return Toolbar.NavButtonMode.BACK;
+            case DOWN:
+                return Toolbar.NavButtonMode.DOWN;
+            case CLOSE:
+                return Toolbar.NavButtonMode.CLOSE;
+            case DISABLED:
+            default:
+                return Toolbar.NavButtonMode.DISABLED;
+        }
     }
 
-    /** Show/hide the background. When hidden, the toolbar is completely transparent. */
+    /**
+     * Show/hide the background. When hidden, the toolbar is completely transparent.
+     */
     @Override
     public void setBackgroundShown(boolean shown) {
         if (mBackground == null) {
@@ -437,14 +554,15 @@ public final class ToolbarControllerImpl implements ToolbarController {
         }
 
         if (shown) {
-            mBackground.setBackground(
-                    getContext().getDrawable(R.drawable.car_ui_toolbar_background));
+            mBackground.setBackground(getDrawable(R.drawable.car_ui_toolbar_background));
         } else {
             mBackground.setBackground(null);
         }
     }
 
-    /** Returns true is the toolbar background is shown */
+    /**
+     * Returns true is the toolbar background is shown
+     */
     @Override
     public boolean getBackgroundShown() {
         if (mBackground == null) {
@@ -514,7 +632,7 @@ public final class ToolbarControllerImpl implements ToolbarController {
             }
         }
 
-        setState(mState);
+        update();
     }
 
     /**
@@ -534,7 +652,7 @@ public final class ToolbarControllerImpl implements ToolbarController {
      *
      * <p>The XML file must have one <MenuItems> tag, with a variable number of <MenuItem>
      * child tags. See CarUiToolbarMenuItem in CarUi's attrs.xml for a list of available attributes.
-     *
+     * <p>
      * Example:
      * <pre>
      * <MenuItems>
@@ -562,19 +680,23 @@ public final class ToolbarControllerImpl implements ToolbarController {
         }
 
         mMenuItemsXmlId = resId;
-        List<MenuItem> menuItems = MenuItemRenderer.readMenuItemList(getContext(), resId);
+        List<MenuItem> menuItems = MenuItemXmlParserUtil.readMenuItemList(getContext(), resId);
         setMenuItemsInternal(menuItems);
         return menuItems;
     }
 
-    /** Gets the {@link MenuItem MenuItems} currently displayed */
+    /**
+     * Gets the {@link MenuItem MenuItems} currently displayed
+     */
     @Override
     @NonNull
     public List<MenuItem> getMenuItems() {
         return Collections.unmodifiableList(mMenuItems);
     }
 
-    /** Gets a {@link MenuItem} by id. */
+    /**
+     * Gets a {@link MenuItem} by id.
+     */
     @Override
     @Nullable
     public MenuItem findMenuItemById(int id) {
@@ -586,7 +708,9 @@ public final class ToolbarControllerImpl implements ToolbarController {
         return null;
     }
 
-    /** Gets a {@link MenuItem} by id. Will throw an IllegalArgumentException if not found. */
+    /**
+     * Gets a {@link MenuItem} by id. Will throw an IllegalArgumentException if not found.
+     */
     @Override
     @NonNull
     public MenuItem requireMenuItemById(int id) {
@@ -659,10 +783,12 @@ public final class ToolbarControllerImpl implements ToolbarController {
     @Override
     public void setShowMenuItemsWhileSearching(boolean showMenuItems) {
         mShowMenuItemsWhileSearching = showMenuItems;
-        setState(mState);
+        update();
     }
 
-    /** Returns if {@link MenuItem MenuItems} are shown while searching */
+    /**
+     * Returns if {@link MenuItem MenuItems} are shown while searching
+     */
     @Override
     public boolean getShowMenuItemsWhileSearching() {
         return mShowMenuItemsWhileSearching;
@@ -677,8 +803,11 @@ public final class ToolbarControllerImpl implements ToolbarController {
             mSearchView.setSearchQuery(query);
         } else {
             mSearchQuery = query;
-            for (Toolbar.OnSearchListener listener : mOnSearchListeners) {
+            for (Toolbar.OnSearchListener listener : mDeprecatedSearchListeners) {
                 listener.onSearch(query);
+            }
+            for (Consumer<String> listener : mOnSearchListeners) {
+                listener.accept(query);
             }
         }
     }
@@ -689,43 +818,77 @@ public final class ToolbarControllerImpl implements ToolbarController {
      */
     @Override
     public void setState(Toolbar.State state) {
-        mState = state;
+        if (mState != state || !mStateSet) {
+            mState = state;
+            mStateSet = true;
+            update();
+        }
+    }
 
-        if (mSearchView == null && (state == Toolbar.State.SEARCH || state == Toolbar.State.EDIT)) {
-            SearchView searchView = new SearchView(getContext());
-            searchView.setHint(mSearchHint);
-            searchView.setIcon(mSearchIcon);
-            searchView.setSearchQuery(mSearchQuery);
-            searchView.setSearchListeners(mOnSearchListeners);
-            searchView.setSearchCompletedListeners(mOnSearchCompletedListeners);
-            searchView.setVisibility(GONE);
+    @Override
+    public void setSearchMode(SearchMode mode) {
+        if (mStateSet) {
+            throw new IllegalStateException("Cannot set search mode when using setState()");
+        }
+        if (mSearchMode != mode) {
+            mSearchMode = mode;
+            update();
+        }
+    }
 
-            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT);
-            mSearchViewContainer.addView(searchView, layoutParams);
-            if (canShowSearchResultsView()) {
-                searchView.setViewToImeWideScreenSurface(mViewForContentAreaInWideScreenMode);
+    private void update() {
+        // Start by removing mState/mStateSet from the equation by incorporating them into other
+        // variables.
+        NavButtonMode navButtonMode = mNavButtonMode;
+        if (mStateSet) {
+            if (mState == Toolbar.State.HOME) {
+                navButtonMode = NavButtonMode.DISABLED;
+            } else if (navButtonMode == NavButtonMode.DISABLED) {
+                navButtonMode = NavButtonMode.BACK;
             }
+        }
 
-            searchView.installWindowInsetsListener(mSearchViewContainer);
-
-            if (mSearchItems != null) {
-                searchView.setSearchItemsForWideScreen(mSearchItems);
+        SearchMode searchMode = mSearchMode;
+        if (mStateSet) {
+            if (mState == Toolbar.State.SEARCH) {
+                searchMode = SearchMode.SEARCH;
+            } else if (mState == Toolbar.State.EDIT) {
+                searchMode = SearchMode.EDIT;
+            } else {
+                searchMode = SearchMode.DISABLED;
             }
+        }
 
-            mSearchView = searchView;
+        boolean hasLogo = mHasLogo;
+        if (mStateSet && (mState == Toolbar.State.SEARCH || mState == Toolbar.State.EDIT)) {
+            hasLogo = false;
+        }
+
+        boolean hasTabs = mTabLayout.hasTabs();
+        if (mStateSet && mState != Toolbar.State.HOME
+                && !(mState == Toolbar.State.SUBPAGE && mShowTabsInSubpage)) {
+            hasTabs = false;
+        }
+
+        boolean isSearching = searchMode != SearchMode.DISABLED;
+        if (mSearchView == null && isSearching) {
+            inflateSearchView();
         }
 
         for (MenuItemRenderer renderer : mMenuItemRenderers) {
-            renderer.setToolbarState(mState);
+            renderer.setToolbarIsSearching(searchMode == SearchMode.SEARCH);
         }
 
         View.OnClickListener backClickListener = (v) -> {
             boolean absorbed = false;
-            List<Toolbar.OnBackListener> listenersCopy = new ArrayList<>(mOnBackListeners);
-            for (Toolbar.OnBackListener listener : listenersCopy) {
+            List<Toolbar.OnBackListener> deprecatedListenersCopy =
+                    new ArrayList<>(mDeprecatedBackListeners);
+            List<Supplier<Boolean>> listenersCopy = new ArrayList<>(mBackListeners);
+            for (Toolbar.OnBackListener listener : deprecatedListenersCopy) {
                 absorbed = absorbed || listener.onBack();
+            }
+            for (Supplier<Boolean> listener : listenersCopy) {
+                absorbed = absorbed || listener.get();
             }
 
             if (!absorbed) {
@@ -736,115 +899,91 @@ public final class ToolbarControllerImpl implements ToolbarController {
             }
         };
 
-        if (state == Toolbar.State.SEARCH) {
-            mNavIcon.setImageResource(R.drawable.car_ui_icon_search_nav_icon);
-        } else {
-            switch (mNavButtonMode) {
-                case CLOSE:
-                    mNavIcon.setImageResource(R.drawable.car_ui_icon_close);
-                    break;
-                case DOWN:
-                    mNavIcon.setImageResource(R.drawable.car_ui_icon_down);
-                    break;
-                default:
-                    mNavIcon.setImageResource(R.drawable.car_ui_icon_arrow_back);
-                    break;
-            }
+        switch (navButtonMode) {
+            case CLOSE:
+                mNavIcon.setImageResource(R.drawable.car_ui_icon_close);
+                break;
+            case DOWN:
+                mNavIcon.setImageResource(R.drawable.car_ui_icon_down);
+                break;
+            default:
+                mNavIcon.setImageResource(R.drawable.car_ui_icon_arrow_back);
+                break;
         }
 
-        mNavIcon.setVisibility(state != Toolbar.State.HOME ? VISIBLE : GONE);
+        mNavIcon.setVisibility(navButtonMode != NavButtonMode.DISABLED
+                ? VISIBLE : GONE);
 
         // Show the logo in the nav space if that's enabled, we have a logo,
-        // and we're in the Home state.
-        mLogoInNavIconSpace.setVisibility(mHasLogo
-                && state == Toolbar.State.HOME
+        // and we don't have a nav button.
+        mLogoInNavIconSpace.setVisibility(hasLogo
+                && navButtonMode == NavButtonMode.DISABLED
                 && mLogoFillsNavIconSpace
                 ? VISIBLE : INVISIBLE);
 
-        // Show logo next to the title if we're in the subpage state or we're configured to not show
+        // Show logo next to the title if we have a back button or we're configured to not show
         // the logo in the nav icon space.
-        mTitleLogoContainer.setVisibility(mHasLogo
-                && (state == Toolbar.State.SUBPAGE
-                || (state == Toolbar.State.HOME && !mLogoFillsNavIconSpace))
+        mTitleLogoContainer.setVisibility(hasLogo
+                && (navButtonMode != NavButtonMode.DISABLED || !mLogoFillsNavIconSpace)
                 ? VISIBLE : GONE);
 
         // Show the nav icon container if we're not in the home space or the logo fills the nav icon
         // container. If car_ui_toolbar_nav_icon_reserve_space is true, hiding it will still reserve
         // its space
         mNavIconContainer.setVisibility(
-                state != Toolbar.State.HOME || (mHasLogo && mLogoFillsNavIconSpace)
+                navButtonMode != NavButtonMode.DISABLED
+                        || (hasLogo && mLogoFillsNavIconSpace)
                         ? VISIBLE : (mNavIconSpaceReserved ? INVISIBLE : GONE));
         mNavIconContainer.setOnClickListener(
-                state != Toolbar.State.HOME ? backClickListener : null);
-        mNavIconContainer.setClickable(state != Toolbar.State.HOME);
-        mNavIconContainer.setContentDescription(state != Toolbar.State.HOME
-                ? mContext.getString(R.string.car_ui_toolbar_nav_icon_content_description)
+                navButtonMode != NavButtonMode.DISABLED ? backClickListener : null);
+        mNavIconContainer.setClickable(navButtonMode != NavButtonMode.DISABLED);
+        mNavIconContainer.setContentDescription(navButtonMode != NavButtonMode.DISABLED
+                ? getContext().getString(R.string.car_ui_toolbar_nav_icon_content_description)
                 : null);
 
-        boolean hasTabs = mTabLayout.getTabCount() > 0
-                && (state == Toolbar.State.HOME
-                || (state == Toolbar.State.SUBPAGE && mShowTabsInSubpage));
         // Show the title if we're in the subpage state, or in the home state with no tabs or tabs
         // on the second row
-        int visibility = (state == Toolbar.State.SUBPAGE || state == Toolbar.State.HOME)
-                && (!hasTabs || mIsTabsInSecondRow)
-                ? VISIBLE : GONE;
-        mTitleContainer.setVisibility(visibility);
+        mTitleContainer.setVisibility((!hasTabs || mIsTabsInSecondRow) && !isSearching
+                ? VISIBLE : GONE);
         mSubtitle.setVisibility(
-                TextUtils.isEmpty(mSubtitle.getText()) ? GONE : VISIBLE);
+                TextUtils.isEmpty(getSubtitle()) ? GONE : VISIBLE);
 
-        mTabLayout.setVisibility(hasTabs ? VISIBLE : GONE);
+        mTabLayout.setVisibility(hasTabs
+                && (mSearchMode == SearchMode.DISABLED || mIsTabsInSecondRow) ? VISIBLE : GONE);
 
         if (mSearchView != null) {
-            if (state == Toolbar.State.SEARCH || state == Toolbar.State.EDIT) {
-                mSearchView.setPlainText(state == Toolbar.State.EDIT);
+            if (isSearching) {
+                mSearchView.setPlainText(searchMode == SearchMode.EDIT);
                 mSearchView.setVisibility(VISIBLE);
             } else {
                 mSearchView.setVisibility(GONE);
             }
         }
 
-        boolean showButtons = (state != Toolbar.State.SEARCH && state != Toolbar.State.EDIT)
-                || mShowMenuItemsWhileSearching;
+        boolean showButtons = !isSearching || mShowMenuItemsWhileSearching;
         mMenuItemsContainer.setVisibility(showButtons ? VISIBLE : GONE);
         mOverflowButton.setVisible(showButtons && countVisibleOverflowItems() > 0);
     }
 
-    /**
-     * Return the list of package names allowed to hide the content area in wide screen IME.
-     */
-    private List<String> allowPackageList(Context context) {
-        String[] packages = context.getResources()
-                .getStringArray(R.array.car_ui_ime_wide_screen_allowed_package_list);
-        return Arrays.asList(packages);
-    }
+    private void inflateSearchView() {
+        SearchView searchView = new SearchView(getContext());
+        searchView.setHint(mSearchHint);
+        searchView.setIcon(mSearchIcon);
+        searchView.setSearchQuery(mSearchQuery);
+        searchView.setSearchListeners(
+                mDeprecatedSearchListeners, mOnSearchListeners);
+        searchView.setSearchCompletedListeners(
+                mDeprecatedSearchCompletedListeners, mOnSearchCompletedListeners);
+        searchView.setVisibility(GONE);
 
-    /**
-     * Returns true if the toolbar can display search result items. One example of this is when the
-     * system is configured to display search items in the IME instead of in the app.
-     */
-    @Override
-    public boolean canShowSearchResultItems() {
-        return isWideScreenMode(mContext);
-    }
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        mSearchViewContainer.addView(searchView, layoutParams);
 
-    /**
-     * Returns whether or not system is running in a wide screen mode.
-     */
-    private static boolean isWideScreenMode(Context context) {
-        return getBooleanSystemProperty(context.getResources(),
-                R.string.car_ui_ime_wide_screen_system_property_name, false);
-    }
+        searchView.setSearchConfig(mSearchConfigForWidescreen);
 
-    /**
-     * Returns true if the app is allowed to set search results view.
-     */
-    @Override
-    public boolean canShowSearchResultsView() {
-        boolean allowAppsToHideContentArea = mContext.getResources().getBoolean(
-                R.bool.car_ui_ime_wide_screen_allow_app_hide_content_area);
-        return isWideScreenMode(mContext) && (allowPackageList(mContext).contains(
-                mContext.getPackageName()) || allowAppsToHideContentArea);
+        mSearchView = searchView;
     }
 
     /**
@@ -853,102 +992,131 @@ public final class ToolbarControllerImpl implements ToolbarController {
      *
      * <p>Note: Apps can only call this method if the package name is allowed via OEM to render
      * their view.  To check if the application have the permission to do so or not first call
-     * {@link #canShowSearchResultsView()}. If the app is not allowed this method will throw an
-     * {@link IllegalStateException}
+     * {@link SearchCapabilities#canShowSearchResultsView()}. If the app is not allowed this
+     * method
+     * will throw an {@link IllegalStateException}
      *
      * @param view to be added in the container.
      */
     @Override
     public void setSearchResultsView(View view) {
-        if (!canShowSearchResultsView()) {
+        if (!getSearchCapabilities().canShowSearchResultsView()) {
             throw new IllegalStateException(
                     "not allowed to add view to wide screen IME, package name: "
-                            + mContext.getPackageName());
+                            + getContext().getPackageName());
         }
 
-        if (mSearchView != null) {
-            mSearchView.setViewToImeWideScreenSurface(view);
-        }
+        setSearchConfig(mSearchConfigBuilder.setSearchResultsView(view).build());
+    }
 
-        mViewForContentAreaInWideScreenMode = view;
+    @Override
+    public void setSearchResultsInputViewIcon(@NonNull Drawable drawable) {
+        setSearchConfig(mSearchConfigBuilder.setSearchResultsInputViewIcon(drawable).build());
     }
 
     /**
      * Sets list of search item {@link CarUiListItem} to be displayed in the IMS
      * template. This method should be called when system is running in a wide screen mode. Apps
-     * can check that by using {@link #canShowSearchResultItems()}
+     * can check that by using {@link SearchCapabilities#canShowSearchResultItems()}
      * Else, this method will throw an {@link IllegalStateException}
      */
     @Override
     public void setSearchResultItems(List<? extends CarUiImeSearchListItem> searchItems) {
-        if (!canShowSearchResultItems()) {
+        if (!getSearchCapabilities().canShowSearchResultItems()) {
             throw new IllegalStateException(
                     "system not in wide screen mode, not allowed to set search result items ");
         }
-        mSearchItems = searchItems;
+
+        setSearchConfig(mSearchConfigBuilder.setSearchResultItems(searchItems).build());
+    }
+
+    @Override
+    public void setSearchConfig(SearchConfig searchConfig) {
+        mSearchConfigForWidescreen = searchConfig;
         if (mSearchView != null) {
-            mSearchView.setSearchItemsForWideScreen(searchItems);
+            mSearchView.setSearchConfig(mSearchConfigForWidescreen);
         }
     }
 
+    @Override
+    public SearchCapabilities getSearchCapabilities() {
+        return SearchWidescreenController.getSearchCapabilities(mContext);
+    }
 
-    /** Gets the current {@link Toolbar.State} of the toolbar. */
+    @Override
+    public boolean canShowSearchResultItems() {
+        return getSearchCapabilities().canShowSearchResultItems();
+    }
+
+    @Override
+    public boolean canShowSearchResultsView() {
+        return getSearchCapabilities().canShowSearchResultsView();
+    }
+
+    /**
+     * Gets the current {@link Toolbar.State} of the toolbar.
+     */
     @Override
     public Toolbar.State getState() {
         return mState;
     }
 
     /**
-     * Registers a new {@link Toolbar.OnHeightChangedListener} to the list of listeners. Register a
-     * {@link com.android.car.ui.recyclerview.CarUiRecyclerView} only if there is a toolbar at
-     * the top and a {@link com.android.car.ui.recyclerview.CarUiRecyclerView} in the view and
-     * nothing else. {@link com.android.car.ui.recyclerview.CarUiRecyclerView} will
-     * automatically adjust its height according to the height of the Toolbar.
+     * Returns whether or not the state of the toolbar was previously set.
      */
     @Override
-    public void registerToolbarHeightChangeListener(
-            Toolbar.OnHeightChangedListener listener) {
-        mOnHeightChangedListeners.add(listener);
+    public boolean isStateSet() {
+        return mStateSet;
     }
 
     /**
-     * Unregisters an existing {@link Toolbar.OnHeightChangedListener} from the list of
-     * listeners.
+     * Registers a new {@link Toolbar.OnTabSelectedListener} to the list of listeners.
      */
-    @Override
-    public boolean unregisterToolbarHeightChangeListener(
-            Toolbar.OnHeightChangedListener listener) {
-        return mOnHeightChangedListeners.remove(listener);
-    }
-
-    /** Registers a new {@link Toolbar.OnTabSelectedListener} to the list of listeners. */
     @Override
     public void registerOnTabSelectedListener(Toolbar.OnTabSelectedListener listener) {
         mOnTabSelectedListeners.add(listener);
     }
 
-    /** Unregisters an existing {@link Toolbar.OnTabSelectedListener} from the list of listeners. */
+    /**
+     * Unregisters an existing {@link Toolbar.OnTabSelectedListener} from the list of listeners.
+     */
     @Override
     public boolean unregisterOnTabSelectedListener(Toolbar.OnTabSelectedListener listener) {
         return mOnTabSelectedListeners.remove(listener);
     }
 
-    /** Registers a new {@link Toolbar.OnSearchListener} to the list of listeners. */
+    /**
+     * Registers a new {@link Toolbar.OnSearchListener} to the list of listeners.
+     */
     @Override
     public void registerOnSearchListener(Toolbar.OnSearchListener listener) {
+        mDeprecatedSearchListeners.add(listener);
+    }
+
+    /**
+     * Unregisters an existing {@link Toolbar.OnSearchListener} from the list of listeners.
+     */
+    @Override
+    public boolean unregisterOnSearchListener(Toolbar.OnSearchListener listener) {
+        return mDeprecatedSearchListeners.remove(listener);
+    }
+
+    @Override
+    public void registerSearchListener(Consumer<String> listener) {
         mOnSearchListeners.add(listener);
     }
 
-    /** Unregisters an existing {@link Toolbar.OnSearchListener} from the list of listeners. */
     @Override
-    public boolean unregisterOnSearchListener(Toolbar.OnSearchListener listener) {
+    public boolean unregisterSearchListener(Consumer<String> listener) {
         return mOnSearchListeners.remove(listener);
     }
 
-    /** Registers a new {@link Toolbar.OnSearchCompletedListener} to the list of listeners. */
+    /**
+     * Registers a new {@link Toolbar.OnSearchCompletedListener} to the list of listeners.
+     */
     @Override
     public void registerOnSearchCompletedListener(Toolbar.OnSearchCompletedListener listener) {
-        mOnSearchCompletedListeners.add(listener);
+        mDeprecatedSearchCompletedListeners.add(listener);
     }
 
     /**
@@ -957,22 +1125,48 @@ public final class ToolbarControllerImpl implements ToolbarController {
      */
     @Override
     public boolean unregisterOnSearchCompletedListener(Toolbar.OnSearchCompletedListener listener) {
+        return mDeprecatedSearchCompletedListeners.remove(listener);
+    }
+
+    @Override
+    public void registerSearchCompletedListener(Runnable listener) {
+        mOnSearchCompletedListeners.add(listener);
+    }
+
+    @Override
+    public boolean unregisterSearchCompletedListener(Runnable listener) {
         return mOnSearchCompletedListeners.remove(listener);
     }
 
-    /** Registers a new {@link Toolbar.OnBackListener} to the list of listeners. */
+    /**
+     * Registers a new {@link Toolbar.OnBackListener} to the list of listeners.
+     */
     @Override
     public void registerOnBackListener(Toolbar.OnBackListener listener) {
-        mOnBackListeners.add(listener);
+        mDeprecatedBackListeners.add(listener);
     }
 
-    /** Unregisters an existing {@link Toolbar.OnBackListener} from the list of listeners. */
+    /**
+     * Unregisters an existing {@link Toolbar.OnBackListener} from the list of listeners.
+     */
     @Override
     public boolean unregisterOnBackListener(Toolbar.OnBackListener listener) {
-        return mOnBackListeners.remove(listener);
+        return mDeprecatedBackListeners.remove(listener);
     }
 
-    /** Returns the progress bar */
+    @Override
+    public void registerBackListener(Supplier<Boolean> listener) {
+        mBackListeners.add(listener);
+    }
+
+    @Override
+    public boolean unregisterBackListener(Supplier<Boolean> listener) {
+        return mBackListeners.remove(listener);
+    }
+
+    /**
+     * Returns the progress bar
+     */
     @Override
     public ProgressBarController getProgressBar() {
         return mProgressBar;

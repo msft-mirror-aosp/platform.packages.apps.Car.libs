@@ -17,8 +17,12 @@ package com.android.car.ui.recyclerview;
 
 import static com.android.car.ui.utils.CarUiUtils.requireViewByRefId;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 import android.content.res.Resources;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,9 +32,10 @@ import android.view.animation.Interpolator;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.annotation.VisibleForTesting;
 import androidx.recyclerview.widget.OrientationHelper;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.LayoutManager;
 
 import com.android.car.ui.R;
 import com.android.car.ui.utils.CarUiUtils;
@@ -58,7 +63,7 @@ class DefaultScrollBar implements ScrollBar {
 
     private final Interpolator mPaginationInterpolator = new AccelerateDecelerateInterpolator();
 
-    private final Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
 
     private OrientationHelper mOrientationHelper;
 
@@ -74,11 +79,8 @@ class DefaultScrollBar implements ScrollBar {
         Resources res = rv.getContext().getResources();
 
         mButtonDisabledAlpha = CarUiUtils.getFloat(res, R.dimen.car_ui_button_disabled_alpha);
-        mScrollbarThumbMinHeight = rv.getContext().getResources()
-                .getDimensionPixelSize(R.dimen.car_ui_scrollbar_min_thumb_height);
-
-        getRecyclerView().addOnScrollListener(mRecyclerViewOnScrollListener);
-        getRecyclerView().getRecycledViewPool().setMaxRecycledViews(0, 12);
+        mScrollbarThumbMinHeight = (int) rv.getContext().getResources()
+                .getDimension(R.dimen.car_ui_scrollbar_min_thumb_height);
 
         mUpButton = requireViewByRefId(mScrollView, R.id.car_ui_scrollbar_page_up);
         View.OnClickListener paginateUpButtonOnClickListener = v -> pageUp();
@@ -86,7 +88,6 @@ class DefaultScrollBar implements ScrollBar {
         mPageUpOnContinuousScrollListener = new OnContinuousScrollListener(rv.getContext(),
                 paginateUpButtonOnClickListener);
         mUpButton.setOnTouchListener(mPageUpOnContinuousScrollListener);
-
 
         mDownButton = requireViewByRefId(mScrollView, R.id.car_ui_scrollbar_page_down);
         View.OnClickListener paginateDownButtonOnClickListener = v -> pageDown();
@@ -105,6 +106,8 @@ class DefaultScrollBar implements ScrollBar {
         // enables fast scrolling.
         FastScroller fastScroller = new FastScroller(mRecyclerView, mScrollTrack, mScrollView);
         fastScroller.enable();
+
+        getRecyclerView().addOnScrollListener(mRecyclerViewOnScrollListener);
 
         mScrollView.setVisibility(View.INVISIBLE);
         mScrollView.addOnLayoutChangeListener(
@@ -215,7 +218,7 @@ class DefaultScrollBar implements ScrollBar {
         }
 
         // If the scroll bars aren't visible, then no need to update.
-        if (mScrollView.getVisibility() == View.GONE || range == 0) {
+        if (mScrollView.getVisibility() != View.VISIBLE || range == 0) {
             return;
         }
 
@@ -243,8 +246,8 @@ class DefaultScrollBar implements ScrollBar {
      */
     private int calculateScrollThumbLength(int range, int extent) {
         // Scale the length by the available space that the thumb can fill.
-        return Math.max(Math.round(((float) extent / range) * mScrollTrack.getHeight()),
-                mScrollbarThumbMinHeight);
+        return max(Math.round(((float) extent / range) * mScrollTrack.getHeight()),
+                min(mScrollbarThumbMinHeight, mScrollTrack.getHeight()));
     }
 
     /**
@@ -319,7 +322,7 @@ class DefaultScrollBar implements ScrollBar {
 
     private void clearCachedHeights() {
         mChildHeightByAdapterPosition.clear();
-        cacheChildrenHeight(mRecyclerView.getLayoutManager());
+        cacheChildrenHeight(getLayoutManager());
     }
 
     private void cacheChildrenHeight(@Nullable RecyclerView.LayoutManager layoutManager) {
@@ -342,8 +345,8 @@ class DefaultScrollBar implements ScrollBar {
         for (int i = currentPos - 1; i >= 0; i--) {
             if (mChildHeightByAdapterPosition.indexOfKey(i) < 0) {
                 // Use the average height estimate when there is not enough data
-                nextPos = mSnapHelper.estimateNextPositionDiffForScrollDistance(orientationHelper,
-                        -scrollDistance);
+                nextPos = mSnapHelper.estimateNextPositionDiffForScrollDistance(
+                        orientationHelper, -scrollDistance);
                 break;
             }
             if ((distance + mChildHeightByAdapterPosition.get(i)) > Math.abs(scrollDistance)) {
@@ -372,28 +375,27 @@ class DefaultScrollBar implements ScrollBar {
      * CarUiRecyclerView}, then the snapping will not occur.
      */
     void pageUp() {
-        int currentOffset = getRecyclerView().computeVerticalScrollOffset();
-        RecyclerView.LayoutManager layoutManager = getRecyclerView().getLayoutManager();
+        int currentOffset = computeVerticalScrollOffset();
+        RecyclerView.LayoutManager layoutManager = getLayoutManager();
         if (layoutManager == null || layoutManager.getChildCount() == 0 || currentOffset == 0) {
             return;
         }
 
         // Use OrientationHelper to calculate scroll distance in order to match snapping behavior.
         OrientationHelper orientationHelper = getOrientationHelper(layoutManager);
-        int screenSize = orientationHelper.getTotalSpace();
-        int scrollDistance = screenSize;
+        int scrollDistance = orientationHelper.getTotalSpace();
 
         View currentPosView = getFirstMostVisibleChild(orientationHelper);
-        int currentPos = currentPosView != null ? mRecyclerView.getLayoutManager().getPosition(
+        int currentPos = currentPosView != null ? getLayoutManager().getPosition(
                 currentPosView) : 0;
         int nextPos = estimateNextPositionScrollUp(currentPos,
                 scrollDistance - Math.max(0, orientationHelper.getStartAfterPadding()
                         - orientationHelper.getDecoratedStart(currentPosView)), orientationHelper);
         if (nextPos == 0) {
             // Distance should always be positive. Negate its value to scroll up.
-            mRecyclerView.smoothScrollBy(0, -scrollDistance);
+            smoothScrollBy(0, -scrollDistance);
         } else {
-            mRecyclerView.smoothScrollToPosition(Math.max(0, currentPos + nextPos));
+            smoothScrollToPosition(Math.max(0, currentPos + nextPos));
         }
     }
 
@@ -401,8 +403,8 @@ class DefaultScrollBar implements ScrollBar {
         float mostVisiblePercent = 0;
         View mostVisibleView = null;
 
-        for (int i = 0; i < getRecyclerView().getLayoutManager().getChildCount(); i++) {
-            View child = getRecyclerView().getLayoutManager().getChildAt(i);
+        for (int i = 0; i < getLayoutManager().getChildCount(); i++) {
+            View child = getLayoutManager().getChildAt(i);
             float visiblePercentage = CarUiSnapHelper.getPercentageVisible(child, helper);
             if (visiblePercentage == 1f) {
                 mostVisibleView = child;
@@ -425,7 +427,7 @@ class DefaultScrollBar implements ScrollBar {
      * scrolled the length of a page, but not snapped to.
      */
     void pageDown() {
-        RecyclerView.LayoutManager layoutManager = getRecyclerView().getLayoutManager();
+        RecyclerView.LayoutManager layoutManager = getLayoutManager();
         if (layoutManager == null || layoutManager.getChildCount() == 0) {
             return;
         }
@@ -478,7 +480,7 @@ class DefaultScrollBar implements ScrollBar {
             }
         }
 
-        mRecyclerView.smoothScrollBy(0, scrollDistance);
+        smoothScrollBy(0, scrollDistance);
     }
 
     /**
@@ -489,61 +491,69 @@ class DefaultScrollBar implements ScrollBar {
      * determination may not be correct.
      */
     private void updatePaginationButtons() {
+        RecyclerView.LayoutManager layoutManager = getLayoutManager();
+
+        if (layoutManager == null) {
+            mScrollView.setVisibility(View.INVISIBLE);
+            return;
+        }
 
         boolean isAtStart = isAtStart();
         boolean isAtEnd = isAtEnd();
-        RecyclerView.LayoutManager layoutManager = getRecyclerView().getLayoutManager();
 
         // enable/disable the button before the view is shown. So there is no flicker.
         setUpEnabled(!isAtStart);
         setDownEnabled(!isAtEnd);
 
-        if ((isAtStart && isAtEnd) || layoutManager == null || layoutManager.getItemCount() == 0) {
+        if ((isAtStart && isAtEnd) || layoutManager.getItemCount() == 0) {
             mScrollView.setVisibility(View.INVISIBLE);
         } else {
             OrientationHelper orientationHelper = getOrientationHelper(layoutManager);
             int screenSize = orientationHelper.getTotalSpace();
             int touchTargetSize = (int) getRecyclerView().getContext().getResources()
                     .getDimension(R.dimen.car_ui_touch_target_size);
-            ConstraintLayout.LayoutParams upButtonLayoutParam =
-                    (ConstraintLayout.LayoutParams) mUpButton.getLayoutParams();
+            ViewGroup.MarginLayoutParams upButtonLayoutParam =
+                    (ViewGroup.MarginLayoutParams) mUpButton.getLayoutParams();
             int upButtonMargin = upButtonLayoutParam.topMargin
                     + upButtonLayoutParam.bottomMargin;
-            ConstraintLayout.LayoutParams downButtonLayoutParam =
-                    (ConstraintLayout.LayoutParams) mDownButton.getLayoutParams();
+            ViewGroup.MarginLayoutParams downButtonLayoutParam =
+                    (ViewGroup.MarginLayoutParams) mDownButton.getLayoutParams();
             int downButtonMargin = downButtonLayoutParam.topMargin
                     + downButtonLayoutParam.bottomMargin;
             int margin = upButtonMargin + downButtonMargin;
             if (screenSize < 2 * touchTargetSize + margin) {
                 mScrollView.setVisibility(View.INVISIBLE);
             } else {
-                ConstraintLayout.LayoutParams trackLayoutParam =
-                        (ConstraintLayout.LayoutParams) mScrollTrack.getLayoutParams();
+                ViewGroup.MarginLayoutParams trackLayoutParam =
+                        (ViewGroup.MarginLayoutParams) mScrollTrack.getLayoutParams();
                 int trackMargin = trackLayoutParam.topMargin
                         + trackLayoutParam.bottomMargin;
                 margin += trackMargin;
-                if (screenSize < 3 * touchTargetSize + margin) {
+                // touchTargetSize (for up button) + touchTargetSize (for down button)
+                // + max(touchTargetSize, mScrollbarThumbMinHeight)
+                // + margin (all margins added together)
+                if (screenSize < 2 * touchTargetSize
+                        + max(touchTargetSize, mScrollbarThumbMinHeight) + margin) {
                     mScrollTrack.setVisibility(View.INVISIBLE);
                     mScrollThumb.setVisibility(View.INVISIBLE);
+                } else {
+                    mScrollTrack.setVisibility(View.VISIBLE);
+                    mScrollThumb.setVisibility(View.VISIBLE);
                 }
                 mScrollView.setVisibility(View.VISIBLE);
             }
         }
 
-        if (layoutManager == null) {
-            return;
-        }
-
         if (layoutManager.canScrollVertically()) {
             setParameters(
-                    getRecyclerView().computeVerticalScrollRange(),
-                    getRecyclerView().computeVerticalScrollOffset(),
-                    getRecyclerView().computeVerticalScrollExtent());
+                    computeVerticalScrollRange(),
+                    computeVerticalScrollOffset(),
+                    computeVerticalScrollExtent());
         } else {
             setParameters(
-                    getRecyclerView().computeHorizontalScrollRange(),
-                    getRecyclerView().computeHorizontalScrollOffset(),
-                    getRecyclerView().computeHorizontalScrollExtent());
+                    computeHorizontalScrollRange(),
+                    computeHorizontalScrollOffset(),
+                    computeHorizontalScrollExtent());
         }
 
         mScrollView.invalidate();
@@ -552,14 +562,65 @@ class DefaultScrollBar implements ScrollBar {
     /**
      * Returns {@code true} if the RecyclerView is completely displaying the first item.
      */
-    boolean isAtStart() {
-        return mSnapHelper.isAtStart(getRecyclerView().getLayoutManager());
+    @Override
+    public boolean isAtStart() {
+        return mSnapHelper.isAtStart(getLayoutManager());
+    }
+
+    @Override
+    public void setHighlightThumb(boolean highlight) {
+        mScrollThumb.setActivated(highlight);
     }
 
     /**
      * Returns {@code true} if the RecyclerView is completely displaying the last item.
      */
     boolean isAtEnd() {
-        return mSnapHelper.isAtEnd(getRecyclerView().getLayoutManager());
+        return mSnapHelper.isAtEnd(getLayoutManager());
+    }
+
+    @VisibleForTesting
+    LayoutManager getLayoutManager() {
+        return getRecyclerView().getLayoutManager();
+    }
+
+    @VisibleForTesting
+    void smoothScrollToPosition(int max) {
+        getRecyclerView().smoothScrollToPosition(max);
+    }
+
+    @VisibleForTesting
+    void smoothScrollBy(int dx, int dy) {
+        getRecyclerView().smoothScrollBy(dx, dy);
+    }
+
+    @VisibleForTesting
+    int computeVerticalScrollRange() {
+        return getRecyclerView().computeVerticalScrollRange();
+    }
+
+    @VisibleForTesting
+    int computeVerticalScrollOffset() {
+        return getRecyclerView().computeVerticalScrollOffset();
+    }
+
+    @VisibleForTesting
+    int computeVerticalScrollExtent() {
+        return getRecyclerView().computeVerticalScrollExtent();
+    }
+
+    @VisibleForTesting
+    int computeHorizontalScrollRange() {
+        return getRecyclerView().computeHorizontalScrollRange();
+    }
+
+    @VisibleForTesting
+    int computeHorizontalScrollOffset() {
+        return getRecyclerView().computeHorizontalScrollOffset();
+    }
+
+    @VisibleForTesting
+    int computeHorizontalScrollExtent() {
+        return getRecyclerView().computeHorizontalScrollExtent();
     }
 }

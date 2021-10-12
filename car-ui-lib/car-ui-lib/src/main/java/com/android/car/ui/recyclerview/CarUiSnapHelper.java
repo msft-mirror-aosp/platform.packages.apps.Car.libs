@@ -35,7 +35,7 @@ import java.util.Objects;
  * the RecyclerView is scrolling vertically; it is defined as the left (or right if RTL) if the
  * RecyclerView is scrolling horizontally.
  */
-public class CarUiSnapHelper extends LinearSnapHelper {
+/* package */ class CarUiSnapHelper extends LinearSnapHelper {
     /**
      * The percentage of a View that needs to be completely visible for it to be a viable snap
      * target.
@@ -52,6 +52,7 @@ public class CarUiSnapHelper extends LinearSnapHelper {
     private static final float LONG_ITEM_END_VISIBLE_THRESHOLD = 0.3f;
 
     private final Context mContext;
+    @Nullable
     private RecyclerView mRecyclerView;
 
     public CarUiSnapHelper(Context context) {
@@ -188,41 +189,6 @@ public class CarUiSnapHelper extends LinearSnapHelper {
     }
 
     /**
-     * Finds the view to snap to. The view to snap to is the child of the LayoutManager that is
-     * closest to the start of the RecyclerView. The "start" depends on if the LayoutManager is
-     * scrolling horizontally or vertically. If it is horizontally scrolling, then the start is the
-     * view on the left (right if RTL). Otherwise, it is the top-most view.
-     *
-     * @param layoutManager The current {@link RecyclerView.LayoutManager} for the attached
-     *                      RecyclerView.
-     * @return The View closest to the start of the RecyclerView.
-     */
-    private static View findTopView(LayoutManager layoutManager, OrientationHelper helper) {
-        int childCount = layoutManager.getChildCount();
-        if (childCount == 0) {
-            return null;
-        }
-
-        View closestChild = null;
-        int absClosest = Integer.MAX_VALUE;
-
-        for (int i = 0; i < childCount; i++) {
-            View child = layoutManager.getChildAt(i);
-            if (child == null) {
-                continue;
-            }
-            int absDistance = Math.abs(distanceToTopMargin(child, helper));
-
-            /* if child top is closer than previous closest, set it as closest */
-            if (absDistance < absClosest) {
-                absClosest = absDistance;
-                closestChild = child;
-            }
-        }
-        return closestChild;
-    }
-
-    /**
      * Returns whether or not the given View is a valid snapping view. A view is considered valid
      * for snapping if it can fit entirely within the height of the RecyclerView it is contained
      * within.
@@ -354,7 +320,7 @@ public class CarUiSnapHelper extends LinearSnapHelper {
         if (distancePerChild <= 0) {
             return 0;
         }
-        return (int) Math.round(scrollDistance / distancePerChild);
+        return Math.round(scrollDistance / distancePerChild);
     }
 
     /**
@@ -373,7 +339,7 @@ public class CarUiSnapHelper extends LinearSnapHelper {
      * @return A float value that is the average number of pixels needed to scroll by one view in
      * the relevant direction.
      */
-    float computeDistancePerChild(RecyclerView.LayoutManager layoutManager,
+    private float computeDistancePerChild(RecyclerView.LayoutManager layoutManager,
             OrientationHelper helper) {
         View minPosView = null;
         View maxPosView = null;

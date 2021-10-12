@@ -32,8 +32,7 @@ public interface ScrollBar {
 
     /**
      * Requests layout of the scrollbar. Should be called when there's been a change that will
-     * affect
-     * the size of the scrollbar view.
+     * affect the size of the scrollbar view.
      */
     void requestLayout();
 
@@ -44,4 +43,12 @@ public interface ScrollBar {
      * Called when recyclerview's setAdapter is called.
      */
     void adapterChanged(RecyclerView.Adapter adapter);
+
+    /**
+     * Returns {@code true} if the RecyclerView is completely displaying the first item.
+     */
+    boolean isAtStart();
+
+    /** Highlights or unhighlight the scrollbar's thumb. */
+    void setHighlightThumb(boolean highlight);
 }

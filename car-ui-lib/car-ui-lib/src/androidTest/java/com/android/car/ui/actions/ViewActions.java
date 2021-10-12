@@ -27,4 +27,12 @@ public class ViewActions {
     public static ViewAction waitForView(Matcher<View> matcher, long waitTimeMillis) {
         return new WaitForViewAction(matcher, waitTimeMillis);
     }
+
+    public static ViewAction waitForView(Matcher<View> matcher) {
+        return new WaitForViewAction(matcher, 500);
+    }
+
+    public static ViewAction setProgress(int progress) {
+        return new SetProgressViewAction(progress);
+    }
 }

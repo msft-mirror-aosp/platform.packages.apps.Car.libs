@@ -29,11 +29,13 @@
     <!-- Paddings -->
     <dimen name="car_ui_padding_0">4dp</dimen>
     <dimen name="car_ui_padding_1">8dp</dimen>
-    <dimen name="car_ui_padding_2">16dp</dimen>
-    <dimen name="car_ui_padding_3">24dp</dimen>
-    <dimen name="car_ui_padding_4">32dp</dimen>
-    <dimen name="car_ui_padding_5">64dp</dimen>
-    <dimen name="car_ui_padding_6">96dp</dimen>
+    <dimen name="car_ui_padding_2">12dp</dimen>
+    <dimen name="car_ui_padding_3">16dp</dimen>
+    <dimen name="car_ui_padding_4">24dp</dimen>
+    <dimen name="car_ui_padding_5">32dp</dimen>
+    <dimen name="car_ui_padding_6">48dp</dimen>
+    <dimen name="car_ui_padding_7">64dp</dimen>
+    <dimen name="car_ui_padding_8">96dp</dimen>
 
     <!-- Type Sizings -->
     <dimen name="car_ui_body1_size">32sp</dimen>
@@ -82,11 +84,11 @@
     <!-- Margin between the logo and the title, when both logo and navigation icons are used -->
     <dimen name="car_ui_toolbar_title_logo_padding">0dp</dimen>
     <!-- Margin at the start of the title -->
-    <dimen name="car_ui_toolbar_title_margin_start">@dimen/car_ui_padding_2</dimen>
+    <dimen name="car_ui_toolbar_title_margin_start">@dimen/car_ui_padding_3</dimen>
     <!-- Margin at the start of the title when there is no logo present -->
     <dimen name="car_ui_toolbar_title_no_logo_margin_start">0dp</dimen>
     <!-- Space at the end and in between menu items -->
-    <dimen name="car_ui_toolbar_menu_item_margin">@dimen/car_ui_padding_2</dimen>
+    <dimen name="car_ui_toolbar_menu_item_margin">@dimen/car_ui_padding_3</dimen>
     <!-- Ripple effect radius for icon menu items -->
     <dimen name="car_ui_toolbar_menu_item_icon_ripple_radius">48dp</dimen>
     <!-- Icon size for icon menu items -->
@@ -196,29 +198,13 @@
     <dimen name="car_ui_list_item_action_divider_width">1dp</dimen>
     <dimen name="car_ui_list_item_action_divider_height">60dp</dimen>
 
-    <!-- List item actions  -->
-
-    <dimen name="car_ui_list_item_radio_button_height">@dimen/car_ui_list_item_height</dimen>
-    <dimen name="car_ui_list_item_radio_button_start_inset">@dimen/car_ui_list_item_start_inset</dimen>
-    <dimen name="car_ui_list_item_radio_button_end_inset">@dimen/car_ui_list_item_end_inset</dimen>
-    <dimen name="car_ui_list_item_radio_button_icon_container_width">@dimen/car_ui_list_item_icon_container_width</dimen>
-    <dimen name="car_ui_list_item_check_box_height">@dimen/car_ui_list_item_height</dimen>
-    <dimen name="car_ui_list_item_check_box_start_inset">@dimen/car_ui_list_item_start_inset</dimen>
-    <dimen name="car_ui_list_item_check_box_end_inset">@dimen/car_ui_list_item_end_inset</dimen>
-    <dimen name="car_ui_list_item_check_box_icon_container_width">@dimen/car_ui_list_item_icon_container_width</dimen>
-
-    <!-- Rotary focus highlight  -->
-
-    <dimen name="car_ui_rotary_focus_stroke_width">8dp</dimen>
-    <dimen name="car_ui_rotary_focus_pressed_stroke_width">4dp</dimen>
-
     <!-- IME wide screen -->
     <dimen name="car_ui_ime_wide_screen_keyboard_width">1250dp</dimen>
     <dimen name="car_ui_ime_wide_screen_keyboard_area_padding_start">36dp</dimen>
     <dimen name="car_ui_ime_wide_screen_keyboard_area_padding_end">36dp</dimen>
     <dimen name="car_ui_ime_wide_screen_keyboard_area_padding_bottom">40dp</dimen>
     <dimen name="car_ui_ime_wide_screen_input_area_height">96dp</dimen>
-    <dimen name="car_ui_ime_wide_screen_input_area_margin_top">56dp</dimen>
+    <dimen name="car_ui_ime_wide_screen_input_area_padding_top">56dp</dimen>
     <dimen name="car_ui_ime_wide_screen_input_padding_start">36dp</dimen>
     <dimen name="car_ui_ime_wide_screen_input_edit_text_padding_left">68dp</dimen>
     <dimen name="car_ui_ime_wide_screen_input_edit_text_padding_right">0dp</dimen>
@@ -253,4 +239,9 @@
      padding is needed so that the icon does not overlap the input field. The
      padding is calculated by 24dp + car_ui_primary_icon_size (44dp). -->
     <dimen name="car_ui_ime_wide_screen_input_area_padding_end">68dp</dimen>
+
+    <dimen name="car_ui_app_styled_dialog_width">0dp</dimen>
+    <dimen name="car_ui_app_styled_dialog_height">0dp</dimen>
+    <dimen name="car_ui_app_styled_dialog_position_x">0dp</dimen>
+    <dimen name="car_ui_app_styled_dialog_position_y">0dp</dimen>
 </resources>

@@ -18,7 +18,10 @@ include ':car-ui-lib'
 project(':car-ui-lib').projectDir = new File('./car-ui-lib')
 include ':PaintBooth'
 project(':PaintBooth').projectDir = new File('./paintbooth')
+include ':oem-apis'
+project(':oem-apis').projectDir = new File('./oem-apis')
 include ':shared-library'
-project(':shared-library').projectDir = new File('./sharedlibrary')
+project(':shared-library').projectDir = new File('./referencedesign/sharedlibrary')
 
 rootProject.name='Chassis'
+include ':car-rotary-lib'

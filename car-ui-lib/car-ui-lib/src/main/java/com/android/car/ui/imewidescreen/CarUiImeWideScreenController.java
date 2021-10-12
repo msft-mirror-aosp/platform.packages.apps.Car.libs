@@ -16,9 +16,6 @@
 
 package com.android.car.ui.imewidescreen;
 
-import static com.android.car.ui.core.SearchResultsProvider.CONTENT;
-import static com.android.car.ui.core.SearchResultsProvider.SEARCH_RESULTS_PROVIDER;
-
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -29,7 +26,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.inputmethodservice.ExtractEditText;
 import android.inputmethodservice.InputMethodService;
 import android.net.Uri;
@@ -42,7 +38,9 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.SurfaceControlViewHost.SurfacePackage;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,14 +53,16 @@ import android.widget.TextView;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.car.ui.CarUiLayoutInflaterFactory;
 import com.android.car.ui.R;
 import com.android.car.ui.core.SearchResultsProvider;
 import com.android.car.ui.recyclerview.CarUiContentListItem;
 import com.android.car.ui.recyclerview.CarUiListItemAdapter;
+import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.utils.CarUiUtils;
 
 import java.util.ArrayList;
@@ -120,6 +120,9 @@ public class CarUiImeWideScreenController {
     // this is not provided applications icon will be used. Value format is int.
     public static final String WIDE_SCREEN_EXTRACTED_TEXT_ICON_RES_ID =
             "extracted_text_icon_res_id";
+    // key to provide the drawable resource for the icon that will be displayed in the input area.
+    // If this is not provided, applications icon will be used. Value format is byteArray.
+    public static final String WIDE_SCREEN_EXTRACTED_TEXT_ICON = "extracted_text_icon";
     // Key to determine if IME should display the content area or not. Content area is referred to
     // the area used by IME to display search results, description title and description
     // provided by the application. By default it will be shown but this value could be ignored
@@ -184,7 +187,7 @@ public class CarUiImeWideScreenController {
     @NonNull
     private ImageView mWideScreenClearData;
     @NonNull
-    private RecyclerView mRecyclerView;
+    private CarUiRecyclerView mRecyclerView;
     @Nullable
     private ImageView mWideScreenExtractedTextIcon;
     private boolean mIsExtractIconProvidedByApp;
@@ -192,6 +195,7 @@ public class CarUiImeWideScreenController {
     private FrameLayout mInputFrame;
     @NonNull
     private ExtractEditText mExtractEditText;
+    @NonNull
     private EditorInfo mInputEditorInfo;
     private InputConnection mInputConnection;
     private boolean mExtractViewHidden;
@@ -219,7 +223,13 @@ public class CarUiImeWideScreenController {
         if (!isWideScreenMode()) {
             return inputView;
         }
-        mRootView = View.inflate(mContext, R.layout.car_ui_ims_wide_screen_input_view, null);
+
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        if (inflater.getFactory2() == null) {
+            inflater.setFactory2(new CarUiLayoutInflaterFactory());
+        }
+
+        mRootView = inflater.inflate(R.layout.car_ui_ims_wide_screen_input_view, null);
 
         mInputFrame = mRootView.requireViewById(R.id.car_ui_wideScreenInputArea);
         mInputFrame.addView(inputView, new FrameLayout.LayoutParams(
@@ -230,6 +240,25 @@ public class CarUiImeWideScreenController {
                         R.bool.car_ui_ime_wide_screen_allow_app_hide_content_area);
 
         mContentAreaSurfaceView = mRootView.requireViewById(R.id.car_ui_ime_surface);
+        mContentAreaSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format,
+                                       int width, int height) {
+                Bundle bundle = new Bundle();
+                bundle.putInt(CONTENT_AREA_SURFACE_HEIGHT,
+                        mContentAreaSurfaceView.getHeight());
+                bundle.putInt(CONTENT_AREA_SURFACE_WIDTH, mContentAreaSurfaceView.getWidth());
+                mInputConnection.performPrivateCommand(WIDE_SCREEN_ACTION, bundle);
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+            }
+        });
         mContentAreaSurfaceView.setZOrderOnTop(true);
         mWideScreenDescriptionTitle =
                 mRootView.requireViewById(R.id.car_ui_wideScreenDescriptionTitle);
@@ -286,8 +315,9 @@ public class CarUiImeWideScreenController {
 
     /**
      * Actions passed by the application must be "automotive_wide_screen" with the corresponding
-     * data that application wants to display. See the comments associated with each bundle key to
-     * know what view is rendered.
+     * data
+     * that application wants to display. See the comments associated with each bundle key to know
+     * what view is rendered.
      *
      * <p> Each bundle key renders or updates/controls a particular view in the template. For
      * example, if application rendered the description title and later also wanted to render an
@@ -295,13 +325,14 @@ public class CarUiImeWideScreenController {
      * and "add_desc_to_content_area" to provide the data. Sending action with only
      * "add_desc_to_content_area" bundle key will not add an extra view but will display only the
      * description and not the title.
-     *
+     * <p>
      * When the IME window is closed all the views are reset. For the default view visibility see
      * {@link #resetAutomotiveWideScreenViews()}.
      *
      * @param action Name of the command to be performed.
      * @param data   Any data to include with the command.
      */
+    @RequiresApi(api = VERSION_CODES.R)
     public void onAppPrivateCommand(String action, Bundle data) {
         if (!isWideScreenMode()) {
             return;
@@ -311,7 +342,7 @@ public class CarUiImeWideScreenController {
             return;
         }
         if (mAllowAppToHideContentArea || (mInputEditorInfo != null && isPackageAuthorized(
-                mInputEditorInfo.packageName))) {
+                getEditorInfoPackageName()))) {
             mImeRendersAllContent = data.getBoolean(REQUEST_RENDER_CONTENT_AREA, true);
             if (!mImeRendersAllContent) {
                 mContentAreaAutomotive.setVisibility(View.GONE);
@@ -371,6 +402,15 @@ public class CarUiImeWideScreenController {
             setWideScreenExtractedIcon(extractedTextIcon);
         }
 
+        byte[] byteArray = data.getByteArray(WIDE_SCREEN_EXTRACTED_TEXT_ICON);
+        if (byteArray != null) {
+            Bitmap bitmap = Bitmap.CREATOR.createFromParcel(
+                    byteArrayToParcel(byteArray));
+            mWideScreenExtractedTextIcon.setImageDrawable(
+                    new BitmapDrawable(mContext.getResources(), bitmap));
+            mWideScreenExtractedTextIcon.setVisibility(View.VISIBLE);
+        }
+
         if (WIDE_SCREEN_SEARCH_RESULTS.equals(action)) {
             loadSearchItems();
         }
@@ -397,8 +437,8 @@ public class CarUiImeWideScreenController {
             Log.w(TAG, "Result can't be loaded, input InputEditorInfo not available ");
             return;
         }
-        String url = CONTENT + getPackageName(mInputEditorInfo) + SEARCH_RESULTS_PROVIDER;
-        Uri contentUrl = Uri.parse(url);
+        Uri contentUrl = Uri.parse(SearchResultsProvider.getAuthority(
+                getPackageName(mInputEditorInfo)));
         ContentResolver cr = mContext.getContentResolver();
         try (Cursor c = cr.query(contentUrl, null, null, null, null)) {
             mAutomotiveSearchItems = new ArrayList<>();
@@ -407,11 +447,7 @@ public class CarUiImeWideScreenController {
                     CarUiContentListItem searchItem = new CarUiContentListItem(
                             CarUiContentListItem.Action.ICON);
                     String itemId = c.getString(c.getColumnIndex(SearchResultsProvider.ITEM_ID));
-                    searchItem.setOnItemClickedListener(v -> {
-                        Bundle bundle = new Bundle();
-                        bundle.putString(SEARCH_RESULT_ITEM_ID_LIST, itemId);
-                        mInputConnection.performPrivateCommand(WIDE_SCREEN_ACTION, bundle);
-                    });
+                    searchItem.setOnItemClickedListener(v -> onItemClicked(itemId));
                     searchItem.setTitle(c.getString(
                             c.getColumnIndex(SearchResultsProvider.TITLE)));
                     searchItem.setBody(c.getString(
@@ -433,12 +469,13 @@ public class CarUiImeWideScreenController {
                     if (secondaryBlob != null) {
                         Bitmap secondaryBitmap = Bitmap.CREATOR.createFromParcel(
                                 byteArrayToParcel(secondaryBlob));
+                        String secondaryItemId = c.getString(c.getColumnIndex(
+                                SearchResultsProvider.SECONDARY_IMAGE_ID));
                         searchItem.setSupplementalIcon(
                                 new BitmapDrawable(mContext.getResources(), secondaryBitmap), v -> {
                                     Bundle bundle = new Bundle();
                                     bundle.putString(SEARCH_RESULT_SUPPLEMENTAL_ICON_ID_LIST,
-                                            c.getString(c.getColumnIndex(
-                                                    SearchResultsProvider.SECONDARY_IMAGE_ID)));
+                                            secondaryItemId);
                                     mInputConnection.performPrivateCommand(WIDE_SCREEN_ACTION,
                                             bundle);
                                 });
@@ -447,7 +484,14 @@ public class CarUiImeWideScreenController {
                 } while (c.moveToNext());
             }
         }
+
         mInputConnection.performPrivateCommand(WIDE_SCREEN_POST_LOAD_SEARCH_RESULTS_ACTION, null);
+    }
+
+    void onItemClicked(String itemId) {
+        Bundle bundle = new Bundle();
+        bundle.putString(SEARCH_RESULT_ITEM_ID_LIST, itemId);
+        mInputConnection.performPrivateCommand(WIDE_SCREEN_ACTION, bundle);
     }
 
     private static Parcel byteArrayToParcel(byte[] bytes) {
@@ -473,8 +517,10 @@ public class CarUiImeWideScreenController {
      * Initialize the view in the wide screen template based on the data provided by the app through
      * {@link #onAppPrivateCommand(String, Bundle)}
      */
+    @RequiresApi(api = VERSION_CODES.R)
     public void onStartInputView(@NonNull EditorInfo editorInfo,
-            @Nullable InputConnection inputConnection, @Nullable CharSequence textForImeAction) {
+                                 @Nullable InputConnection inputConnection,
+                                 @Nullable CharSequence textForImeAction) {
         if (!isWideScreenMode()) {
             return;
         }
@@ -491,9 +537,7 @@ public class CarUiImeWideScreenController {
 
         // This view is rendered by the framework when IME is in full screen mode. For more info
         // see {@link #onEvaluateFullscreenMode}
-        mExtractEditText = mRootView.getRootView().requireViewById(
-                android.R.id.inputExtractEditText);
-
+        mExtractEditText = getExtractEditText();
         mExtractEditText.setPadding(
                 mContext.getResources().getDimensionPixelSize(
                         R.dimen.car_ui_ime_wide_screen_input_edit_text_padding_left),
@@ -545,19 +589,30 @@ public class CarUiImeWideScreenController {
         }
     }
 
+    @VisibleForTesting
+    ExtractEditText getExtractEditText() {
+        return mRootView.getRootView().requireViewById(
+                android.R.id.inputExtractEditText);
+    }
+
     /**
      * Sends the information for surface view to the application on which they can draw on. This
      * information will ONLY be sent if OEM allows an application to hide the content area and let
      * it draw its own content.
      */
+    @RequiresApi(api = VERSION_CODES.R)
     private void sendSurfaceInfo() {
         if (!mAllowAppToHideContentArea && mContentAreaSurfaceView.getDisplay() == null
                 && !(mInputEditorInfo != null
-                && isPackageAuthorized(mInputEditorInfo.packageName))) {
+                && isPackageAuthorized(getEditorInfoPackageName()))) {
             return;
         }
-        int displayId = mContentAreaSurfaceView.getDisplay().getDisplayId();
-        IBinder hostToken = mContentAreaSurfaceView.getHostToken();
+        // Dispatch the window visibility change for IME window as soon as its displayed.
+        mRootView.dispatchWindowVisibilityChanged(View.VISIBLE);
+        IBinder hostToken = null;
+        int displayId = mContentAreaSurfaceView.getDisplay() == null
+                ? 0 : mContentAreaSurfaceView.getDisplay().getDisplayId();
+        hostToken = mContentAreaSurfaceView.getHostToken();
 
         Bundle bundle = new Bundle();
         bundle.putBinder(CONTENT_AREA_SURFACE_HOST_TOKEN, hostToken);
@@ -569,7 +624,8 @@ public class CarUiImeWideScreenController {
         mInputConnection.performPrivateCommand(WIDE_SCREEN_ACTION, bundle);
     }
 
-    private boolean isPackageAuthorized(String packageName) {
+    @VisibleForTesting
+    boolean isPackageAuthorized(String packageName) {
         String[] packages = mContext.getResources()
                 .getStringArray(R.array.car_ui_ime_wide_screen_allowed_package_list);
 
@@ -595,7 +651,7 @@ public class CarUiImeWideScreenController {
      */
     @Nullable
     private static PackageInfo getPackageInfo(Context context,
-            String packageName) {
+                                              String packageName) {
         PackageManager packageManager = context.getPackageManager();
         PackageInfo packageInfo = null;
         try {
@@ -633,8 +689,9 @@ public class CarUiImeWideScreenController {
 
     /**
      * To support wide screen mode, IME should always call
-     * {@link InputMethodService#setExtractViewShown} with false and pass the flag to this method.
-     *
+     * {@link InputMethodService#setExtractViewShown}
+     * with false and pass the flag to this method.
+     * <p>
      * For example, within the IMS service call
      * <pre>
      *   @Override
@@ -647,7 +704,7 @@ public class CarUiImeWideScreenController {
      *     mImeWideScreenController.setExtractViewShown(shown);
      *   }
      * </pre>
-     *
+     * <p>
      * This is required as IMS checks for ExtractViewIsShown and if that is true then set the
      * touchable insets to the entire screen rather than a region. If an app hides the content area
      * in that case we want the user to be able to interact with the application.
@@ -699,13 +756,8 @@ public class CarUiImeWideScreenController {
     }
 
     @VisibleForTesting
-    void setExtractEditText(ExtractEditText editText) {
-        mExtractEditText = editText;
-    }
-
-    @VisibleForTesting
-    void setEditorInfo(EditorInfo editorInfo) {
-        mInputEditorInfo = editorInfo;
+    void setContentAreaSurfaceView(SurfaceView surfaceView) {
+        mContentAreaSurfaceView = surfaceView;
     }
 
     @VisibleForTesting
@@ -727,11 +779,11 @@ public class CarUiImeWideScreenController {
             if (iconResId == 0) {
                 mWideScreenExtractedTextIcon.setImageDrawable(
                         mContext.getPackageManager().getApplicationIcon(
-                                mInputEditorInfo.packageName));
+                                getEditorInfoPackageName()));
             } else {
                 mIsExtractIconProvidedByApp = true;
                 mWideScreenExtractedTextIcon.setImageDrawable(
-                        mContext.createPackageContext(mInputEditorInfo.packageName, 0).getDrawable(
+                        mContext.createPackageContext(getEditorInfoPackageName(), 0).getDrawable(
                                 iconResId));
             }
             mWideScreenExtractedTextIcon.setVisibility(View.VISIBLE);
@@ -744,9 +796,15 @@ public class CarUiImeWideScreenController {
         }
     }
 
+    @VisibleForTesting
+    String getEditorInfoPackageName() {
+        return mInputEditorInfo != null ? mInputEditorInfo.packageName : null;
+    }
+
     /**
      * Called when IME window closes. Reset all the views once that happens.
      */
+    @RequiresApi(api = VERSION_CODES.R)
     public void onFinishInputView() {
         if (!isWideScreenMode()) {
             return;
@@ -754,9 +812,11 @@ public class CarUiImeWideScreenController {
         resetAutomotiveWideScreenViews();
     }
 
+    @RequiresApi(api = VERSION_CODES.R)
     private void resetAutomotiveWideScreenViews() {
         mWideScreenDescriptionTitle.setVisibility(View.GONE);
         mContentAreaSurfaceView.setVisibility(View.GONE);
+        mContentAreaSurfaceView.setChildSurfacePackage(null);
         mWideScreenErrorMessage.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.GONE);
         mWideScreenDescription.setVisibility(View.GONE);
@@ -784,20 +844,7 @@ public class CarUiImeWideScreenController {
      */
     public boolean isWideScreenMode() {
         return CarUiUtils.getBooleanSystemProperty(mContext.getResources(),
-                R.string.car_ui_ime_wide_screen_system_property_name, false);
-    }
-
-    private Drawable loadDrawableFromPackage(int resId) {
-        try {
-            if (mInputEditorInfo != null) {
-                return mContext.createPackageContext(mInputEditorInfo.packageName, 0)
-                        .getDrawable(resId);
-            }
-        } catch (PackageManager.NameNotFoundException ex) {
-            Log.e(TAG, "loadDrawableFromPackage: package name not found: ", ex);
-        } catch (Resources.NotFoundException ex) {
-            Log.w(TAG, "loadDrawableFromPackage: resource not found with id " + resId, ex);
-        }
-        return null;
+                R.string.car_ui_ime_wide_screen_system_property_name, false)
+                && Build.VERSION.SDK_INT >= VERSION_CODES.R;
     }
 }
