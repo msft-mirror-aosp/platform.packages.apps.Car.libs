@@ -36,6 +36,8 @@ android_library {
         "androidx.legacy_legacy-support-v4",
         "car-apps-common",
         "glide-prebuilt",
+        "glide-gifdecoder-prebuilt",
+        "glide-disklrucache-prebuilt",
         "libphonenumber",
     ],
 
