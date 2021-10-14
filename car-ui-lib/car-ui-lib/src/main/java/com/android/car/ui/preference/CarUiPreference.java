@@ -19,13 +19,14 @@ package com.android.car.ui.preference;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 
 import com.android.car.ui.R;
-import com.android.car.ui.utils.ViewUtils;
+import com.android.car.ui.utils.CarUiUtils;
 
 import java.util.function.Consumer;
 
@@ -33,6 +34,7 @@ import java.util.function.Consumer;
  * This class extends the base {@link Preference} class. Adds the support to add a drawable icon to
  * the preference if there is one of fragment, intent or onPreferenceClickListener set.
  */
+@SuppressWarnings("AndroidJdkLibsChecker")
 public class CarUiPreference extends Preference implements DisabledPreferenceCallback {
     private boolean mShowChevron;
 
@@ -74,7 +76,7 @@ public class CarUiPreference extends Preference implements DisabledPreferenceCal
     public void onBindViewHolder(PreferenceViewHolder holder) {
         super.onBindViewHolder(holder);
 
-        ViewUtils.makeAllViewsUxRestricted(holder.itemView, isUxRestricted());
+        CarUiUtils.makeAllViewsUxRestricted(holder.itemView, isUxRestricted());
     }
 
     @Override
@@ -92,6 +94,16 @@ public class CarUiPreference extends Preference implements DisabledPreferenceCal
                 || getFragment() != null) {
             setWidgetLayoutResource(R.layout.car_ui_preference_chevron);
         }
+    }
+
+    /**
+     * An exact copy of {@link androidx.preference.Preference#performClick(View)}
+     * This method was added here because super.performClick(View) is not open
+     * for app usage.
+     */
+    @SuppressWarnings("RestrictTo")
+    void performClickUnrestricted(View v) {
+        performClick();
     }
 
     @Override

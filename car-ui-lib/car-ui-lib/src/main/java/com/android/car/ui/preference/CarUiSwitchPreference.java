@@ -26,7 +26,7 @@ import androidx.preference.PreferenceViewHolder;
 import androidx.preference.SwitchPreference;
 
 import com.android.car.ui.R;
-import com.android.car.ui.utils.ViewUtils;
+import com.android.car.ui.utils.CarUiUtils;
 
 import java.util.function.Consumer;
 
@@ -34,6 +34,7 @@ import java.util.function.Consumer;
  * This class is the same as the base {@link SwitchPreference} class, except it implements
  * {@link UxRestrictablePreference}
  */
+@SuppressWarnings("AndroidJdkLibsChecker")
 public class CarUiSwitchPreference extends SwitchPreference implements DisabledPreferenceCallback {
 
     private Consumer<Preference> mRestrictedClickListener;
@@ -70,7 +71,7 @@ public class CarUiSwitchPreference extends SwitchPreference implements DisabledP
     public void onBindViewHolder(PreferenceViewHolder holder) {
         super.onBindViewHolder(holder);
 
-        ViewUtils.makeAllViewsUxRestricted(holder.itemView, isUxRestricted());
+        CarUiUtils.makeAllViewsUxRestricted(holder.itemView, isUxRestricted());
     }
 
     @Override

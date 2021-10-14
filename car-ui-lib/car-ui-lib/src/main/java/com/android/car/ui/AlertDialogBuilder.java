@@ -29,6 +29,7 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -69,13 +70,35 @@ public class AlertDialogBuilder {
     private CharSequence mSubtitle;
     private Drawable mIcon;
     private boolean mIconTinted;
-    private boolean mAllowDismissButton = true;
-    private boolean mHasSingleChoiceBodyButton = false;
     private EditText mCarUiEditText;
     private InputMethodManager mInputMethodManager;
     private String mWideScreenTitle;
     private String mWideScreenTitleDesc;
     private ViewGroup mRoot;
+    private boolean mAllowDismissButton = true;
+    private boolean mHasSingleChoiceBodyButton = false;
+
+    private final TextWatcher mTextWatcherWideScreen = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            Bundle bundle = new Bundle();
+            String titleString = mWideScreenTitle != null ? mWideScreenTitle : mTitle.toString();
+            bundle.putString(ADD_DESC_TITLE_TO_CONTENT_AREA, titleString);
+            bundle.putString(ADD_DESC_TO_CONTENT_AREA, s.toString());
+            mInputMethodManager.sendAppPrivateCommand(mCarUiEditText, WIDE_SCREEN_ACTION,
+                    bundle);
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+    };
 
     // Whenever the IME is closed and opened again, the title and desc information needs to be
     // passed to the IME to be rendered. If the information is not passed to the IME the content
@@ -234,7 +257,7 @@ public class AlertDialogBuilder {
     /**
      * Set a listener to be invoked when the positive button of the dialog is pressed.
      *
-     * @param textId The resource id of the text to display in the positive button
+     * @param textId   The resource id of the text to display in the positive button
      * @param listener The {@link DialogInterface.OnClickListener} to use.
      * @return This Builder object to allow for chaining of calls to set methods
      */
@@ -248,7 +271,7 @@ public class AlertDialogBuilder {
     /**
      * Set a listener to be invoked when the positive button of the dialog is pressed.
      *
-     * @param text The text to display in the positive button
+     * @param text     The text to display in the positive button
      * @param listener The {@link DialogInterface.OnClickListener} to use.
      * @return This Builder object to allow for chaining of calls to set methods
      */
@@ -262,7 +285,7 @@ public class AlertDialogBuilder {
     /**
      * Set a listener to be invoked when the negative button of the dialog is pressed.
      *
-     * @param textId The resource id of the text to display in the negative button
+     * @param textId   The resource id of the text to display in the negative button
      * @param listener The {@link DialogInterface.OnClickListener} to use.
      * @return This Builder object to allow for chaining of calls to set methods
      */
@@ -276,7 +299,7 @@ public class AlertDialogBuilder {
     /**
      * Set a listener to be invoked when the negative button of the dialog is pressed.
      *
-     * @param text The text to display in the negative button
+     * @param text     The text to display in the negative button
      * @param listener The {@link DialogInterface.OnClickListener} to use.
      * @return This Builder object to allow for chaining of calls to set methods
      */
@@ -290,7 +313,7 @@ public class AlertDialogBuilder {
     /**
      * Set a listener to be invoked when the neutral button of the dialog is pressed.
      *
-     * @param textId The resource id of the text to display in the neutral button
+     * @param textId   The resource id of the text to display in the neutral button
      * @param listener The {@link DialogInterface.OnClickListener} to use.
      * @return This Builder object to allow for chaining of calls to set methods
      */
@@ -304,7 +327,7 @@ public class AlertDialogBuilder {
     /**
      * Set a listener to be invoked when the neutral button of the dialog is pressed.
      *
-     * @param text The text to display in the neutral button
+     * @param text     The text to display in the neutral button
      * @param listener The {@link DialogInterface.OnClickListener} to use.
      * @return This Builder object to allow for chaining of calls to set methods
      */
@@ -430,10 +453,10 @@ public class AlertDialogBuilder {
      * displayed in the dialog as the content, you will be notified of the
      * selected item via the supplied listener.
      *
-     * @param cursor The {@link Cursor} to supply the list of items
-     * @param listener The listener that will be called when an item is clicked.
+     * @param cursor      The {@link Cursor} to supply the list of items
+     * @param listener    The listener that will be called when an item is clicked.
      * @param labelColumn The column name on the cursor containing the string to display
-     * in the label.
+     *                    in the label.
      * @return This Builder object to allow for chaining of calls to set methods
      */
     public AlertDialogBuilder setCursor(final Cursor cursor,
@@ -452,13 +475,16 @@ public class AlertDialogBuilder {
      * item. Clicking on an item in the list will not dismiss the dialog.
      * Clicking on a button will dismiss the dialog.
      *
-     * @param itemsId the resource id of an array i.e. R.array.foo
+     * @param itemsId      the resource id of an array i.e. R.array.foo
      * @param checkedItems specifies which items are checked. It should be null in which case no
-     * items are checked. If non null it must be exactly the same length as the array of
-     * items.
-     * @param listener notified when an item on the list is clicked. The dialog will not be
-     * dismissed when an item is clicked. It will only be dismissed if clicked on a
-     * button, if no buttons are supplied it's up to the user to dismiss the dialog.
+     *                     items are checked. If non null it must be exactly the same length as the
+     *                     array of
+     *                     items.
+     * @param listener     notified when an item on the list is clicked. The dialog will not be
+     *                     dismissed when an item is clicked. It will only be dismissed if clicked
+     *                     on a
+     *                     button, if no buttons are supplied it's up to the user to dismiss the
+     *                     dialog.
      * @return This Builder object to allow for chaining of calls to set methods
      */
     public AlertDialogBuilder setMultiChoiceItems(@ArrayRes int itemsId, boolean[] checkedItems,
@@ -475,13 +501,16 @@ public class AlertDialogBuilder {
      * for each checked item. Clicking on an item in the list will not
      * dismiss the dialog. Clicking on a button will dismiss the dialog.
      *
-     * @param items the text of the items to be displayed in the list.
+     * @param items        the text of the items to be displayed in the list.
      * @param checkedItems specifies which items are checked. It should be null in which case no
-     * items are checked. If non null it must be exactly the same length as the array of
-     * items.
-     * @param listener notified when an item on the list is clicked. The dialog will not be
-     * dismissed when an item is clicked. It will only be dismissed if clicked on a
-     * button, if no buttons are supplied it's up to the user to dismiss the dialog.
+     *                     items are checked. If non null it must be exactly the same length as the
+     *                     array of
+     *                     items.
+     * @param listener     notified when an item on the list is clicked. The dialog will not be
+     *                     dismissed when an item is clicked. It will only be dismissed if clicked
+     *                     on a
+     *                     button, if no buttons are supplied it's up to the user to dismiss the
+     *                     dialog.
      * @return This Builder object to allow for chaining of calls to set methods
      */
     public AlertDialogBuilder setMultiChoiceItems(CharSequence[] items, boolean[] checkedItems,
@@ -498,22 +527,25 @@ public class AlertDialogBuilder {
      * for each checked item. Clicking on an item in the list will not
      * dismiss the dialog. Clicking on a button will dismiss the dialog.
      *
-     * @param cursor the cursor used to provide the items.
+     * @param cursor          the cursor used to provide the items.
      * @param isCheckedColumn specifies the column name on the cursor to use to determine
-     * whether a checkbox is checked or not. It must return an integer value where 1
-     * means checked and 0 means unchecked.
-     * @param labelColumn The column name on the cursor containing the string to display in the
-     * label.
-     * @param listener notified when an item on the list is clicked. The dialog will not be
-     * dismissed when an item is clicked. It will only be dismissed if clicked on a
-     * button, if no buttons are supplied it's up to the user to dismiss the dialog.
+     *                        whether a checkbox is checked or not. It must return an integer value
+     *                        where 1
+     *                        means checked and 0 means unchecked.
+     * @param labelColumn     The column name on the cursor containing the string to display in the
+     *                        label.
+     * @param listener        notified when an item on the list is clicked. The dialog will not be
+     *                        dismissed when an item is clicked. It will only be dismissed if
+     *                        clicked on a
+     *                        button, if no buttons are supplied it's up to the user to dismiss the
+     *                        dialog.
      * @return This Builder object to allow for chaining of calls to set methods
      */
     public AlertDialogBuilder setMultiChoiceItems(Cursor cursor, String isCheckedColumn,
             String labelColumn,
             final DialogInterface.OnMultiChoiceClickListener listener) {
         mBuilder.setMultiChoiceItems(cursor, isCheckedColumn, labelColumn, listener);
-        mHasSingleChoiceBodyButton = true;
+        mHasSingleChoiceBodyButton = false;
         return this;
     }
 
@@ -524,11 +556,13 @@ public class AlertDialogBuilder {
      * checked item. Clicking on an item in the list will not dismiss the dialog. Clicking on a
      * button will dismiss the dialog.
      *
-     * @param itemsId the resource id of an array i.e. R.array.foo
+     * @param itemsId     the resource id of an array i.e. R.array.foo
      * @param checkedItem specifies which item is checked. If -1 no items are checked.
-     * @param listener notified when an item on the list is clicked. The dialog will not be
-     * dismissed when an item is clicked. It will only be dismissed if clicked on a
-     * button, if no buttons are supplied it's up to the user to dismiss the dialog.
+     * @param listener    notified when an item on the list is clicked. The dialog will not be
+     *                    dismissed when an item is clicked. It will only be dismissed if clicked on
+     *                    a
+     *                    button, if no buttons are supplied it's up to the user to dismiss the
+     *                    dialog.
      * @return This Builder object to allow for chaining of calls to set methods
      */
     public AlertDialogBuilder setSingleChoiceItems(@ArrayRes int itemsId, int checkedItem,
@@ -544,13 +578,15 @@ public class AlertDialogBuilder {
      * the right of the text for the checked item. Clicking on an item in the list will not
      * dismiss the dialog. Clicking on a button will dismiss the dialog.
      *
-     * @param cursor the cursor to retrieve the items from.
+     * @param cursor      the cursor to retrieve the items from.
      * @param checkedItem specifies which item is checked. If -1 no items are checked.
      * @param labelColumn The column name on the cursor containing the string to display in the
-     * label.
-     * @param listener notified when an item on the list is clicked. The dialog will not be
-     * dismissed when an item is clicked. It will only be dismissed if clicked on a
-     * button, if no buttons are supplied it's up to the user to dismiss the dialog.
+     *                    label.
+     * @param listener    notified when an item on the list is clicked. The dialog will not be
+     *                    dismissed when an item is clicked. It will only be dismissed if clicked on
+     *                    a
+     *                    button, if no buttons are supplied it's up to the user to dismiss the
+     *                    dialog.
      * @return This Builder object to allow for chaining of calls to set methods
      */
     public AlertDialogBuilder setSingleChoiceItems(Cursor cursor, int checkedItem,
@@ -567,11 +603,13 @@ public class AlertDialogBuilder {
      * the right of the text for the checked item. Clicking on an item in the list will not
      * dismiss the dialog. Clicking on a button will dismiss the dialog.
      *
-     * @param items the items to be displayed.
+     * @param items       the items to be displayed.
      * @param checkedItem specifies which item is checked. If -1 no items are checked.
-     * @param listener notified when an item on the list is clicked. The dialog will not be
-     * dismissed when an item is clicked. It will only be dismissed if clicked on a
-     * button, if no buttons are supplied it's up to the user to dismiss the dialog.
+     * @param listener    notified when an item on the list is clicked. The dialog will not be
+     *                    dismissed when an item is clicked. It will only be dismissed if clicked on
+     *                    a
+     *                    button, if no buttons are supplied it's up to the user to dismiss the
+     *                    dialog.
      * @return This Builder object to allow for chaining of calls to set methods
      */
     public AlertDialogBuilder setSingleChoiceItems(CharSequence[] items, int checkedItem,
@@ -601,10 +639,10 @@ public class AlertDialogBuilder {
      * the right of the text for the checked item. Clicking on an item in the list will not
      * dismiss the dialog. Clicking on a button will dismiss the dialog.
      *
-     * @param adapter The {@link CarUiRadioButtonListItemAdapter} to supply the list of items
+     * @param adapter  The {@link CarUiRadioButtonListItemAdapter} to supply the list of items
      * @param listener notified when an item on the list is clicked. The dialog will not be
-     * dismissed when an item is clicked. It will only be dismissed if clicked on a
-     * button, if no buttons are supplied it's up to the user to dismiss the dialog.
+     *                 dismissed when an item is clicked. It will only be dismissed if clicked on a
+     *                 button, if no buttons are supplied it's up to the user to dismiss the dialog.
      * @return This Builder object to allow for chaining of calls to set methods
      * @deprecated Use {@link #setSingleChoiceItems(CarUiRadioButtonListItemAdapter)} instead.
      */
@@ -622,8 +660,8 @@ public class AlertDialogBuilder {
      * will not dismiss the dialog. Clicking on a button will dismiss the dialog.
      *
      * @param adapter The {@link CarUiRadioButtonListItemAdapter} to supply the list of items
-     * dismissed when an item is clicked. It will only be dismissed if clicked on a
-     * button, if no buttons are supplied it's up to the user to dismiss the dialog.
+     *                dismissed when an item is clicked. It will only be dismissed if clicked on a
+     *                button, if no buttons are supplied it's up to the user to dismiss the dialog.
      * @return This Builder object to allow for chaining of calls to set methods
      */
     public AlertDialogBuilder setSingleChoiceItems(CarUiRadioButtonListItemAdapter adapter) {
@@ -649,12 +687,12 @@ public class AlertDialogBuilder {
     /**
      * Sets a custom edit text box within the alert dialog.
      *
-     * @param prompt the string that will be set on the edit text view
+     * @param prompt              the string that will be set on the edit text view
      * @param textChangedListener textWatcher whose methods are called whenever this TextView's text
-     * changes {@link null} otherwise.
-     * @param inputFilters list of input filters, {@link null} if no filter is needed
-     * @param inputType See {@link EditText#setInputType(int)}, except
-     *                  {@link android.text.InputType#TYPE_NULL} will not be set.
+     *                            changes {@link null} otherwise.
+     * @param inputFilters        list of input filters, {@link null} if no filter is needed
+     * @param inputType           See {@link EditText#setInputType(int)}, except
+     *                            {@link android.text.InputType#TYPE_NULL} will not be set.
      * @return this Builder object to allow for chaining of calls to set methods
      */
     public AlertDialogBuilder setEditBox(String prompt, TextWatcher textChangedListener,
@@ -684,15 +722,45 @@ public class AlertDialogBuilder {
     /**
      * Sets a custom edit text box within the alert dialog.
      *
-     * @param prompt the string that will be set on the edit text view
+     * @param prompt              the string that will be set on the edit text view
      * @param textChangedListener textWatcher whose methods are called whenever this TextView's text
-     * changes {@link null} otherwise.
-     * @param inputFilters list of input filters, {@link null} if no filter is needed
+     *                            changes {@link null} otherwise.
+     * @param inputFilters        list of input filters, {@link null} if no filter is needed
      * @return this Builder object to allow for chaining of calls to set methods
      */
     public AlertDialogBuilder setEditBox(String prompt, TextWatcher textChangedListener,
             InputFilter[] inputFilters) {
         return setEditBox(prompt, textChangedListener, inputFilters, 0);
+    }
+
+    /**
+     * Sets the title and desc related to the dialog within the IMS templates.
+     *
+     * @param title title to be set.
+     * @param desc  description related to the dialog.
+     * @return this Builder object to allow for chaining of calls to set methods
+     */
+    public AlertDialogBuilder setEditTextTitleAndDescForWideScreen(String title, String desc) {
+        mWideScreenTitle = title;
+        mWideScreenTitleDesc = desc;
+
+        return this;
+    }
+
+    /**
+     * By default, the AlertDialogBuilder will just display the static text in the content area of
+     * widescreen IME provided by {@link #setEditTextTitleAndDescForWideScreen(String, String)}. To
+     * display the text typed by the user in the description set this to true.
+     *
+     * @return this Builder object to allow for chaining of calls to set methods
+     */
+    public AlertDialogBuilder setAutoDescUpdateForWidescreen(boolean autoUpdateDesc) {
+        if (autoUpdateDesc) {
+            mCarUiEditText.addTextChangedListener(mTextWatcherWideScreen);
+        } else {
+            mCarUiEditText.removeTextChangedListener(mTextWatcherWideScreen);
+        }
+        return this;
     }
 
     /**
@@ -708,20 +776,6 @@ public class AlertDialogBuilder {
      */
     public AlertDialogBuilder setAllowDismissButton(boolean allowDismissButton) {
         mAllowDismissButton = allowDismissButton;
-        return this;
-    }
-
-    /**
-     * Sets the title and desc related to the dialog within the IMS templates.
-     *
-     * @param title title to be set.
-     * @param desc description related to the dialog.
-     * @return this Builder object to allow for chaining of calls to set methods
-     */
-    public AlertDialogBuilder setEditTextTitleAndDescForWideScreen(String title, String desc) {
-        mWideScreenTitle = title;
-        mWideScreenTitleDesc = desc;
-
         return this;
     }
 
