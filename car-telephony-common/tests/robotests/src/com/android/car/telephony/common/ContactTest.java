@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
 @RunWith(RobolectricTestRunner.class)
 public class ContactTest {
 
