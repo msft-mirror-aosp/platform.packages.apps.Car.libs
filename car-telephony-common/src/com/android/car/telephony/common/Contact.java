@@ -32,7 +32,6 @@ import com.android.car.apps.common.log.L;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Encapsulates data about a phone Contact entry. Typically loaded from the local Contact store.
@@ -201,19 +200,9 @@ public class Contact implements Parcelable, Comparable<Contact> {
 
     /**
      * All postal addresses of this contact mapping to the unique primary key for the raw data
-     * entry.
+     * entry
      */
     private final List<PostalAddress> mPostalAddresses = new ArrayList<>();
-
-    /**
-     * Collator instance for proper comparison based on localized names.
-     */
-    private Collator mCollator;
-
-    /**
-     * Locale used for mCollator creation.
-     */
-    private Locale mLocale;
 
     /**
      * Parses a contact entry for a Cursor loaded from the Contact Database. A new contact will be
@@ -375,7 +364,7 @@ public class Contact implements Parcelable, Comparable<Contact> {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof Contact && mLookupKey.equals(((Contact) obj).mLookupKey)
-                && TextUtils.equals(((Contact) obj).mAccountName, mAccountName);
+                && mAccountName.equals(((Contact) obj).mAccountName);
     }
 
     @Override
@@ -458,17 +447,6 @@ public class Contact implements Parcelable, Comparable<Contact> {
         }
 
         return mInitials;
-    }
-
-    /**
-     * Returns the initials of the contact's name based on display order.
-     */
-    public String getInitialsBasedOnDisplayOrder(boolean startWithFirstName) {
-        if (startWithFirstName) {
-            return TelecomUtils.getInitials(mDisplayName, mDisplayNameAlt);
-        } else {
-            return TelecomUtils.getInitials(mDisplayNameAlt, mDisplayName);
-        }
     }
 
     /**
@@ -639,7 +617,7 @@ public class Contact implements Parcelable, Comparable<Contact> {
         for (int i = 0; i < phoneNumberListLength; i++) {
             PhoneNumber phoneNumber = source.readParcelable(PhoneNumber.class.getClassLoader());
             contact.mPhoneNumbers.add(phoneNumber);
-            if (phoneNumber != null && phoneNumber.isPrimary()) {
+            if (phoneNumber.isPrimary()) {
                 contact.mPrimaryPhoneNumber = phoneNumber;
             }
         }
@@ -687,12 +665,8 @@ public class Contact implements Parcelable, Comparable<Contact> {
         if (type != otherType) {
             return Integer.compare(type, otherType);
         }
-        Locale currentLocale = Locale.getDefault();
-        if (mCollator == null || mLocale == null || !mLocale.equals(currentLocale)) {
-            mCollator = Collator.getInstance(currentLocale);
-            mLocale = currentLocale;
-        }
-        return mCollator.compare(name == null ? "" : name, otherName == null ? "" : otherName);
+        Collator collator = Collator.getInstance();
+        return collator.compare(name == null ? "" : name, otherName == null ? "" : otherName);
     }
 
     /**

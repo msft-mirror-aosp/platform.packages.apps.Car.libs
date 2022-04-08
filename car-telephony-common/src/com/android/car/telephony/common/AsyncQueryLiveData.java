@@ -51,7 +51,8 @@ public abstract class AsyncQueryLiveData<T> extends LiveData<T> {
 
     public AsyncQueryLiveData(Context context, QueryParam.Provider provider,
             ExecutorService executorService) {
-        mObservableAsyncQuery = new ObservableAsyncQuery(context, provider, this::onCursorLoaded);
+        mObservableAsyncQuery = new ObservableAsyncQuery(provider, context.getContentResolver(),
+                this::onCursorLoaded);
         mExecutorService = executorService;
     }
 

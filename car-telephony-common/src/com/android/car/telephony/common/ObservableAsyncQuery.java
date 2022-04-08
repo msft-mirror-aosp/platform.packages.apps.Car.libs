@@ -18,15 +18,12 @@ package com.android.car.telephony.common;
 
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.database.Cursor;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 import com.android.car.apps.common.log.L;
 
@@ -51,12 +48,11 @@ public class ObservableAsyncQuery {
         void onQueryFinished(@Nullable Cursor cursor);
     }
 
-    private Context mContext;
     private AsyncQueryHandler mAsyncQueryHandler;
     private QueryParam.Provider mQueryParamProvider;
+    private Cursor mCurrentCursor;
     private OnQueryFinishedListener mOnQueryFinishedListener;
     private ContentObserver mContentObserver;
-    private ContentResolver mContentResolver;
     private boolean mIsActive = false;
     private int mToken;
 
@@ -65,12 +61,10 @@ public class ObservableAsyncQuery {
      * @param listener           Listener which will be called when data is available.
      */
     public ObservableAsyncQuery(
-            @NonNull Context context,
             @NonNull QueryParam.Provider queryParamProvider,
+            @NonNull ContentResolver cr,
             @NonNull OnQueryFinishedListener listener) {
-        mContext = context;
-        mContentResolver = context.getContentResolver();
-        mAsyncQueryHandler = new AsyncQueryHandlerImpl(this, mContentResolver);
+        mAsyncQueryHandler = new AsyncQueryHandlerImpl(this, cr);
         mContentObserver = new ContentObserver(mAsyncQueryHandler) {
             @Override
             public void onChange(boolean selfChange) {
@@ -89,12 +83,10 @@ public class ObservableAsyncQuery {
     public void startQuery() {
         L.d(TAG, "startQuery");
         mAsyncQueryHandler.cancelOperation(mToken); // Cancel the query task.
-        mContentResolver.unregisterContentObserver(mContentObserver);
 
         mToken++;
         QueryParam queryParam = mQueryParamProvider.getQueryParam();
-        if (queryParam != null && ContextCompat.checkSelfPermission(mContext,
-                queryParam.mPermission) == PackageManager.PERMISSION_GRANTED) {
+        if (queryParam != null) {
             mAsyncQueryHandler.startQuery(
                     mToken,
                     null,
@@ -103,7 +95,6 @@ public class ObservableAsyncQuery {
                     queryParam.mSelection,
                     queryParam.mSelectionArgs,
                     queryParam.mOrderBy);
-            mContentResolver.registerContentObserver(queryParam.mUri, false, mContentObserver);
         } else {
             mOnQueryFinishedListener.onQueryFinished(null);
         }
@@ -118,7 +109,7 @@ public class ObservableAsyncQuery {
     public void stopQuery() {
         L.d(TAG, "stopQuery");
         mIsActive = false;
-        mContentResolver.unregisterContentObserver(mContentObserver);
+        cleanupCursorIfNecessary();
         mAsyncQueryHandler.cancelOperation(mToken); // Cancel the query task.
     }
 
@@ -127,9 +118,21 @@ public class ObservableAsyncQuery {
             return;
         }
         L.d(TAG, "onQueryComplete");
+        cleanupCursorIfNecessary();
+        if (cursor != null) {
+            cursor.registerContentObserver(mContentObserver);
+            mCurrentCursor = cursor;
+        }
         if (mOnQueryFinishedListener != null) {
             mOnQueryFinishedListener.onQueryFinished(cursor);
         }
+    }
+
+    protected void cleanupCursorIfNecessary() {
+        if (mCurrentCursor != null) {
+            mCurrentCursor.unregisterContentObserver(mContentObserver);
+        }
+        mCurrentCursor = null;
     }
 
     private static class AsyncQueryHandlerImpl extends AsyncQueryHandler {

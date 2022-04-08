@@ -17,7 +17,6 @@
 package com.android.car.media.common.playback;
 
 import static com.android.car.arch.common.LiveDataFunctions.dataOf;
-import static com.android.car.media.common.MediaTestUtils.newFakeMediaSource;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -26,7 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.robolectric.RuntimeEnvironment.application;
 
-import android.support.v4.media.MediaBrowserCompat;
+import android.media.MediaDescription;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -40,9 +39,6 @@ import com.android.car.arch.common.testing.CaptureObserver;
 import com.android.car.arch.common.testing.InstantTaskExecutorRule;
 import com.android.car.arch.common.testing.TestLifecycleOwner;
 import com.android.car.media.common.MediaItemMetadata;
-import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
-import com.android.car.media.common.source.MediaBrowserConnector.ConnectionStatus;
-import com.android.car.media.common.source.MediaSource;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,11 +51,8 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RunWith(RobolectricTestRunner.class)
 public class PlaybackViewModelTest {
@@ -71,14 +64,12 @@ public class PlaybackViewModelTest {
     @Rule
     public final TestLifecycleOwner mLifecycleOwner = new TestLifecycleOwner();
 
-    private final MediaSource mMediaSource = newFakeMediaSource("test", "test");
-
-    @Mock
-    public MediaBrowserCompat mMediaBrowser;
     @Mock
     public MediaControllerCompat mMediaController;
     @Mock
     public MediaMetadataCompat mMediaMetadata;
+    @Mock
+    public MediaDescription mMediaDescription;
     @Mock
     public MediaDescriptionCompat mMediaDescriptionCompat;
     @Mock
@@ -88,23 +79,19 @@ public class PlaybackViewModelTest {
 
     private PlaybackViewModel mPlaybackViewModel;
 
-    private MutableLiveData<BrowsingState> mBrowsingStateLD;
-
-    private Map<MediaBrowserCompat, MediaControllerCompat> mBrowserToController = new HashMap<>();
+    private MutableLiveData<MediaControllerCompat> mMediaControllerLiveData;
 
     @Before
     public void setUp() {
-        mBrowserToController.put(mMediaBrowser, mMediaController);
         doNothing().when(mMediaController).registerCallback(mCapturedCallback.capture());
-        mBrowsingStateLD = dataOf(
-                new BrowsingState(mMediaSource, mMediaBrowser, ConnectionStatus.CONNECTED));
-        mPlaybackViewModel = new PlaybackViewModel(application, mBrowsingStateLD,
-                browser -> mBrowserToController.get(browser));
+        when(mMediaDescriptionCompat.getMediaDescription()).thenReturn(mMediaDescription);
+        when(mMediaMetadata.getDescription()).thenReturn(mMediaDescriptionCompat);
+        mMediaControllerLiveData = dataOf(mMediaController);
+        mPlaybackViewModel = new PlaybackViewModel(application, mMediaControllerLiveData);
     }
 
     @Test
     public void testGetMetadata() {
-        when(mMediaMetadata.getDescription()).thenReturn(mMediaDescriptionCompat);
         CaptureObserver<MediaItemMetadata> observer = new CaptureObserver<>();
         mPlaybackViewModel.getMetadata().observe(mLifecycleOwner, observer);
         observer.reset();
@@ -186,7 +173,7 @@ public class PlaybackViewModelTest {
     @Test
     public void testGetHasQueue_true() {
         List<MediaSessionCompat.QueueItem> queue =
-                Arrays.asList(createQueueItem("title1", 1), createQueueItem("title2", 2));
+                Collections.singletonList(createQueueItem("title", 1));
         CaptureObserver<Boolean> observer = new CaptureObserver<>();
         mPlaybackViewModel.hasQueue().observe(mLifecycleOwner, observer);
         observer.reset();
@@ -199,13 +186,13 @@ public class PlaybackViewModelTest {
 
     @Test
     public void testChangeMediaSource_consistentController() {
+        // Ensure getters are consistent with values delivered by callback
+        when(mMediaController.getMetadata()).thenReturn(mMediaMetadata);
+        when(mMediaController.getPlaybackState()).thenReturn(mPlaybackState);
         deliverValuesToCallbacks(mCapturedCallback, mMediaMetadata, mPlaybackState);
 
-        // Create new MediaBrowser, new MediaController and associated callback captor
-        MediaBrowserCompat newMediaBrowser = mock(MediaBrowserCompat.class);
+        // Create new MediaController and associated callback captor
         MediaControllerCompat newController = mock(MediaControllerCompat.class);
-        mBrowserToController.put(newMediaBrowser, newController);
-
         ArgumentCaptor<MediaControllerCompat.Callback> newCallbackCaptor =
                 ArgumentCaptor.forClass(MediaControllerCompat.Callback.class);
         doNothing().when(newController).registerCallback(newCallbackCaptor.capture());
@@ -213,15 +200,16 @@ public class PlaybackViewModelTest {
         // Wire up new data for new MediaController
         MediaMetadataCompat newMetadata = mock(MediaMetadataCompat.class);
         PlaybackStateCompat newPlaybackState = mock(PlaybackStateCompat.class);
+        when(newController.getMetadata()).thenReturn(newMetadata);
+        when(newController.getPlaybackState()).thenReturn(newPlaybackState);
 
         // Ensure that all values are coming from the correct MediaController.
         mPlaybackViewModel.getMetadata().observe(mLifecycleOwner, mediaItemMetadata -> {
             if (mPlaybackViewModel.getMediaMetadata() == newMetadata) {
-                assertThat(mPlaybackViewModel.getMediaController()).isSameInstanceAs(newController);
+                assertThat(mPlaybackViewModel.getMediaController()).isSameAs(newController);
             }
             if (mPlaybackViewModel.getMediaMetadata() == mMediaMetadata) {
-                assertThat(mPlaybackViewModel.getMediaController())
-                        .isSameInstanceAs(mMediaController);
+                assertThat(mPlaybackViewModel.getMediaController()).isSameAs(mMediaController);
             }
         });
 
@@ -229,16 +217,14 @@ public class PlaybackViewModelTest {
             if (state == null) return;
 
             if (state.getStateCompat() == newPlaybackState) {
-                assertThat(mPlaybackViewModel.getMediaController()).isSameInstanceAs(newController);
+                assertThat(mPlaybackViewModel.getMediaController()).isSameAs(newController);
             }
             if (state.getStateCompat() == mPlaybackState) {
-                assertThat(mPlaybackViewModel.getMediaController())
-                        .isSameInstanceAs(mMediaController);
+                assertThat(mPlaybackViewModel.getMediaController()).isSameAs(mMediaController);
             }
         });
 
-        mBrowsingStateLD.setValue(
-                new BrowsingState(mMediaSource, newMediaBrowser, ConnectionStatus.CONNECTED));
+        mMediaControllerLiveData.setValue(newController);
         deliverValuesToCallbacks(newCallbackCaptor, newMetadata, newPlaybackState);
     }
 

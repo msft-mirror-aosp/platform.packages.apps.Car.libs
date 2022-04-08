@@ -27,11 +27,11 @@
          highlight is disabled, so it's invisible to the user no matter whether it's focused or not.
          -->
     <com.android.car.ui.FocusParkingView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_width="1dp"
+        android:layout_height="1dp"/>
 
     <FrameLayout
-        android:id="@+id/car_ui_base_layout_content_container"
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -56,8 +56,7 @@
 
             <FrameLayout
                 android:id="@+id/car_ui_toolbar_nav_icon_container"
-                style="@style/Widget.CarUi.Toolbar.NavIconContainer"
-                android:layout_width="@dimen/car_ui_toolbar_margin"
+                android:layout_width="112dp"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -65,7 +64,7 @@
 
                 <ImageView
                     android:id="@+id/car_ui_toolbar_nav_icon"
-                    style="@style/Widget.CarUi.Toolbar.NavIcon"
+                    android:background="@drawable/car_ui_toolbar_menu_item_icon_ripple"
                     android:tint="@color/car_ui_text_color_primary"
                     android:layout_width="@dimen/car_ui_toolbar_nav_icon_size"
                     android:layout_height="@dimen/car_ui_toolbar_nav_icon_size"
@@ -145,9 +144,9 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@id/car_ui_toolbar_menu_items_container"
-                app:layout_constraintRight_toLeftOf="@id/car_ui_toolbar_title_logo_container"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintLeft_toRightOf="@+id/car_ui_toolbar_menu_items_container"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ProgressBar
                 android:id="@+id/car_ui_toolbar_progress_bar"

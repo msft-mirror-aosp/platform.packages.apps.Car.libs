@@ -70,7 +70,6 @@ public class PhoneCallLog {
     private long mId;
     private String mPhoneNumberString;
     private I18nPhoneNumberWrapper mI18nPhoneNumberWrapper;
-    private String mAccountName;
     private List<Record> mCallRecords = new ArrayList<>();
 
     /**
@@ -81,7 +80,6 @@ public class PhoneCallLog {
         int numberColumn = cursor.getColumnIndex(CallLog.Calls.NUMBER);
         int dateColumn = cursor.getColumnIndex(CallLog.Calls.DATE);
         int callTypeColumn = cursor.getColumnIndex(CallLog.Calls.TYPE);
-        int accountNameColumn = cursor.getColumnIndex(CallLog.Calls.PHONE_ACCOUNT_ID);
 
         PhoneCallLog phoneCallLog = new PhoneCallLog();
         phoneCallLog.mId = cursor.getLong(idColumn);
@@ -90,21 +88,12 @@ public class PhoneCallLog {
                 phoneCallLog.mPhoneNumberString);
         Record record = new Record(cursor.getLong(dateColumn), cursor.getInt(callTypeColumn));
         phoneCallLog.mCallRecords.add(record);
-        phoneCallLog.mAccountName = cursor.getString(accountNameColumn);
         return phoneCallLog;
     }
 
     /** Returns the phone number of this log. */
     public String getPhoneNumberString() {
         return mPhoneNumberString;
-    }
-
-    /**
-     * Returns the account name that this call log belongs to. For call logs from Bluetooth device,
-     * account name is the same as Bluetooth address.
-     */
-    public String getAccountName() {
-        return mAccountName;
     }
 
     /** Returns the id of this log. */
@@ -174,8 +163,6 @@ public class PhoneCallLog {
         sb.append(TelecomUtils.piiLog(mPhoneNumberString));
         sb.append(" CallLog: ");
         sb.append(mCallRecords.size());
-        sb.append(" Account: ");
-        sb.append(mAccountName);
         return sb.toString();
     }
 }

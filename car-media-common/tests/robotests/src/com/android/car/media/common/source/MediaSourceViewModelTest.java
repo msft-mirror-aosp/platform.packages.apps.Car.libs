@@ -18,11 +18,9 @@ package com.android.car.media.common.source;
 
 import static android.car.media.CarMediaManager.MEDIA_SOURCE_MODE_PLAYBACK;
 
-import static com.android.car.apps.common.util.CarAppsDebugUtils.idHash;
-import static com.android.car.media.common.MediaTestUtils.newFakeMediaSource;
-
 import static com.google.common.truth.Truth.assertThat;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.robolectric.RuntimeEnvironment.application;
 
@@ -31,15 +29,15 @@ import android.car.Car;
 import android.car.media.CarMediaManager;
 import android.content.ComponentName;
 import android.support.v4.media.MediaBrowserCompat;
-import android.util.Log;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.android.car.arch.common.testing.CaptureObserver;
 import com.android.car.arch.common.testing.InstantTaskExecutorRule;
 import com.android.car.arch.common.testing.TestLifecycleOwner;
-import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
-import com.android.car.media.common.source.MediaBrowserConnector.ConnectionStatus;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,12 +48,11 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
 
-
 @RunWith(RobolectricTestRunner.class)
 public class MediaSourceViewModelTest {
 
-    private static final String TAG = "MediaSourceVMTest";
-
+    private static final String BROWSER_CONTROLLER_PACKAGE_NAME = "browser";
+    private static final String SESSION_MANAGER_CONTROLLER_PACKAGE_NAME = "mediaSessionManager";
     @Rule
     public final MockitoRule mMockitoRule = MockitoJUnit.rule();
     @Rule
@@ -65,6 +62,10 @@ public class MediaSourceViewModelTest {
 
     @Mock
     public MediaBrowserCompat mMediaBrowser;
+    @Mock
+    public MediaControllerCompat mMediaControllerFromBrowser;
+    @Mock
+    public MediaControllerCompat mMediaControllerFromSessionManager;
 
     @Mock
     public Car mCar;
@@ -73,12 +74,17 @@ public class MediaSourceViewModelTest {
 
     private MediaSourceViewModel mViewModel;
 
-    private MediaSource mRequestedSource;
+    private ComponentName mRequestedBrowseService;
     private MediaSource mMediaSource;
 
     @Before
     public void setUp() {
-        mRequestedSource = null;
+        when(mMediaControllerFromBrowser.getPackageName())
+                .thenReturn(BROWSER_CONTROLLER_PACKAGE_NAME);
+        when(mMediaControllerFromSessionManager.getPackageName())
+                .thenReturn(SESSION_MANAGER_CONTROLLER_PACKAGE_NAME);
+
+        mRequestedBrowseService = null;
         mMediaSource = null;
     }
 
@@ -91,14 +97,18 @@ public class MediaSourceViewModelTest {
                     @NonNull MediaBrowserConnector.Callback connectedBrowserCallback) {
                 return new MediaBrowserConnector(application, connectedBrowserCallback) {
                     @Override
-                    protected MediaBrowserCompat createMediaBrowser(MediaSource mediaSource,
+                    protected MediaBrowserCompat createMediaBrowser(ComponentName browseService,
                             MediaBrowserCompat.ConnectionCallback callback) {
-                        mRequestedSource = mediaSource;
-                        MediaBrowserCompat bro = super.createMediaBrowser(mediaSource, callback);
-                        Log.i(TAG, "createMediaBrowser: " + idHash(bro) + " for: " + mediaSource);
-                        return bro;
+                        mRequestedBrowseService = browseService;
+                        return super.createMediaBrowser(browseService, callback);
                     }
                 };
+            }
+
+            @Override
+            public MediaControllerCompat getControllerForSession(
+                    @Nullable MediaSessionCompat.Token token) {
+                return mMediaControllerFromBrowser;
             }
 
             @Override
@@ -130,35 +140,33 @@ public class MediaSourceViewModelTest {
 
     @Test
     public void testGetMediaController_connectedBrowser() {
-        CaptureObserver<BrowsingState> observer = new CaptureObserver<>();
-        mMediaSource = newFakeMediaSource("test", "test");
+        CaptureObserver<MediaControllerCompat> observer = new CaptureObserver<>();
+        ComponentName testComponent = new ComponentName("test", "test");
+        mMediaSource = mock(MediaSource.class);
+        when(mMediaSource.getBrowseServiceComponentName()).thenReturn(testComponent);
         when(mMediaBrowser.isConnected()).thenReturn(true);
         initializeViewModel();
 
-        mViewModel.getBrowserCallback().onBrowserConnectionChanged(
-                new BrowsingState(mMediaSource, mMediaBrowser, ConnectionStatus.CONNECTED));
-        mViewModel.getBrowsingState().observe(mLifecycleOwner, observer);
+        mViewModel.getConnectedBrowserCallback().onConnectedBrowserChanged(mMediaBrowser);
+        mViewModel.getMediaController().observe(mLifecycleOwner, observer);
 
-        BrowsingState browsingState = observer.getObservedValue();
-        assertThat(browsingState.mBrowser).isSameInstanceAs(mMediaBrowser);
-        assertThat(browsingState.mConnectionStatus).isEqualTo(ConnectionStatus.CONNECTED);
-        assertThat(mRequestedSource).isEqualTo(mMediaSource);
+        assertThat(observer.getObservedValue()).isSameAs(mMediaControllerFromBrowser);
+        assertThat(mRequestedBrowseService).isEqualTo(testComponent);
     }
 
     @Test
     public void testGetMediaController_noActiveSession_notConnected() {
-        CaptureObserver<BrowsingState> observer = new CaptureObserver<>();
-        mMediaSource = newFakeMediaSource("test", "test");
+        CaptureObserver<MediaControllerCompat> observer = new CaptureObserver<>();
+        ComponentName testComponent = new ComponentName("test", "test");
+        mMediaSource = mock(MediaSource.class);
+        when(mMediaSource.getBrowseServiceComponentName()).thenReturn(testComponent);
         when(mMediaBrowser.isConnected()).thenReturn(false);
         initializeViewModel();
 
-        mViewModel.getBrowserCallback().onBrowserConnectionChanged(
-                new BrowsingState(mMediaSource, mMediaBrowser, ConnectionStatus.REJECTED));
-        mViewModel.getBrowsingState().observe(mLifecycleOwner, observer);
+        mViewModel.getMediaController().observe(mLifecycleOwner, observer);
 
-        BrowsingState browsingState = observer.getObservedValue();
-        assertThat(browsingState.mBrowser).isSameInstanceAs(mMediaBrowser);
-        assertThat(browsingState.mConnectionStatus).isEqualTo(ConnectionStatus.REJECTED);
-        assertThat(mRequestedSource).isEqualTo(mMediaSource);
+        assertThat(observer.hasBeenNotified()).isTrue();
+        assertThat(observer.getObservedValue()).isNull();
+        assertThat(mRequestedBrowseService).isEqualTo(testComponent);
     }
 }

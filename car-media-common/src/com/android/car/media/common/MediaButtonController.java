@@ -41,9 +41,7 @@ import com.android.car.media.common.playback.PlaybackViewModel;
 import com.android.car.media.common.source.MediaSourceColors;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -55,8 +53,6 @@ import java.util.stream.Collectors;
 public class MediaButtonController {
 
     private static final String TAG = "MediaButton";
-
-    private final Map<String, ImageButton> mImageButtons = new HashMap<>();
 
     private Context mContext;
     private PlayPauseStopImageView mPlayPauseStopImageView;
@@ -84,13 +80,11 @@ public class MediaButtonController {
         mPlayPauseStopImageContainer.setOnClickListener(this::onPlayPauseStopClicked);
         mPlayPauseStopImageView = mPlayPauseStopImageContainer.findViewById(R.id.play_pause_stop);
         mPlayPauseStopImageView.setVisibility(View.INVISIBLE);
+        mPlayPauseStopImageView.setFocusedByDefault(true);
         mCircularProgressBar = mPlayPauseStopImageContainer.findViewById(
                 R.id.circular_progress_bar);
         mPlayPauseStopImageView.setAction(PlayPauseStopImageView.ACTION_DISABLED);
         mPlayPauseStopImageView.setOnClickListener(this::onPlayPauseStopClicked);
-        // In non-touch mode, a browse list will request focus explicitly and its first element
-        // will get focused instead of this button
-        mPlayPauseStopImageView.setFocusedByDefault(true);
 
         mShowCircularProgressBar = context.getResources().getBoolean(
                 R.bool.show_circular_progress_bar);
@@ -140,7 +134,6 @@ public class MediaButtonController {
         mControlBar.setView(null, ControlBar.SLOT_RIGHT);
         mSkipNextAdded = false;
         mSkipPrevAdded = false;
-        mImageButtons.clear();
     }
 
     private ImageButton createIconButton(Drawable icon) {
@@ -235,7 +228,12 @@ public class MediaButtonController {
             imageButtons.addAll(state.getCustomActions()
                     .stream()
                     .map(rawAction -> rawAction.fetchDrawable(mContext))
-                    .map(action -> getOrCreateIconButton(action))
+                    .map(action -> {
+                        ImageButton button = createIconButton(action.mIcon);
+                        button.setOnClickListener(view ->
+                                mController.doCustomAction(action.mAction, action.mExtras));
+                        return button;
+                    })
                     .collect(Collectors.toList()));
         }
         if (!mSkipPrevAdded && !imageButtons.isEmpty()) {
@@ -245,21 +243,6 @@ public class MediaButtonController {
             mControlBar.setView(imageButtons.remove(0), CarControlBar.SLOT_RIGHT);
         }
         mControlBar.setViews(imageButtons.toArray(new ImageButton[0]));
-    }
-
-    private ImageButton getOrCreateIconButton(CustomPlaybackAction action) {
-        // Reuse the ImageButton with the same action identifier if it exists, because if the
-        // ImageButton is focused, replacing it with a new one will make it lose focus.
-        ImageButton button = mImageButtons.get(action.mAction);
-        if (button != null) {
-            button.setImageDrawable(action.mIcon);
-        } else {
-            button = createIconButton(action.mIcon);
-            mImageButtons.put(action.mAction, button);
-        }
-        button.setOnClickListener(view ->
-                mController.doCustomAction(action.mAction, action.mExtras));
-        return button;
     }
 
     private void onPlayPauseStopClicked(View view) {

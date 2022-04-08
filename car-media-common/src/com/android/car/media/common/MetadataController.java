@@ -47,12 +47,7 @@ public class MetadataController {
             new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    // Allow to set the progress via the rotary controller. It will do nothing
-                    // when the user uses touch screen because no view will be focused in touch
-                    // mode.
-                    if (mController != null && fromUser && seekBar.isFocused()) {
-                        mController.seekTo(seekBar.getProgress());
-                    }
+                    // Do nothing.
                 }
 
                 @Override

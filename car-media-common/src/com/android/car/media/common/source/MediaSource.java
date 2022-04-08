@@ -31,7 +31,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 
 import com.android.car.apps.common.BitmapUtils;
 import com.android.car.apps.common.IconCropper;
@@ -85,8 +84,7 @@ public class MediaSource {
         }
     }
 
-    @VisibleForTesting
-    public MediaSource(@NonNull ComponentName browseService, @NonNull CharSequence displayName,
+    private MediaSource(@NonNull ComponentName browseService, @NonNull CharSequence displayName,
             @NonNull Drawable icon, @NonNull IconCropper iconCropper) {
         mBrowseService = browseService;
         mDisplayName = displayName;

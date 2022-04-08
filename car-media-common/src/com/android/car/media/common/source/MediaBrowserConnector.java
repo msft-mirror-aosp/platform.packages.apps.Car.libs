@@ -26,106 +26,30 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
-import androidx.core.util.Preconditions;
 
 import com.android.car.media.common.MediaConstants;
 
-import java.util.Objects;
-
 /**
- * A helper class to connect to a single {@link MediaSource} to its {@link MediaBrowserCompat}.
- * Connecting to a new one automatically disconnects the previous browser. Changes in the
- * connection status are sent via {@link MediaBrowserConnector.Callback}.
+ * A helper class to connect to a single {@link MediaBrowserCompat}. Connecting to a new one
+ * automatically disconnects the previous browser. Changes of the currently connected browser are
+ * sent via {@link MediaBrowserConnector.Callback}.
  */
 
 public class MediaBrowserConnector {
 
     private static final String TAG = "MediaBrowserConnector";
 
-    /**
-     * Represents the state of the connection to the media browser service given to
-     * {@link #connectTo}.
-     */
-    public enum ConnectionStatus {
-        /**
-         * The connection request to the browser is being initiated.
-         * Sent from {@link #connectTo} just before calling {@link MediaBrowserCompat#connect}.
-         */
-        CONNECTING,
-        /**
-         * The connection to the browser has been established and it can be used.
-         * Sent from {@link MediaBrowserCompat.ConnectionCallback#onConnected} if
-         * {@link MediaBrowserCompat#isConnected} also returns true.
-         */
-        CONNECTED,
-        /**
-         * The connection to the browser was refused.
-         * Sent from {@link MediaBrowserCompat.ConnectionCallback#onConnectionFailed} or from
-         * {@link MediaBrowserCompat.ConnectionCallback#onConnected} if
-         * {@link MediaBrowserCompat#isConnected} returns false.
-         */
-        REJECTED,
-        /**
-         * The browser crashed and that calls should NOT be made to it anymore.
-         * Called from {@link MediaBrowserCompat.ConnectionCallback#onConnectionSuspended} and from
-         * {@link #connectTo} when {@link MediaBrowserCompat#connect} throws
-         * {@link IllegalStateException}.
-         */
-        SUSPENDED,
-        /**
-         * The connection to the browser is being closed.
-         * When connecting to a new browser and the old browser is connected, this is sent
-         * from {@link #connectTo} just before calling {@link MediaBrowserCompat#disconnect} on the
-         * old browser.
-         */
-        DISCONNECTING
-    }
-
-    /**
-     * Encapsulates a {@link ComponentName} with its {@link MediaBrowserCompat} and the
-     * {@link ConnectionStatus}.
-     */
-    public static class BrowsingState {
-        @NonNull public final MediaSource mMediaSource;
-        @NonNull public final MediaBrowserCompat mBrowser;
-        @NonNull public final ConnectionStatus mConnectionStatus;
-
-        @VisibleForTesting
-        public BrowsingState(@NonNull MediaSource mediaSource, @NonNull MediaBrowserCompat browser,
-                @NonNull ConnectionStatus status) {
-            mMediaSource = Preconditions.checkNotNull(mediaSource, "source can't be null");
-            mBrowser = Preconditions.checkNotNull(browser, "browser can't be null");
-            mConnectionStatus = Preconditions.checkNotNull(status, "status can't be null");
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            BrowsingState that = (BrowsingState) o;
-            return mMediaSource.equals(that.mMediaSource)
-                    && mBrowser.equals(that.mBrowser)
-                    && mConnectionStatus == that.mConnectionStatus;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(mMediaSource, mBrowser, mConnectionStatus);
-        }
-    }
-
-    /** The callback to receive the current {@link MediaBrowserCompat} and its connection state. */
+    /** The callback to receive the currently connected {@link MediaBrowserCompat}. */
     public interface Callback {
-        /** Notifies the listener of connection status changes. */
-        void onBrowserConnectionChanged(@NonNull BrowsingState state);
+        /** When disconnecting, the given browser will be null. */
+        void onConnectedBrowserChanged(@Nullable MediaBrowserCompat browser);
     }
 
     private final Context mContext;
     private final Callback mCallback;
     private final int mMaxBitmapSizePx;
 
-    @Nullable private MediaSource mMediaSource;
+    @Nullable private ComponentName mBrowseService;
     @Nullable private MediaBrowserCompat mBrowser;
 
     /**
@@ -140,34 +64,22 @@ public class MediaBrowserConnector {
                 com.android.car.media.common.R.integer.media_items_bitmap_max_size_px);
     }
 
-    private String getSourcePackage() {
-        if (mMediaSource == null) return null;
-        return mMediaSource.getBrowseServiceComponentName().getPackageName();
-    }
-
     /** Counter so callbacks from obsolete connections can be ignored. */
     private int mBrowserConnectionCallbackCounter = 0;
 
     private class BrowserConnectionCallback extends MediaBrowserCompat.ConnectionCallback {
 
         private final int mSequenceNumber = ++mBrowserConnectionCallbackCounter;
-        private final String mCallbackPackage = getSourcePackage();
-
-        private BrowserConnectionCallback() {
-            if (Log.isLoggable(TAG, Log.INFO)) {
-                Log.i(TAG, "New Callback: " + idHash(this));
-            }
-        }
+        private final String mCallbackPackage = mBrowseService.getPackageName();
 
         private boolean isValidCall(String method) {
             if (mSequenceNumber != mBrowserConnectionCallbackCounter) {
-                Log.e(TAG, "Callback: " + idHash(this) + " ignoring " + method + " for "
-                        + mCallbackPackage + " seq: "
+                Log.e(TAG, "Ignoring callback " + method + " for " + mCallbackPackage + " seq: "
                         + mSequenceNumber + " current: " + mBrowserConnectionCallbackCounter
-                        + " package: " + getSourcePackage());
+                        + " current: " + mBrowseService.getPackageName());
                 return false;
             } else if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, method + " " + getSourcePackage() + " mBrowser: " + idHash(mBrowser));
+                Log.d(TAG, method + " " + mBrowseService.getPackageName() + idHash(mBrowser));
             }
             return true;
         }
@@ -175,67 +87,48 @@ public class MediaBrowserConnector {
         @Override
         public void onConnected() {
             if (isValidCall("onConnected")) {
-                if (mBrowser != null && mBrowser.isConnected()) {
-                    sendNewState(ConnectionStatus.CONNECTED);
-                } else {
-                    sendNewState(ConnectionStatus.REJECTED);
-                }
+                mCallback.onConnectedBrowserChanged(mBrowser);
             }
         }
 
         @Override
         public void onConnectionFailed() {
             if (isValidCall("onConnectionFailed")) {
-                sendNewState(ConnectionStatus.REJECTED);
+                mCallback.onConnectedBrowserChanged(null);
             }
         }
 
         @Override
         public void onConnectionSuspended() {
             if (isValidCall("onConnectionSuspended")) {
-                sendNewState(ConnectionStatus.SUSPENDED);
+                mCallback.onConnectedBrowserChanged(null);
             }
         }
-    }
-
-    private void sendNewState(ConnectionStatus cnx) {
-        if (mMediaSource == null) {
-            Log.e(TAG, "sendNewState mMediaSource is null!");
-            return;
-        }
-        if (mBrowser == null) {
-            Log.e(TAG, "sendNewState mBrowser is null!");
-            return;
-        }
-        mCallback.onBrowserConnectionChanged(new BrowsingState(mMediaSource, mBrowser, cnx));
     }
 
     /**
-     * Creates and connects a new {@link MediaBrowserCompat} if the given {@link MediaSource}
+     * Creates and connects a new {@link MediaBrowserCompat} if the given {@link ComponentName}
      * isn't null. If needed, the previous browser is disconnected.
-     * @param mediaSource the media source to connect to.
+     * @param browseService the ComponentName of the media browser service.
      * @see MediaBrowserCompat#MediaBrowserCompat(Context, ComponentName,
      * MediaBrowserCompat.ConnectionCallback, android.os.Bundle)
      */
-    public void connectTo(@Nullable MediaSource mediaSource) {
+    public void connectTo(@Nullable ComponentName browseService) {
         if (mBrowser != null && mBrowser.isConnected()) {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "Disconnecting: " + getSourcePackage()
-                        + " mBrowser: " + idHash(mBrowser));
+                Log.d(TAG, "Disconnecting: " + mBrowseService.getPackageName() + idHash(mBrowser));
             }
-            sendNewState(ConnectionStatus.DISCONNECTING);
+            mCallback.onConnectedBrowserChanged(null);
             mBrowser.disconnect();
         }
 
-        mMediaSource = mediaSource;
-        if (mMediaSource != null) {
-            mBrowser = createMediaBrowser(mMediaSource, new BrowserConnectionCallback());
+        mBrowseService = browseService;
+        if (mBrowseService != null) {
+            mBrowser = createMediaBrowser(mBrowseService, new BrowserConnectionCallback());
             if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "Connecting to: " + getSourcePackage()
-                        + " mBrowser: " + idHash(mBrowser));
+                Log.d(TAG, "Connecting to: " + mBrowseService.getPackageName() + idHash(mBrowser));
             }
             try {
-                sendNewState(ConnectionStatus.CONNECTING);
                 mBrowser.connect();
             } catch (IllegalStateException ex) {
                 // Is this comment still valid ?
@@ -243,7 +136,6 @@ public class MediaBrowserConnector {
                 // disconnected either.). In this situation, trying to connect again can throw
                 // this exception, but there is no way to know without trying.
                 Log.e(TAG, "Connection exception: " + ex);
-                sendNewState(ConnectionStatus.SUSPENDED);
             }
         } else {
             mBrowser = null;
@@ -252,11 +144,10 @@ public class MediaBrowserConnector {
 
     // Override for testing.
     @NonNull
-    protected MediaBrowserCompat createMediaBrowser(@NonNull MediaSource mediaSource,
+    protected MediaBrowserCompat createMediaBrowser(@NonNull ComponentName browseService,
             @NonNull MediaBrowserCompat.ConnectionCallback callback) {
         Bundle rootHints = new Bundle();
         rootHints.putInt(MediaConstants.EXTRA_MEDIA_ART_SIZE_HINT_PIXELS, mMaxBitmapSizePx);
-        ComponentName browseService = mediaSource.getBrowseServiceComponentName();
         return new MediaBrowserCompat(mContext, browseService, callback, rootHints);
     }
 }

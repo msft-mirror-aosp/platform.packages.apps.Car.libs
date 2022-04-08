@@ -23,6 +23,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -106,8 +107,8 @@ public class PhoneNumber implements Parcelable {
         mLabel = label;
         mIsPrimary = isPrimary;
         mId = id;
-        mAccountName = accountName == null ? "" : accountName;
-        mAccountType = accountType == null ? "" : accountType;
+        mAccountName = TextUtils.emptyIfNull(accountName);
+        mAccountType = TextUtils.emptyIfNull(accountType);
         mDataVersion = dataVersion;
     }
 

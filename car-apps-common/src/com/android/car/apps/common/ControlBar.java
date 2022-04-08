@@ -16,8 +16,6 @@
 
 package com.android.car.apps.common;
 
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
@@ -31,8 +29,6 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.view.ViewTreeObserver.OnGlobalFocusChangeListener;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -44,8 +40,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.util.Preconditions;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
-
-import com.android.car.apps.common.util.ViewUtils;
 
 import java.util.Locale;
 
@@ -94,26 +88,11 @@ public class ControlBar extends RelativeLayout implements ExpandableControlBar {
     private boolean mExpandEnabled;
     // Callback for the expand/collapse button
     private ExpandCollapseCallback mExpandCollapseCallback;
-    // The root of the transition animation.
-    private ViewGroup mTransitionRoot;
-    // Whether this control bar has focus.
-    private boolean mHasFocus;
 
     // Default number of columns, if unspecified
     private static final int DEFAULT_COLUMNS = 3;
     // Weight for the spacers used between buttons
     private static final float SPACERS_WEIGHT = 1f;
-
-    private final OnGlobalFocusChangeListener mFocusChangeListener =
-            (oldFocus, newFocus) -> {
-                // Collapse the control bar when it is expanded and loses focus.
-                boolean hasFocus = hasFocus();
-                if (mHasFocus && !hasFocus && mIsExpanded) {
-                    onExpandCollapse();
-                }
-                mHasFocus = hasFocus;
-            };
-
 
     public ControlBar(Context context) {
         super(context);
@@ -183,18 +162,6 @@ public class ControlBar extends RelativeLayout implements ExpandableControlBar {
 
     private int getSlotIndex(@SlotPosition int slotPosition) {
         return CarControlBar.getSlotIndex(slotPosition, mNumColumns);
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        getViewTreeObserver().addOnGlobalFocusChangeListener(mFocusChangeListener);
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        getViewTreeObserver().removeOnGlobalFocusChangeListener(mFocusChangeListener);
-        super.onDetachedFromWindow();
     }
 
     @Override
@@ -291,7 +258,7 @@ public class ControlBar extends RelativeLayout implements ExpandableControlBar {
                 viewToUse = mViews[viewsIndex];
                 viewsIndex++;
             }
-            ViewUtils.setView(viewToUse, mSlots[i]);
+            setView(viewToUse, mSlots[i]);
             if (viewToUse != null) {
                 lastUsedIndex = i;
             }
@@ -323,6 +290,31 @@ public class ControlBar extends RelativeLayout implements ExpandableControlBar {
         }
     }
 
+    private void setView(@Nullable View view, FrameLayout container) {
+        if (view != null) {
+            // Don't set the view if it stays the same.
+            if (container.getChildCount() == 1 && container.getChildAt(0) == view) {
+                return;
+            }
+
+            ViewGroup parent = (ViewGroup) view.getParent();
+            // As we are removing views (on BT disconnect, for example), some items will be
+            // shifting from expanded to collapsed (like Queue item) - remove those from the
+            // group before adding to the new slot
+            if (view.getParent() != null) {
+                parent.removeView(view);
+            }
+            container.removeAllViews();
+            container.addView(view);
+            container.setVisibility(VISIBLE);
+        } else {
+            if (container.getChildCount() != 0) {
+                container.removeAllViews();
+            }
+            container.setVisibility(INVISIBLE);
+        }
+    }
+
     private void onExpandCollapse() {
         mIsExpanded = !mIsExpanded;
         if (mExpandCollapseView != null) {
@@ -341,31 +333,9 @@ public class ControlBar extends RelativeLayout implements ExpandableControlBar {
                 .addTransition(new Fade())
                 .setDuration(animationDuration)
                 .setInterpolator(new FastOutSlowInInterpolator());
-        maybeInitTransitionRoot();
-        TransitionManager.beginDelayedTransition(mTransitionRoot, set);
+        TransitionManager.beginDelayedTransition(this, set);
         for (int i = 0; i < mNumExtraRowsInUse; i++) {
             mRowsContainer.getChildAt(i).setVisibility(mIsExpanded ? View.VISIBLE : View.GONE);
-        }
-    }
-
-    private void maybeInitTransitionRoot() {
-        if (mTransitionRoot != null) {
-            return;
-        }
-        // During the control bar expanding/collapsing animation, the height of the control bar
-        // changes gradually. If the height of its ancestor is WRAP_CONTENT, the height of its
-        // ancestor will not change during the animation, causing janky animation. To fix it the
-        // animation should be played on the highest ancestor that wraps the control bar vertically.
-        mTransitionRoot = this;
-        ViewParent viewParent = getParent();
-        while (viewParent != null && viewParent instanceof ViewGroup) {
-            ViewGroup parent = (ViewGroup) viewParent;
-            if (parent.getLayoutParams().height == WRAP_CONTENT) {
-                mTransitionRoot = parent;
-                viewParent = parent.getParent();
-            } else {
-                break;
-            }
         }
     }
 

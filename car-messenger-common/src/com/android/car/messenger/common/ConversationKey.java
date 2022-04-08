@@ -21,9 +21,6 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.Collections;
-import java.util.List;
-
 /**
  * {@link CompositeKey} subclass used to give each conversation on all the connected devices a
  * unique Key.
@@ -41,9 +38,7 @@ public class ConversationKey extends CompositeKey implements Parcelable {
         String senderName = Utils.getSenderName(intent);
         String subKey = senderName + "/" + senderUri;
         if (Utils.isGroupConversation(intent)) {
-            List<String> names = Utils.getInclusiveRecipientsUrisList(intent);
-            Collections.sort(names);
-            subKey = names.toString();
+            subKey = Utils.getInclusiveRecipientsUrisList(intent).toString();
         }
         return new ConversationKey(device.getAddress(), subKey);
     }

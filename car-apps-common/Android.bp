@@ -14,10 +14,6 @@
 //
 
 // Unbundled target (should stay that way).
-package {
-    default_applicable_licenses: ["Android-Apache-2.0"],
-}
-
 android_library {
     name: "car-apps-common",
 
@@ -29,10 +25,8 @@ android_library {
         enabled: false,
     },
 
-    libs: ["android.car-stubs",],
-
+    libs: ["android.car-stubs"],
     sdk_version: "system_current",
-    min_sdk_version: "28",
 
     static_libs: [
         "androidx.annotation_annotation",

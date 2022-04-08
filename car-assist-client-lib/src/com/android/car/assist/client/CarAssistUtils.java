@@ -33,7 +33,6 @@ import android.util.Log;
 
 import androidx.annotation.StringDef;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationCompat.Action;
 
 import com.android.car.assist.CarVoiceInteractionSession;
 import com.android.internal.app.AssistUtils;
@@ -47,6 +46,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Util class providing helper methods to interact with the current active voice service,
@@ -69,7 +69,6 @@ public class CarAssistUtils {
 
     private final Context mContext;
     private final AssistUtils mAssistUtils;
-    @Nullable
     private final FallbackAssistant mFallbackAssistant;
     private final String mErrorMessage;
     private final boolean mIsFallbackAssistantEnabled;
@@ -107,11 +106,10 @@ public class CarAssistUtils {
     public CarAssistUtils(Context context) {
         mContext = context;
         mAssistUtils = new AssistUtils(context);
+        mFallbackAssistant = new FallbackAssistant(context);
         mErrorMessage = context.getString(R.string.assist_action_failed_toast);
-
         mIsFallbackAssistantEnabled =
                 context.getResources().getBoolean(R.bool.config_enableFallbackAssistant);
-        mFallbackAssistant = mIsFallbackAssistantEnabled ? new FallbackAssistant(context) : null;
     }
 
     /**
@@ -119,13 +117,6 @@ public class CarAssistUtils {
      */
     public boolean hasActiveAssistant() {
         return mAssistUtils.getActiveServiceComponentName() != null;
-    }
-
-    /**
-     * Returns {@code true} if the fallback assistant is enabled.
-     */
-    public boolean isFallbackAssistantEnabled() {
-        return mIsFallbackAssistantEnabled;
     }
 
     /**
@@ -170,12 +161,11 @@ public class CarAssistUtils {
      * @return true if the notification is a car-compatible messaging notification.
      */
     public static boolean isCarCompatibleMessagingNotification(StatusBarNotification sbn) {
-        Notification notification = sbn.getNotification();
-        return hasMessagingStyle(notification)
-                && hasRequiredAssistantCallbacks(notification)
-                && ((getReplyAction(notification) == null)
-                    || replyCallbackHasRemoteInput(notification))
-                && assistantCallbacksShowNoUi(notification);
+        return hasMessagingStyle(sbn)
+                && hasRequiredAssistantCallbacks(sbn)
+                && ((getReplyAction(sbn.getNotification()) == null)
+                    || replyCallbackHasRemoteInput(sbn))
+                && assistantCallbacksShowNoUi(sbn);
     }
 
     /** Returns true if the semantic action provided can be supported. */
@@ -190,9 +180,9 @@ public class CarAssistUtils {
      * {@link Notification.MessagingStyle} (or an instance of
      * {@link NotificationCompat.MessagingStyle} if {@link NotificationCompat} was used).
      */
-    private static boolean hasMessagingStyle(Notification notification) {
+    private static boolean hasMessagingStyle(StatusBarNotification sbn) {
         return NotificationCompat.MessagingStyle
-                .extractMessagingStyleFromNotification(notification) != null;
+                .extractMessagingStyleFromNotification(sbn.getNotification()) != null;
     }
 
     /**
@@ -200,8 +190,8 @@ public class CarAssistUtils {
      * a car-compatible messaging notification. The callbacks must be unambiguous, therefore false
      * is returned if multiple callbacks exist for any semantic action that is supported.
      */
-    private static boolean hasRequiredAssistantCallbacks(Notification notification) {
-        List<Integer> semanticActionList = getAllActions(notification)
+    private static boolean hasRequiredAssistantCallbacks(StatusBarNotification sbn) {
+        List<Integer> semanticActionList = getAllActions(sbn.getNotification())
                 .stream()
                 .map(NotificationCompat.Action::getSemanticAction)
                 .filter(REQUIRED_SEMANTIC_ACTIONS::contains)
@@ -211,13 +201,11 @@ public class CarAssistUtils {
                 && semanticActionSet.containsAll(REQUIRED_SEMANTIC_ACTIONS);
     }
 
-    /** Retrieves visible and invisible {@link Action}s from the {@link Notification}. */
-    public static List<Action> getAllActions(Notification notification) {
-        List<Action> actions = new ArrayList<>(
-                NotificationCompat.getInvisibleActions(notification)
-        );
-        int visibleActionCount = NotificationCompat.getActionCount(notification);
-        for (int i = 0; i < visibleActionCount; i++) {
+    /** Retrieves all visible and invisible {@link Action}s from the {@link #notification}. */
+    public static List<NotificationCompat.Action> getAllActions(Notification notification) {
+        List<NotificationCompat.Action> actions = new ArrayList<>();
+        actions.addAll(NotificationCompat.getInvisibleActions(notification));
+        for (int i = 0; i < NotificationCompat.getActionCount(notification); i++) {
             actions.add(NotificationCompat.getAction(notification, i));
         }
         return actions;
@@ -232,20 +220,6 @@ public class CarAssistUtils {
         for (NotificationCompat.Action action : getAllActions(notification)) {
             if (action.getSemanticAction()
                     == NotificationCompat.Action.SEMANTIC_ACTION_MARK_AS_READ) {
-                return action;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Retrieves the {@link NotificationCompat.Action} containing the
-     * {@link NotificationCompat.Action#SEMANTIC_ACTION_MUTE semantic action.
-     */
-    @Nullable
-    public static NotificationCompat.Action getMuteAction(Notification notification) {
-        for (NotificationCompat.Action action : getAllActions(notification)) {
-            if (action.getSemanticAction() == Action.SEMANTIC_ACTION_MUTE) {
                 return action;
             }
         }
@@ -272,19 +246,19 @@ public class CarAssistUtils {
      * <p/>
      * Precondition: There exists only one reply callback.
      */
-    private static boolean replyCallbackHasRemoteInput(Notification notification) {
-        return getAllActions(notification)
-                .stream()
+    private static boolean replyCallbackHasRemoteInput(StatusBarNotification sbn) {
+        return Arrays.stream(sbn.getNotification().actions)
                 .filter(action -> action.getSemanticAction() == SEMANTIC_ACTION_REPLY)
-                .map(NotificationCompat.Action::getRemoteInputs)
+                .map(Notification.Action::getRemoteInputs)
                 .filter(Objects::nonNull)
                 .anyMatch(remoteInputs -> remoteInputs.length > 0);
     }
 
     /** Returns true if all Assistant callbacks indicate that they show no UI, false otherwise. */
-    private static boolean assistantCallbacksShowNoUi(final Notification notification) {
-        return getAllActions(notification)
-                .stream()
+    private static boolean assistantCallbacksShowNoUi(StatusBarNotification sbn) {
+        final Notification notification = sbn.getNotification();
+        return IntStream.range(0, notification.actions.length)
+                .mapToObj(i -> NotificationCompat.getAction(notification, i))
                 .filter(Objects::nonNull)
                 .filter(action -> SUPPORTED_SEMANTIC_ACTIONS.contains(action.getSemanticAction()))
                 .noneMatch(NotificationCompat.Action::getShowsUserInterface);
@@ -410,10 +384,6 @@ public class CarAssistUtils {
 
     private void handleFallback(StatusBarNotification sbn, String action,
             ActionRequestCallback callback) {
-        if (mFallbackAssistant == null) {
-            return;
-        }
-
         FallbackAssistant.Listener listener = new FallbackAssistant.Listener() {
             @Override
             public void onMessageRead(boolean hasError) {

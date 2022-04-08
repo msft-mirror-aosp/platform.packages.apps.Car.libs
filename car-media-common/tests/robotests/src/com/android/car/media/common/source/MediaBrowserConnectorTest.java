@@ -16,24 +16,21 @@
 
 package com.android.car.media.common.source;
 
-import static com.android.car.media.common.MediaTestUtils.newFakeMediaSource;
-
 import static com.google.common.truth.Truth.assertThat;
 
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.robolectric.RuntimeEnvironment.application;
 
+import android.content.ComponentName;
 import android.support.v4.media.MediaBrowserCompat;
 
 import androidx.annotation.NonNull;
 
 import com.android.car.arch.common.testing.InstantTaskExecutorRule;
 import com.android.car.arch.common.testing.TestLifecycleOwner;
-import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
-import com.android.car.media.common.source.MediaBrowserConnector.ConnectionStatus;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -65,10 +62,10 @@ public class MediaBrowserConnectorTest {
     @Mock
     public MediaBrowserCompat mMediaBrowser2;
 
-    private final MediaSource mMediaSource1 = newFakeMediaSource("mediaService1", "className1");
-    private final MediaSource mMediaSource2 = newFakeMediaSource("mediaService2", "className2");
+    private final ComponentName mBrowseService1 = new ComponentName("mediaService1", "className1");
+    private final ComponentName mBrowseService2 = new ComponentName("mediaService2", "className2");
 
-    private final Map<MediaSource, MediaBrowserCompat> mBrowsers = new HashMap<>(2);
+    private final Map<ComponentName, MediaBrowserCompat> mBrowsers = new HashMap<>(2);
 
     private MediaBrowserConnector mBrowserConnector;
     private MediaBrowserCompat.ConnectionCallback mConnectionCallback;
@@ -76,22 +73,24 @@ public class MediaBrowserConnectorTest {
     @Mock
     public MediaBrowserConnector.Callback mConnectedBrowserCallback;
     @Captor
-    private ArgumentCaptor<BrowsingState> mBrowsingStateCaptor;
+    private ArgumentCaptor<MediaBrowserCompat> mConnectedBrowserCaptor;
 
     @Before
     public void setUp() {
-        mBrowsers.put(mMediaSource1, mMediaBrowser1);
-        mBrowsers.put(mMediaSource2, mMediaBrowser2);
+        mBrowsers.put(mBrowseService1, mMediaBrowser1);
+        mBrowsers.put(mBrowseService2, mMediaBrowser2);
+        when(mMediaBrowser1.isConnected()).thenReturn(false);
+        when(mMediaBrowser2.isConnected()).thenReturn(false);
 
-        doNothing().when(mConnectedBrowserCallback).onBrowserConnectionChanged(
-                mBrowsingStateCaptor.capture());
+        doNothing().when(mConnectedBrowserCallback).onConnectedBrowserChanged(
+                mConnectedBrowserCaptor.capture());
 
         mBrowserConnector = new MediaBrowserConnector(application, mConnectedBrowserCallback) {
             @Override
-            protected MediaBrowserCompat createMediaBrowser(@NonNull MediaSource mediaSource,
+            protected MediaBrowserCompat createMediaBrowser(@NonNull ComponentName browseService,
                     @NonNull MediaBrowserCompat.ConnectionCallback callback) {
                 mConnectionCallback = callback;
-                return mBrowsers.get(mediaSource);
+                return mBrowsers.get(browseService);
             }
         };
     }
@@ -102,77 +101,54 @@ public class MediaBrowserConnectorTest {
             throw new IllegalStateException("expected");
         });
 
-        mBrowserConnector.connectTo(mMediaSource1);
+        mBrowserConnector.connectTo(mBrowseService1);
         verify(mMediaBrowser1).connect();
     }
 
     @Test
     public void testConnectionCallback_onConnected() {
-        doReturn(true).when(mMediaBrowser1).isConnected();
         setConnectionAction(() -> mConnectionCallback.onConnected());
 
-        mBrowserConnector.connectTo(mMediaSource1);
+        mBrowserConnector.connectTo(mBrowseService1);
 
-        BrowsingState state = mBrowsingStateCaptor.getValue();
-        assertThat(state.mBrowser).isEqualTo(mMediaBrowser1);
-        assertThat(state.mConnectionStatus).isEqualTo(ConnectionStatus.CONNECTED);
-    }
-
-    @Test
-    public void testConnectionCallback_onConnected_inconsistentState() {
-        doReturn(false).when(mMediaBrowser1).isConnected();
-        setConnectionAction(() -> mConnectionCallback.onConnected());
-
-        mBrowserConnector.connectTo(mMediaSource1);
-
-        BrowsingState state = mBrowsingStateCaptor.getValue();
-        assertThat(state.mBrowser).isEqualTo(mMediaBrowser1);
-        assertThat(state.mConnectionStatus).isEqualTo(ConnectionStatus.REJECTED);
+        assertThat(mConnectedBrowserCaptor.getValue()).isEqualTo(mMediaBrowser1);
     }
 
     @Test
     public void testConnectionCallback_onConnectionFailed() {
         setConnectionAction(() -> mConnectionCallback.onConnectionFailed());
 
-        mBrowserConnector.connectTo(mMediaSource1);
+        mBrowserConnector.connectTo(mBrowseService1);
 
-        BrowsingState state = mBrowsingStateCaptor.getValue();
-        assertThat(state.mBrowser).isEqualTo(mMediaBrowser1);
-        assertThat(state.mConnectionStatus).isEqualTo(ConnectionStatus.REJECTED);
+        assertThat(mConnectedBrowserCaptor.getValue()).isNull();
     }
 
     @Test
     public void testConnectionCallback_onConnectionSuspended() {
-        doReturn(true).when(mMediaBrowser1).isConnected();
         setConnectionAction(() -> {
             mConnectionCallback.onConnected();
             mConnectionCallback.onConnectionSuspended();
         });
 
-        mBrowserConnector.connectTo(mMediaSource1);
+        mBrowserConnector.connectTo(mBrowseService1);
 
 
-        List<BrowsingState> browsingStates = mBrowsingStateCaptor.getAllValues();
-        assertThat(browsingStates.get(0).mBrowser).isEqualTo(mMediaBrowser1);
-        assertThat(browsingStates.get(1).mBrowser).isEqualTo(mMediaBrowser1);
-        assertThat(browsingStates.get(2).mBrowser).isEqualTo(mMediaBrowser1);
-
-        assertThat(browsingStates.get(0).mConnectionStatus).isEqualTo(ConnectionStatus.CONNECTING);
-        assertThat(browsingStates.get(1).mConnectionStatus).isEqualTo(ConnectionStatus.CONNECTED);
-        assertThat(browsingStates.get(2).mConnectionStatus).isEqualTo(ConnectionStatus.SUSPENDED);
+        List<MediaBrowserCompat> browsers = mConnectedBrowserCaptor.getAllValues();
+        assertThat(browsers.get(0)).isEqualTo(mMediaBrowser1);
+        assertThat(browsers.get(1)).isNull();
     }
 
     @Test
     public void testConnectionCallback_onConnectedIgnoredWhenLate() {
-        mBrowserConnector.connectTo(mMediaSource1);
+        mBrowserConnector.connectTo(mBrowseService1);
         MediaBrowserCompat.ConnectionCallback cb1 = mConnectionCallback;
 
-        mBrowserConnector.connectTo(mMediaSource2);
+        mBrowserConnector.connectTo(mBrowseService2);
         MediaBrowserCompat.ConnectionCallback cb2 = mConnectionCallback;
 
         cb2.onConnected();
         cb1.onConnected();
-        assertThat(mBrowsingStateCaptor.getValue().mBrowser).isEqualTo(mMediaBrowser2);
+        assertThat(mConnectedBrowserCaptor.getValue()).isEqualTo(mMediaBrowser2);
     }
 
     private void setConnectionAction(@NonNull Runnable action) {

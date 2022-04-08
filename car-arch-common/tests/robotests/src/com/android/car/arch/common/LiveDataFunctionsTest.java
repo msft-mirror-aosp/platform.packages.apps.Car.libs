@@ -289,7 +289,7 @@ public class LiveDataFunctionsTest {
         predicate.setValue(true);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(valueObject);
+        assertThat(observer.getObservedValue()).isSameAs(valueObject);
         observer.reset();
 
         predicate.setValue(null);
@@ -318,13 +318,13 @@ public class LiveDataFunctionsTest {
         value.setValue(firstObject);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(firstObject);
+        assertThat(observer.getObservedValue()).isSameAs(firstObject);
         observer.reset();
 
         value.setValue(new Object());
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isNotSameInstanceAs(firstObject);
+        assertThat(observer.getObservedValue()).isNotSameAs(firstObject);
     }
 
     @Test
@@ -404,13 +404,13 @@ public class LiveDataFunctionsTest {
         predicate.setValue(false);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(falseObject);
+        assertThat(observer.getObservedValue()).isSameAs(falseObject);
         observer.reset();
 
         predicate.setValue(true);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(trueObject);
+        assertThat(observer.getObservedValue()).isSameAs(trueObject);
         observer.reset();
 
         predicate.setValue(null);
@@ -444,13 +444,13 @@ public class LiveDataFunctionsTest {
         trueObjectData.setValue(trueObject);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(trueObject);
+        assertThat(observer.getObservedValue()).isSameAs(trueObject);
         observer.reset();
 
         trueObjectData.setValue(new Object());
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isNotSameInstanceAs(trueObject);
+        assertThat(observer.getObservedValue()).isNotSameAs(trueObject);
     }
 
     @Test
@@ -512,13 +512,13 @@ public class LiveDataFunctionsTest {
         predicate.setValue(false);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(falseObject);
+        assertThat(observer.getObservedValue()).isSameAs(falseObject);
         observer.reset();
 
         predicate.setValue(true);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(trueObject);
+        assertThat(observer.getObservedValue()).isSameAs(trueObject);
         observer.reset();
 
         predicate.setValue(null);
@@ -566,25 +566,25 @@ public class LiveDataFunctionsTest {
         data.observe(mLifecycleOwner, observer);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(fallbackObject);
+        assertThat(observer.getObservedValue()).isSameAs(fallbackObject);
         observer.reset();
 
         sourceData.setValue(firstSourceObject);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(firstSourceObject);
+        assertThat(observer.getObservedValue()).isSameAs(firstSourceObject);
         observer.reset();
 
         sourceData.setValue(secondSourceObject);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(secondSourceObject);
+        assertThat(observer.getObservedValue()).isSameAs(secondSourceObject);
         observer.reset();
 
         sourceData.setValue(null);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(fallbackObject);
+        assertThat(observer.getObservedValue()).isSameAs(fallbackObject);
         observer.reset();
     }
 
@@ -608,19 +608,19 @@ public class LiveDataFunctionsTest {
         fallbackData.setValue(firstFallbackObject);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(firstFallbackObject);
+        assertThat(observer.getObservedValue()).isSameAs(firstFallbackObject);
         observer.reset();
 
         fallbackData.setValue(secondFallbackObject);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(secondFallbackObject);
+        assertThat(observer.getObservedValue()).isSameAs(secondFallbackObject);
         observer.reset();
 
         fallbackData.setValue(null);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(null);
+        assertThat(observer.getObservedValue()).isSameAs(null);
         observer.reset();
     }
 
@@ -685,25 +685,25 @@ public class LiveDataFunctionsTest {
         data.observe(mLifecycleOwner, observer);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(fallbackObject);
+        assertThat(observer.getObservedValue()).isSameAs(fallbackObject);
         observer.reset();
 
         sourceData.setValue(firstSourceObject);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(firstSourceObject);
+        assertThat(observer.getObservedValue()).isSameAs(firstSourceObject);
         observer.reset();
 
         sourceData.setValue(secondSourceObject);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(secondSourceObject);
+        assertThat(observer.getObservedValue()).isSameAs(secondSourceObject);
         observer.reset();
 
         sourceData.setValue(null);
 
         assertThat(observer.hasBeenNotified()).isTrue();
-        assertThat(observer.getObservedValue()).isSameInstanceAs(fallbackObject);
+        assertThat(observer.getObservedValue()).isSameAs(fallbackObject);
         observer.reset();
     }
 
@@ -731,8 +731,8 @@ public class LiveDataFunctionsTest {
                                 }));
 
         assertThat(notified[0]).isTrue();
-        assertThat(observedValues[0]).isSameInstanceAs(first);
-        assertThat(observedValues[1]).isSameInstanceAs(second);
+        assertThat(observedValues[0]).isSameAs(first);
+        assertThat(observedValues[1]).isSameAs(second);
     }
 
     @Test
@@ -771,16 +771,16 @@ public class LiveDataFunctionsTest {
 
         Pair<Object, Object> observedValue = observer.getObservedValue();
         assertThat(observedValue).isNotNull();
-        assertThat(observedValue.first).isSameInstanceAs(first);
-        assertThat(observedValue.second).isSameInstanceAs(second);
+        assertThat(observedValue.first).isSameAs(first);
+        assertThat(observedValue.second).isSameAs(second);
 
         Object third = new Object();
         firstData.setValue(third);
 
         observedValue = observer.getObservedValue();
         assertThat(observedValue).isNotNull();
-        assertThat(observedValue.first).isSameInstanceAs(third);
-        assertThat(observedValue.second).isSameInstanceAs(second);
+        assertThat(observedValue.first).isSameAs(third);
+        assertThat(observedValue.second).isSameAs(second);
     }
 
     private static class IfThenElseDataParams<T> {

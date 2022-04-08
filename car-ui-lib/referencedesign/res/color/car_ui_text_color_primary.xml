@@ -21,8 +21,5 @@
     <item android:state_enabled="false"
           android:alpha="?android:attr/disabledAlpha"
           android:color="?android:attr/colorForeground"/>
-    <item app:state_ux_restricted="true"
-          android:alpha="?android:attr/disabledAlpha"
-          android:color="?android:attr/colorForeground"/>
     <item android:color="?android:attr/colorForeground"/>
 </selector>

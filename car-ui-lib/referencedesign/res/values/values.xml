@@ -1,5 +1,7 @@
 <resources>
-    <style name="TextAppearance.CarUi.Widget" parent="android:TextAppearance.DeviceDefault.Widget"/>
+    <style name="TextAppearance.CarUi.Widget" parent="android:TextAppearance.DeviceDefault.Widget">
+        <item name="android:textAlignment">viewStart</item>
+    </style>
 
     <style name="TextAppearance.CarUi.Widget.Toolbar"/>
 
@@ -10,6 +12,4 @@
 
     <dimen name="car_ui_toolbar_logo_size">44dp</dimen>
     <dimen name="car_ui_toolbar_nav_icon_size">44dp</dimen>
-
-    <bool name="car_ui_toolbar_menuitem_individual_click_listeners">true</bool>
 </resources>

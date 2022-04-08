@@ -45,7 +45,8 @@ public class LetterTileDrawable extends Drawable {
     private static Drawable sDefaultVoicemailAvatar;
 
     /** Reusable components to avoid new allocations */
-    private static final Paint sTextPaint = new Paint();
+    private static final Paint sPaint = new Paint();
+    private static final Rect sRect = new Rect();
 
     /** Contact type constants */
     public static final int TYPE_PERSON = 1;
@@ -107,12 +108,11 @@ public class LetterTileDrawable extends Drawable {
             sDefaultPersonAvatar = res.getDrawable(R.drawable.ic_person, null /* theme */);
             sDefaultBusinessAvatar = res.getDrawable(R.drawable.ic_person, null /* theme */);
             sDefaultVoicemailAvatar = res.getDrawable(R.drawable.ic_person, null /* theme */);
-            sTextPaint.setTypeface(
+            sPaint.setTypeface(
                     Typeface.create(res.getString(R.string.config_letter_tile_font_family),
                             res.getInteger(R.integer.config_letter_tile_text_style)));
-            sTextPaint.setTextAlign(Align.CENTER);
-            sTextPaint.setAntiAlias(true);
-            sTextPaint.setColor(sTileFontColor);
+            sPaint.setTextAlign(Align.CENTER);
+            sPaint.setAntiAlias(true);
         }
 
         setContactDetails(letters, identifier);
@@ -152,26 +152,31 @@ public class LetterTileDrawable extends Drawable {
     }
 
     private void drawLetterTile(final Canvas canvas) {
+        // Draw background color.
+        sPaint.setColor(mColor);
+
+        sPaint.setAlpha(mPaint.getAlpha());
         final Rect bounds = getBounds();
         final int minDimension = Math.min(bounds.width(), bounds.height());
 
-        // Draw background color.
-        mPaint.setColor(mColor);
         if (mIsCircle) {
-            canvas.drawCircle(bounds.centerX(), bounds.centerY(), minDimension / 2, mPaint);
+            canvas.drawCircle(bounds.centerX(), bounds.centerY(), minDimension / 2, sPaint);
         } else {
-            canvas.drawRect(bounds, mPaint);
+            canvas.drawRect(bounds, sPaint);
         }
 
         if (!TextUtils.isEmpty(mLetters)) {
             // Scale text by canvas bounds and user selected scaling factor
-            sTextPaint.setTextSize(mScale * sLetterToTileRatio * minDimension);
-            Paint.FontMetrics fontMetrics = sTextPaint.getFontMetrics();
+            sPaint.setTextSize(mScale * sLetterToTileRatio * minDimension);
+            //sPaint.setTextSize(sTileLetterFontSize);
+            sPaint.getTextBounds(mLetters, 0, mLetters.length(), sRect);
+            sPaint.setColor(sTileFontColor);
 
             // Draw the letter in the canvas, vertically shifted up or down by the user-defined
             // offset
-            canvas.drawText(mLetters, bounds.centerX(), bounds.centerY() + mOffset * bounds.height()
-                    - (fontMetrics.ascent + fontMetrics.descent) / 2f, sTextPaint);
+            canvas.drawText(mLetters, 0, mLetters.length(), bounds.centerX(),
+                    bounds.centerY() + mOffset * bounds.height() + sRect.height() / 2,
+                    sPaint);
         } else {
             // Draw the default image if there is no letter/digit to be drawn
             final Drawable drawable = getDrawablepForContactType(mContactType);

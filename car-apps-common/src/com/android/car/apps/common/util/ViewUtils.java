@@ -16,16 +16,11 @@
 
 package com.android.car.apps.common.util;
 
-import static android.view.View.INVISIBLE;
-import static android.view.View.VISIBLE;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -39,34 +34,13 @@ import java.util.List;
  * Utility methods to operate over views.
  */
 public class ViewUtils {
-
-    /** Listener to take action when animations are done. */
-    public interface ViewAnimEndListener {
-        /**
-         * Called when the animation created by {@link #hideViewAnimated} or
-         * {@link #showHideViewAnimated} has reached its end.
-         */
-        void onAnimationEnd(View view);
-    }
-
-    /** Shows the view if show is set to true otherwise hides it. */
-    public static void showHideViewAnimated(boolean show, @NonNull View view, int duration,
-            @Nullable ViewAnimEndListener listener) {
-        if (show) {
-            showViewAnimated(view, duration, listener);
-        } else {
-            hideViewAnimated(view, duration, listener);
-        }
-    }
-
     /**
      * Hides a view using a fade-out animation
      *
      * @param view     {@link View} to be hidden
      * @param duration animation duration in milliseconds.
      */
-    public static void hideViewAnimated(@NonNull View view, int duration,
-            @Nullable ViewAnimEndListener listener) {
+    public static void hideViewAnimated(@NonNull View view, int duration) {
         // Cancel existing animation to avoid race condition
         // if show and hide are called at the same time
         view.animate().cancel();
@@ -77,24 +51,10 @@ public class ViewUtils {
             return;
         }
 
-        Animator.AnimatorListener hider = hideViewAfterAnimation(view);
         view.animate()
                 .setDuration(duration)
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        hider.onAnimationEnd(animation);
-                        if (listener != null) {
-                            listener.onAnimationEnd(view);
-                        }
-                    }
-                })
+                .setListener(hideViewAfterAnimation(view))
                 .alpha(0f);
-    }
-
-    /** Hides a view using a fade-out animation. */
-    public static void hideViewAnimated(@NonNull View view, int duration) {
-        hideViewAnimated(view, duration, null);
     }
 
     /** Returns an AnimatorListener that hides the view at the end. */
@@ -114,26 +74,20 @@ public class ViewUtils {
      * @param duration animation duration in milliseconds.
      */
     public static void hideViewsAnimated(@Nullable List<View> views, int duration) {
-        if (views == null) {
-            return;
-        }
         for (View view : views) {
             if (view != null) {
-                hideViewAnimated(view, duration, null);
+                hideViewAnimated(view, duration);
             }
         }
     }
 
     /**
-     * Shows a view using a fade-in animation. The view's alpha value isn't changed so that
-     * animating an already visible won't have a visible effect. Therefore, <b>views initialized as
-     * hidden must have their alpha set to 0 prior to calling this method</b>.
+     * Shows a view using a fade-in animation
      *
      * @param view     {@link View} to be shown
      * @param duration animation duration in milliseconds.
      */
-    public static void showViewAnimated(@NonNull View view, int duration,
-            @Nullable ViewAnimEndListener listener) {
+    public static void showViewAnimated(@NonNull View view, int duration) {
         // Cancel existing animation to avoid race condition
         // if show and hide are called at the same time
         view.animate().cancel();
@@ -146,21 +100,10 @@ public class ViewUtils {
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationStart(Animator animation) {
-                        view.setVisibility(VISIBLE);
-                    }
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        if (listener != null) {
-                            listener.onAnimationEnd(view);
-                        }
+                        view.setVisibility(View.VISIBLE);
                     }
                 })
                 .alpha(1f);
-    }
-
-    /** Shows a view using a fade-in animation. */
-    public static void showViewAnimated(@NonNull View view, int duration) {
-        showViewAnimated(view, duration, null);
     }
 
     /**
@@ -172,7 +115,7 @@ public class ViewUtils {
     public static void showViewsAnimated(@Nullable List<View> views, int duration) {
         for (View view : views) {
             if (view != null) {
-                showViewAnimated(view, duration, null);
+                showViewAnimated(view, duration);
             }
         }
     }
@@ -180,7 +123,7 @@ public class ViewUtils {
     /** Sets the visibility of the (optional) view to {@link View#VISIBLE} or {@link View#GONE}. */
     public static void setVisible(@Nullable View view, boolean visible) {
         if (view != null) {
-            view.setVisibility(visible ? VISIBLE : View.GONE);
+            view.setVisibility(visible ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -196,7 +139,7 @@ public class ViewUtils {
      */
     public static void setInvisible(@Nullable View view, boolean invisible) {
         if (view != null) {
-            view.setVisibility(invisible ? INVISIBLE : VISIBLE);
+            view.setVisibility(invisible ? View.INVISIBLE : View.VISIBLE);
         }
     }
 
@@ -257,39 +200,5 @@ public class ViewUtils {
         }
         viewIds.recycle();
         return views;
-    }
-
-    /** Removes the view from its parent (if it has one). */
-    public static void removeFromParent(@Nullable View view) {
-        if (view != null) {
-            ViewGroup parent = (ViewGroup) view.getParent();
-            if (parent != null) {
-                parent.removeView(view);
-            }
-        }
-    }
-
-    /** Adds the {@code view} into the {@code container}. */
-    public static void setView(@Nullable View view, FrameLayout container) {
-        if (view != null) {
-            // Don't set the view if it stays the same.
-            if (container.getChildCount() == 1 && container.getChildAt(0) == view) {
-                return;
-            }
-
-            // As we are removing views (on BT disconnect, for example), some items will be
-            // shifting from expanded to collapsed (like Queue item) - remove those from the
-            // group before adding to the new slot
-            removeFromParent(view);
-
-            container.removeAllViews();
-            container.addView(view);
-            container.setVisibility(VISIBLE);
-        } else {
-            if (container.getChildCount() != 0) {
-                container.removeAllViews();
-            }
-            container.setVisibility(INVISIBLE);
-        }
     }
 }
