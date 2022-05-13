@@ -73,6 +73,10 @@ android_library {
         "car-ui-lib-resources",
         "car-rotary-lib",
     ],
+    apex_available: [
+        "com.android.permission",
+        "//apex_available:platform",
+    ],
 }
 
 android_library {
