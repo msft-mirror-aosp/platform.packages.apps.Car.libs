@@ -32,6 +32,8 @@
 # tags, which will be replaced accordingly during build.
 LOCAL_PATH:= $(call my-dir)
 
+$(call declare-1p-copy-files,packages/apps/Car,)
+
 CAR_UI_GENERATE_RRO_SET := $(call my-dir)/generate_rros.mk
 
 ifeq (,$(ONE_SHOT_MAKEFILE))
