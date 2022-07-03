@@ -23,7 +23,7 @@
     </plurals>
     <string name="action_play" msgid="1884580550634079470">"ప్లే చేయి"</string>
     <string name="action_mark_as_read" msgid="5185216939940407938">"చదివినట్లు గుర్తు పెట్టు"</string>
-    <string name="action_repeat" msgid="8184323082093728957">"పునరావృతం చేయి"</string>
+    <string name="action_repeat" msgid="8184323082093728957">"రిపీట్‌ చేయి"</string>
     <string name="action_reply" msgid="564106590567600685">"ప్రత్యుత్తరమివ్వు"</string>
     <string name="action_stop" msgid="6950369080845695405">"ఆపివేయి"</string>
     <string name="action_close_messages" msgid="7949295965012770696">"మూసివేయి"</string>
