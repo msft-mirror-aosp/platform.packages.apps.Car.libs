@@ -17,12 +17,20 @@
 package com.android.car.media.common.browse;
 
 import static com.android.car.apps.common.util.LiveDataFunctions.dataOf;
+import static com.android.car.media.common.MediaConstants.BROWSE_CUSTOM_ACTIONS_ACTION_EXTRAS;
+import static com.android.car.media.common.MediaConstants.BROWSE_CUSTOM_ACTIONS_ACTION_ICON;
+import static com.android.car.media.common.MediaConstants.BROWSE_CUSTOM_ACTIONS_ACTION_ID;
+import static com.android.car.media.common.MediaConstants.BROWSE_CUSTOM_ACTIONS_ACTION_LABEL;
+import static com.android.car.media.common.MediaConstants.BROWSE_CUSTOM_ACTIONS_ROOT_LIST;
+import static com.android.car.media.common.source.MediaBrowserConnector.ConnectionStatus.CONNECTED;
 
 import static java.util.stream.Collectors.toList;
 
 import android.app.Application;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.MediaBrowserCompat.ItemCallback;
 import android.support.v4.media.MediaBrowserCompat.SearchCallback;
 import android.support.v4.media.MediaBrowserCompat.SubscriptionCallback;
 import android.text.TextUtils;
@@ -35,6 +43,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.android.car.apps.common.util.FutureData;
+import com.android.car.media.common.CustomBrowseAction;
 import com.android.car.media.common.MediaItemMetadata;
 import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
 import com.android.car.media.common.source.MediaSource;
@@ -116,6 +125,8 @@ public class MediaItemsRepository {
     private final MutableLiveData<BrowsingState> mBrowsingStateLiveData = dataOf(null);
     private final MediaItemsLiveData mRootMediaItems = new MediaItemsLiveData();
     private final MediaItemsLiveData mSearchMediaItems = new MediaItemsLiveData(/*loading*/ false);
+    private final MutableLiveData<Map<String, CustomBrowseAction>> mCustomBrowseActions =
+            dataOf(Collections.emptyMap());
 
     private String mSearchQuery;
 
@@ -147,6 +158,13 @@ public class MediaItemsRepository {
         return mSearchMediaItems;
     }
 
+    /**
+     * Returns the custom browse actions for the current browse root.
+     */
+    public MutableLiveData<Map<String, CustomBrowseAction>> getCustomBrowseActions() {
+        return mCustomBrowseActions;
+    }
+
     /** Returns the children of the given node. */
     public MediaItemsLiveData getMediaChildren(String nodeId) {
         PerMediaSourceCache cache = getCache();
@@ -161,6 +179,17 @@ public class MediaItemsRepository {
         mBrowsingState.mBrowser.subscribe(nodeId, mBrowseCallback);
 
         return items.mLiveData;
+    }
+
+    /** Retrieves a specific {@link MediaBrowserCompat.MediaItem} from the connected service. */
+    public void getItem(@NonNull final String mediaId, @NonNull final ItemCallback cb) {
+        if (mBrowsingState.mConnectionStatus == CONNECTED) {
+            mBrowsingState.mBrowser.getItem(mediaId, cb);
+        } else {
+            Log.e(TAG, "getItem called without a connection! "
+                    + mediaId + " status: " + mBrowsingState.mConnectionStatus);
+            cb.onError(mediaId);
+        }
     }
 
     /** Sets the search query. Results will be given through {@link #getSearchMediaItems}. */
@@ -250,6 +279,7 @@ public class MediaItemsRepository {
 
         if (Objects.equals(parentId, cache.mRootId)) {
             mRootMediaItems.onDataLoaded(old, list);
+            mCustomBrowseActions.postValue(parseBrowseActions(mBrowsingState));
         }
     }
 
@@ -307,4 +337,26 @@ public class MediaItemsRepository {
             }
         }
     };
+
+    private Map<String, CustomBrowseAction> parseBrowseActions(BrowsingState browsingState) {
+        Map<String, CustomBrowseAction> customBrowseActions = new HashMap<>();
+
+        Bundle rootExtras = browsingState.mBrowser.getExtras();
+        if (rootExtras == null) return customBrowseActions;
+
+        List<Bundle> actionBundles =
+                rootExtras.getParcelableArrayList(BROWSE_CUSTOM_ACTIONS_ROOT_LIST);
+        if (actionBundles == null) return customBrowseActions;
+
+        for (Bundle actionBundle : actionBundles) {
+            CustomBrowseAction customBrowseAction =
+                    new CustomBrowseAction(
+                            actionBundle.getString(BROWSE_CUSTOM_ACTIONS_ACTION_ID),
+                            actionBundle.getString(BROWSE_CUSTOM_ACTIONS_ACTION_LABEL),
+                            Uri.parse(actionBundle.getString(BROWSE_CUSTOM_ACTIONS_ACTION_ICON)),
+                            actionBundle.getBundle(BROWSE_CUSTOM_ACTIONS_ACTION_EXTRAS));
+            customBrowseActions.put(customBrowseAction.getId(), customBrowseAction);
+        }
+        return customBrowseActions;
+    }
 }

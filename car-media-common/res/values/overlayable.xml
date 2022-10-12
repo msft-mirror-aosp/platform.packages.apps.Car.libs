@@ -123,6 +123,7 @@ REGENERATE USING packages/apps/Car/tests/tools/rro/generate-overlayable.py
       <item type="integer" name="media_items_bitmap_max_size_px"/>
       <item type="integer" name="new_album_art_fade_in_duration"/>
       <item type="integer" name="num_app_selector_columns"/>
+      <item type="integer" name="max_custom_actions"/>
       <item type="integer" name="playback_subtitle_text_max_lines"/>
       <item type="integer" name="playback_title_text_max_lines"/>
       <item type="integer" name="widget_error_text_max_lines"/>
