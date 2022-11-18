@@ -20,11 +20,9 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.LayoutInflater;
 
 import com.android.car.ui.plugin.oemapis.PluginVersionProviderOEMV1;
 
-import com.chassis.car.ui.plugin.CarUiProxyLayoutInflaterFactory;
 import com.chassis.car.ui.plugin.PluginFactoryImpl;
 
 import java.lang.reflect.InvocationTargetException;
@@ -56,12 +54,7 @@ public class PluginVersionProviderImpl implements PluginVersionProviderOEMV1 {
                 rewriteRValues(context.getClassLoader(), r.valueAt(i), id);
             }
         }
-        // add a custom layout inflator that can handle things like CarUiTextView that is in the
-        // layout files of the car-ui-lib static implementation
-        LayoutInflater inflater = LayoutInflater.from(context);
-        if (inflater.getFactory2() == null) {
-            inflater.setFactory2(new CarUiProxyLayoutInflaterFactory());
-        }
+
         return new PluginFactoryImpl(context);
     }
 

@@ -16,7 +16,12 @@
 
 package com.chassis.car.ui.plugin;
 
+import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION;
+
 import android.content.Context;
+import android.content.res.Configuration;
+import android.os.Build.VERSION;
+import android.view.LayoutInflater;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -53,6 +58,8 @@ import com.chassis.car.ui.plugin.toolbar.ToolbarAdapterProxy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * An implication of the plugin factory that delegates back to the car-ui-lib implementation.
@@ -63,6 +70,7 @@ import java.util.List;
 public class PluginFactoryImpl implements PluginFactoryOEMV5 {
 
     private final Context mPluginContext;
+    Map<Context, Context> mAppToPluginContextMap = new WeakHashMap<>();
 
     public PluginFactoryImpl(Context pluginContext) {
         mPluginContext = pluginContext;
@@ -72,7 +80,6 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
     public void setRotaryFactories(
             com.android.car.ui.plugin.oemapis.Function<Context, FocusParkingViewOEMV1> function,
             com.android.car.ui.plugin.oemapis.Function<Context, FocusAreaOEMV1> function1) {
-
     }
 
     @Nullable
@@ -82,8 +89,9 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
             @Nullable com.android.car.ui.plugin.oemapis.Consumer<InsetsOEMV1> consumer,
             boolean b,
             boolean b1) {
+        Context pluginContext = getPluginUiContext(context, mPluginContext);
         ToolbarControllerImpl toolbarController = new ToolbarControllerImpl(view);
-        return new ToolbarAdapterProxy(mPluginContext, toolbarController);
+        return new ToolbarAdapterProxy(pluginContext, toolbarController);
     }
 
     @Override
@@ -94,9 +102,10 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
     @Nullable
     @Override
     public AppStyledViewControllerOEMV2 createAppStyledView(@NonNull Context context) {
+        Context pluginContext = getPluginUiContext(context, mPluginContext);
         // build the app styled controller that will be delegated to
         AppStyledViewControllerImpl appStyledViewController = new AppStyledViewControllerImpl(
-                mPluginContext);
+                pluginContext);
         return new AppStyledViewControllerAdapterProxy(appStyledViewController);
     }
 
@@ -104,15 +113,17 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
     @Override
     public RecyclerViewOEMV2 createRecyclerView(@NonNull Context context,
             @Nullable RecyclerViewAttributesOEMV1 recyclerViewAttributesOEMV1) {
+        Context pluginContext = getPluginUiContext(context, mPluginContext);
         CarUiRecyclerViewImpl recyclerView =
-                new CarUiRecyclerViewImpl(mPluginContext, recyclerViewAttributesOEMV1);
-        return new RecyclerViewAdapterProxy(mPluginContext, recyclerView,
+                new CarUiRecyclerViewImpl(pluginContext, recyclerViewAttributesOEMV1);
+        return new RecyclerViewAdapterProxy(pluginContext, recyclerView,
                 recyclerViewAttributesOEMV1);
     }
 
     @Override
     public AdapterOEMV1<? extends ViewHolderOEMV1> createListItemAdapter(
             List<ListItemOEMV1> items) {
+        // TODO: add this here? Context pluginContext = getPluginUiContext(context, mPluginContext);
         List<? extends CarUiListItem> staticItems = CarUiUtils.convertList(items,
                 PluginFactoryImpl::toStaticListItem);
         // Build the CarUiListItemAdapter that will be delegated to
@@ -180,7 +191,6 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
         }
     }
 
-
     private static CarUiText toCarUiText(TextOEMV1 text) {
         return new CarUiText.Builder(text.getTextVariants()).setMaxChars(
                 text.getMaxChars()).setMaxLines(text.getMaxLines()).build();
@@ -228,5 +238,44 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
             default:
                 throw new IllegalStateException("Unexpected list item icon type");
         }
+    }
+
+    /**
+     * This method tries to return a ui-context for usage in the plugin that has the same
+     * configuration as the given source ui context.
+     *
+     * @param sourceContext a UI context, normally an Activity context.
+     */
+    private Context getPluginUiContext(@NonNull Context sourceContext,
+            @NonNull Context pluginContext) {
+
+        Context uiContext = mAppToPluginContextMap.get(sourceContext);
+
+        if (uiContext == null) {
+            uiContext = pluginContext;
+            if (VERSION.SDK_INT >= 34 /* Android U */ && !uiContext.isUiContext()) {
+                // On U and above we need a UiContext for initializing the proxy plugin.
+                uiContext = pluginContext
+                        .createWindowContext(sourceContext.getDisplay(), TYPE_APPLICATION, null);
+            }
+        }
+
+        Configuration currentConfiguration = uiContext.getResources()
+                .getConfiguration();
+        Configuration newConfiguration = sourceContext.getResources().getConfiguration();
+        if (currentConfiguration.diff(newConfiguration) != 0) {
+            uiContext = uiContext.createConfigurationContext(newConfiguration);
+        }
+
+        // add a custom layout inflater that can handle things like CarUiTextView that is in the
+        // layout files of the car-ui-lib static implementation
+        LayoutInflater inflater = LayoutInflater.from(uiContext);
+        if (inflater.getFactory2() == null) {
+            inflater.setFactory2(new CarUiProxyLayoutInflaterFactory());
+        }
+
+        mAppToPluginContextMap.put(sourceContext, uiContext);
+
+        return uiContext;
     }
 }
