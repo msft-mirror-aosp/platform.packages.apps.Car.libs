@@ -27,7 +27,7 @@ car_apps_common_static_libs = [
     "androidx-constraintlayout_constraintlayout",
     "androidx.recyclerview_recyclerview",
     "androidx-constraintlayout_constraintlayout-solver",
-    "car-ui-lib-prebuilt",
+    "car-ui-lib-source",
     "junit",
 ]
 

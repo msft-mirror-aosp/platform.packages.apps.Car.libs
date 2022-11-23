@@ -81,7 +81,7 @@ android_test {
         "androidx.test.espresso.contrib",
         "androidx.test.ext.junit",
         "car-rotary-lib",
-        "car-ui-lib",
+        "car-ui-lib-source",
         "platform-test-annotations",
         "mockito-target-inline-minus-junit4",
         "truth-prebuilt",

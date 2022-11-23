@@ -18,6 +18,7 @@ package {
 
 android_app {
     name: "car-ui-lib-sharedlibrary",
+    manifest: "AndroidManifest.xml",
     aaptflags: ["--shared-lib"],
     sdk_version: "current",
     optimize: {
@@ -30,4 +31,7 @@ android_app {
         "car-ui-lib-oem-apis",
     ],
     export_package_resources: true,
+    overrides: [
+        "car-ui-lib-sharedlibrary-vendor",
+    ]
 }
