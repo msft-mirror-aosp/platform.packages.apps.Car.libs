@@ -27,6 +27,8 @@ import com.chassis.car.ui.plugin.PluginFactoryImpl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Builds a Plugin that will delegate to the standard car-ui-lib implementation. The main benefit
@@ -38,8 +40,18 @@ public class PluginVersionProviderImpl implements PluginVersionProviderOEMV1 {
     public static final String TAG = "PluginVersionProvider";
     public static final String SHARED_LIBRARY_PACKAGE = "com.android.car.ui.sharedlibrary";
 
+    private static final List<String> DENIED_PACKAGES = new ArrayList<>(List.of(
+            // TODO(b/260267959) remove.
+            "com.android.vending"
+    ));
+
     @Override
     public Object getPluginFactory(int maxVersion, Context context, String packageName) {
+
+        if (DENIED_PACKAGES.contains(packageName)) {
+            return null;
+        }
+
         SparseArray<String> r = getAssignedPackageIdentifiers(context.getAssets());
         for (int i = 0, n = r.size(); i < n; i++) {
             final int id = r.keyAt(i);
