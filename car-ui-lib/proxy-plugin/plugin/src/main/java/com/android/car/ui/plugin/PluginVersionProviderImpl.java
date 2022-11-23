@@ -43,7 +43,7 @@ public class PluginVersionProviderImpl implements PluginVersionProviderOEMV1 {
         SparseArray<String> r = getAssignedPackageIdentifiers(context.getAssets());
         for (int i = 0, n = r.size(); i < n; i++) {
             final int id = r.keyAt(i);
-            // we can skip framework-res (0x01) and anything in the app space (0x07)
+            // we can skip framework-res (0x01) and anything in the app space (0x7f)
             if (id == 0x01 || id == 0x7f) {
                 continue;
             }
@@ -55,7 +55,7 @@ public class PluginVersionProviderImpl implements PluginVersionProviderOEMV1 {
             }
         }
 
-        return new PluginFactoryImpl(context);
+        return new PluginFactoryImpl(new PluginContextWrapper(context));
     }
 
     /**
