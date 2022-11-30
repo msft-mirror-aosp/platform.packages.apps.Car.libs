@@ -235,6 +235,11 @@ public class FocusParkingView extends View {
     protected void onDetachedFromWindow() {
         getViewTreeObserver().removeOnTouchModeChangeListener(mTouchModeChangeListener);
         getViewTreeObserver().removeOnGlobalFocusChangeListener(mFocusChangeListener);
+
+        // Release the reference to the focused view to avoid memory leak.
+        mFocusCache.setFocusedView(null, /* elapsedRealtime= */ 0);
+        mFocusedView = null;
+
         super.onDetachedFromWindow();
     }
 
