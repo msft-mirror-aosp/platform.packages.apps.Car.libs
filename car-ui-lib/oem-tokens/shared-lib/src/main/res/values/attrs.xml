@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2022 The Android Open Source Project
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<resources>
+  <item name="colorOemSeed" format="color" />
+
+  <!-- Primary color palette -->
+  <item name="colorPrimary" format="color" />
+  <item name="colorOnPrimary" format="color" />
+  <item name="colorPrimaryContainer" format="color" />
+  <item name="colorOnPrimaryContainer" format="color" />
+  <!-- TODO: Determine usage of inverse colors. -->
+  <!--  <item name="colorPrimaryInverse" format="color" />-->
+
+  <!-- Secondary color palette -->
+  <item name="colorSecondary" format="color" />
+  <item name="colorOnSecondary" format="color" />
+  <item name="colorSecondaryContainer" format="color" />
+  <item name="colorOnSecondaryContainer" format="color" />
+
+  <!-- Tertiary color palette -->
+  <item name="colorTertiary" format="color" />
+  <item name="colorOnTertiary" format="color" />
+  <item name="colorTertiaryContainer" format="color" />
+  <item name="colorOnTertiaryContainer" format="color" />
+
+  <!-- Error color palette -->
+  <item name="colorError" format="color" />
+  <item name="colorOnError" format="color" />
+  <item name="colorErrorContainer" format="color" />
+  <item name="colorOnErrorContainer" format="color" />
+
+  <!-- Neutral color palette -->
+  <item name="colorBackground" format="color" />
+  <item name="colorOnBackground" format="color" />
+  <item name="colorSurface" format="color" />
+  <item name="colorOnSurface" format="color" />
+  <item name="colorSurfaceVariant" format="color" />
+  <item name="colorOnSurfaceVariant" format="color" />
+  <item name="colorOutline" format="color" />
+  <!-- TODO: Determine usage of inverse colors. -->
+  <!--  <item name="colorSurfaceInverse" format="color" />-->
+  <!--  <item name="colorOnSurfaceInverse" format="color" />-->
+
+  <!-- Primary tonal palette -->
+  <item name="colorPrimaryPalette100" format="color" />
+  <item name="colorPrimaryPalette99" format="color" />
+  <item name="colorPrimaryPalette95" format="color" />
+  <item name="colorPrimaryPalette90" format="color" />
+  <item name="colorPrimaryPalette80" format="color" />
+  <item name="colorPrimaryPalette70" format="color" />
+  <item name="colorPrimaryPalette60" format="color" />
+  <item name="colorPrimaryPalette50" format="color" />
+  <item name="colorPrimaryPalette40" format="color" />
+  <item name="colorPrimaryPalette30" format="color" />
+  <item name="colorPrimaryPalette20" format="color" />
+  <item name="colorPrimaryPalette10" format="color" />
+  <item name="colorPrimaryPalette0" format="color" />
+
+  <!-- Secondary tonal palette -->
+  <item name="colorSecondaryPalette100" format="color" />
+  <item name="colorSecondaryPalette99" format="color" />
+  <item name="colorSecondaryPalette95" format="color" />
+  <item name="colorSecondaryPalette90" format="color" />
+  <item name="colorSecondaryPalette80" format="color" />
+  <item name="colorSecondaryPalette70" format="color" />
+  <item name="colorSecondaryPalette60" format="color" />
+  <item name="colorSecondaryPalette50" format="color" />
+  <item name="colorSecondaryPalette40" format="color" />
+  <item name="colorSecondaryPalette30" format="color" />
+  <item name="colorSecondaryPalette20" format="color" />
+  <item name="colorSecondaryPalette10" format="color" />
+  <item name="colorSecondaryPalette0" format="color" />
+
+  <!-- Tertiary tonal palette -->
+  <item name="colorTertiaryPalette100" format="color" />
+  <item name="colorTertiaryPalette99" format="color" />
+  <item name="colorTertiaryPalette95" format="color" />
+  <item name="colorTertiaryPalette90" format="color" />
+  <item name="colorTertiaryPalette80" format="color" />
+  <item name="colorTertiaryPalette70" format="color" />
+  <item name="colorTertiaryPalette60" format="color" />
+  <item name="colorTertiaryPalette50" format="color" />
+  <item name="colorTertiaryPalette40" format="color" />
+  <item name="colorTertiaryPalette30" format="color" />
+  <item name="colorTertiaryPalette20" format="color" />
+  <item name="colorTertiaryPalette10" format="color" />
+  <item name="colorTertiaryPalette0" format="color" />
+
+  <!-- Neutral tonal palette -->
+  <item name="colorNeutralPalette100" format="color" />
+  <item name="colorNeutralPalette99" format="color" />
+  <item name="colorNeutralPalette95" format="color" />
+  <item name="colorNeutralPalette90" format="color" />
+  <item name="colorNeutralPalette80" format="color" />
+  <item name="colorNeutralPalette70" format="color" />
+  <item name="colorNeutralPalette60" format="color" />
+  <item name="colorNeutralPalette50" format="color" />
+  <item name="colorNeutralPalette40" format="color" />
+  <item name="colorNeutralPalette30" format="color" />
+  <item name="colorNeutralPalette20" format="color" />
+  <item name="colorNeutralPalette10" format="color" />
+  <item name="colorNeutralPalette0" format="color" />
+
+    <!-- Neutral variant tonal palette -->
+  <item name="colorNeutralVariantPalette100" format="color" />
+  <item name="colorNeutralVariantPalette99" format="color" />
+  <item name="colorNeutralVariantPalette95" format="color" />
+  <item name="colorNeutralVariantPalette90" format="color" />
+  <item name="colorNeutralVariantPalette80" format="color" />
+  <item name="colorNeutralVariantPalette70" format="color" />
+  <item name="colorNeutralVariantPalette60" format="color" />
+  <item name="colorNeutralVariantPalette50" format="color" />
+  <item name="colorNeutralVariantPalette40" format="color" />
+  <item name="colorNeutralVariantPalette30" format="color" />
+  <item name="colorNeutralVariantPalette20" format="color" />
+  <item name="colorNeutralVariantPalette10" format="color" />
+  <item name="colorNeutralVariantPalette0" format="color" />
+</resources>
