@@ -129,6 +129,31 @@
   <attr name="colorNeutralVariantPalette10" format="color" />
   <attr name="colorNeutralVariantPalette0" format="color" />
 
+  <!-- Display typeface styles -->
+  <attr name="textAppearanceDisplayLarge" format="reference" />
+  <attr name="textAppearanceDisplayMedium" format="reference" />
+  <attr name="textAppearanceDisplaySmall" format="reference" />
+
+  <!-- Headline typeface styles -->
+  <attr name="textAppearanceHeadlineLarge" format="reference" />
+  <attr name="textAppearanceHeadlineMedium" format="reference" />
+  <attr name="textAppearanceHeadlineSmall" format="reference" />
+
+  <!-- Title typeface styles -->
+  <attr name="textAppearanceTitleLarge" format="reference" />
+  <attr name="textAppearanceTitleMedium" format="reference" />
+  <attr name="textAppearanceTitleSmall" format="reference" />
+
+  <!-- Label typeface styles -->
+  <attr name="textAppearanceLabelLarge" format="reference" />
+  <attr name="textAppearanceLabelMedium" format="reference" />
+  <attr name="textAppearanceLabelSmall" format="reference" />
+
+  <!-- Body typeface styles -->
+  <attr name="textAppearanceBodyLarge" format="reference" />
+  <attr name="textAppearanceBodyMedium" format="reference" />
+  <attr name="textAppearanceBodySmall" format="reference" />
+
   <!-- Shape scales -->
   <attr name="shapeAppearanceCornerNone" format="reference" />
   <attr name="shapeAppearanceCornerExtraSmall" format="reference" />
