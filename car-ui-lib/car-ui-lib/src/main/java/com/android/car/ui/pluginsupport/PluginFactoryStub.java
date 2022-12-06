@@ -40,6 +40,7 @@ import com.android.car.ui.appstyledview.AppStyledViewController;
 import com.android.car.ui.appstyledview.AppStyledViewControllerImpl;
 import com.android.car.ui.baselayout.Insets;
 import com.android.car.ui.baselayout.InsetsChangedListener;
+import com.android.car.ui.preference.CarUiPreferenceViewStub;
 import com.android.car.ui.recyclerview.CarUiListItem;
 import com.android.car.ui.recyclerview.CarUiListItemAdapter;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
@@ -165,6 +166,11 @@ public final class PluginFactoryStub implements PluginFactory {
     @Override
     public CarUiTextView createTextView(Context context, AttributeSet attrs) {
         return new CarUiTextViewImpl(context, attrs);
+    }
+
+    @Override
+    public View createCarUiPreferenceView(Context sourceContext, AttributeSet attrs) {
+        return CarUiPreferenceViewStub.createCarUiPreferenceView(sourceContext, attrs);
     }
 
     @Override

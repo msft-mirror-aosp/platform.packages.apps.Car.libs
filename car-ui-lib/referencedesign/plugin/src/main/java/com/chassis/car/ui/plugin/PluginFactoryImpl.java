@@ -28,6 +28,7 @@ import com.android.car.ui.plugin.oemapis.Function;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5;
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
+import com.android.car.ui.plugin.oemapis.preference.PreferenceOEM1;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.ListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewAttributesOEMV1;
@@ -88,6 +89,12 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
     @Override
     public boolean customizesBaseLayout() {
         return true;
+    }
+
+    @Nullable
+    @Override
+    public PreferenceOEM1 createCarUiPreference(Context sourceContext) {
+        return null;
     }
 
     @Override

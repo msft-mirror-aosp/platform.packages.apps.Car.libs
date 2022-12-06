@@ -15,6 +15,8 @@
  */
 package com.android.car.ui.pluginsupport;
 
+import static com.android.car.ui.preference.CarUiPreferenceViewStub.PREFERENCE;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
@@ -43,6 +45,8 @@ import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5;
 import com.android.car.ui.plugin.oemapis.TextOEMV1;
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
+import com.android.car.ui.plugin.oemapis.preference.PreferenceOEM1;
+import com.android.car.ui.plugin.oemapis.preference.PreferenceViewAttributesOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.ContentListItemOEMV2;
 import com.android.car.ui.plugin.oemapis.recyclerview.HeaderListItemOEMV1;
@@ -121,6 +125,37 @@ public final class PluginFactoryAdapterV5 implements PluginFactory {
     @Override
     public CarUiTextView createTextView(Context context, AttributeSet attrs) {
         return mFactoryStub.createTextView(context, attrs);
+    }
+
+    @Override
+    public View createCarUiPreferenceView(Context context, AttributeSet attrs) {
+        PreferenceOEM1 preferenceOEM1 = mOem.createCarUiPreference(context);
+        if (preferenceOEM1 == null) {
+            return mFactoryStub.createCarUiPreferenceView(context, attrs);
+        }
+        try {
+            int preferenceType = getPreferenceType(context, attrs);
+            return preferenceOEM1.createCarUiPreferenceView(
+                    new PreferenceViewAttributesOEMV1() {
+                        @Override
+                        public int getPreferenceType() {
+                            return preferenceType;
+                        }
+                    });
+        } catch (Exception ex) {
+            // Fallback
+            return mFactoryStub.createCarUiPreferenceView(context, attrs);
+        }
+    }
+
+    int getPreferenceType(Context context, AttributeSet attrs) {
+        TypedArray a = context.obtainStyledAttributes(
+                attrs, R.styleable.Preference, 0, 0);
+
+        int preferenceType = a.getInt(R.styleable.Preference_carUiPreferenceType, PREFERENCE);
+        a.recycle();
+
+        return preferenceType;
     }
 
     @Override

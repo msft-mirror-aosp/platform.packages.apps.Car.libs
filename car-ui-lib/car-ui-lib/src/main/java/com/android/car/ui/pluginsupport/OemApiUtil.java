@@ -46,9 +46,9 @@ final class OemApiUtil {
      * factory object, and checking if it's instanceof each version of
      * {@link PluginFactoryOEMV1}, casting to the correct one when found.
      *
-     * @param pluginContext The plugin's context. This context will return
-     *                             the plugin's classloader from
-     *                             {@link Context#getClassLoader()}.
+     * @param pluginContext  The plugin's context. This context will return
+     *                       the plugin's classloader from
+     *                       {@link Context#getClassLoader()}.
      * @param appPackageName The package name of the application. This is passed to the plugin
      *                       so that it can provide unique customizations per-app.
      * @return A {@link PluginFactory}
@@ -102,7 +102,7 @@ final class OemApiUtil {
                     "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV4")
                     && factory instanceof PluginFactoryOEMV4) {
                 oemPluginFactory = new PluginFactoryAdapterV4(
-                    (PluginFactoryOEMV4) factory);
+                        (PluginFactoryOEMV4) factory);
             } else if (classExists(
                     "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5")
                     && factory instanceof PluginFactoryOEMV5) {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright 2019 The Android Open Source Project
+    Copyright 2023 The Android Open Source Project
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -14,14 +14,19 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
+
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    <com.android.car.ui.preference.CarUiPreferenceViewStub
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:carUiPreferenceType="footer">
-    </com.android.car.ui.preference.CarUiPreferenceViewStub>
+  <!-- This spinner should be invisible in the layout and take up no space, when the Preference
+       is clicked the dropdown will appear from this location on screen. -->
+  <Spinner
+      android:id="@+id/spinner"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="@dimen/car_ui_preference_dropdown_padding_start"
+      android:visibility="invisible"/>
+  <include layout="@layout/car_ui_preference"/>
+
 </FrameLayout>
