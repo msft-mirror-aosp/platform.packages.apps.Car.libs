@@ -17,6 +17,8 @@
 <resources>
     <!-- Specifies that the app theme has a dark background with light text on top -->
     <bool name="car_ui_is_light_theme">false</bool>
+    <!-- Specifies that the window decor will not contain display cut out safe insets -->
+    <bool name="car_ui_omit_display_cut_out_insets">false</bool>
 
     <!-- Toolbar -->
 

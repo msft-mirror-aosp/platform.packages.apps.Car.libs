@@ -45,7 +45,6 @@ import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.recyclerview.CarUiRecyclerViewImpl;
 import com.android.car.ui.toolbar.ToolbarController;
 import com.android.car.ui.toolbar.ToolbarControllerImpl;
-import com.android.car.ui.utils.CarUiUtils;
 import com.android.car.ui.widget.CarUiTextView;
 import com.android.car.ui.widget.CarUiTextViewImpl;
 
@@ -122,21 +121,21 @@ public final class PluginFactoryStub implements PluginFactory {
     }
 
     private void handleDisplayCutOut(View contentView) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
+            return;
+        }
+
         if (!(contentView.getContext() instanceof Activity)) {
             return;
         }
 
         Activity activity = ((Activity) contentView.getContext());
-        if (!CarUiUtils.getThemeBoolean(activity, R.attr.carUiOmitDisplayCutOutInsets)) {
+        if (!activity.getResources().getBoolean(R.bool.car_ui_omit_display_cut_out_insets)) {
             return;
         }
 
         Window baseLayoutWindow = activity.getWindow();
         WindowManager.LayoutParams lp = baseLayoutWindow.getAttributes();
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
-            return;
-        }
 
         if (lp.layoutInDisplayCutoutMode
                 != WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS) {

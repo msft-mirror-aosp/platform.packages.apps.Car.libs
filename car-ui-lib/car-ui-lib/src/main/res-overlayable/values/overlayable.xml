@@ -32,7 +32,6 @@ limitations under the License.-->
       <item type="attr" name="carUiClickableWhileDisabled"/>
       <item type="attr" name="carUiIcon"/>
       <item type="attr" name="carUiLayout"/>
-      <item type="attr" name="carUiOmitDisplayCutOutInsets"/>
       <item type="attr" name="carUiPreferenceStyle"/>
       <item type="attr" name="carUiRecyclerViewStyle"/>
       <item type="attr" name="carUiShowChevron"/>
@@ -148,6 +147,7 @@ limitations under the License.-->
       <item type="bool" name="car_ui_ime_wide_screen_allow_app_hide_content_area"/>
       <item type="bool" name="car_ui_is_light_theme"/>
       <item type="bool" name="car_ui_list_item_single_line_title"/>
+      <item type="bool" name="car_ui_omit_display_cut_out_insets"/>
       <item type="bool" name="car_ui_preference_list_instant_change_callback"/>
       <item type="bool" name="car_ui_preference_list_show_full_screen"/>
       <item type="bool" name="car_ui_preference_show_chevron"/>
