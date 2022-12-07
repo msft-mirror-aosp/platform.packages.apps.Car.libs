@@ -19,6 +19,7 @@ import static com.android.car.ui.utils.CarUiUtils.requireViewByRefId;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -122,12 +123,27 @@ public final class PluginFactoryStub implements PluginFactory {
     }
 
     private void handleDisplayCutOut(View contentView) {
+<<<<<<< HEAD   (c377a4 Merge cherrypicks of ['ag/20669415'] into car-apps-release.)
         if (!(contentView.getContext() instanceof Activity)) {
+=======
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
             return;
         }
 
+        // Unwrap context to account for ContextWrapper
+        Context context = unwrapContext(contentView.getContext());
+        if (!(context instanceof Activity)) {
+>>>>>>> CHANGE (e2eebc Update baselayout inset handling to be compatible with Googl)
+            return;
+        }
+
+<<<<<<< HEAD   (c377a4 Merge cherrypicks of ['ag/20669415'] into car-apps-release.)
         Activity activity = ((Activity) contentView.getContext());
         if (!CarUiUtils.getThemeBoolean(activity, R.attr.carUiOmitDisplayCutOutInsets)) {
+=======
+        Activity activity = (Activity) context;
+        if (!activity.getResources().getBoolean(R.bool.car_ui_omit_display_cut_out_insets)) {
+>>>>>>> CHANGE (e2eebc Update baselayout inset handling to be compatible with Googl)
             return;
         }
 
@@ -149,6 +165,14 @@ public final class PluginFactoryStub implements PluginFactory {
                     WindowInsets.Type.displayCutout(), android.graphics.Insets.NONE).build();
             return v.onApplyWindowInsets(insets);
         });
+    }
+
+    private Context unwrapContext(Context context) {
+        while (!(context instanceof Activity) && context instanceof ContextWrapper) {
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+
+        return context;
     }
 
     @NonNull
