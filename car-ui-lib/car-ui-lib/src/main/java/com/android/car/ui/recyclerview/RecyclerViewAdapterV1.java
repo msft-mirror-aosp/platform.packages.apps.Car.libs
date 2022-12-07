@@ -23,6 +23,7 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
@@ -180,6 +181,15 @@ public final class RecyclerViewAdapterV1 extends FrameLayout
         mWidth = params.width;
         mHeight = params.height;
         super.setLayoutParams(params);
+    }
+
+    @Override
+    public ViewPropertyAnimator animate() {
+        if (mOEMRecyclerView != null) {
+            return mOEMRecyclerView.getView().animate();
+        } else {
+            throw new IllegalStateException("OEMRecyclerView is not initialized!");
+        }
     }
 
     @Override
