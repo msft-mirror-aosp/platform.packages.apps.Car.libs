@@ -19,6 +19,7 @@ import static com.android.car.ui.utils.CarUiUtils.requireViewByRefId;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -125,11 +126,13 @@ public final class PluginFactoryStub implements PluginFactory {
             return;
         }
 
-        if (!(contentView.getContext() instanceof Activity)) {
+        // Unwrap context to account for ContextWrapper
+        Context context = unwrapContext(contentView.getContext());
+        if (!(context instanceof Activity)) {
             return;
         }
 
-        Activity activity = ((Activity) contentView.getContext());
+        Activity activity = (Activity) context;
         if (!activity.getResources().getBoolean(R.bool.car_ui_omit_display_cut_out_insets)) {
             return;
         }
@@ -148,6 +151,14 @@ public final class PluginFactoryStub implements PluginFactory {
                     WindowInsets.Type.displayCutout(), android.graphics.Insets.NONE).build();
             return v.onApplyWindowInsets(insets);
         });
+    }
+
+    private Context unwrapContext(Context context) {
+        while (!(context instanceof Activity) && context instanceof ContextWrapper) {
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+
+        return context;
     }
 
     @NonNull
