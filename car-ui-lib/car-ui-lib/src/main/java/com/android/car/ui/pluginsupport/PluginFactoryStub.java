@@ -46,7 +46,6 @@ import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.recyclerview.CarUiRecyclerViewImpl;
 import com.android.car.ui.toolbar.ToolbarController;
 import com.android.car.ui.toolbar.ToolbarControllerImpl;
-import com.android.car.ui.utils.CarUiUtils;
 import com.android.car.ui.widget.CarUiTextView;
 import com.android.car.ui.widget.CarUiTextViewImpl;
 
@@ -123,7 +122,14 @@ public final class PluginFactoryStub implements PluginFactory {
     }
 
     private void handleDisplayCutOut(View contentView) {
+<<<<<<< HEAD   (42acf9 Merge cherrypicks of ['ag/20671890'] into car-apps-release.)
 <<<<<<< HEAD   (c377a4 Merge cherrypicks of ['ag/20669415'] into car-apps-release.)
+=======
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
+            return;
+        }
+
+>>>>>>> CHANGE (f5c8e4 Add boolean to allow for easier overlay control of display c)
         if (!(contentView.getContext() instanceof Activity)) {
 =======
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
@@ -139,20 +145,20 @@ public final class PluginFactoryStub implements PluginFactory {
 
 <<<<<<< HEAD   (c377a4 Merge cherrypicks of ['ag/20669415'] into car-apps-release.)
         Activity activity = ((Activity) contentView.getContext());
+<<<<<<< HEAD   (42acf9 Merge cherrypicks of ['ag/20671890'] into car-apps-release.)
         if (!CarUiUtils.getThemeBoolean(activity, R.attr.carUiOmitDisplayCutOutInsets)) {
 =======
         Activity activity = (Activity) context;
         if (!activity.getResources().getBoolean(R.bool.car_ui_omit_display_cut_out_insets)) {
 >>>>>>> CHANGE (e2eebc Update baselayout inset handling to be compatible with Googl)
+=======
+        if (!activity.getResources().getBoolean(R.bool.car_ui_omit_display_cut_out_insets)) {
+>>>>>>> CHANGE (f5c8e4 Add boolean to allow for easier overlay control of display c)
             return;
         }
 
         Window baseLayoutWindow = activity.getWindow();
         WindowManager.LayoutParams lp = baseLayoutWindow.getAttributes();
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
-            return;
-        }
 
         if (lp.layoutInDisplayCutoutMode
                 != WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS) {

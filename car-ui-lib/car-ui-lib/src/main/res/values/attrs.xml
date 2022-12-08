@@ -22,8 +22,6 @@
         <attr name="carUiToolbar" format="boolean"/>
         <!-- Indicates that this is a CarUi activity. Used to disable CarUi on phone/tv/wear activities -->
         <attr name="carUiActivity" format="boolean"/>
-        <!-- When set to true, the window decor will not contain display cut out safe insets -->
-        <attr name="carUiOmitDisplayCutOutInsets" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="CarUiToolbar">

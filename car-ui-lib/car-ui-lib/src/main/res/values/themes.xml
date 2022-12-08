@@ -22,7 +22,6 @@
         <item name="carUiBaseLayout">false</item>
         <item name="carUiToolbar">false</item>
         <item name="carUiActivity">true</item>
-        <item name="carUiOmitDisplayCutOutInsets">false</item>
 
         <!-- Attributes from: Base.V7.Theme.AppCompat -->
 
