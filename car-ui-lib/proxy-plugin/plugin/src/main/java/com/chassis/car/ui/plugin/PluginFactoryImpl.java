@@ -29,6 +29,7 @@ import androidx.annotation.Nullable;
 
 import com.android.car.ui.CarUiText;
 import com.android.car.ui.appstyledview.AppStyledViewControllerImpl;
+import com.android.car.ui.plugin.PluginContextWrapper;
 import com.android.car.ui.plugin.oemapis.FocusAreaOEMV1;
 import com.android.car.ui.plugin.oemapis.FocusParkingViewOEMV1;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
@@ -266,6 +267,8 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
         if (currentConfiguration.diff(newConfiguration) != 0) {
             uiContext = uiContext.createConfigurationContext(newConfiguration);
         }
+
+        uiContext = new PluginContextWrapper(uiContext);
 
         // add a custom layout inflater that can handle things like CarUiTextView that is in the
         // layout files of the car-ui-lib static implementation
