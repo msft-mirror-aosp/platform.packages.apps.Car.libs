@@ -22,6 +22,7 @@ import static java.lang.Math.sin;
 import static java.lang.Math.toDegrees;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -79,6 +80,7 @@ public class CarUiArrowContainerView extends LinearLayout {
     private boolean mHasArrow;
     private boolean mArrowGravityLeft;
     private boolean mArrowGravityTop;
+    private ColorStateList mArrowColorState;
     private float mArrowWidth;
     private float mArrowHeight;
     private float mArrowRadius;
@@ -102,6 +104,7 @@ public class CarUiArrowContainerView extends LinearLayout {
     private static final String TAG = CarUiArrowContainerView.class.getSimpleName();
     private static final String ARROW_VIEW_ATTACHED_TOP_TAG = "CAR_UI_ARROW_VIEW_TOP_TAG";
     private static final String ARROW_VIEW_ATTACHED_BOTTOM_TAG = "CAR_UI_ARROW_VIEW_BOTTOM_TAG";
+    private static final int[] DISABLED_ATTR_STATE = new int[]{-android.R.attr.enabled};
 
 
     public CarUiArrowContainerView(@NonNull Context context) {
@@ -115,8 +118,7 @@ public class CarUiArrowContainerView extends LinearLayout {
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs,
                 R.styleable.CarUiArrowContainerView, 0, 0);
         mHasArrow = a.getBoolean(R.styleable.CarUiArrowContainerView_carUiHasArrow, false);
-        int arrowColor = a.getColor(R.styleable.CarUiArrowContainerView_carUiArrowColor,
-                Color.GRAY);
+        mArrowColorState = a.getColorStateList(R.styleable.CarUiArrowContainerView_carUiArrowColor);
         mArrowWidth = a.getDimension(R.styleable.CarUiArrowContainerView_carUiArrowWidth, 0);
         mArrowHeight = a.getDimension(R.styleable.CarUiArrowContainerView_carUiArrowHeight, 0);
         mArrowRadius = a.getDimension(R.styleable.CarUiArrowContainerView_carUiArrowRadius, 0);
@@ -129,8 +131,7 @@ public class CarUiArrowContainerView extends LinearLayout {
         mContentViewId = a.getResourceId(R.styleable.CarUiArrowContainerView_carUiContentView, 0);
         mContentDrawableId = a.getResourceId(
                 R.styleable.CarUiArrowContainerView_carUiContentViewDrawable, 0);
-
-        mPaint.setColor(arrowColor);
+        mPaint.setColor(mArrowColorState.getDefaultColor());
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setAntiAlias(true);
 
@@ -325,6 +326,11 @@ public class CarUiArrowContainerView extends LinearLayout {
                     Path.Op.UNION);
         }
         mPath.close();
+        if (isEnabled()) {
+            mPaint.setColor(mArrowColorState.getDefaultColor());
+        } else {
+            mPaint.setColor(mArrowColorState.getColorForState(DISABLED_ATTR_STATE, Color.GRAY));
+        }
         canvas.drawPath(mPath, mPaint);
         super.onDraw(canvas);
     }
@@ -340,8 +346,31 @@ public class CarUiArrowContainerView extends LinearLayout {
 
     @Override
     public void setEnabled(boolean enabled) {
+        if (enabled == isEnabled()) {
+            return;
+        }
+        super.setEnabled(enabled);
         View contentView = findViewById(mContentViewId);
-        contentView.setEnabled(enabled);
+        setEnableNested(enabled, contentView);
+        if (mHasArrow) {
+            refreshArrowView(true);
+            invalidate();
+        }
+    }
+
+
+    /**
+     * recursively calls setEnable for children
+     */
+    private void setEnableNested(boolean enabled, View view) {
+        view.setEnabled(enabled);
+        if (!(view instanceof ViewGroup)) {
+            return;
+        }
+        ViewGroup viewGroup = (ViewGroup) view;
+        for (int i = 0; i < viewGroup.getChildCount(); i++) {
+            setEnableNested(enabled, viewGroup.getChildAt(i));
+        }
     }
 
     /**
