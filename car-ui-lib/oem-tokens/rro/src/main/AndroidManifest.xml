@@ -18,7 +18,6 @@
           package="oem.brand.model.rro">
     <application android:hasCode="false"/>
     <overlay android:priority="2001"
-             android:targetPackage="oem.demo.sharedlib" />
+             android:targetPackage="oem.demo.sharedlib"
+             android:resourcesMap="@xml/overlays"/>
 </manifest>
-
-

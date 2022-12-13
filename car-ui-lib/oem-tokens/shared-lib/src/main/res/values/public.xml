@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2019 The Android Open Source Project
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<resources>
+  <public type="attr" name="colorOemSeed" id="0x00770000" />
+  <public type="attr" name="colorPrimary" id="0x00770001" />
+  <public type="attr" name="colorOnPrimary" id="0x00770002" />
+  <public type="attr" name="colorPrimaryContainer" id="0x00770003" />
+  <public type="attr" name="colorOnPrimaryContainer" id="0x00770004" />
+  <public type="attr" name="colorSecondary" id="0x00770005" />
+  <public type="attr" name="colorOnSecondary" id="0x00770006" />
+  <public type="attr" name="colorSecondaryContainer" id="0x00770007" />
+  <public type="attr" name="colorOnSecondaryContainer" id="0x00770008" />
+  <public type="attr" name="colorTertiary" id="0x00770009" />
+  <public type="attr" name="colorOnTertiary" id="0x0077000A" />
+  <public type="attr" name="colorTertiaryContainer" id="0x0077000B"/>
+  <public type="attr" name="colorOnTertiaryContainer" id="0x0077000C"/>
+  <public type="attr" name="colorError" id="0x0077000D" />
+  <public type="attr" name="colorOnError" id="0x0077000E" />
+  <public type="attr" name="colorErrorContainer" id="0x0077000F" />
+  <public type="attr" name="colorOnErrorContainer" id="0x00770010" />
+  <public type="attr" name="colorBackground" id="0x00770011" />
+  <public type="attr" name="colorOnBackground" id="0x00770012" />
+  <public type="attr" name="colorSurface" id="0x00770013" />
+  <public type="attr" name="colorOnSurface" id="0x00770014" />
+  <public type="attr" name="colorSurfaceVariant" id="0x00770015" />
+  <public type="attr" name="colorOnSurfaceVariant" id="0x00770016" />
+  <public type="attr" name="colorOutline" id="0x00770017" />
+</resources>

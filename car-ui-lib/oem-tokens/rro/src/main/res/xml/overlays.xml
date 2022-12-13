@@ -14,4 +14,6 @@
      limitations under the License.
 -->
 <overlay>
+      <item target="bool/enable_oem_tokens" value="@bool/enable_oem_tokens"/>
+      <item target="style/OemStyle" value="@style/OemStyle"/>
 </overlay>
