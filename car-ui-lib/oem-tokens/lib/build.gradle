@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 The Android Open Source Project
+ * Copyright (C) 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-include ':car-ui-lib'
-project(':car-ui-lib').projectDir = new File('./car-ui-lib')
-include ':PaintBooth'
-project(':PaintBooth').projectDir = new File('./paintbooth')
-include ':oem-apis'
-project(':oem-apis').projectDir = new File('./oem-apis')
-include ':plugin'
-project(':plugin').projectDir = new File('./referencedesign/plugin')
-include ':oem-token-lib'
-project(':oem-token-lib').projectDir = new File('./oem-tokens/lib')
+apply plugin: 'com.android.library'
 
-rootProject.name='Chassis'
-include ':car-rotary-lib'
+android {
+    compileSdkVersion 32
+    defaultConfig {
+        minSdkVersion 28
+        targetSdkVersion 32
+        versionCode gradle.ext.getVersionCode()
+        versionName gradle.ext.getVersionName()
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}

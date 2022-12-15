@@ -26,6 +26,8 @@ include ':plugin'
 project(':plugin').projectDir = new File('../car-ui-lib/referencedesign/plugin')
 include ':car-rotary-lib'
 project(':car-rotary-lib').projectDir = new File('../car-ui-lib/car-rotary-lib')
+include ':oem-token-lib'
+project(':oem-token-lib').projectDir = new File('../car-ui-lib/oem-tokens/lib')
 
 include ':car-apps-common'
 project(':car-apps-common').projectDir = new File('../car-apps-common')
