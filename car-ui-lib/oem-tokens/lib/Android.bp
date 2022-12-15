@@ -13,22 +13,21 @@
 // limitations under the License.
 
 // MUST be a resource only library
-android_app {
-    name: "token-shared-lib",
+android_library {
+    name: "oem-token-lib",
     min_sdk_version: "28",
     target_sdk_version: "33",
     sdk_version: "current",
-    aaptflags: ["--shared-lib"],
     manifest: "src/main/AndroidManifest.xml",
+    srcs: ["src/main/java/**/*.java"],
     resource_dirs: [
         "src/main/res"
-    ]
-}
-
-override_android_app {
-    name: "oem-token-shared-lib",
-    base: "token-shared-lib",
-    package_name: "oem.demo.sharedlib",
-    rename_resources_package: false
+    ],
+    libs: [
+        "token-shared-lib",
+    ],
+    static_libs: [
+        "androidx.annotation_annotation",
+    ],
 }
 

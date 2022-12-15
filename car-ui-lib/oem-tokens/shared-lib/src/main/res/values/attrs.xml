@@ -14,118 +14,118 @@
  limitations under the License.
 -->
 <resources>
-  <item name="colorOemSeed" format="color" />
+  <attr name="colorOemSeed" format="color" />
 
   <!-- Primary color palette -->
-  <item name="colorPrimary" format="color" />
-  <item name="colorOnPrimary" format="color" />
-  <item name="colorPrimaryContainer" format="color" />
-  <item name="colorOnPrimaryContainer" format="color" />
+  <attr name="colorPrimary" format="color" />
+  <attr name="colorOnPrimary" format="color" />
+  <attr name="colorPrimaryContainer" format="color" />
+  <attr name="colorOnPrimaryContainer" format="color" />
   <!-- TODO: Determine usage of inverse colors. -->
-  <!--  <item name="colorPrimaryInverse" format="color" />-->
+  <!--  <attr name="colorPrimaryInverse" format="color" />-->
 
   <!-- Secondary color palette -->
-  <item name="colorSecondary" format="color" />
-  <item name="colorOnSecondary" format="color" />
-  <item name="colorSecondaryContainer" format="color" />
-  <item name="colorOnSecondaryContainer" format="color" />
+  <attr name="colorSecondary" format="color" />
+  <attr name="colorOnSecondary" format="color" />
+  <attr name="colorSecondaryContainer" format="color" />
+  <attr name="colorOnSecondaryContainer" format="color" />
 
   <!-- Tertiary color palette -->
-  <item name="colorTertiary" format="color" />
-  <item name="colorOnTertiary" format="color" />
-  <item name="colorTertiaryContainer" format="color" />
-  <item name="colorOnTertiaryContainer" format="color" />
+  <attr name="colorTertiary" format="color" />
+  <attr name="colorOnTertiary" format="color" />
+  <attr name="colorTertiaryContainer" format="color" />
+  <attr name="colorOnTertiaryContainer" format="color" />
 
   <!-- Error color palette -->
-  <item name="colorError" format="color" />
-  <item name="colorOnError" format="color" />
-  <item name="colorErrorContainer" format="color" />
-  <item name="colorOnErrorContainer" format="color" />
+  <attr name="colorError" format="color" />
+  <attr name="colorOnError" format="color" />
+  <attr name="colorErrorContainer" format="color" />
+  <attr name="colorOnErrorContainer" format="color" />
 
   <!-- Neutral color palette -->
-  <item name="colorBackground" format="color" />
-  <item name="colorOnBackground" format="color" />
-  <item name="colorSurface" format="color" />
-  <item name="colorOnSurface" format="color" />
-  <item name="colorSurfaceVariant" format="color" />
-  <item name="colorOnSurfaceVariant" format="color" />
-  <item name="colorOutline" format="color" />
+  <attr name="colorBackground" format="color" />
+  <attr name="colorOnBackground" format="color" />
+  <attr name="colorSurface" format="color" />
+  <attr name="colorOnSurface" format="color" />
+  <attr name="colorSurfaceVariant" format="color" />
+  <attr name="colorOnSurfaceVariant" format="color" />
+  <attr name="colorOutline" format="color" />
   <!-- TODO: Determine usage of inverse colors. -->
-  <!--  <item name="colorSurfaceInverse" format="color" />-->
-  <!--  <item name="colorOnSurfaceInverse" format="color" />-->
+  <!--  <attr name="colorSurfaceInverse" format="color" />-->
+  <!--  <attr name="colorOnSurfaceInverse" format="color" />-->
 
   <!-- Primary tonal palette -->
-  <item name="colorPrimaryPalette100" format="color" />
-  <item name="colorPrimaryPalette99" format="color" />
-  <item name="colorPrimaryPalette95" format="color" />
-  <item name="colorPrimaryPalette90" format="color" />
-  <item name="colorPrimaryPalette80" format="color" />
-  <item name="colorPrimaryPalette70" format="color" />
-  <item name="colorPrimaryPalette60" format="color" />
-  <item name="colorPrimaryPalette50" format="color" />
-  <item name="colorPrimaryPalette40" format="color" />
-  <item name="colorPrimaryPalette30" format="color" />
-  <item name="colorPrimaryPalette20" format="color" />
-  <item name="colorPrimaryPalette10" format="color" />
-  <item name="colorPrimaryPalette0" format="color" />
+  <attr name="colorPrimaryPalette100" format="color" />
+  <attr name="colorPrimaryPalette99" format="color" />
+  <attr name="colorPrimaryPalette95" format="color" />
+  <attr name="colorPrimaryPalette90" format="color" />
+  <attr name="colorPrimaryPalette80" format="color" />
+  <attr name="colorPrimaryPalette70" format="color" />
+  <attr name="colorPrimaryPalette60" format="color" />
+  <attr name="colorPrimaryPalette50" format="color" />
+  <attr name="colorPrimaryPalette40" format="color" />
+  <attr name="colorPrimaryPalette30" format="color" />
+  <attr name="colorPrimaryPalette20" format="color" />
+  <attr name="colorPrimaryPalette10" format="color" />
+  <attr name="colorPrimaryPalette0" format="color" />
 
   <!-- Secondary tonal palette -->
-  <item name="colorSecondaryPalette100" format="color" />
-  <item name="colorSecondaryPalette99" format="color" />
-  <item name="colorSecondaryPalette95" format="color" />
-  <item name="colorSecondaryPalette90" format="color" />
-  <item name="colorSecondaryPalette80" format="color" />
-  <item name="colorSecondaryPalette70" format="color" />
-  <item name="colorSecondaryPalette60" format="color" />
-  <item name="colorSecondaryPalette50" format="color" />
-  <item name="colorSecondaryPalette40" format="color" />
-  <item name="colorSecondaryPalette30" format="color" />
-  <item name="colorSecondaryPalette20" format="color" />
-  <item name="colorSecondaryPalette10" format="color" />
-  <item name="colorSecondaryPalette0" format="color" />
+  <attr name="colorSecondaryPalette100" format="color" />
+  <attr name="colorSecondaryPalette99" format="color" />
+  <attr name="colorSecondaryPalette95" format="color" />
+  <attr name="colorSecondaryPalette90" format="color" />
+  <attr name="colorSecondaryPalette80" format="color" />
+  <attr name="colorSecondaryPalette70" format="color" />
+  <attr name="colorSecondaryPalette60" format="color" />
+  <attr name="colorSecondaryPalette50" format="color" />
+  <attr name="colorSecondaryPalette40" format="color" />
+  <attr name="colorSecondaryPalette30" format="color" />
+  <attr name="colorSecondaryPalette20" format="color" />
+  <attr name="colorSecondaryPalette10" format="color" />
+  <attr name="colorSecondaryPalette0" format="color" />
 
   <!-- Tertiary tonal palette -->
-  <item name="colorTertiaryPalette100" format="color" />
-  <item name="colorTertiaryPalette99" format="color" />
-  <item name="colorTertiaryPalette95" format="color" />
-  <item name="colorTertiaryPalette90" format="color" />
-  <item name="colorTertiaryPalette80" format="color" />
-  <item name="colorTertiaryPalette70" format="color" />
-  <item name="colorTertiaryPalette60" format="color" />
-  <item name="colorTertiaryPalette50" format="color" />
-  <item name="colorTertiaryPalette40" format="color" />
-  <item name="colorTertiaryPalette30" format="color" />
-  <item name="colorTertiaryPalette20" format="color" />
-  <item name="colorTertiaryPalette10" format="color" />
-  <item name="colorTertiaryPalette0" format="color" />
+  <attr name="colorTertiaryPalette100" format="color" />
+  <attr name="colorTertiaryPalette99" format="color" />
+  <attr name="colorTertiaryPalette95" format="color" />
+  <attr name="colorTertiaryPalette90" format="color" />
+  <attr name="colorTertiaryPalette80" format="color" />
+  <attr name="colorTertiaryPalette70" format="color" />
+  <attr name="colorTertiaryPalette60" format="color" />
+  <attr name="colorTertiaryPalette50" format="color" />
+  <attr name="colorTertiaryPalette40" format="color" />
+  <attr name="colorTertiaryPalette30" format="color" />
+  <attr name="colorTertiaryPalette20" format="color" />
+  <attr name="colorTertiaryPalette10" format="color" />
+  <attr name="colorTertiaryPalette0" format="color" />
 
   <!-- Neutral tonal palette -->
-  <item name="colorNeutralPalette100" format="color" />
-  <item name="colorNeutralPalette99" format="color" />
-  <item name="colorNeutralPalette95" format="color" />
-  <item name="colorNeutralPalette90" format="color" />
-  <item name="colorNeutralPalette80" format="color" />
-  <item name="colorNeutralPalette70" format="color" />
-  <item name="colorNeutralPalette60" format="color" />
-  <item name="colorNeutralPalette50" format="color" />
-  <item name="colorNeutralPalette40" format="color" />
-  <item name="colorNeutralPalette30" format="color" />
-  <item name="colorNeutralPalette20" format="color" />
-  <item name="colorNeutralPalette10" format="color" />
-  <item name="colorNeutralPalette0" format="color" />
+  <attr name="colorNeutralPalette100" format="color" />
+  <attr name="colorNeutralPalette99" format="color" />
+  <attr name="colorNeutralPalette95" format="color" />
+  <attr name="colorNeutralPalette90" format="color" />
+  <attr name="colorNeutralPalette80" format="color" />
+  <attr name="colorNeutralPalette70" format="color" />
+  <attr name="colorNeutralPalette60" format="color" />
+  <attr name="colorNeutralPalette50" format="color" />
+  <attr name="colorNeutralPalette40" format="color" />
+  <attr name="colorNeutralPalette30" format="color" />
+  <attr name="colorNeutralPalette20" format="color" />
+  <attr name="colorNeutralPalette10" format="color" />
+  <attr name="colorNeutralPalette0" format="color" />
 
     <!-- Neutral variant tonal palette -->
-  <item name="colorNeutralVariantPalette100" format="color" />
-  <item name="colorNeutralVariantPalette99" format="color" />
-  <item name="colorNeutralVariantPalette95" format="color" />
-  <item name="colorNeutralVariantPalette90" format="color" />
-  <item name="colorNeutralVariantPalette80" format="color" />
-  <item name="colorNeutralVariantPalette70" format="color" />
-  <item name="colorNeutralVariantPalette60" format="color" />
-  <item name="colorNeutralVariantPalette50" format="color" />
-  <item name="colorNeutralVariantPalette40" format="color" />
-  <item name="colorNeutralVariantPalette30" format="color" />
-  <item name="colorNeutralVariantPalette20" format="color" />
-  <item name="colorNeutralVariantPalette10" format="color" />
-  <item name="colorNeutralVariantPalette0" format="color" />
+  <attr name="colorNeutralVariantPalette100" format="color" />
+  <attr name="colorNeutralVariantPalette99" format="color" />
+  <attr name="colorNeutralVariantPalette95" format="color" />
+  <attr name="colorNeutralVariantPalette90" format="color" />
+  <attr name="colorNeutralVariantPalette80" format="color" />
+  <attr name="colorNeutralVariantPalette70" format="color" />
+  <attr name="colorNeutralVariantPalette60" format="color" />
+  <attr name="colorNeutralVariantPalette50" format="color" />
+  <attr name="colorNeutralVariantPalette40" format="color" />
+  <attr name="colorNeutralVariantPalette30" format="color" />
+  <attr name="colorNeutralVariantPalette20" format="color" />
+  <attr name="colorNeutralVariantPalette10" format="color" />
+  <attr name="colorNeutralVariantPalette0" format="color" />
 </resources>
