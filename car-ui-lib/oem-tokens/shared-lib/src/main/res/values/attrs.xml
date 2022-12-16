@@ -114,7 +114,7 @@
   <attr name="colorNeutralPalette10" format="color" />
   <attr name="colorNeutralPalette0" format="color" />
 
-    <!-- Neutral variant tonal palette -->
+  <!-- Neutral variant tonal palette -->
   <attr name="colorNeutralVariantPalette100" format="color" />
   <attr name="colorNeutralVariantPalette99" format="color" />
   <attr name="colorNeutralVariantPalette95" format="color" />
@@ -128,4 +128,18 @@
   <attr name="colorNeutralVariantPalette20" format="color" />
   <attr name="colorNeutralVariantPalette10" format="color" />
   <attr name="colorNeutralVariantPalette0" format="color" />
+
+  <!-- Shape scales -->
+  <attr name="shapeAppearanceCornerNone" format="reference" />
+  <attr name="shapeAppearanceCornerExtraSmall" format="reference" />
+  <attr name="shapeAppearanceCornerExtraSmallTop" format="reference" />
+  <attr name="shapeAppearanceCornerSmall" format="reference" />
+  <attr name="shapeAppearanceCornerMedium" format="reference" />
+  <attr name="shapeAppearanceCornerLarge" format="reference" />
+  <attr name="shapeAppearanceCornerLargeTop" format="reference" />
+  <attr name="shapeAppearanceCornerLargeStart" format="reference" />
+  <attr name="shapeAppearanceCornerLargeEnd" format="reference" />
+  <attr name="shapeAppearanceCornerExtraLarge" format="reference" />
+  <attr name="shapeAppearanceCornerExtraLargeTop" format="reference" />
+  <attr name="shapeAppearanceCornerFull" format="reference" />
 </resources>
