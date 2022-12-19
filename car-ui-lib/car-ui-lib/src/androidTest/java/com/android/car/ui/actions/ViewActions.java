@@ -43,4 +43,8 @@ public class ViewActions {
     public static ViewAction setProgress(int progress) {
         return new SetProgressViewAction(progress);
     }
+
+    public static ViewAction setChecked(boolean checked) {
+        return new SetCheckedViewAction(checked);
+    }
 }

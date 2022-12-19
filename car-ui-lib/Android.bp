@@ -243,9 +243,13 @@ android_app {
 
     required: ["allowed_privapp_com.android.car.ui.paintbooth"],
 
-    libs: ["android.car-stubs"],
+    libs: [
+         "android.car-stubs",
+	 "token-shared-lib"
+    ],
     static_libs: [
-        "car-ui-lib-prebuilt",
+        "oem-token-lib",
+        "car-ui-lib-source",
         "androidx.annotation_annotation",
         "androidx.appcompat_appcompat",
         "androidx-constraintlayout_constraintlayout",
@@ -259,6 +263,10 @@ android_app {
     certificate: CERTIFICATE,
     privileged: true,
 
+    enforce_uses_libs:false,
+    dex_preopt: {
+        enabled: false,
+    },
     export_package_resources: true,
 
     optimize: {

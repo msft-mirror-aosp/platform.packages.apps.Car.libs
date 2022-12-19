@@ -215,13 +215,16 @@ public class SearchView extends ConstraintLayout {
     public void onVisibilityChanged(@NonNull View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
 
-        boolean isShown = isShown();
+        final boolean isShown = isShown();
         if (isShown && !mWasShown) {
             boolean hasQuery = mSearchText.getText().length() > 0;
             mCloseIcon.setVisibility(hasQuery ? View.VISIBLE : View.GONE);
             mSearchText.requestFocus();
             mInputMethodManager.showSoftInput(mSearchText, 0);
+        } else if (!isShown && mWasShown) {
+            mInputMethodManager.hideSoftInputFromWindow(mSearchText.getWindowToken(), 0);
         }
+
         mWasShown = isShown;
     }
 

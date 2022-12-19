@@ -61,7 +61,7 @@ public class ShortcutsPopupSamples extends AbstractSampleActivity {
 
                                 @Override
                                 public boolean isEnabled() {
-                                    return true;
+                                    return false;
                                 }
                             })
                     .addShortcut(new CarUiShortcutsPopup.ShortcutItem() {
@@ -83,7 +83,7 @@ public class ShortcutsPopupSamples extends AbstractSampleActivity {
 
                         @Override
                         public boolean isEnabled() {
-                            return false;
+                            return true;
                         }
                     }).build(ShortcutsPopupSamples.this, v);
             carUiShortcutsPopup.show();

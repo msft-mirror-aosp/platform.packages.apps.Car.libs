@@ -122,16 +122,6 @@ public final class PluginFactoryStub implements PluginFactory {
     }
 
     private void handleDisplayCutOut(View contentView) {
-<<<<<<< HEAD   (42acf9 Merge cherrypicks of ['ag/20671890'] into car-apps-release.)
-<<<<<<< HEAD   (c377a4 Merge cherrypicks of ['ag/20669415'] into car-apps-release.)
-=======
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
-            return;
-        }
-
->>>>>>> CHANGE (f5c8e4 Add boolean to allow for easier overlay control of display c)
-        if (!(contentView.getContext() instanceof Activity)) {
-=======
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
             return;
         }
@@ -139,21 +129,11 @@ public final class PluginFactoryStub implements PluginFactory {
         // Unwrap context to account for ContextWrapper
         Context context = unwrapContext(contentView.getContext());
         if (!(context instanceof Activity)) {
->>>>>>> CHANGE (e2eebc Update baselayout inset handling to be compatible with Googl)
             return;
         }
 
-<<<<<<< HEAD   (c377a4 Merge cherrypicks of ['ag/20669415'] into car-apps-release.)
-        Activity activity = ((Activity) contentView.getContext());
-<<<<<<< HEAD   (42acf9 Merge cherrypicks of ['ag/20671890'] into car-apps-release.)
-        if (!CarUiUtils.getThemeBoolean(activity, R.attr.carUiOmitDisplayCutOutInsets)) {
-=======
         Activity activity = (Activity) context;
         if (!activity.getResources().getBoolean(R.bool.car_ui_omit_display_cut_out_insets)) {
->>>>>>> CHANGE (e2eebc Update baselayout inset handling to be compatible with Googl)
-=======
-        if (!activity.getResources().getBoolean(R.bool.car_ui_omit_display_cut_out_insets)) {
->>>>>>> CHANGE (f5c8e4 Add boolean to allow for easier overlay control of display c)
             return;
         }
 

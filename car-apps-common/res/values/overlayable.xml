@@ -17,6 +17,7 @@ limitations under the License.-->
       <item type="color" name="action_button_icon_tint" />
 
       <item type="dimen" name="control_bar_button_size" />
+      <item type="dimen" name="control_bar_button_padding" />
       <item type="dimen" name="play_pause_image_size" />
 
       <item type="drawable" name="ic_overflow_button"/>
