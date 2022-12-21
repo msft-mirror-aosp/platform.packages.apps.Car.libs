@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.-->
 <resources>
   <overlayable name="CarAppsCommon">
-    <policy type="system|product|signature">
+    <policy type="system|product|signature|vendor">
       <item type="bool" name="enable_control_bar_overflow"/>
 
       <item type="color" name="action_button_icon_tint" />
