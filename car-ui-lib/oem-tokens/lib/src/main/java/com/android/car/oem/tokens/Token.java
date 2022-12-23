@@ -15,10 +15,19 @@
  */
 package com.android.car.oem.tokens;
 
+import static android.util.TypedValue.TYPE_ATTRIBUTE;
+
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.SharedLibraryInfo;
+import android.content.res.TypedArray;
+import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.StyleableRes;
 
 import java.util.List;
 
@@ -63,5 +72,68 @@ public class Token {
         } catch (PackageManager.NameNotFoundException e) {
             return false;
         }
+    }
+
+    /**
+     * Return a {@link ContextThemeWrapper} that includes OEM provided values for design tokens.
+     * <p>
+     * If OEM customized token values are unavailable on the system , the {@code Context} object is
+     * returned with library default token values.
+     */
+    @NonNull
+    public static Context createOemStyledContext(@NonNull Context context) {
+        ContextThemeWrapper oemContext = new ContextThemeWrapper(context, R.style.OemTokens);
+
+        int oemStyleOverride = context.getResources().getIdentifier("OemStyle",
+                "style", Token.getTokenSharedLibraryName());
+        if (oemStyleOverride == 0) {
+            return context;
+        }
+
+        oemContext.getTheme().applyStyle(oemStyleOverride, true);
+
+        return oemContext;
+    }
+
+    /**
+     * Return the OEM provided color value corresponding to the color resource.
+     * <p>
+     * If OEM customized token color values are unavailable on the system , the library default
+     * color token value is returned.
+     */
+    @ColorInt
+    public static int getColor(@NonNull Context context, @ColorRes int colorId) {
+        Context oemContext = createOemStyledContext(context);
+        return oemContext.getResources().getColor(colorId, oemContext.getTheme());
+    }
+
+    /**
+     * Return {@code true} if there is an available OEM provided value for the design token that
+     * corresponds to the styleable resource.
+     */
+    public static boolean isOemStyled(Context context, @StyleableRes int styleableId) {
+        int oemStyleOverride = context.getResources().getIdentifier("OemStyle",
+                "style", Token.getTokenSharedLibraryName());
+        if (oemStyleOverride == 0) {
+            return false;
+        }
+
+        TypedArray libAttributes = context.obtainStyledAttributes(R.style.OemTokens,
+                R.styleable.OemTokens);
+        TypedValue tv = new TypedValue();
+        if (libAttributes.getType(styleableId) != TYPE_ATTRIBUTE) {
+            return false;
+        }
+        libAttributes.getValue(styleableId, tv);
+
+        int[] attrs = {tv.data};
+
+        TypedArray sharedLibAttributes = context.obtainStyledAttributes(oemStyleOverride, attrs);
+        int type = sharedLibAttributes.getType(0);
+        boolean isOemStyled = type != 0;
+
+        libAttributes.recycle();
+        sharedLibAttributes.recycle();
+        return isOemStyled;
     }
 }
