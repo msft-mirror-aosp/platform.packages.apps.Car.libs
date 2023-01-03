@@ -46,5 +46,89 @@
           <attr name="oemColorSurfaceVariant" format="color"/>
           <attr name="oemColorOnSurfaceVariant" format="color"/>
           <attr name="oemColorOutline" format="color"/>
+
+          <attr name="oemColorPrimaryPalette100" format="color" />
+          <attr name="oemColorPrimaryPalette99" format="color" />
+          <attr name="oemColorPrimaryPalette95" format="color" />
+          <attr name="oemColorPrimaryPalette90" format="color" />
+          <attr name="oemColorPrimaryPalette80" format="color" />
+          <attr name="oemColorPrimaryPalette70" format="color" />
+          <attr name="oemColorPrimaryPalette60" format="color" />
+          <attr name="oemColorPrimaryPalette50" format="color" />
+          <attr name="oemColorPrimaryPalette40" format="color" />
+          <attr name="oemColorPrimaryPalette30" format="color" />
+          <attr name="oemColorPrimaryPalette20" format="color" />
+          <attr name="oemColorPrimaryPalette10" format="color" />
+          <attr name="oemColorPrimaryPalette0" format="color" />
+
+          <attr name="oemColorSecondaryPalette100" format="color" />
+          <attr name="oemColorSecondaryPalette99" format="color" />
+          <attr name="oemColorSecondaryPalette95" format="color" />
+          <attr name="oemColorSecondaryPalette90" format="color" />
+          <attr name="oemColorSecondaryPalette80" format="color" />
+          <attr name="oemColorSecondaryPalette70" format="color" />
+          <attr name="oemColorSecondaryPalette60" format="color" />
+          <attr name="oemColorSecondaryPalette50" format="color" />
+          <attr name="oemColorSecondaryPalette40" format="color" />
+          <attr name="oemColorSecondaryPalette30" format="color" />
+          <attr name="oemColorSecondaryPalette20" format="color" />
+          <attr name="oemColorSecondaryPalette10" format="color" />
+          <attr name="oemColorSecondaryPalette0" format="color" />
+
+          <attr name="oemColorTertiaryPalette100" format="color" />
+          <attr name="oemColorTertiaryPalette99" format="color" />
+          <attr name="oemColorTertiaryPalette95" format="color" />
+          <attr name="oemColorTertiaryPalette90" format="color" />
+          <attr name="oemColorTertiaryPalette80" format="color" />
+          <attr name="oemColorTertiaryPalette70" format="color" />
+          <attr name="oemColorTertiaryPalette60" format="color" />
+          <attr name="oemColorTertiaryPalette50" format="color" />
+          <attr name="oemColorTertiaryPalette40" format="color" />
+          <attr name="oemColorTertiaryPalette30" format="color" />
+          <attr name="oemColorTertiaryPalette20" format="color" />
+          <attr name="oemColorTertiaryPalette10" format="color" />
+          <attr name="oemColorTertiaryPalette0" format="color" />
+
+          <attr name="oemColorErrorPalette100" format="color" />
+          <attr name="oemColorErrorPalette99" format="color" />
+          <attr name="oemColorErrorPalette95" format="color" />
+          <attr name="oemColorErrorPalette90" format="color" />
+          <attr name="oemColorErrorPalette80" format="color" />
+          <attr name="oemColorErrorPalette70" format="color" />
+          <attr name="oemColorErrorPalette60" format="color" />
+          <attr name="oemColorErrorPalette50" format="color" />
+          <attr name="oemColorErrorPalette40" format="color" />
+          <attr name="oemColorErrorPalette30" format="color" />
+          <attr name="oemColorErrorPalette20" format="color" />
+          <attr name="oemColorErrorPalette10" format="color" />
+          <attr name="oemColorErrorPalette0" format="color" />
+
+          <attr name="oemColorNeutralPalette100" format="color" />
+          <attr name="oemColorNeutralPalette99" format="color" />
+          <attr name="oemColorNeutralPalette95" format="color" />
+          <attr name="oemColorNeutralPalette90" format="color" />
+          <attr name="oemColorNeutralPalette80" format="color" />
+          <attr name="oemColorNeutralPalette70" format="color" />
+          <attr name="oemColorNeutralPalette60" format="color" />
+          <attr name="oemColorNeutralPalette50" format="color" />
+          <attr name="oemColorNeutralPalette40" format="color" />
+          <attr name="oemColorNeutralPalette30" format="color" />
+          <attr name="oemColorNeutralPalette20" format="color" />
+          <attr name="oemColorNeutralPalette10" format="color" />
+          <attr name="oemColorNeutralPalette0" format="color" />
+
+          <attr name="oemColorNeutralVariantPalette100" format="color" />
+          <attr name="oemColorNeutralVariantPalette99" format="color" />
+          <attr name="oemColorNeutralVariantPalette95" format="color" />
+          <attr name="oemColorNeutralVariantPalette90" format="color" />
+          <attr name="oemColorNeutralVariantPalette80" format="color" />
+          <attr name="oemColorNeutralVariantPalette70" format="color" />
+          <attr name="oemColorNeutralVariantPalette60" format="color" />
+          <attr name="oemColorNeutralVariantPalette50" format="color" />
+          <attr name="oemColorNeutralVariantPalette40" format="color" />
+          <attr name="oemColorNeutralVariantPalette30" format="color" />
+          <attr name="oemColorNeutralVariantPalette20" format="color" />
+          <attr name="oemColorNeutralVariantPalette10" format="color" />
+          <attr name="oemColorNeutralVariantPalette0" format="color" />
      </declare-styleable>
 </resources>

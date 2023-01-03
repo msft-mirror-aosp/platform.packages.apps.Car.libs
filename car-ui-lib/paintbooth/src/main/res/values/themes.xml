@@ -47,5 +47,9 @@
     <item name="oemColorOnSecondary">@android:color/holo_blue_dark</item>
     <item name="oemColorSecondaryContainer">@android:color/holo_blue_dark</item>
     <item name="oemColorOnSecondaryContainer">@android:color/holo_blue_dark</item>
+    <item name="oemColorTertiary">@android:color/holo_blue_dark</item>
+    <item name="oemColorOnTertiary">@android:color/holo_blue_dark</item>
+    <item name="oemColorTertiaryContainer">@android:color/holo_blue_dark</item>
+    <item name="oemColorOnTertiaryContainer">@android:color/holo_blue_dark</item>
   </style>
 </resources>

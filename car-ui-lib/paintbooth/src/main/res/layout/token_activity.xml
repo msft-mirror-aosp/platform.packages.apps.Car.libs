@@ -89,6 +89,30 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/color_on_secondary_container_token"
                 android:text="colorOnSecondaryContainer"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/color_tertiary_token"
+                android:text="colorTertiary"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/color_on_tertiary_token"
+                android:text="colorOnTertiary"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/color_tertiary_container_token"
+                android:text="colorTertiaryContainer"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/color_on_tertiary_container_token"
+                android:text="colorOnTertiaryContainer"/>
         </LinearLayout>
     </ScrollView>
 
