@@ -14,33 +14,37 @@
  limitations under the License.
 -->
 <resources>
-     <attr name="oemTokenOverrideEnabled" format="boolean"/>
+     <declare-styleable name="OemTokens">
+          <attr name="oemTokenOverrideEnabled" format="boolean"/>
 
-     <attr name="oemColorPrimary" format="color"/>
-     <attr name="oemColorOnPrimary" format="color"/>
-     <attr name="oemColorPrimaryContainer" format="color"/>
-     <attr name="oemColorOnPrimaryContainer" format="color"/>
+          <attr name="oemColorSeed" format="color" />
 
-     <attr name="oemColorSecondary" format="color"/>
-     <attr name="oemColorOnSecondary" format="color"/>
-     <attr name="oemColorSecondaryContainer" format="color"/>
-     <attr name="oemColorOnSecondaryContainer" format="color"/>
+          <attr name="oemColorPrimary" format="color"/>
+          <attr name="oemColorOnPrimary" format="color"/>
+          <attr name="oemColorPrimaryContainer" format="color"/>
+          <attr name="oemColorOnPrimaryContainer" format="color"/>
 
-     <attr name="oemColorTertiary" format="color"/>
-     <attr name="oemColorOnTertiary" format="color"/>
-     <attr name="oemColorTertiaryContainer" format="color"/>
-     <attr name="oemColorOnTertiaryContainer" format="color"/>
+          <attr name="oemColorSecondary" format="color"/>
+          <attr name="oemColorOnSecondary" format="color"/>
+          <attr name="oemColorSecondaryContainer" format="color"/>
+          <attr name="oemColorOnSecondaryContainer" format="color"/>
 
-     <attr name="oemColorError" format="color"/>
-     <attr name="oemColorOnError" format="color"/>
-     <attr name="oemColorErrorContainer" format="color"/>
-     <attr name="oemColorOnErrorContainer" format="color"/>
+          <attr name="oemColorTertiary" format="color"/>
+          <attr name="oemColorOnTertiary" format="color"/>
+          <attr name="oemColorTertiaryContainer" format="color"/>
+          <attr name="oemColorOnTertiaryContainer" format="color"/>
 
-     <attr name="oemColorBackground"/>
-     <attr name="oemColorOnBackground"/>
-     <attr name="oemColorSurface" format="color"/>
-     <attr name="oemColorOnSurface" format="color"/>
-     <attr name="oemColorSurfaceVariant" format="color"/>
-     <attr name="oemColorOnSurfaceVariant" format="color"/>
-     <attr name="oemColorOutline" format="color"/>
+          <attr name="oemColorError" format="color"/>
+          <attr name="oemColorOnError" format="color"/>
+          <attr name="oemColorErrorContainer" format="color"/>
+          <attr name="oemColorOnErrorContainer" format="color"/>
+
+          <attr name="oemColorBackground" format="color"/>
+          <attr name="oemColorOnBackground" format="color"/>
+          <attr name="oemColorSurface" format="color"/>
+          <attr name="oemColorOnSurface" format="color"/>
+          <attr name="oemColorSurfaceVariant" format="color"/>
+          <attr name="oemColorOnSurfaceVariant" format="color"/>
+          <attr name="oemColorOutline" format="color"/>
+     </declare-styleable>
 </resources>
