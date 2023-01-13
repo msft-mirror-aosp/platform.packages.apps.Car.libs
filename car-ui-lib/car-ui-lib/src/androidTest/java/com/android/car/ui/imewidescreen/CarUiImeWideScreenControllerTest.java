@@ -492,7 +492,7 @@ public class CarUiImeWideScreenControllerTest {
             }
 
             @Override
-            ExtractEditText getExtractEditText() {
+            public ExtractEditText getExtractEditText() {
                 FrameLayout parent = new FrameLayout(mContext);
                 ExtractEditText extractEditText = new ExtractEditText(mContext);
                 parent.addView(extractEditText);

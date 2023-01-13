@@ -500,8 +500,11 @@ public class CarUiImeWideScreenController {
 
         mInputConnection.performPrivateCommand(WIDE_SCREEN_POST_LOAD_SEARCH_RESULTS_ACTION, null);
     }
-
-    void onItemClicked(String itemId) {
+    /**
+     * Used to attach item to click listener.
+     */
+    @VisibleForTesting
+    public void onItemClicked(String itemId) {
         Bundle bundle = new Bundle();
         bundle.putString(SEARCH_RESULT_ITEM_ID_LIST, itemId);
         mInputConnection.performPrivateCommand(WIDE_SCREEN_ACTION, bundle);
@@ -623,7 +626,7 @@ public class CarUiImeWideScreenController {
     }
 
     @VisibleForTesting
-    ExtractEditText getExtractEditText() {
+    public ExtractEditText getExtractEditText() {
         return mRootView.getRootView().requireViewById(
                 android.R.id.inputExtractEditText);
     }
@@ -657,7 +660,7 @@ public class CarUiImeWideScreenController {
     }
 
     @VisibleForTesting
-    boolean isPackageAuthorized(String packageName) {
+    public boolean isPackageAuthorized(String packageName) {
         String[] packages = mContext.getResources()
                 .getStringArray(R.array.car_ui_ime_wide_screen_allowed_package_list);
 
@@ -797,12 +800,12 @@ public class CarUiImeWideScreenController {
     }
 
     @VisibleForTesting
-    void setContentAreaSurfaceView(SurfaceView surfaceView) {
+    public void setContentAreaSurfaceView(SurfaceView surfaceView) {
         mContentAreaSurfaceView = surfaceView;
     }
 
     @VisibleForTesting
-    String getPackageName(EditorInfo editorInfo) {
+    public String getPackageName(EditorInfo editorInfo) {
         return editorInfo.packageName;
     }
 
@@ -838,7 +841,7 @@ public class CarUiImeWideScreenController {
     }
 
     @VisibleForTesting
-    String getEditorInfoPackageName() {
+    public String getEditorInfoPackageName() {
         return mInputEditorInfo != null ? mInputEditorInfo.packageName : null;
     }
 

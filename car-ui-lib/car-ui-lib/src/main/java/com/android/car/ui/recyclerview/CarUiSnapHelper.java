@@ -20,6 +20,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.OrientationHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,7 +36,8 @@ import java.util.Objects;
  * the RecyclerView is scrolling vertically; it is defined as the left (or right if RTL) if the
  * RecyclerView is scrolling horizontally.
  */
-/* package */ class CarUiSnapHelper extends LinearSnapHelper {
+@VisibleForTesting
+/* package */ public class CarUiSnapHelper extends LinearSnapHelper {
     /**
      * The percentage of a View that needs to be completely visible for it to be a viable snap
      * target.
@@ -212,7 +214,8 @@ import java.util.Objects;
      * @param helper An {@link OrientationHelper} to aid with calculation.
      * @return A float indicating the percentage of the given view that is visible.
      */
-    static float getPercentageVisible(View view, OrientationHelper helper) {
+    @VisibleForTesting
+    public static float getPercentageVisible(View view, OrientationHelper helper) {
         int start = helper.getStartAfterPadding();
         int end = helper.getEndAfterPadding();
 
