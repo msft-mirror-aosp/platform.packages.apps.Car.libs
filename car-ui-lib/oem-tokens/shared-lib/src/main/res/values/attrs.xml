@@ -99,6 +99,21 @@
   <attr name="colorTertiaryPalette10" format="color" />
   <attr name="colorTertiaryPalette0" format="color" />
 
+  <!-- Error tonal palette -->
+  <attr name="colorErrorPalette100" format="color" />
+  <attr name="colorErrorPalette99" format="color" />
+  <attr name="colorErrorPalette95" format="color" />
+  <attr name="colorErrorPalette90" format="color" />
+  <attr name="colorErrorPalette80" format="color" />
+  <attr name="colorErrorPalette70" format="color" />
+  <attr name="colorErrorPalette60" format="color" />
+  <attr name="colorErrorPalette50" format="color" />
+  <attr name="colorErrorPalette40" format="color" />
+  <attr name="colorErrorPalette30" format="color" />
+  <attr name="colorErrorPalette20" format="color" />
+  <attr name="colorErrorPalette10" format="color" />
+  <attr name="colorErrorPalette0" format="color" />
+
   <!-- Neutral tonal palette -->
   <attr name="colorNeutralPalette100" format="color" />
   <attr name="colorNeutralPalette99" format="color" />
