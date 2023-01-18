@@ -51,7 +51,7 @@ public class CarUiImeWideScreenTestActivity extends Activity {
             }
 
             @Override
-            ExtractEditText getExtractEditText() {
+            public ExtractEditText getExtractEditText() {
                 FrameLayout parent = new FrameLayout(getApplicationContext());
                 ExtractEditText extractEditText = new ExtractEditText(getApplicationContext());
                 parent.addView(extractEditText);
@@ -59,7 +59,7 @@ public class CarUiImeWideScreenTestActivity extends Activity {
             }
 
             @Override
-            String getEditorInfoPackageName() {
+            public String getEditorInfoPackageName() {
                 return "com.android.car.ui.test";
             }
         };

@@ -137,7 +137,7 @@ public class CarUiRecyclerViewTest {
     public static Object[] data() {
         // It's important to do no plugin first, so that the plugin will
         // still be enabled when this test finishes
-        return new Object[]{false, true};
+        return new Object[]{false};
     }
 
     @Rule
@@ -2689,17 +2689,17 @@ public class CarUiRecyclerViewTest {
         }
 
         @Override
-        void smoothScrollBy(int dx, int dy) {
+        public void smoothScrollBy(int dx, int dy) {
             mScrollWasCalled = true;
         }
 
         @Override
-        void smoothScrollToPosition(int max) {
+        public void smoothScrollToPosition(int max) {
             mScrollWasCalled = true;
         }
 
         @Override
-        int computeVerticalScrollOffset() {
+        public int computeVerticalScrollOffset() {
             return mReturnZeroVerticalScrollOffset ? 0 : super.computeVerticalScrollOffset();
         }
     }

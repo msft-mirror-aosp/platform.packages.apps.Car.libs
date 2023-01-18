@@ -39,15 +39,15 @@ import com.android.car.ui.utils.CarUiUtils;
  */
 public class CarUiSmoothScroller extends LinearSmoothScroller {
     @VisibleForTesting
-    float mMillisecondsPerInch;
+    public float mMillisecondsPerInch;
     @VisibleForTesting
-    float mDecelerationTimeDivisor;
+    public float mDecelerationTimeDivisor;
     @VisibleForTesting
-    float mMillisecondsPerPixel;
+    public float mMillisecondsPerPixel;
     @VisibleForTesting
-    Interpolator mInterpolator;
+    public Interpolator mInterpolator;
     @VisibleForTesting
-    int mDensityDpi;
+    public int mDensityDpi;
 
     public CarUiSmoothScroller(Context context) {
         super(context);
@@ -68,14 +68,14 @@ public class CarUiSmoothScroller extends LinearSmoothScroller {
     }
 
     @Override
-    protected int getVerticalSnapPreference() {
+    public int getVerticalSnapPreference() {
         // Returning SNAP_TO_START will ensure that if the top (start) row is partially visible it
         // will be scrolled downward (END) to make the row fully visible.
         return SNAP_TO_START;
     }
 
     @Override
-    protected void onTargetFound(View targetView, RecyclerView.State state, Action action) {
+    public void onTargetFound(View targetView, RecyclerView.State state, Action action) {
         int dy = calculateDyToMakeVisible(targetView, SNAP_TO_START);
 
         if (dy == 0) {
@@ -89,12 +89,12 @@ public class CarUiSmoothScroller extends LinearSmoothScroller {
     }
 
     @Override
-    protected int calculateTimeForScrolling(int dx) {
+    public int calculateTimeForScrolling(int dx) {
         return (int) Math.ceil(Math.abs(dx) * mMillisecondsPerPixel);
     }
 
     @Override
-    protected int calculateTimeForDeceleration(int dx) {
+    public int calculateTimeForDeceleration(int dx) {
         return (int) Math.ceil(calculateTimeForScrolling(dx) / mDecelerationTimeDivisor);
     }
 }
