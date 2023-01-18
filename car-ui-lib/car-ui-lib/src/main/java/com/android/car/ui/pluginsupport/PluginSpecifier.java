@@ -46,7 +46,7 @@ public final class PluginSpecifier {
 
     /** Returns {@code true} if package matches this specifier's package */
     @VisibleForTesting
-    /* package */ public boolean matches(@NonNull PackageInfo packageInfo) {
+    public boolean matches(@NonNull PackageInfo packageInfo) {
         boolean nameMatches = mPackageName == null
                 || mPackageName.equals(packageInfo.packageName);
         boolean versionMatches = mMaxVersion == null
