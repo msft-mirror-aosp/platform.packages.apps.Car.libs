@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 The Android Open Source Project
+ * Copyright (C) 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,9 @@ import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 
 import androidx.annotation.ColorInt;
-import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StyleableRes;
+import androidx.core.content.ContextCompat;
 
 import java.util.List;
 
@@ -96,15 +96,29 @@ public class Token {
     }
 
     /**
-     * Return the OEM provided color value corresponding to the color resource.
+     * Return the OEM provided color value corresponding to the styleable resource.
      * <p>
      * If OEM customized token color values are unavailable on the system , the library default
      * color token value is returned.
      */
     @ColorInt
-    public static int getColor(@NonNull Context context, @ColorRes int colorId) {
-        Context oemContext = createOemStyledContext(context);
-        return oemContext.getResources().getColor(colorId, oemContext.getTheme());
+    public static int getColor(@NonNull Context context, @StyleableRes int styleableId) {
+        TypedValue tv = new TypedValue();
+        context.getTheme().resolveAttribute(R.attr.oemTokenOverrideEnabled, tv, true);
+        boolean oemOverrideDisabled = tv.data == 0;
+        if (oemOverrideDisabled) {
+            context = createOemStyledContext(context);
+        }
+
+        TypedArray libAttrs = context.obtainStyledAttributes(R.style.OemTokens,
+                R.styleable.OemTokens);
+        libAttrs.getValue(styleableId, tv);
+
+        if (tv.resourceId == 0) {
+            return tv.data;
+        }
+        libAttrs.recycle();
+        return ContextCompat.getColor(context, tv.resourceId);
     }
 
     /**
@@ -112,6 +126,7 @@ public class Token {
      * corresponds to the styleable resource.
      */
     public static boolean isOemStyled(Context context, @StyleableRes int styleableId) {
+        context = context.getApplicationContext();
         int oemStyleOverride = context.getResources().getIdentifier("OemStyle",
                 "style", Token.getTokenSharedLibraryName());
         if (oemStyleOverride == 0) {

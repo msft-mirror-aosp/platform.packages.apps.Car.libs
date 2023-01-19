@@ -15,6 +15,8 @@
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <style name="OemTokens">
+        <item name="oemTokenOverrideEnabled">true</item>
+
         <item name="oemColorPrimary">?com.android.oem.tokens:attr/colorPrimary</item>
         <item name="oemColorOnPrimary">?com.android.oem.tokens:attr/colorOnPrimary</item>
         <item name="oemColorPrimaryContainer">?com.android.oem.tokens:attr/colorPrimaryContainer</item>
