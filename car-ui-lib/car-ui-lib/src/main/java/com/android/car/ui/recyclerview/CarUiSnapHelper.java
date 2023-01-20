@@ -37,7 +37,7 @@ import java.util.Objects;
  * RecyclerView is scrolling horizontally.
  */
 @VisibleForTesting
-/* package */ public class CarUiSnapHelper extends LinearSnapHelper {
+public class CarUiSnapHelper extends LinearSnapHelper {
     /**
      * The percentage of a View that needs to be completely visible for it to be a viable snap
      * target.
