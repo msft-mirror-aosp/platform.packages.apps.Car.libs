@@ -31,7 +31,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/car_ui_shortcuts_contentView"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="wrap_content"
         android:focusable="true"
         android:layout_gravity="center"
         android:paddingBottom="24dp"
