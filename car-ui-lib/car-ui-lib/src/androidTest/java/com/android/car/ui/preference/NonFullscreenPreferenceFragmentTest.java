@@ -21,13 +21,15 @@ import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static com.android.car.ui.matchers.ViewMatchers.withPadding;
 import static com.android.car.ui.matchers.ViewMatchers.withPaddingAtLeast;
+
+import static org.hamcrest.CoreMatchers.endsWith;
 
 import android.content.Context;
 import android.content.Intent;
@@ -40,7 +42,6 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.ListPreference;
 import androidx.preference.MultiSelectListPreference;
 import androidx.preference.PreferenceScreen;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.platform.app.InstrumentationRegistry;
 
@@ -48,6 +49,7 @@ import com.android.car.ui.baselayout.Insets;
 import com.android.car.ui.baselayout.InsetsChangedListener;
 import com.android.car.ui.core.CarUi;
 import com.android.car.ui.matchers.PaddingMatcher.Side;
+import com.android.car.ui.recyclerview.CarUiRecyclerViewImpl;
 import com.android.car.ui.toolbar.ToolbarController;
 
 import org.junit.Test;
@@ -68,20 +70,20 @@ public class NonFullscreenPreferenceFragmentTest {
                      ActivityScenario.launch(MyActivity.newIntent(true))) {
             onView(withText(TOOLBAR_DEFAULT_TEXT)).check(doesNotExist());
             onView(withText(PREFERENCE_SCREEN_TITLE)).check(matches(isDisplayed()));
-            onView(isAssignableFrom(RecyclerView.class)).check(
+            onView(withClassName(endsWith(CarUiRecyclerViewImpl.class.getName()))).check(
                     matches(withPaddingAtLeast(Side.TOP, 1)));
 
             onView(withText(MULTI_SELECT_LIST_PREFERENCE_TITLE)).perform(click());
             onView(withText(MULTI_SELECT_LIST_PREFERENCE_TITLE)).check(matches(isDisplayed()));
             onView(withText(ITEMS[0])).check(matches(isDisplayed()));
-            onView(isAssignableFrom(RecyclerView.class)).check(
+            onView(withClassName(endsWith(CarUiRecyclerViewImpl.class.getName()))).check(
                     matches(withPaddingAtLeast(Side.TOP, 1)));
             onView(withContentDescription(BACK_CONTENT_DESCRIPTION)).perform(click());
 
             onView(withText(LIST_PREFERENCE_TITLE)).perform(click());
             onView(withText(LIST_PREFERENCE_TITLE)).check(matches(isDisplayed()));
             onView(withText(ITEMS[0])).check(matches(isDisplayed()));
-            onView(isAssignableFrom(RecyclerView.class)).check(
+            onView(withClassName(endsWith(CarUiRecyclerViewImpl.class.getName()))).check(
                     matches(withPaddingAtLeast(Side.TOP, 1)));
             onView(withContentDescription(BACK_CONTENT_DESCRIPTION)).perform(click());
         }
@@ -93,13 +95,15 @@ public class NonFullscreenPreferenceFragmentTest {
                      ActivityScenario.launch(MyActivity.newIntent(false))) {
             onView(withText(TOOLBAR_DEFAULT_TEXT)).check(matches(isDisplayed()));
             onView(withText(PREFERENCE_SCREEN_TITLE)).check(doesNotExist());
-            onView(isAssignableFrom(RecyclerView.class)).check(matches(withPadding(Side.TOP, 0)));
+            onView(withClassName(endsWith(CarUiRecyclerViewImpl.class.getName()))).check(
+                    matches(withPadding(Side.TOP, 0)));
 
             onView(withText(MULTI_SELECT_LIST_PREFERENCE_TITLE)).perform(click());
             onView(withText(MULTI_SELECT_LIST_PREFERENCE_TITLE)).check(doesNotExist());
             onView(withText(TOOLBAR_DEFAULT_TEXT)).check(matches(isDisplayed()));
             onView(withText(ITEMS[0])).check(matches(isDisplayed()));
-            onView(isAssignableFrom(RecyclerView.class)).check(matches(withPadding(Side.TOP, 0)));
+            onView(withClassName(endsWith(CarUiRecyclerViewImpl.class.getName()))).check(
+                    matches(withPadding(Side.TOP, 0)));
             onView(withContentDescription(BACK_CONTENT_DESCRIPTION)).check(doesNotExist());
             pressBack();
 
@@ -107,7 +111,8 @@ public class NonFullscreenPreferenceFragmentTest {
             onView(withText(LIST_PREFERENCE_TITLE)).check(doesNotExist());
             onView(withText(TOOLBAR_DEFAULT_TEXT)).check(matches(isDisplayed()));
             onView(withText(ITEMS[0])).check(matches(isDisplayed()));
-            onView(isAssignableFrom(RecyclerView.class)).check(matches(withPadding(Side.TOP, 0)));
+            onView(withClassName(endsWith(CarUiRecyclerViewImpl.class.getName()))).check(
+                    matches(withPadding(Side.TOP, 0)));
             onView(withContentDescription(BACK_CONTENT_DESCRIPTION)).check(doesNotExist());
             pressBack();
         }
