@@ -137,7 +137,9 @@ public class CarUiRecyclerViewTest {
     public static Object[] data() {
         // It's important to do no plugin first, so that the plugin will
         // still be enabled when this test finishes
-        return new Object[]{false};
+        // TODO b/266150495 Fix plugin tests
+        // Temporarily disabling plugin tests due to conflicting resource loading of proxy-plugin
+        return new Object[]{false/*, true*/};
     }
 
     @Rule
