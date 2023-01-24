@@ -74,30 +74,12 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
         }
     }
 
-    /**
-     * An hack used to show the dialogs in Immersive Mode (that is with the NavBar hidden). To
-     * obtain this, the method makes the dialog not focusable before showing it, change the UI
-     * visibility of the window like the owner activity of the dialog and then (after showing it)
-     * makes the dialog focusable again.
-     */
-    @Override
-    public void show() {
-        // Set the dialog to not focusable.
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-
-        copySystemUiVisibility();
-
-        super.show();
-
-        // Set the dialog to focusable again.
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-    }
 
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
         copyWindowInsets();
+        copySystemUiVisibility();
     }
 
     /**
