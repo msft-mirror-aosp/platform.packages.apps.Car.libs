@@ -35,7 +35,7 @@ public class RangeFilterImpl implements RangeFilter {
 
     private int mUnlimitedCount;
     @VisibleForTesting
-    public int mPivotIndex;
+    int mPivotIndex;
     private final ListRange mRange = new ListRange();
 
     /**
@@ -180,31 +180,31 @@ public class RangeFilterImpl implements RangeFilter {
     }
 
     @VisibleForTesting
-    public ListRange getRange() {
+    ListRange getRange() {
         return mRange;
     }
 
     /** Represents a portion of the unfiltered list. */
-    public static class ListRange {
+    static class ListRange {
         public static final int INVALID_INDEX = -1;
 
         @VisibleForTesting
         /* In original data, inclusive. */
-        public int mStartIndex;
+                int mStartIndex;
         @VisibleForTesting
         /* In original data, exclusive. */
-        public int mEndIndex;
+                int mEndIndex;
 
         @VisibleForTesting
         /* 1 when clamped, otherwise 0. */
-        public int mClampedHead;
+                int mClampedHead;
         @VisibleForTesting
         /* 1 when clamped, otherwise 0. */
-        public int mClampedTail;
+                int mClampedTail;
 
         @VisibleForTesting
         /* The count of the resulting elements, including the truncation message(s). */
-        public int mLimitedCount;
+                int mLimitedCount;
 
         /**
          * Deep copy from a ListRange.

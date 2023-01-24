@@ -47,8 +47,7 @@ import com.android.car.ui.utils.CarUiUtils;
  * <p>Inspired by {@code androidx.car.widget.PagedListView}. Most pagination and scrolling logic
  * has been ported from the PLV with minor updates.
  */
-@VisibleForTesting
-public class DefaultScrollBar implements ScrollBar {
+class DefaultScrollBar implements ScrollBar {
     private final SparseArray<Integer> mChildHeightByAdapterPosition = new SparseArray();
     private final Handler mHandler = new Handler(Looper.getMainLooper());
     private final Interpolator mPaginationInterpolator = new AccelerateDecelerateInterpolator();
@@ -606,47 +605,47 @@ public class DefaultScrollBar implements ScrollBar {
     }
 
     @VisibleForTesting
-    public LayoutManager getLayoutManager() {
+    LayoutManager getLayoutManager() {
         return getRecyclerView().getLayoutManager();
     }
 
     @VisibleForTesting
-    public void smoothScrollToPosition(int max) {
+    void smoothScrollToPosition(int max) {
         getRecyclerView().smoothScrollToPosition(max);
     }
 
     @VisibleForTesting
-    public void smoothScrollBy(int dx, int dy) {
+    void smoothScrollBy(int dx, int dy) {
         getRecyclerView().smoothScrollBy(dx, dy);
     }
 
     @VisibleForTesting
-    public int computeVerticalScrollRange() {
+    int computeVerticalScrollRange() {
         return getRecyclerView().computeVerticalScrollRange();
     }
 
     @VisibleForTesting
-    public int computeVerticalScrollOffset() {
+    int computeVerticalScrollOffset() {
         return getRecyclerView().computeVerticalScrollOffset();
     }
 
     @VisibleForTesting
-    public int computeVerticalScrollExtent() {
+    int computeVerticalScrollExtent() {
         return getRecyclerView().computeVerticalScrollExtent();
     }
 
     @VisibleForTesting
-    public int computeHorizontalScrollRange() {
+    int computeHorizontalScrollRange() {
         return getRecyclerView().computeHorizontalScrollRange();
     }
 
     @VisibleForTesting
-    public int computeHorizontalScrollOffset() {
+    int computeHorizontalScrollOffset() {
         return getRecyclerView().computeHorizontalScrollOffset();
     }
 
     @VisibleForTesting
-    public int computeHorizontalScrollExtent() {
+    int computeHorizontalScrollExtent() {
         return getRecyclerView().computeHorizontalScrollExtent();
     }
 }

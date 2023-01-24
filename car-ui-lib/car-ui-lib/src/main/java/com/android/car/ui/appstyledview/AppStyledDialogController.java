@@ -65,7 +65,7 @@ public final class AppStyledDialogController {
     }
 
     @VisibleForTesting
-    public void setAppStyledViewController(AppStyledViewController controller, Activity context) {
+    void setAppStyledViewController(AppStyledViewController controller, Activity context) {
         mAppStyledViewController = controller;
         mDialog = new AppStyledDialog(context, mAppStyledViewController);
     }

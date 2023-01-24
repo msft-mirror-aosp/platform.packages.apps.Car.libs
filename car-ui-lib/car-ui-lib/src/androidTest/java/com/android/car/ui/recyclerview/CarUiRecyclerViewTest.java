@@ -2691,17 +2691,17 @@ public class CarUiRecyclerViewTest {
         }
 
         @Override
-        public void smoothScrollBy(int dx, int dy) {
+        void smoothScrollBy(int dx, int dy) {
             mScrollWasCalled = true;
         }
 
         @Override
-        public void smoothScrollToPosition(int max) {
+        void smoothScrollToPosition(int max) {
             mScrollWasCalled = true;
         }
 
         @Override
-        public int computeVerticalScrollOffset() {
+        int computeVerticalScrollOffset() {
             return mReturnZeroVerticalScrollOffset ? 0 : super.computeVerticalScrollOffset();
         }
     }

@@ -19,7 +19,6 @@ import android.content.pm.PackageInfo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 
 /**
  * This is a data class that represents a particular plugin. It can be used
@@ -44,9 +43,7 @@ public final class PluginSpecifier {
         return new Builder();
     }
 
-    /** Returns {@code true} if package matches this specifier's package */
-    @VisibleForTesting
-    public boolean matches(@NonNull PackageInfo packageInfo) {
+    /* package */ boolean matches(@NonNull PackageInfo packageInfo) {
         boolean nameMatches = mPackageName == null
                 || mPackageName.equals(packageInfo.packageName);
         boolean versionMatches = mMaxVersion == null
