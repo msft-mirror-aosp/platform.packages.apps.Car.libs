@@ -114,10 +114,15 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
             return;
         }
 
-        // Configure the behavior of the hidden system bars to match requesting activity
-        dialogWindowInsetsController.setSystemBarsBehavior(
-                activityWindowInsetsController.getSystemBarsBehavior()
-        );
+        int activitySystemBarBehavior = activityWindowInsetsController.getSystemBarsBehavior();
+        // Only set system bar behavior when non-default settings are required. Setting default may
+        // overwrite flags set by deprecated methods with different defaults.
+        if (activitySystemBarBehavior != 0) {
+            // Configure the behavior of the hidden system bars to match requesting activity
+            dialogWindowInsetsController.setSystemBarsBehavior(
+                    activityWindowInsetsController.getSystemBarsBehavior()
+            );
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // Configure nav bar visibility to match requesting activity
