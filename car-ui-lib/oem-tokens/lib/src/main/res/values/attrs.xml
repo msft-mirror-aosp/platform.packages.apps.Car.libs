@@ -130,5 +130,21 @@
         <attr name="oemColorNeutralVariantPalette20" format="color" />
         <attr name="oemColorNeutralVariantPalette10" format="color" />
         <attr name="oemColorNeutralVariantPalette0" format="color" />
+
+        <attr name="oemTextAppearanceDisplayLarge" format="reference" />
+        <attr name="oemTextAppearanceDisplayMedium" format="reference" />
+        <attr name="oemTextAppearanceDisplaySmall" format="reference" />
+        <attr name="oemTextAppearanceHeadlineLarge" format="reference" />
+        <attr name="oemTextAppearanceHeadlineMedium" format="reference" />
+        <attr name="oemTextAppearanceHeadlineSmall" format="reference" />
+        <attr name="oemTextAppearanceTitleLarge" format="reference" />
+        <attr name="oemTextAppearanceTitleMedium" format="reference" />
+        <attr name="oemTextAppearanceTitleSmall" format="reference" />
+        <attr name="oemTextAppearanceLabelLarge" format="reference" />
+        <attr name="oemTextAppearanceLabelMedium" format="reference" />
+        <attr name="oemTextAppearanceLabelSmall" format="reference" />
+        <attr name="oemTextAppearanceBodyLarge" format="reference" />
+        <attr name="oemTextAppearanceBodyMedium" format="reference" />
+        <attr name="oemTextAppearanceBodySmall" format="reference" />
     </declare-styleable>
 </resources>

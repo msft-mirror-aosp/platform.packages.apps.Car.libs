@@ -116,4 +116,19 @@
     <public name="colorNeutralVariantPalette20" id="0x00770063" type="attr" />
     <public name="colorNeutralVariantPalette10" id="0x00770064" type="attr" />
     <public name="colorNeutralVariantPalette0" id="0x00770065" type="attr" />
+    <public name="textAppearanceDisplayLarge" id="0x00770066" type="attr" />
+    <public name="textAppearanceDisplayMedium" id="0x00770067" type="attr" />
+    <public name="textAppearanceDisplaySmall" id="0x00770068" type="attr" />
+    <public name="textAppearanceHeadlineLarge" id="0x00770069" type="attr" />
+    <public name="textAppearanceHeadlineMedium" id="0x0077006A" type="attr" />
+    <public name="textAppearanceHeadlineSmall" id="0x0077006B" type="attr" />
+    <public name="textAppearanceTitleLarge" id="0x0077006C" type="attr" />
+    <public name="textAppearanceTitleMedium" id="0x0077006D" type="attr" />
+    <public name="textAppearanceTitleSmall" id="0x0077006E" type="attr" />
+    <public name="textAppearanceLabelLarge" id="0x0077006F" type="attr" />
+    <public name="textAppearanceLabelMedium" id="0x00770070" type="attr" />
+    <public name="textAppearanceLabelSmall" id="0x00770071" type="attr" />
+    <public name="textAppearanceBodyLarge" id="0x00770072" type="attr" />
+    <public name="textAppearanceBodyMedium" id="0x00770073" type="attr" />
+    <public name="textAppearanceBodySmall" id="0x00770074" type="attr" />
 </resources>
