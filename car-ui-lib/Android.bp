@@ -103,6 +103,30 @@ android_library {
     ],
 }
 
+java_genrule {
+    name: "car-ui-lib-no-overlayable-aar",
+    srcs: [
+        ":car-ui-lib-source-no-overlayable{.aar}",
+        "car-ui-lib/src/main/res/**/*",
+        "car-ui-lib/src/main/res-private/**/*",
+        "car-rotary-lib/src/main/res/**/*",
+    ],
+    out: ["car-ui-lib-no-overlayable.aar"],
+    tools: [
+        "make_slim_aar",
+    ],
+    cmd: "dir=packages/apps/Car/libs/car-ui-lib && " +
+        "$(location make_slim_aar) --classes-allowlist com/android/car/ui $(out) " +
+        "$(location :car-ui-lib-source-no-overlayable{.aar}) " +
+        "$$dir/car-ui-lib/src/main/res $$dir/car-ui-lib/src/main/res-private " +
+        "$$dir/car-rotary-lib/src/main/res " +
+        "--proguard-files $$dir/car-ui-lib/proguard-rules.pro " +
+        "$$dir/car-ui-lib/proguard-rules-platform.pro",
+    dist: {
+        targets: ["car-ui-lib-no-overlayable-aar",]
+    },
+}
+
 android_library {
     name: "car-ui-lib-source",
 
@@ -137,6 +161,7 @@ java_genrule {
         "car-ui-lib/src/main/res-overlayable/**/*",
         "car-ui-lib/src/main/res-private/**/*",
         "car-rotary-lib/src/main/res/**/*",
+        "car-rotary-lib/src/main/res-overlayable/**/*",
     ],
     out: ["car-ui-lib.aar"],
     tools: [
@@ -147,6 +172,7 @@ java_genrule {
         "$(location :car-ui-lib-source{.aar}) " +
         "$$dir/car-ui-lib/src/main/res $$dir/car-ui-lib/src/main/res-overlayable " +
         "$$dir/car-ui-lib/src/main/res-private $$dir/car-rotary-lib/src/main/res " +
+        "$$dir/car-rotary-lib/src/main/res-overlayable " +
         "--proguard-files $$dir/car-ui-lib/proguard-rules.pro " +
         "$$dir/car-ui-lib/proguard-rules-platform.pro",
     dist: {
