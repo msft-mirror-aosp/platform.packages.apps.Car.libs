@@ -17,7 +17,7 @@ package {
 }
 
 java_library {
-    name: "car-ui-lib-oem-apis-jar",
+    name: "car-ui-lib-oem-apis-source",
 
     min_sdk_version: "28",
     target_sdk_version: "30",

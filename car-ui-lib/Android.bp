@@ -94,7 +94,7 @@ android_library {
     },
     libs: [
         "android.car-stubs",
-        "car-ui-lib-oem-apis-jar",
+        "car-ui-lib-oem-apis-source",
     ],
     static_libs: ["car-ui-lib-resources",] + car_ui_lib_static_libs,
     apex_available: [
@@ -144,7 +144,7 @@ android_library {
     },
     libs: [
         "android.car-stubs",
-        "car-ui-lib-oem-apis-jar",
+        "car-ui-lib-oem-apis-source",
     ],
     static_libs: ["car-ui-lib-overlayable-resources",] + car_ui_lib_static_libs,
     apex_available: [
