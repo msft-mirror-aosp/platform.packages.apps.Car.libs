@@ -18,78 +18,100 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:theme="@style/AppStyledDialogThemeSample">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-  <TextView android:id="@+id/loginscrn"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="80dp"
-      android:text="ScrollView"
-      android:textSize="25dp"
-      android:textStyle="bold"
-      android:layout_gravity="center"/>
-  <TextView android:id="@+id/fstTxt"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="20dp"
-      android:text="Welcome"
-      android:layout_gravity="center"/>
-  <Button android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:background="@drawable/button_background_for_rotary"
-      android:layout_marginTop="60dp"
-      android:text="Button One" />
-  <Button android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:background="@drawable/button_background_for_rotary"
-      android:layout_marginTop="60dp"
-      android:text="Button Two" />
-  <Button android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:background="@drawable/button_background_for_rotary"
-      android:layout_marginTop="60dp"
-      android:text="Button Three" />
-  <Button android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:background="@drawable/button_background_for_rotary"
-      android:layout_gravity="center"
-      android:layout_marginTop="60dp"
-      android:text="Button Four" />
-  <Button android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:background="@drawable/button_background_for_rotary"
-      android:layout_gravity="center"
-      android:layout_marginTop="60dp"
-      android:text="Button Five" />
-  <Button android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:background="@drawable/button_background_for_rotary"
-      android:layout_marginTop="60dp"
-      android:text="Button Six" />
-  <Button android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:background="@drawable/button_background_for_rotary"
-      android:layout_gravity="center"
-      android:layout_marginTop="60dp"
-      android:text="Button Seven" />
-  <Button android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:background="@drawable/button_background_for_rotary"
-      android:layout_gravity="center"
-      android:layout_marginTop="60dp"
-      android:text="Button Eight" />
-  <Button android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:background="@drawable/button_background_for_rotary"
-      android:layout_gravity="center"
-      android:layout_marginTop="60dp"
-      android:text="Button Nine" />
-</LinearLayout>
+      <TextView
+          android:id="@+id/loginscrn"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center"
+          android:layout_marginTop="80dp"
+          android:text="ScrollView"
+          android:textSize="25dp"
+          android:textStyle="bold" />
+
+      <TextView
+          android:id="@+id/fstTxt"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center"
+          android:layout_marginTop="20dp"
+          android:text="Welcome" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="60dp"
+            android:background="@drawable/button_background_for_rotary"
+            android:text="Button One" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="60dp"
+            android:background="@drawable/button_background_for_rotary"
+            android:text="Button Two" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="60dp"
+            android:background="@drawable/button_background_for_rotary"
+            android:text="Button Three" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="60dp"
+            android:background="@drawable/button_background_for_rotary"
+            android:text="Button Four" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="60dp"
+            android:background="@drawable/button_background_for_rotary"
+            android:text="Button Five" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="60dp"
+            android:background="@drawable/button_background_for_rotary"
+            android:text="Button Six" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="60dp"
+            android:background="@drawable/button_background_for_rotary"
+            android:text="Button Seven" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="60dp"
+            android:background="@drawable/button_background_for_rotary"
+            android:text="Button Eight" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="60dp"
+            android:background="@drawable/button_background_for_rotary"
+            android:text="Button Nine" />
+    </LinearLayout>
 </com.android.car.ui.FocusArea>

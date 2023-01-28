@@ -18,6 +18,8 @@ package com.android.car.ui.appstyledview;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -152,6 +154,32 @@ public final class AppStyledDialogController {
      */
     public int getContentAreaHeight() {
         return mAppStyledViewController.getContentAreaHeight();
+    }
+
+    /**
+     * Returns a {@link Context} with a {@link Configuration} set to values that align with the
+     * sizing of the content area of the AppStyledView to better facilitate resource loading
+     * appropriate for the size onf the content area.
+     */
+    public Context createContentViewConfigurationContext(Context context) {
+        int width = getContentAreaWidth();
+        if (width == -1) {
+            int widthPx = getAppStyledViewDialogWidth();
+            width = (int) (widthPx / context.getResources().getDisplayMetrics().density);
+        }
+
+        int height = getContentAreaHeight();
+        if (height == -1) {
+            int heightPx = getAppStyledViewDialogHeight();
+            height = (int) (heightPx / context.getResources().getDisplayMetrics().density);
+        }
+
+        Configuration config = context.getResources().getConfiguration();
+        config.smallestScreenWidthDp = Math.min(width, height);
+        config.screenWidthDp = width;
+        config.screenHeightDp = height;
+        Context configContext = context.createConfigurationContext(config);
+        return new ContextThemeWrapper(configContext, context.getTheme());
     }
 
     @VisibleForTesting
