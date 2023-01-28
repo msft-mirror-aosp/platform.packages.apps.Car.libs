@@ -31,8 +31,7 @@ import com.android.car.ui.appstyledview.AppStyledRecyclerViewAdapter.AppStyledRe
 /**
  * Adapter for app styled dialog.
  */
-public class AppStyledRecyclerViewAdapter extends
-        RecyclerView.Adapter<AppStyledRecyclerViewHolder> {
+class AppStyledRecyclerViewAdapter extends RecyclerView.Adapter<AppStyledRecyclerViewHolder> {
     @Nullable
     private final View mContent;
 
