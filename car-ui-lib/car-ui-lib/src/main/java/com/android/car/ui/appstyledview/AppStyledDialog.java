@@ -39,7 +39,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
  * layout and add the view provided by the application into the layout. Everything other than the
  * view within the layout can be customized by OEM.
  * <p>
- * Apps should not use this directly. App's should use {@link AppStyledDialogController}.
+ * Apps should not use this directly. Apps should use {@link AppStyledDialogController}.
  */
 class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListener {
     private final AppStyledViewController mController;

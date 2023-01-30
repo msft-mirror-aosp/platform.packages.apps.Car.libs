@@ -34,6 +34,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.ui.CarUiLayoutInflaterFactory;
 import com.android.car.ui.R;
+import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
+
 
 /**
  * Controller to interact with the app styled view.
@@ -42,10 +44,12 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
     private static final double VISIBLE_SCREEN_PERCENTAGE = 0.9;
 
     private final Context mContext;
-    @AppStyledViewNavIcon
+    @NavIcon
     private int mAppStyleViewNavIcon;
-    @Nullable private Runnable mAppStyledVCloseClickListener;
-    @Nullable private View mAppStyledView;
+    @Nullable
+    private Runnable mAppStyledVCloseClickListener;
+    @Nullable
+    private View mAppStyledView;
     private int mWidth;
     private int mHeight;
 
@@ -54,10 +58,9 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
     }
 
     @Override
-    public void setNavIcon(@AppStyledViewNavIcon int navIcon) {
+    public void setNavIcon(@NavIcon int navIcon) {
         mAppStyleViewNavIcon = navIcon;
         updateNavIcon();
-
     }
 
     /**
@@ -167,9 +170,9 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
         }
 
         ImageView close = mAppStyledView.findViewById(R.id.car_ui_app_styled_view_icon_close);
-        if (mAppStyleViewNavIcon == AppStyledViewNavIcon.BACK) {
+        if (mAppStyleViewNavIcon == NavIcon.BACK) {
             close.setImageResource(R.drawable.car_ui_icon_arrow_back);
-        } else if (mAppStyleViewNavIcon == AppStyledViewNavIcon.CLOSE) {
+        } else if (mAppStyleViewNavIcon == NavIcon.CLOSE) {
             close.setImageResource(R.drawable.car_ui_icon_close);
         } else {
             close.setImageResource(R.drawable.car_ui_icon_close);
