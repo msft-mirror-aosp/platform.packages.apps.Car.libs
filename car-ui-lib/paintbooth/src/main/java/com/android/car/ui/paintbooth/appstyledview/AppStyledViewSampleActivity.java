@@ -15,11 +15,7 @@
  */
 package com.android.car.ui.paintbooth.appstyledview;
 
-import android.content.Context;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -56,19 +52,8 @@ public class AppStyledViewSampleActivity extends AppCompatActivity {
         toolbar.setLogo(R.drawable.ic_launcher);
 
         mAppStyledDialogController = new AppStyledDialogController(this);
-        int width = mAppStyledDialogController.getContentAreaWidth();
-        Resources resources = getResources();
-        Configuration config = resources.getConfiguration();
-
-        config.smallestScreenWidthDp = width;
-        // fake the min screen size so resources load from the corresponding folders. For eg.
-        // layout-sw400dp
-        Context testContext = createConfigurationContext(config);
-
-        Context contextThemeWrapper = new ContextThemeWrapper(testContext,
-                R.style.AppStyledDialogThemeSample);
-
-        View appStyledTestView = LayoutInflater.from(contextThemeWrapper)
+        View appStyledTestView = LayoutInflater.from(
+                        mAppStyledDialogController.createContentViewConfigurationContext(this))
                 .inflate(R.layout.app_styled_view_test_sample, null, false);
 
         mAppStyledDialogController.setOnNavIconClickListener(
