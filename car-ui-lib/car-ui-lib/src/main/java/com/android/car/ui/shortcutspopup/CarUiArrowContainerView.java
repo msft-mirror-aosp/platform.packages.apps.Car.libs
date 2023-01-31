@@ -39,6 +39,7 @@ import androidx.annotation.GravityInt;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.android.car.ui.R;
 
@@ -57,6 +58,9 @@ import com.android.car.ui.R;
  * Arrow Path uses the space of view {@code CarUiArrowContainerView#mArrowViewSpace},
  * Its width is defined by: {@code CarUiArrowContainerView#mArrowWidth}
  * and Height: {@code CarUiArrowContainerView#mArrowHeight}
+ *
+ * @attr com.android.car.ui.R.styleable#CarUiArrowContainerView_carUiContentView is required to
+ * instantiate class {@code CarUiArrowContainerView}
  * </p>
  *
  * <p>
@@ -107,18 +111,25 @@ public class CarUiArrowContainerView extends LinearLayout {
     private static final int[] DISABLED_ATTR_STATE = new int[]{-android.R.attr.enabled};
 
 
-    public CarUiArrowContainerView(@NonNull Context context) {
+
+    /** Prevent instantiating without attrs */
+    private CarUiArrowContainerView(@NonNull Context context) {
         super(context);
     }
 
-    public CarUiArrowContainerView(@NonNull Context context,
-            @Nullable AttributeSet attrs) {
+    public CarUiArrowContainerView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        init(context, attrs);
+    }
 
+    private void init(@NonNull Context context, @Nullable AttributeSet attrs) {
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs,
                 R.styleable.CarUiArrowContainerView, 0, 0);
         mHasArrow = a.getBoolean(R.styleable.CarUiArrowContainerView_carUiHasArrow, false);
-        mArrowColorState = a.getColorStateList(R.styleable.CarUiArrowContainerView_carUiArrowColor);
+        mArrowColorState = a.hasValue(R.styleable.CarUiArrowContainerView_carUiArrowColor)
+                ? a.getColorStateList(R.styleable.CarUiArrowContainerView_carUiArrowColor)
+                : ContextCompat.getColorStateList(getContext(),
+                R.color.car_ui_shortcuts_arrow_color);
         mArrowWidth = a.getDimension(R.styleable.CarUiArrowContainerView_carUiArrowWidth, 0);
         mArrowHeight = a.getDimension(R.styleable.CarUiArrowContainerView_carUiArrowHeight, 0);
         mArrowRadius = a.getDimension(R.styleable.CarUiArrowContainerView_carUiArrowRadius, 0);
@@ -128,9 +139,15 @@ public class CarUiArrowContainerView extends LinearLayout {
                 ARROW_DEFAULT_GRAVITY) & ARROW_GRAVITY_LEFT) == ARROW_GRAVITY_LEFT;
         mArrowGravityTop = (a.getInt(R.styleable.CarUiArrowContainerView_carUiArrowGravity,
                 ARROW_DEFAULT_GRAVITY) & ARROW_GRAVITY_TOP) == ARROW_GRAVITY_TOP;
+        if (!a.hasValue(R.styleable.CarUiArrowContainerView_carUiContentView)) {
+            throw new IllegalStateException("Attribute app:carUiContentView must be specified "
+                    + "when using CarUiArrowContainerView");
+        }
         mContentViewId = a.getResourceId(R.styleable.CarUiArrowContainerView_carUiContentView, 0);
         mContentDrawableId = a.getResourceId(
-                R.styleable.CarUiArrowContainerView_carUiContentViewDrawable, 0);
+                R.styleable.CarUiArrowContainerView_carUiContentViewDrawable,
+                R.drawable.car_ui_shortcuts_rounded_selector);
+
         mPaint.setColor(mArrowColorState.getDefaultColor());
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setAntiAlias(true);
