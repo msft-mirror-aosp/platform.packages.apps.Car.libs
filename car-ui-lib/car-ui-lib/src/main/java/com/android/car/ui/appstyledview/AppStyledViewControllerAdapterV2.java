@@ -78,4 +78,9 @@ public class AppStyledViewControllerAdapterV2 implements AppStyledViewController
     public int getContentAreaHeight() {
         return mOemController.getContentAreaHeight();
     }
+
+    @Override
+    public void setSceneType(int sceneType) {
+        // Do nothing. Scene type not supported in AppStyledViewControllerOEMV2.
+    }
 }

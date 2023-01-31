@@ -70,7 +70,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * This class is an wrapper around {@link PluginFactoryOEMV3} that implements {@link PluginFactory},
+ * This class is a wrapper around {@link PluginFactoryOEMV3} that implements {@link PluginFactory},
  * to provide a version-agnostic way of interfacing with the OEM's PluginFactory.
  */
 @SuppressWarnings("AndroidJdkLibsChecker")

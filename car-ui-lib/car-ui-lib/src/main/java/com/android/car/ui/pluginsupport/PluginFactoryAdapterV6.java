@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 The Android Open Source Project
+ * Copyright (C) 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,23 +34,24 @@ import com.android.car.ui.FocusParkingView;
 import com.android.car.ui.FocusParkingViewAdapterV1;
 import com.android.car.ui.R;
 import com.android.car.ui.appstyledview.AppStyledViewController;
-import com.android.car.ui.appstyledview.AppStyledViewControllerAdapterV1;
+import com.android.car.ui.appstyledview.AppStyledViewControllerAdapterV3;
 import com.android.car.ui.appstyledview.AppStyledViewControllerImpl;
 import com.android.car.ui.baselayout.Insets;
 import com.android.car.ui.baselayout.InsetsChangedListener;
+import com.android.car.ui.plugin.oemapis.Consumer;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
-import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV2;
+import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6;
 import com.android.car.ui.plugin.oemapis.TextOEMV1;
-import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV1;
+import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
-import com.android.car.ui.plugin.oemapis.recyclerview.ContentListItemOEMV1;
+import com.android.car.ui.plugin.oemapis.recyclerview.ContentListItemOEMV2;
 import com.android.car.ui.plugin.oemapis.recyclerview.HeaderListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.LayoutStyleOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.ListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewAttributesOEMV1;
-import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewOEMV1;
+import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewOEMV2;
 import com.android.car.ui.plugin.oemapis.recyclerview.ViewHolderOEMV1;
-import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV1;
+import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV2;
 import com.android.car.ui.recyclerview.CarUiContentListItem;
 import com.android.car.ui.recyclerview.CarUiHeaderListItem;
 import com.android.car.ui.recyclerview.CarUiLayoutStyle;
@@ -58,31 +59,28 @@ import com.android.car.ui.recyclerview.CarUiListItem;
 import com.android.car.ui.recyclerview.CarUiListItemAdapterAdapterV1;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.recyclerview.CarUiRecyclerView.CarUiRecyclerViewLayout;
-import com.android.car.ui.recyclerview.RecyclerViewAdapterV1;
+import com.android.car.ui.recyclerview.RecyclerViewAdapterV2;
 import com.android.car.ui.toolbar.ToolbarController;
-import com.android.car.ui.toolbar.ToolbarControllerAdapterV1;
+import com.android.car.ui.toolbar.ToolbarControllerAdapterV2;
 import com.android.car.ui.utils.CarUiUtils;
 import com.android.car.ui.widget.CarUiTextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
- * This class is a wrapper around {@link PluginFactoryOEMV2} that implements {@link PluginFactory},
+ * This class is a wrapper around {@link PluginFactoryOEMV6} that implements {@link PluginFactory},
  * to provide a version-agnostic way of interfacing with the OEM's PluginFactory.
  */
-@SuppressWarnings("AndroidJdkLibsChecker")
-public final class PluginFactoryAdapterV2 implements PluginFactory {
+public final class PluginFactoryAdapterV6 implements PluginFactory {
     @NonNull
-    private final PluginFactoryOEMV2 mOem;
+    private final PluginFactoryOEMV6 mOem;
     @NonNull
     private final PluginFactoryStub mFactoryStub = new PluginFactoryStub();
 
-    public PluginFactoryAdapterV2(@NonNull PluginFactoryOEMV2 oem) {
+    public PluginFactoryAdapterV6(@NonNull PluginFactoryOEMV6 oem) {
         mOem = oem;
-
         mOem.setRotaryFactories(
                 c -> new FocusParkingViewAdapterV1(new FocusParkingView(c)),
                 c -> new FocusAreaAdapterV1(new FocusArea(c)));
@@ -101,14 +99,14 @@ public final class PluginFactoryAdapterV2 implements PluginFactory {
                     insetsChangedListener, toolbarEnabled, fullscreen);
         }
 
-        ToolbarControllerOEMV1 toolbar = mOem.installBaseLayoutAround(
+        ToolbarControllerOEMV2 toolbar = mOem.installBaseLayoutAround(
                 contentView.getContext(),
                 contentView,
                 insets -> insetsChangedListener.onCarUiInsetsChanged(adaptInsets(insets)),
                 toolbarEnabled, fullscreen);
 
         if (toolbar != null) {
-            return new ToolbarControllerAdapterV1(contentView.getContext(), toolbar);
+            return new ToolbarControllerAdapterV2(contentView.getContext(), toolbar);
         }
 
         if (toolbarEnabled) {
@@ -127,11 +125,11 @@ public final class PluginFactoryAdapterV2 implements PluginFactory {
 
     @Override
     public AppStyledViewController createAppStyledView(Context activityContext) {
-        AppStyledViewControllerOEMV1 appStyledViewControllerOEMV1 = mOem.createAppStyledView(
+        AppStyledViewControllerOEMV3 appStyledViewControllerOEMV3 = mOem.createAppStyledView(
                 activityContext);
-        return appStyledViewControllerOEMV1 == null ? new AppStyledViewControllerImpl(
-                activityContext) : new AppStyledViewControllerAdapterV1(
-                appStyledViewControllerOEMV1);
+        return appStyledViewControllerOEMV3 == null ? new AppStyledViewControllerImpl(
+                activityContext) : new AppStyledViewControllerAdapterV3(
+                appStyledViewControllerOEMV3);
     }
 
     private Insets adaptInsets(InsetsOEMV1 insetsOEM) {
@@ -143,9 +141,9 @@ public final class PluginFactoryAdapterV2 implements PluginFactory {
     public CarUiRecyclerView createRecyclerView(@NonNull Context context,
             @Nullable AttributeSet attrs) {
         RecyclerViewAttributesOEMV1 oemAttrs = from(context, attrs);
-        RecyclerViewOEMV1 oemRecyclerView = mOem.createRecyclerView(context, oemAttrs);
+        RecyclerViewOEMV2 oemRecyclerView = mOem.createRecyclerView(context, oemAttrs);
         if (oemRecyclerView != null) {
-            RecyclerViewAdapterV1 rv = new RecyclerViewAdapterV1(context, attrs, 0);
+            RecyclerViewAdapterV2 rv = new RecyclerViewAdapterV2(context, attrs, 0);
             rv.setOemRecyclerView(oemRecyclerView, oemAttrs);
             return rv;
         } else {
@@ -157,7 +155,7 @@ public final class PluginFactoryAdapterV2 implements PluginFactory {
     public RecyclerView.Adapter<? extends RecyclerView.ViewHolder> createListItemAdapter(
             List<? extends CarUiListItem> items) {
         List<ListItemOEMV1> oemItems = CarUiUtils.convertList(items,
-                PluginFactoryAdapterV2::toOemListItem);
+                PluginFactoryAdapterV6::toOemListItem);
 
         AdapterOEMV1<? extends ViewHolderOEMV1> oemAdapter = mOem.createListItemAdapter(oemItems);
 
@@ -172,7 +170,7 @@ public final class PluginFactoryAdapterV2 implements PluginFactory {
             public void onChanged() {
                 oemItems.clear();
                 oemItems.addAll(
-                        CarUiUtils.convertList(items, PluginFactoryAdapterV2::toOemListItem));
+                        CarUiUtils.convertList(items, PluginFactoryAdapterV6::toOemListItem));
             }
 
             @Override
@@ -468,7 +466,7 @@ public final class PluginFactoryAdapterV2 implements PluginFactory {
         } else if (item instanceof CarUiContentListItem) {
             CarUiContentListItem contentItem = (CarUiContentListItem) item;
 
-            ContentListItemOEMV1.Builder builder = new ContentListItemOEMV1.Builder(
+            ContentListItemOEMV2.Builder builder = new ContentListItemOEMV2.Builder(
                     toOemListItemAction(contentItem.getAction()));
 
             if (contentItem.getTitle() != null) {
@@ -483,7 +481,7 @@ public final class PluginFactoryAdapterV2 implements PluginFactory {
                     toOemListItemIconType(contentItem.getPrimaryIconType()));
 
             if (contentItem.getAction() == CarUiContentListItem.Action.ICON) {
-                Consumer<ContentListItemOEMV1> listener =
+                Consumer<ContentListItemOEMV2> listener =
                         contentItem.getSupplementalIconOnClickListener() != null
                                 ? oemItem ->
                                 contentItem.getSupplementalIconOnClickListener().onClick(
@@ -492,7 +490,7 @@ public final class PluginFactoryAdapterV2 implements PluginFactory {
             }
 
             if (contentItem.getOnClickListener() != null) {
-                Consumer<ContentListItemOEMV1> listener =
+                Consumer<ContentListItemOEMV2> listener =
                         contentItem.getOnClickListener() != null
                                 ? oemItem ->
                                 contentItem.getOnClickListener().onClick(contentItem) : null;
@@ -526,35 +524,35 @@ public final class PluginFactoryAdapterV2 implements PluginFactory {
         return oemLines;
     }
 
-    private static ContentListItemOEMV1.Action toOemListItemAction(
+    private static ContentListItemOEMV2.Action toOemListItemAction(
             CarUiContentListItem.Action action) {
         switch (action) {
             case NONE:
-                return ContentListItemOEMV1.Action.NONE;
+                return ContentListItemOEMV2.Action.NONE;
             case SWITCH:
-                return ContentListItemOEMV1.Action.SWITCH;
+                return ContentListItemOEMV2.Action.SWITCH;
             case CHECK_BOX:
-                return ContentListItemOEMV1.Action.CHECK_BOX;
+                return ContentListItemOEMV2.Action.CHECK_BOX;
             case RADIO_BUTTON:
-                return ContentListItemOEMV1.Action.RADIO_BUTTON;
+                return ContentListItemOEMV2.Action.RADIO_BUTTON;
             case ICON:
-                return ContentListItemOEMV1.Action.ICON;
+                return ContentListItemOEMV2.Action.ICON;
             case CHEVRON:
-                return ContentListItemOEMV1.Action.CHEVRON;
+                return ContentListItemOEMV2.Action.CHEVRON;
             default:
                 throw new IllegalStateException("Unexpected list item action type");
         }
     }
 
-    private static ContentListItemOEMV1.IconType toOemListItemIconType(
+    private static ContentListItemOEMV2.IconType toOemListItemIconType(
             CarUiContentListItem.IconType iconType) {
         switch (iconType) {
             case CONTENT:
-                return ContentListItemOEMV1.IconType.CONTENT;
+                return ContentListItemOEMV2.IconType.CONTENT;
             case STANDARD:
-                return ContentListItemOEMV1.IconType.STANDARD;
+                return ContentListItemOEMV2.IconType.STANDARD;
             case AVATAR:
-                return ContentListItemOEMV1.IconType.AVATAR;
+                return ContentListItemOEMV2.IconType.AVATAR;
             default:
                 throw new IllegalStateException("Unexpected list item icon type");
         }

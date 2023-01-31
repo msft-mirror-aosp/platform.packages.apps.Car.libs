@@ -513,6 +513,9 @@
   <public type="style" name="Widget.CarUi.AlertDialog.TitleContainer"/>
   <public type="style" name="Widget.CarUi.AppStyledView"/>
   <public type="style" name="Widget.CarUi.AppStyledView.WindowAnimations"/>
+  <public type="style" name="Widget.CarUi.AppStyledView.WindowAnimations.Enter"/>
+  <public type="style" name="Widget.CarUi.AppStyledView.WindowAnimations.Exit"/>
+  <public type="style" name="Widget.CarUi.AppStyledView.WindowAnimations.Intermediate"/>
   <public type="style" name="Widget.CarUi.Button"/>
   <public type="style" name="Widget.CarUi.Button.Borderless.Colored"/>
   <public type="style" name="Widget.CarUi.CarUiRecyclerView"/>
