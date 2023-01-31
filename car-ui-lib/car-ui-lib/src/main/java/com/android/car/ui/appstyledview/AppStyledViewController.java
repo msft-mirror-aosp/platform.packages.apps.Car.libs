@@ -25,6 +25,7 @@ import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
 
 import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
+import com.android.car.ui.appstyledview.AppStyledDialogController.SceneType;
 
 import java.lang.annotation.Retention;
 
@@ -90,4 +91,9 @@ public interface AppStyledViewController {
      * Returns the maximum height for content to be rendered in the AppStyledView.
      */
     int getContentAreaHeight();
+
+    /**
+     * Sets the {@link AppStyledDialogController.SceneType} for the app styled view.
+     */
+    void setSceneType(@SceneType int sceneType);
 }

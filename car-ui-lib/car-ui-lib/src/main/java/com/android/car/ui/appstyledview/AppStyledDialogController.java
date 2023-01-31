@@ -62,19 +62,72 @@ public final class AppStyledDialogController {
         int CLOSE = 1;
     }
 
+    /**
+     * The possible values for SceneType.
+     */
+    @IntDef({
+            SceneType.SINGLE,
+            SceneType.ENTER,
+            SceneType.INTERMEDIATE,
+            SceneType.EXIT,
+    })
+    @Retention(SOURCE)
+    public @interface SceneType {
+        /**
+         * An AppStyledView that renders all content in a single modal.
+         */
+        int SINGLE = 0;
+
+        /**
+         * An AppStyledView that renders the initial content for content to be rendered across
+         * multiple modals.
+         */
+        int ENTER = 1;
+
+        /**
+         * An AppStyledView that renders the intermediate content for content to be rendered across
+         * multiple modals.
+         */
+        int INTERMEDIATE = 2;
+
+        /**
+         * An AppStyledView that renders the final content for content to be rendered across
+         * multiple modals.
+         */
+        int EXIT = 3;
+    }
+
     @NonNull
     private AppStyledViewController mAppStyledViewController;
     @NonNull
     private AppStyledDialog mDialog;
 
-    public AppStyledDialogController(@NonNull Activity context) {
-        Objects.requireNonNull(context);
-        mAppStyledViewController = PluginFactorySingleton.get(context)
-                .createAppStyledView(context);
-        mDialog = new AppStyledDialog(context, mAppStyledViewController);
+    /**
+     * Constructs a controller that can display an app styled view.
+     *
+     * @param activity The {@code Activity} that will display the app styled view.
+     */
+    public AppStyledDialogController(@NonNull Activity activity) {
+        this(activity, SceneType.SINGLE);
     }
 
     /**
+     * Constructs a controller that can display an app styled view.
+     *
+     * @param activity The {@code Activity} that will display the app styled view.
+     * @param sceneType The {@link SceneType} for the app styled view.
+     */
+    public AppStyledDialogController(@NonNull Activity activity, @SceneType int sceneType) {
+        Objects.requireNonNull(activity);
+        mAppStyledViewController = PluginFactorySingleton.get(activity)
+                .createAppStyledView(activity);
+        mAppStyledViewController.setSceneType(sceneType);
+        mDialog = new AppStyledDialog(activity, mAppStyledViewController);
+    }
+
+    /**
+     * Constructs a controller that can display an app styled view.
+     *
      * @deprecated Use {@link #AppStyledDialogController(Activity)} instead
      */
     @Deprecated

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--Copyright (C) 2022 The Android Open Source Project
+<!--Copyright (C) 2023 The Android Open Source Project
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -604,6 +604,9 @@ limitations under the License.-->
       <item type="style" name="Widget.CarUi.AlertDialog.TitleContainer"/>
       <item type="style" name="Widget.CarUi.AppStyledView"/>
       <item type="style" name="Widget.CarUi.AppStyledView.WindowAnimations"/>
+      <item type="style" name="Widget.CarUi.AppStyledView.WindowAnimations.Enter"/>
+      <item type="style" name="Widget.CarUi.AppStyledView.WindowAnimations.Exit"/>
+      <item type="style" name="Widget.CarUi.AppStyledView.WindowAnimations.Intermediate"/>
       <item type="style" name="Widget.CarUi.Button"/>
       <item type="style" name="Widget.CarUi.Button.Borderless.Colored"/>
       <item type="style" name="Widget.CarUi.CarUiRecyclerView"/>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 The Android Open Source Project
+ * Copyright (C) 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
-import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV1;
+import com.android.car.ui.appstyledview.AppStyledDialogController.SceneType;
+import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
 
 /**
- * Adapts a {@link AppStyledViewControllerOEMV1} into a {@link AppStyledViewController}
+ * Adapts a {@link AppStyledViewControllerOEMV3} into a {@link AppStyledViewController}
  */
-public class AppStyledViewControllerAdapterV1 implements AppStyledViewController {
+public class AppStyledViewControllerAdapterV3 implements AppStyledViewController {
     @NonNull
-    private final AppStyledViewControllerOEMV1 mOemController;
+    private final AppStyledViewControllerOEMV3 mOemController;
 
-    public AppStyledViewControllerAdapterV1(@NonNull AppStyledViewControllerOEMV1 controllerOEMV1) {
-        mOemController = controllerOEMV1;
-        mOemController.setNavIcon(AppStyledViewControllerOEMV1.NAV_ICON_CLOSE);
+    public AppStyledViewControllerAdapterV3(@NonNull AppStyledViewControllerOEMV3 controllerOEMV3) {
+        mOemController = controllerOEMV3;
+        mOemController.setNavIcon(AppStyledViewControllerOEMV3.NAV_ICON_CLOSE);
     }
 
     /**
@@ -49,10 +50,10 @@ public class AppStyledViewControllerAdapterV1 implements AppStyledViewController
     public void setNavIcon(@NavIcon int navIcon) {
         switch (navIcon) {
             case NavIcon.BACK:
-                mOemController.setNavIcon(AppStyledViewControllerOEMV1.NAV_ICON_BACK);
+                mOemController.setNavIcon(AppStyledViewControllerOEMV3.NAV_ICON_BACK);
                 break;
             case NavIcon.CLOSE:
-                mOemController.setNavIcon(AppStyledViewControllerOEMV1.NAV_ICON_CLOSE);
+                mOemController.setNavIcon(AppStyledViewControllerOEMV3.NAV_ICON_CLOSE);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown nav icon style: " + navIcon);
@@ -71,16 +72,16 @@ public class AppStyledViewControllerAdapterV1 implements AppStyledViewController
 
     @Override
     public int getContentAreaWidth() {
-        return -1;
+        return mOemController.getContentAreaWidth();
     }
 
     @Override
     public int getContentAreaHeight() {
-        return -1;
+        return mOemController.getContentAreaHeight();
     }
 
     @Override
-    public void setSceneType(int sceneType) {
-        // Do nothing. Scene type not supported in AppStyledViewControllerOEMV2.
+    public void setSceneType(@SceneType int sceneType) {
+        mOemController.setSceneType(sceneType);
     }
 }

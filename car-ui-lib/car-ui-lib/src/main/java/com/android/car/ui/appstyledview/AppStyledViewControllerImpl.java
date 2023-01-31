@@ -35,7 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.android.car.ui.CarUiLayoutInflaterFactory;
 import com.android.car.ui.R;
 import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
-
+import com.android.car.ui.appstyledview.AppStyledDialogController.SceneType;
 
 /**
  * Controller to interact with the app styled view.
@@ -46,6 +46,8 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
     private final Context mContext;
     @NavIcon
     private int mAppStyleViewNavIcon;
+    @SceneType
+    private int mSceneType;
     @Nullable
     private Runnable mAppStyledVCloseClickListener;
     @Nullable
@@ -112,7 +114,22 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
             params.y = posY;
         }
 
-        params.windowAnimations = R.style.Widget_CarUi_AppStyledView_WindowAnimations;
+        switch (mSceneType) {
+            case SceneType.ENTER:
+                params.windowAnimations = R.style.Widget_CarUi_AppStyledView_WindowAnimations_Enter;
+                break;
+            case SceneType.EXIT:
+                params.windowAnimations = R.style.Widget_CarUi_AppStyledView_WindowAnimations_Exit;
+                break;
+            case SceneType.INTERMEDIATE:
+                params.windowAnimations =
+                        R.style.Widget_CarUi_AppStyledView_WindowAnimations_Intermediate;
+                break;
+            case SceneType.SINGLE:
+            default:
+                params.windowAnimations = R.style.Widget_CarUi_AppStyledView_WindowAnimations;
+                break;
+        }
 
         return params;
     }
@@ -137,6 +154,11 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
 
         return mHeight - mContext.getResources().getDimensionPixelSize(
                 R.dimen.car_ui_toolbar_first_row_height);
+    }
+
+    @Override
+    public void setSceneType(int sceneType) {
+        mSceneType = sceneType;
     }
 
     @Override

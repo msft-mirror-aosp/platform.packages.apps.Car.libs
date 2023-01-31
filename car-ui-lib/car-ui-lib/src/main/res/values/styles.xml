@@ -159,6 +159,21 @@
         <item name="android:windowExitAnimation">@anim/car_ui_app_styled_view_exit_anim</item>
     </style>
 
+    <style name="Widget.CarUi.AppStyledView.WindowAnimations.Enter">
+        <item name="android:windowEnterAnimation">@anim/car_ui_app_styled_view_enter_anim</item>
+        <item name="android:windowExitAnimation">@null</item>
+    </style>
+
+    <style name="Widget.CarUi.AppStyledView.WindowAnimations.Exit">
+        <item name="android:windowEnterAnimation">@null</item>
+        <item name="android:windowExitAnimation">@anim/car_ui_app_styled_view_exit_anim</item>
+    </style>
+
+    <style name="Widget.CarUi.AppStyledView.WindowAnimations.Intermediate">
+        <item name="android:windowEnterAnimation">@null</item>
+        <item name="android:windowExitAnimation">@null</item>
+    </style>
+
     <!-- Preference Styles -->
 
     <style name="Preference.CarUi">
