@@ -27,7 +27,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.android.car.ui.appstyledview.AppStyledDialogController;
-import com.android.car.ui.appstyledview.AppStyledViewController.AppStyledViewNavIcon;
+import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
 import com.android.car.ui.core.CarUi;
 import com.android.car.ui.paintbooth.R;
 import com.android.car.ui.toolbar.NavButtonMode;
@@ -63,7 +63,7 @@ public class AppStyledViewSampleActivity extends AppCompatActivity {
         Button btn = findViewById(R.id.show_app_styled_fragment);
         btn.setOnClickListener(v -> {
             mAppStyledDialogController.setContentView(appStyledTestView);
-            mAppStyledDialogController.setNavIcon(AppStyledViewNavIcon.CLOSE);
+            mAppStyledDialogController.setNavIconType(NavIcon.CLOSE);
             hideSystemBars();
             mAppStyledDialogController.show();
         });

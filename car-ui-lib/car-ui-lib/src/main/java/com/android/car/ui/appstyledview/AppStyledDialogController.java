@@ -16,19 +16,22 @@
 
 package com.android.car.ui.appstyledview;
 
+import static java.lang.annotation.RetentionPolicy.SOURCE;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 
+import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
-import com.android.car.ui.appstyledview.AppStyledViewController.AppStyledViewNavIcon;
 import com.android.car.ui.pluginsupport.PluginFactorySingleton;
 
+import java.lang.annotation.Retention;
 import java.util.Objects;
 
 /**
@@ -38,6 +41,27 @@ import java.util.Objects;
  * <a href="https://source.android.com/devices/automotive/hmi/car_ui/appendix_b">customization guardrails</a>
  */
 public final class AppStyledDialogController {
+    /**
+     * The possible values for NavIcon.
+     */
+    @IntDef({
+            NavIcon.BACK,
+            NavIcon.CLOSE,
+    })
+    @Retention(SOURCE)
+    public @interface NavIcon {
+
+        /**
+         * Show a back icon
+         */
+        int BACK = 0;
+
+        /**
+         * Show a close icon
+         */
+        int CLOSE = 1;
+    }
+
     @NonNull
     private AppStyledViewController mAppStyledViewController;
     @NonNull
@@ -90,8 +114,18 @@ public final class AppStyledDialogController {
 
     /**
      * Sets the nav icon to be used.
+     *
+     * @deprecated Use {@link #setNavIconType(int)} instead.
      */
-    public void setNavIcon(@AppStyledViewNavIcon int navIcon) {
+    @Deprecated
+    public void setNavIcon(@AppStyledViewController.AppStyledViewNavIcon int navIcon) {
+        mAppStyledViewController.setNavIcon(navIcon);
+    }
+
+    /**
+     * Sets the nav icon to be used.
+     */
+    public void setNavIconType(@NavIcon int navIcon) {
         mAppStyledViewController.setNavIcon(navIcon);
     }
 
