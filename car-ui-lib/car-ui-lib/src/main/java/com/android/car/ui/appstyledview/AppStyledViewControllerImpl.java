@@ -19,7 +19,6 @@ package com.android.car.ui.appstyledview;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.util.DisplayMetrics;
-import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +31,6 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.car.ui.CarUiLayoutInflaterFactory;
 import com.android.car.ui.R;
 
 /**
@@ -44,8 +42,10 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
     private final Context mContext;
     @AppStyledViewNavIcon
     private int mAppStyleViewNavIcon;
-    @Nullable private Runnable mAppStyledVCloseClickListener;
-    @Nullable private View mAppStyledView;
+    @Nullable
+    private Runnable mAppStyledVCloseClickListener;
+    @Nullable
+    private View mAppStyledView;
     private int mWidth;
     private int mHeight;
 
@@ -138,16 +138,8 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
 
     @Override
     public View getAppStyledView(@Nullable View contentView) {
-        // create ContextThemeWrapper from the original Activity Context with the custom theme
-        final Context contextThemeWrapper = new ContextThemeWrapper(mContext, R.style.Theme_CarUi);
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        if (inflater.getFactory2() == null) {
-            inflater.setFactory2(new CarUiLayoutInflaterFactory());
-        }
-        // clone the inflater using the ContextThemeWrapper
-        LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
-
-        mAppStyledView = localInflater.inflate(R.layout.car_ui_app_styled_view, null, false);
+        mAppStyledView = inflater.inflate(R.layout.car_ui_app_styled_view, null, false);
         mAppStyledView.setClipToOutline(true);
         RecyclerView rv = mAppStyledView.findViewById(R.id.car_ui_app_styled_content);
 
