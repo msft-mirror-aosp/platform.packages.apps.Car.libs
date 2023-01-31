@@ -39,7 +39,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
  * layout and add the view provided by the application into the layout. Everything other than the
  * view within the layout can be customized by OEM.
  * <p>
- * Apps should not use this directly. App's should use {@link AppStyledDialogController}.
+ * Apps should not use this directly. Apps should use {@link AppStyledDialogController}.
  */
 class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListener {
     private final AppStyledViewController mController;
@@ -74,30 +74,12 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
         }
     }
 
-    /**
-     * An hack used to show the dialogs in Immersive Mode (that is with the NavBar hidden). To
-     * obtain this, the method makes the dialog not focusable before showing it, change the UI
-     * visibility of the window like the owner activity of the dialog and then (after showing it)
-     * makes the dialog focusable again.
-     */
-    @Override
-    public void show() {
-        // Set the dialog to not focusable.
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-
-        copySystemUiVisibility();
-
-        super.show();
-
-        // Set the dialog to focusable again.
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-    }
 
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
         copyWindowInsets();
+        copySystemUiVisibility();
     }
 
     /**
@@ -132,10 +114,15 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
             return;
         }
 
-        // Configure the behavior of the hidden system bars to match requesting activity
-        dialogWindowInsetsController.setSystemBarsBehavior(
-                activityWindowInsetsController.getSystemBarsBehavior()
-        );
+        int activitySystemBarBehavior = activityWindowInsetsController.getSystemBarsBehavior();
+        // Only set system bar behavior when non-default settings are required. Setting default may
+        // overwrite flags set by deprecated methods with different defaults.
+        if (activitySystemBarBehavior != 0) {
+            // Configure the behavior of the hidden system bars to match requesting activity
+            dialogWindowInsetsController.setSystemBarsBehavior(
+                    activityWindowInsetsController.getSystemBarsBehavior()
+            );
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // Configure nav bar visibility to match requesting activity

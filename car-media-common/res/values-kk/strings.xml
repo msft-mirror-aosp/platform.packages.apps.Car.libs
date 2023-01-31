@@ -25,8 +25,8 @@
     <string name="error_code_authentication_expired" msgid="1727285213286610186">"Бұл қолданбаны пайдалану үшін аккаунтқа кіріңіз."</string>
     <string name="error_code_premium_account_required" msgid="2328664287270814966">"Премиум рұқсат қажет."</string>
     <string name="error_code_concurrent_stream_limit" msgid="493048763425570552">"Тым көп құрылғыларда тыңдалып жатыр."</string>
-    <string name="error_code_parental_control_restricted" msgid="325145513462419399">"Бұл мазмұнға тыйым салынған."</string>
-    <string name="error_code_not_available_in_region" msgid="5840935836875073145">"Мазмұнды алу мүмкін емес."</string>
+    <string name="error_code_parental_control_restricted" msgid="325145513462419399">"Бұл контентке тыйым салынған."</string>
+    <string name="error_code_not_available_in_region" msgid="5840935836875073145">"Контентті алу мүмкін емес."</string>
     <string name="error_code_content_already_playing" msgid="1306236349553004461">"Әлдеқашан ойнатылып жатыр."</string>
     <string name="error_code_skip_limit_reached" msgid="4203743406433151146">"Басқа тректерді өткізіп жіберу мүмкін емес."</string>
     <string name="error_code_action_aborted" msgid="8611777981356536501">"Аяқталмады. Қайталап көріңіз."</string>

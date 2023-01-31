@@ -70,7 +70,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This class is an wrapper around {@link PluginFactoryOEMV5} that implements {@link PluginFactory},
+ * This class is a wrapper around {@link PluginFactoryOEMV5} that implements {@link PluginFactory},
  * to provide a version-agnostic way of interfacing with the OEM's PluginFactory.
  */
 public final class PluginFactoryAdapterV5 implements PluginFactory {

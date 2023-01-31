@@ -22,20 +22,21 @@ import android.view.WindowManager.LayoutParams;
 import androidx.annotation.NonNull;
 
 import com.android.car.ui.appstyledview.AppStyledViewController;
-import com.android.car.ui.appstyledview.AppStyledViewController.AppStyledViewNavIcon;
-import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV2;
+import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
+import com.android.car.ui.appstyledview.AppStyledDialogController.SceneType;
+import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
 
 /**
- * Adapts a {@link AppStyledViewController} into a {@link AppStyledViewControllerOEMV2}.
+ * Adapts a {@link AppStyledViewController} into a {@link AppStyledViewControllerOEMV3}.
  */
-public class AppStyledViewControllerAdapterProxy implements AppStyledViewControllerOEMV2 {
+public class AppStyledViewControllerAdapterProxy implements AppStyledViewControllerOEMV3 {
 
     @NonNull
     private final AppStyledViewController mStaticController;
     private View mContentView;
 
-    public AppStyledViewControllerAdapterProxy(@NonNull AppStyledViewController controllerOEMV1) {
-        mStaticController = controllerOEMV1;
+    public AppStyledViewControllerAdapterProxy(@NonNull AppStyledViewController controllerOEMV3) {
+        mStaticController = controllerOEMV3;
     }
 
     @Override
@@ -54,16 +55,36 @@ public class AppStyledViewControllerAdapterProxy implements AppStyledViewControl
     }
 
     @Override
-    public void setNavIcon(@AppStyledViewNavIcon int navIcon) {
+    public void setNavIcon(@NavIcon int navIcon) {
         switch (navIcon) {
-            case AppStyledViewControllerOEMV2.NAV_ICON_BACK:
-                mStaticController.setNavIcon(AppStyledViewNavIcon.BACK);
+            case AppStyledViewControllerOEMV3.NAV_ICON_BACK:
+                mStaticController.setNavIcon(NavIcon.BACK);
                 break;
-            case AppStyledViewControllerOEMV2.NAV_ICON_CLOSE:
-                mStaticController.setNavIcon(AppStyledViewNavIcon.CLOSE);
+            case AppStyledViewControllerOEMV3.NAV_ICON_CLOSE:
+                mStaticController.setNavIcon(NavIcon.CLOSE);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown nav icon style: " + navIcon);
+        }
+    }
+
+    @Override
+    public void setSceneType(@SceneType int sceneType) {
+        switch (sceneType) {
+            case AppStyledViewControllerOEMV3.SCENE_TYPE_SINGLE:
+                mStaticController.setSceneType(SceneType.SINGLE);
+                break;
+            case AppStyledViewControllerOEMV3.SCENE_TYPE_ENTER:
+                mStaticController.setSceneType(SceneType.ENTER);
+                break;
+            case AppStyledViewControllerOEMV3.SCENE_TYPE_INTERMEDIATE:
+                mStaticController.setSceneType(SceneType.INTERMEDIATE);
+                break;
+            case AppStyledViewControllerOEMV3.SCENE_TYPE_EXIT:
+                mStaticController.setSceneType(SceneType.EXIT);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown nav icon style: " + sceneType);
         }
     }
 

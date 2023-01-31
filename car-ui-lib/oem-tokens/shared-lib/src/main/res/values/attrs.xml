@@ -14,118 +14,172 @@
  limitations under the License.
 -->
 <resources>
-  <attr name="colorOemSeed" format="color" />
+    <attr name="colorOemSeed" format="color" />
 
-  <!-- Primary color palette -->
-  <attr name="colorPrimary" format="color" />
-  <attr name="colorOnPrimary" format="color" />
-  <attr name="colorPrimaryContainer" format="color" />
-  <attr name="colorOnPrimaryContainer" format="color" />
-  <!-- TODO: Determine usage of inverse colors. -->
-  <!--  <attr name="colorPrimaryInverse" format="color" />-->
+    <!-- Primary color palette -->
+    <attr name="colorPrimary" format="color" />
+    <attr name="colorOnPrimary" format="color" />
+    <attr name="colorPrimaryContainer" format="color" />
+    <attr name="colorOnPrimaryContainer" format="color" />
+    <!-- TODO: Determine usage of inverse colors. -->
+    <!--  <attr name="colorPrimaryInverse" format="color" />-->
 
-  <!-- Secondary color palette -->
-  <attr name="colorSecondary" format="color" />
-  <attr name="colorOnSecondary" format="color" />
-  <attr name="colorSecondaryContainer" format="color" />
-  <attr name="colorOnSecondaryContainer" format="color" />
+    <!-- Secondary color palette -->
+    <attr name="colorSecondary" format="color" />
+    <attr name="colorOnSecondary" format="color" />
+    <attr name="colorSecondaryContainer" format="color" />
+    <attr name="colorOnSecondaryContainer" format="color" />
 
-  <!-- Tertiary color palette -->
-  <attr name="colorTertiary" format="color" />
-  <attr name="colorOnTertiary" format="color" />
-  <attr name="colorTertiaryContainer" format="color" />
-  <attr name="colorOnTertiaryContainer" format="color" />
+    <!-- Tertiary color palette -->
+    <attr name="colorTertiary" format="color" />
+    <attr name="colorOnTertiary" format="color" />
+    <attr name="colorTertiaryContainer" format="color" />
+    <attr name="colorOnTertiaryContainer" format="color" />
 
-  <!-- Error color palette -->
-  <attr name="colorError" format="color" />
-  <attr name="colorOnError" format="color" />
-  <attr name="colorErrorContainer" format="color" />
-  <attr name="colorOnErrorContainer" format="color" />
+    <!-- Error color palette -->
+    <attr name="colorError" format="color" />
+    <attr name="colorOnError" format="color" />
+    <attr name="colorErrorContainer" format="color" />
+    <attr name="colorOnErrorContainer" format="color" />
 
-  <!-- Neutral color palette -->
-  <attr name="colorBackground" format="color" />
-  <attr name="colorOnBackground" format="color" />
-  <attr name="colorSurface" format="color" />
-  <attr name="colorOnSurface" format="color" />
-  <attr name="colorSurfaceVariant" format="color" />
-  <attr name="colorOnSurfaceVariant" format="color" />
-  <attr name="colorOutline" format="color" />
-  <!-- TODO: Determine usage of inverse colors. -->
-  <!--  <attr name="colorSurfaceInverse" format="color" />-->
-  <!--  <attr name="colorOnSurfaceInverse" format="color" />-->
+    <!-- Neutral color palette -->
+    <attr name="colorBackground" format="color" />
+    <attr name="colorOnBackground" format="color" />
+    <attr name="colorSurface" format="color" />
+    <attr name="colorOnSurface" format="color" />
+    <attr name="colorSurfaceVariant" format="color" />
+    <attr name="colorOnSurfaceVariant" format="color" />
+    <attr name="colorOutline" format="color" />
+    <!-- TODO: Determine usage of inverse colors. -->
+    <!--  <attr name="colorSurfaceInverse" format="color" />-->
+    <!--  <attr name="colorOnSurfaceInverse" format="color" />-->
 
-  <!-- Primary tonal palette -->
-  <attr name="colorPrimaryPalette100" format="color" />
-  <attr name="colorPrimaryPalette99" format="color" />
-  <attr name="colorPrimaryPalette95" format="color" />
-  <attr name="colorPrimaryPalette90" format="color" />
-  <attr name="colorPrimaryPalette80" format="color" />
-  <attr name="colorPrimaryPalette70" format="color" />
-  <attr name="colorPrimaryPalette60" format="color" />
-  <attr name="colorPrimaryPalette50" format="color" />
-  <attr name="colorPrimaryPalette40" format="color" />
-  <attr name="colorPrimaryPalette30" format="color" />
-  <attr name="colorPrimaryPalette20" format="color" />
-  <attr name="colorPrimaryPalette10" format="color" />
-  <attr name="colorPrimaryPalette0" format="color" />
+    <!-- Primary tonal palette -->
+    <attr name="colorPrimaryPalette100" format="color" />
+    <attr name="colorPrimaryPalette99" format="color" />
+    <attr name="colorPrimaryPalette95" format="color" />
+    <attr name="colorPrimaryPalette90" format="color" />
+    <attr name="colorPrimaryPalette80" format="color" />
+    <attr name="colorPrimaryPalette70" format="color" />
+    <attr name="colorPrimaryPalette60" format="color" />
+    <attr name="colorPrimaryPalette50" format="color" />
+    <attr name="colorPrimaryPalette40" format="color" />
+    <attr name="colorPrimaryPalette30" format="color" />
+    <attr name="colorPrimaryPalette20" format="color" />
+    <attr name="colorPrimaryPalette10" format="color" />
+    <attr name="colorPrimaryPalette0" format="color" />
 
-  <!-- Secondary tonal palette -->
-  <attr name="colorSecondaryPalette100" format="color" />
-  <attr name="colorSecondaryPalette99" format="color" />
-  <attr name="colorSecondaryPalette95" format="color" />
-  <attr name="colorSecondaryPalette90" format="color" />
-  <attr name="colorSecondaryPalette80" format="color" />
-  <attr name="colorSecondaryPalette70" format="color" />
-  <attr name="colorSecondaryPalette60" format="color" />
-  <attr name="colorSecondaryPalette50" format="color" />
-  <attr name="colorSecondaryPalette40" format="color" />
-  <attr name="colorSecondaryPalette30" format="color" />
-  <attr name="colorSecondaryPalette20" format="color" />
-  <attr name="colorSecondaryPalette10" format="color" />
-  <attr name="colorSecondaryPalette0" format="color" />
+    <!-- Secondary tonal palette -->
+    <attr name="colorSecondaryPalette100" format="color" />
+    <attr name="colorSecondaryPalette99" format="color" />
+    <attr name="colorSecondaryPalette95" format="color" />
+    <attr name="colorSecondaryPalette90" format="color" />
+    <attr name="colorSecondaryPalette80" format="color" />
+    <attr name="colorSecondaryPalette70" format="color" />
+    <attr name="colorSecondaryPalette60" format="color" />
+    <attr name="colorSecondaryPalette50" format="color" />
+    <attr name="colorSecondaryPalette40" format="color" />
+    <attr name="colorSecondaryPalette30" format="color" />
+    <attr name="colorSecondaryPalette20" format="color" />
+    <attr name="colorSecondaryPalette10" format="color" />
+    <attr name="colorSecondaryPalette0" format="color" />
 
-  <!-- Tertiary tonal palette -->
-  <attr name="colorTertiaryPalette100" format="color" />
-  <attr name="colorTertiaryPalette99" format="color" />
-  <attr name="colorTertiaryPalette95" format="color" />
-  <attr name="colorTertiaryPalette90" format="color" />
-  <attr name="colorTertiaryPalette80" format="color" />
-  <attr name="colorTertiaryPalette70" format="color" />
-  <attr name="colorTertiaryPalette60" format="color" />
-  <attr name="colorTertiaryPalette50" format="color" />
-  <attr name="colorTertiaryPalette40" format="color" />
-  <attr name="colorTertiaryPalette30" format="color" />
-  <attr name="colorTertiaryPalette20" format="color" />
-  <attr name="colorTertiaryPalette10" format="color" />
-  <attr name="colorTertiaryPalette0" format="color" />
+    <!-- Tertiary tonal palette -->
+    <attr name="colorTertiaryPalette100" format="color" />
+    <attr name="colorTertiaryPalette99" format="color" />
+    <attr name="colorTertiaryPalette95" format="color" />
+    <attr name="colorTertiaryPalette90" format="color" />
+    <attr name="colorTertiaryPalette80" format="color" />
+    <attr name="colorTertiaryPalette70" format="color" />
+    <attr name="colorTertiaryPalette60" format="color" />
+    <attr name="colorTertiaryPalette50" format="color" />
+    <attr name="colorTertiaryPalette40" format="color" />
+    <attr name="colorTertiaryPalette30" format="color" />
+    <attr name="colorTertiaryPalette20" format="color" />
+    <attr name="colorTertiaryPalette10" format="color" />
+    <attr name="colorTertiaryPalette0" format="color" />
 
-  <!-- Neutral tonal palette -->
-  <attr name="colorNeutralPalette100" format="color" />
-  <attr name="colorNeutralPalette99" format="color" />
-  <attr name="colorNeutralPalette95" format="color" />
-  <attr name="colorNeutralPalette90" format="color" />
-  <attr name="colorNeutralPalette80" format="color" />
-  <attr name="colorNeutralPalette70" format="color" />
-  <attr name="colorNeutralPalette60" format="color" />
-  <attr name="colorNeutralPalette50" format="color" />
-  <attr name="colorNeutralPalette40" format="color" />
-  <attr name="colorNeutralPalette30" format="color" />
-  <attr name="colorNeutralPalette20" format="color" />
-  <attr name="colorNeutralPalette10" format="color" />
-  <attr name="colorNeutralPalette0" format="color" />
+    <!-- Error tonal palette -->
+    <attr name="colorErrorPalette100" format="color" />
+    <attr name="colorErrorPalette99" format="color" />
+    <attr name="colorErrorPalette95" format="color" />
+    <attr name="colorErrorPalette90" format="color" />
+    <attr name="colorErrorPalette80" format="color" />
+    <attr name="colorErrorPalette70" format="color" />
+    <attr name="colorErrorPalette60" format="color" />
+    <attr name="colorErrorPalette50" format="color" />
+    <attr name="colorErrorPalette40" format="color" />
+    <attr name="colorErrorPalette30" format="color" />
+    <attr name="colorErrorPalette20" format="color" />
+    <attr name="colorErrorPalette10" format="color" />
+    <attr name="colorErrorPalette0" format="color" />
+
+    <!-- Neutral tonal palette -->
+    <attr name="colorNeutralPalette100" format="color" />
+    <attr name="colorNeutralPalette99" format="color" />
+    <attr name="colorNeutralPalette95" format="color" />
+    <attr name="colorNeutralPalette90" format="color" />
+    <attr name="colorNeutralPalette80" format="color" />
+    <attr name="colorNeutralPalette70" format="color" />
+    <attr name="colorNeutralPalette60" format="color" />
+    <attr name="colorNeutralPalette50" format="color" />
+    <attr name="colorNeutralPalette40" format="color" />
+    <attr name="colorNeutralPalette30" format="color" />
+    <attr name="colorNeutralPalette20" format="color" />
+    <attr name="colorNeutralPalette10" format="color" />
+    <attr name="colorNeutralPalette0" format="color" />
 
     <!-- Neutral variant tonal palette -->
-  <attr name="colorNeutralVariantPalette100" format="color" />
-  <attr name="colorNeutralVariantPalette99" format="color" />
-  <attr name="colorNeutralVariantPalette95" format="color" />
-  <attr name="colorNeutralVariantPalette90" format="color" />
-  <attr name="colorNeutralVariantPalette80" format="color" />
-  <attr name="colorNeutralVariantPalette70" format="color" />
-  <attr name="colorNeutralVariantPalette60" format="color" />
-  <attr name="colorNeutralVariantPalette50" format="color" />
-  <attr name="colorNeutralVariantPalette40" format="color" />
-  <attr name="colorNeutralVariantPalette30" format="color" />
-  <attr name="colorNeutralVariantPalette20" format="color" />
-  <attr name="colorNeutralVariantPalette10" format="color" />
-  <attr name="colorNeutralVariantPalette0" format="color" />
+    <attr name="colorNeutralVariantPalette100" format="color" />
+    <attr name="colorNeutralVariantPalette99" format="color" />
+    <attr name="colorNeutralVariantPalette95" format="color" />
+    <attr name="colorNeutralVariantPalette90" format="color" />
+    <attr name="colorNeutralVariantPalette80" format="color" />
+    <attr name="colorNeutralVariantPalette70" format="color" />
+    <attr name="colorNeutralVariantPalette60" format="color" />
+    <attr name="colorNeutralVariantPalette50" format="color" />
+    <attr name="colorNeutralVariantPalette40" format="color" />
+    <attr name="colorNeutralVariantPalette30" format="color" />
+    <attr name="colorNeutralVariantPalette20" format="color" />
+    <attr name="colorNeutralVariantPalette10" format="color" />
+    <attr name="colorNeutralVariantPalette0" format="color" />
+
+    <!-- Display typeface styles -->
+    <attr name="textAppearanceDisplayLarge" format="reference" />
+    <attr name="textAppearanceDisplayMedium" format="reference" />
+    <attr name="textAppearanceDisplaySmall" format="reference" />
+
+    <!-- Headline typeface styles -->
+    <attr name="textAppearanceHeadlineLarge" format="reference" />
+    <attr name="textAppearanceHeadlineMedium" format="reference" />
+    <attr name="textAppearanceHeadlineSmall" format="reference" />
+
+    <!-- Title typeface styles -->
+    <attr name="textAppearanceTitleLarge" format="reference" />
+    <attr name="textAppearanceTitleMedium" format="reference" />
+    <attr name="textAppearanceTitleSmall" format="reference" />
+
+    <!-- Label typeface styles -->
+    <attr name="textAppearanceLabelLarge" format="reference" />
+    <attr name="textAppearanceLabelMedium" format="reference" />
+    <attr name="textAppearanceLabelSmall" format="reference" />
+
+    <!-- Body typeface styles -->
+    <attr name="textAppearanceBodyLarge" format="reference" />
+    <attr name="textAppearanceBodyMedium" format="reference" />
+    <attr name="textAppearanceBodySmall" format="reference" />
+
+    <!-- Shape scales -->
+    <attr name="shapeAppearanceCornerNone" format="reference" />
+    <attr name="shapeAppearanceCornerExtraSmall" format="reference" />
+    <attr name="shapeAppearanceCornerExtraSmallTop" format="reference" />
+    <attr name="shapeAppearanceCornerSmall" format="reference" />
+    <attr name="shapeAppearanceCornerMedium" format="reference" />
+    <attr name="shapeAppearanceCornerLarge" format="reference" />
+    <attr name="shapeAppearanceCornerLargeTop" format="reference" />
+    <attr name="shapeAppearanceCornerLargeStart" format="reference" />
+    <attr name="shapeAppearanceCornerLargeEnd" format="reference" />
+    <attr name="shapeAppearanceCornerExtraLarge" format="reference" />
+    <attr name="shapeAppearanceCornerExtraLargeTop" format="reference" />
+    <attr name="shapeAppearanceCornerFull" format="reference" />
 </resources>

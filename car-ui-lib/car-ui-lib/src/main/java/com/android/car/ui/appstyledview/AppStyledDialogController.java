@@ -16,17 +16,22 @@
 
 package com.android.car.ui.appstyledview;
 
+import static java.lang.annotation.RetentionPolicy.SOURCE;
+
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 
+import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
-import com.android.car.ui.appstyledview.AppStyledViewController.AppStyledViewNavIcon;
 import com.android.car.ui.pluginsupport.PluginFactorySingleton;
 
+import java.lang.annotation.Retention;
 import java.util.Objects;
 
 /**
@@ -36,19 +41,93 @@ import java.util.Objects;
  * <a href="https://source.android.com/devices/automotive/hmi/car_ui/appendix_b">customization guardrails</a>
  */
 public final class AppStyledDialogController {
+    /**
+     * The possible values for NavIcon.
+     */
+    @IntDef({
+            NavIcon.BACK,
+            NavIcon.CLOSE,
+    })
+    @Retention(SOURCE)
+    public @interface NavIcon {
+
+        /**
+         * Show a back icon
+         */
+        int BACK = 0;
+
+        /**
+         * Show a close icon
+         */
+        int CLOSE = 1;
+    }
+
+    /**
+     * The possible values for SceneType.
+     */
+    @IntDef({
+            SceneType.SINGLE,
+            SceneType.ENTER,
+            SceneType.INTERMEDIATE,
+            SceneType.EXIT,
+    })
+    @Retention(SOURCE)
+    public @interface SceneType {
+        /**
+         * An AppStyledView that renders all content in a single modal.
+         */
+        int SINGLE = 0;
+
+        /**
+         * An AppStyledView that renders the initial content for content to be rendered across
+         * multiple modals.
+         */
+        int ENTER = 1;
+
+        /**
+         * An AppStyledView that renders the intermediate content for content to be rendered across
+         * multiple modals.
+         */
+        int INTERMEDIATE = 2;
+
+        /**
+         * An AppStyledView that renders the final content for content to be rendered across
+         * multiple modals.
+         */
+        int EXIT = 3;
+    }
+
     @NonNull
     private AppStyledViewController mAppStyledViewController;
     @NonNull
     private AppStyledDialog mDialog;
 
-    public AppStyledDialogController(@NonNull Activity context) {
-        Objects.requireNonNull(context);
-        mAppStyledViewController = PluginFactorySingleton.get(context)
-                .createAppStyledView(context);
-        mDialog = new AppStyledDialog(context, mAppStyledViewController);
+    /**
+     * Constructs a controller that can display an app styled view.
+     *
+     * @param activity The {@code Activity} that will display the app styled view.
+     */
+    public AppStyledDialogController(@NonNull Activity activity) {
+        this(activity, SceneType.SINGLE);
     }
 
     /**
+     * Constructs a controller that can display an app styled view.
+     *
+     * @param activity The {@code Activity} that will display the app styled view.
+     * @param sceneType The {@link SceneType} for the app styled view.
+     */
+    public AppStyledDialogController(@NonNull Activity activity, @SceneType int sceneType) {
+        Objects.requireNonNull(activity);
+        mAppStyledViewController = PluginFactorySingleton.get(activity)
+                .createAppStyledView(activity);
+        mAppStyledViewController.setSceneType(sceneType);
+        mDialog = new AppStyledDialog(activity, mAppStyledViewController);
+    }
+
+    /**
+     * Constructs a controller that can display an app styled view.
+     *
      * @deprecated Use {@link #AppStyledDialogController(Activity)} instead
      */
     @Deprecated
@@ -88,8 +167,18 @@ public final class AppStyledDialogController {
 
     /**
      * Sets the nav icon to be used.
+     *
+     * @deprecated Use {@link #setNavIconType(int)} instead.
      */
-    public void setNavIcon(@AppStyledViewNavIcon int navIcon) {
+    @Deprecated
+    public void setNavIcon(@AppStyledViewController.AppStyledViewNavIcon int navIcon) {
+        mAppStyledViewController.setNavIcon(navIcon);
+    }
+
+    /**
+     * Sets the nav icon to be used.
+     */
+    public void setNavIconType(@NavIcon int navIcon) {
         mAppStyledViewController.setNavIcon(navIcon);
     }
 
@@ -152,6 +241,32 @@ public final class AppStyledDialogController {
      */
     public int getContentAreaHeight() {
         return mAppStyledViewController.getContentAreaHeight();
+    }
+
+    /**
+     * Returns a {@link Context} with a {@link Configuration} set to values that align with the
+     * sizing of the content area of the AppStyledView to better facilitate resource loading
+     * appropriate for the size onf the content area.
+     */
+    public Context createContentViewConfigurationContext(Context context) {
+        int width = getContentAreaWidth();
+        if (width == -1) {
+            int widthPx = getAppStyledViewDialogWidth();
+            width = (int) (widthPx / context.getResources().getDisplayMetrics().density);
+        }
+
+        int height = getContentAreaHeight();
+        if (height == -1) {
+            int heightPx = getAppStyledViewDialogHeight();
+            height = (int) (heightPx / context.getResources().getDisplayMetrics().density);
+        }
+
+        Configuration config = context.getResources().getConfiguration();
+        config.smallestScreenWidthDp = Math.min(width, height);
+        config.screenWidthDp = width;
+        config.screenHeightDp = height;
+        Context configContext = context.createConfigurationContext(config);
+        return new ContextThemeWrapper(configContext, context.getTheme());
     }
 
     @VisibleForTesting

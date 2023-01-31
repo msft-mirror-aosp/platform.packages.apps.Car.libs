@@ -25,7 +25,7 @@ import androidx.annotation.Nullable;
 /**
  * The OEM interface for a AppStyledView.
  *
- * @deprecated Please use {@link AppStyledViewControllerOEMV2} instead
+ * @deprecated Please use {@link AppStyledViewControllerOEMV3} instead
  */
 @Deprecated
 public interface AppStyledViewControllerOEMV1 {

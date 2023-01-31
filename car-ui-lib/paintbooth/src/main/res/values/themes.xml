@@ -15,37 +15,27 @@
   ~ limitations under the License.
   -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-  <style name="AppStyledDialogThemeSample" parent="Theme.AppCompat.Light.Dialog">
-    <item name="android:windowContentOverlay">@null</item>
-    <item name="android:windowSoftInputMode">stateAlwaysHidden</item>
-    <item name="windowActionModeOverlay">true</item>
-    <item name="android:windowIsTranslucent">true</item>
+    <style name="AppStyledDialogThemeSample" parent="Theme.AppCompat.Light">
+        <item name="android:background">#969696</item>
+    </style>
 
-    <item name="android:windowCloseOnTouchOutside">false</item>
-    <item name="android:colorBackgroundCacheHint">@null</item>
-    <item name="android:backgroundDimEnabled">false</item>
+    <!--Theme for the dialog testing-->
+    <style name="Theme.Testing.Dialog.Alert" parent="android:Theme.DeviceDefault.Dialog.Alert"></style>
 
-    <item name="windowActionBar">false</item>
-    <item name="windowNoTitle">true</item>
-    <item name="android:windowBackground">@android:color/transparent</item>
-    <item name="android:windowIsFloating">true</item>
-    <item name="android:background">#969696</item>
-  </style>
-
-  <!--Theme for the dialog testing-->
-  <style name="Theme.Testing.Dialog.Alert" parent="android:Theme.DeviceDefault.Dialog.Alert">
-  </style>
-
-  <!--Theme for the app defaults for automotive tokens-->
-  <style name="TokenTheme" parent="Theme.CarUi.WithToolbar">
-    <item name="oemTokenOverrideEnabled">true</item>
-    <item name="oemColorPrimary">@android:color/holo_blue_dark</item>
-    <item name="oemColorOnPrimary">@android:color/holo_blue_dark</item>
-    <item name="oemColorPrimaryContainer">@android:color/holo_blue_dark</item>
-    <item name="oemColorOnPrimaryContainer">@android:color/holo_blue_dark</item>
-    <item name="oemColorSecondary">@android:color/holo_blue_dark</item>
-    <item name="oemColorOnSecondary">@android:color/holo_blue_dark</item>
-    <item name="oemColorSecondaryContainer">@android:color/holo_blue_dark</item>
-    <item name="oemColorOnSecondaryContainer">@android:color/holo_blue_dark</item>
-  </style>
+    <!--Theme for the app defaults for automotive tokens-->
+    <style name="TokenTheme" parent="Theme.CarUi.WithToolbar">
+        <item name="oemTokenOverrideEnabled">true</item>
+        <item name="oemColorPrimary">@android:color/holo_blue_dark</item>
+        <item name="oemColorOnPrimary">@android:color/holo_blue_dark</item>
+        <item name="oemColorPrimaryContainer">@android:color/holo_blue_dark</item>
+        <item name="oemColorOnPrimaryContainer">@android:color/holo_blue_dark</item>
+        <item name="oemColorSecondary">@android:color/holo_blue_dark</item>
+        <item name="oemColorOnSecondary">@android:color/holo_blue_dark</item>
+        <item name="oemColorSecondaryContainer">@android:color/holo_blue_dark</item>
+        <item name="oemColorOnSecondaryContainer">@android:color/holo_blue_dark</item>
+        <item name="oemColorTertiary">@android:color/holo_blue_dark</item>
+        <item name="oemColorOnTertiary">@android:color/holo_blue_dark</item>
+        <item name="oemColorTertiaryContainer">@android:color/holo_blue_dark</item>
+        <item name="oemColorOnTertiaryContainer">@android:color/holo_blue_dark</item>
+    </style>
 </resources>

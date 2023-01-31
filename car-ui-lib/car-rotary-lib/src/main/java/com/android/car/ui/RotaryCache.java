@@ -25,6 +25,7 @@ import androidx.annotation.VisibleForTesting;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
 /**
@@ -58,14 +59,17 @@ class RotaryCache {
 
     /** A record of when a View was focused. */
     private static class FocusHistory {
-        /** The focused view. */
+        /**
+         * WeakReference to the focused view. Using a WeakReference instead of the view to avoid
+         * potential memory leak.
+         */
         @NonNull
-        final View mFocusedView;
+        final WeakReference<View> mFocusedViewReference;
         /** The {@link SystemClock#uptimeMillis} when this history was recorded. */
         final long mTimestamp;
 
         FocusHistory(@NonNull View focusedView, long timestamp) {
-            mFocusedView = focusedView;
+            mFocusedViewReference = new WeakReference<>(focusedView);
             mTimestamp = timestamp;
         }
     }
@@ -92,7 +96,9 @@ class RotaryCache {
         }
 
         View getFocusedView(long elapsedRealtime) {
-            return isValidHistory(elapsedRealtime) ? mFocusHistory.mFocusedView : null;
+            return isValidHistory(elapsedRealtime)
+                    ? mFocusHistory.mFocusedViewReference.get()
+                    : null;
         }
 
         void setFocusedView(@Nullable View focusedView, long elapsedRealtime) {
@@ -121,14 +127,17 @@ class RotaryCache {
 
     /** A record of a focus area that was nudged to. */
     private static class FocusAreaHistory {
-        /** The focus area that was nudged to. */
+        /**
+         * WeakReference to the focus area that was nudged to. Using a WeakReference instead of the
+         * focus area to avoid potential memory leak.
+         */
         @NonNull
-        final IFocusArea mFocusArea;
+        final WeakReference<IFocusArea> mFocusAreaReference;
         /** The {@link SystemClock#uptimeMillis} when this history was recorded. */
         final long mTimestamp;
 
         FocusAreaHistory(@NonNull IFocusArea focusArea, long timestamp) {
-            mFocusArea = focusArea;
+            mFocusAreaReference = new WeakReference<>(focusArea);
             mTimestamp = timestamp;
         }
     }
@@ -160,7 +169,9 @@ class RotaryCache {
 
         IFocusArea get(int direction, long elapsedRealtime) {
             FocusAreaHistory history = get(direction);
-            return isValidHistory(history, elapsedRealtime) ? history.mFocusArea : null;
+            return isValidHistory(history, elapsedRealtime)
+                    ? history.mFocusAreaReference.get()
+                    : null;
         }
 
         boolean isValidHistory(@Nullable FocusAreaHistory history, long elapsedRealtime) {

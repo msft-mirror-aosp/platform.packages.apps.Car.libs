@@ -19,6 +19,7 @@ package com.android.car.ui.actions;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayingAtLeast;
 
+import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -152,8 +153,10 @@ public class LowLevelActions {
                 float[] coordinatesMove = new float[]{downX + location[0], downY + location[1]};
                 float[] precision = new float[]{1f, 1f};
                 // Send down event, pause, and send up
-                MotionEvent down = MotionEvents.sendDown(uiController, coordinatesDown,
-                        precision).down;
+                // Use SOURCE_CLASS_POINTER for the down event because the default source that
+                // MotionEvents#sendDown uses is SOURCE_UNKNOWN
+                MotionEvent down = MotionEvents.sendDown(uiController, coordinatesDown, precision,
+                        InputDevice.SOURCE_CLASS_POINTER, /* buttonState= */ 0).down;
                 uiController.loopMainThreadForAtLeast(200);
                 for (int i = 0; i < interval; i++) {
                     MotionEvents.sendMovement(uiController, down, coordinatesMove);

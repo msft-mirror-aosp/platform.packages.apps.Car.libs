@@ -25,7 +25,10 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
 import static com.android.car.ui.actions.ViewActions.waitForView;
 
+import static junit.framework.TestCase.assertEquals;
+
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertThrows;
 
 import android.app.Activity;
 import android.view.View;
@@ -150,6 +153,16 @@ public class CarUiArrowContainerViewTest {
         onView(isRoot()).perform(waitForView(withId(R.id.textView)));
         onView(withId(R.id.textView)).check(
                 matches(ViewMatchers.withBackgroundDrawable(mActivity, contentViewDrawable)));
+    }
+
+    @Test
+    public void doNotSetContentViewId_shouldThrowException() {
+        // Pass null to attrs to create CarUiArrowContainerView with no specified carUiContentView.
+        IllegalStateException ex =
+                assertThrows(IllegalStateException.class, () -> mCarUiArrowContainerView =
+                new CarUiArrowContainerView(mActivity.getApplicationContext(), null));
+        assertEquals("Attribute app:carUiContentView must be specified when using "
+                         + "CarUiArrowContainerView", ex.getMessage());
     }
 
     private Matcher<? super View> hasArrowHeight(int arrowHeight, boolean isArrowTop) {
