@@ -23,8 +23,8 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static com.android.car.ui.matchers.ViewMatchers.doesNotExistOrIsNotDisplayed;
-import static com.android.car.ui.matchers.ViewMatchers.withDrawable;
+import static com.android.car.ui.testing.matchers.ViewMatchers.doesNotExistOrIsNotDisplayed;
+import static com.android.car.ui.testing.matchers.ViewMatchers.withDrawable;
 
 import static com.google.common.truth.Truth.assertThat;
 

@@ -31,9 +31,9 @@ import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static com.android.car.ui.actions.ViewActions.setProgress;
-import static com.android.car.ui.matchers.ViewMatchers.isActivated;
-import static com.android.car.ui.matchers.ViewMatchers.withIndex;
+import static com.android.car.ui.testing.actions.ViewActions.setProgress;
+import static com.android.car.ui.testing.matchers.ViewMatchers.isActivated;
+import static com.android.car.ui.testing.matchers.ViewMatchers.withIndex;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertEquals;

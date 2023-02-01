@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 The Android Open Source Project
+ * Copyright (C) 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,39 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.android.car.ui.matchers;
+package com.android.car.ui.testing.matchers;
 
 import android.view.View;
+
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.car.ui.recyclerview.CarUiRecyclerView;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 /**
- * A custom matcher that allows for the specification of an index when multiple views meet the
- * criteria of a matcher.
+ * Creates matcher for view holder with given item view matcher.
  */
-public class IndexMatcher extends TypeSafeMatcher<View> {
+public class ViewHolderMatcher<VH extends RecyclerView.ViewHolder> extends TypeSafeMatcher<VH> {
 
-    private final Matcher<View> mMatcher;
-    private final int mIndex;
-    int mCurrentIndex = 0;
+    private final Matcher<View> mItemViewMatcher;
 
-    public IndexMatcher(Matcher<View> matcher, int index) {
-        mMatcher = matcher;
-        mIndex = index;
+    public ViewHolderMatcher(Matcher<View> itemViewMatcher) {
+        mItemViewMatcher = itemViewMatcher;
     }
 
     @Override
     public void describeTo(Description description) {
-        description.appendText("with index: ");
-        description.appendValue(mIndex);
-        mMatcher.describeTo(description);
+        description.appendText("is assignable from class: " + CarUiRecyclerView.class);
     }
 
     @Override
-    public boolean matchesSafely(View view) {
-        return mMatcher.matches(view) && mCurrentIndex++ == mIndex;
+    protected boolean matchesSafely(RecyclerView.ViewHolder viewHolder) {
+        return mItemViewMatcher.matches(viewHolder.itemView);
     }
 }

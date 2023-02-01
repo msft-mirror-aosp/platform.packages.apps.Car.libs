@@ -26,8 +26,8 @@ import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static com.android.car.ui.actions.ViewActions.waitForView;
-import static com.android.car.ui.matchers.ViewMatchers.doesNotExistOrIsNotDisplayed;
+import static com.android.car.ui.testing.actions.ViewActions.waitForView;
+import static com.android.car.ui.testing.matchers.ViewMatchers.doesNotExistOrIsNotDisplayed;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -45,9 +45,9 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.android.car.ui.core.CarUi;
-import com.android.car.ui.matchers.ViewMatchers;
 import com.android.car.ui.pluginsupport.PluginFactorySingleton;
 import com.android.car.ui.test.R;
+import com.android.car.ui.testing.matchers.ViewMatchers;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;

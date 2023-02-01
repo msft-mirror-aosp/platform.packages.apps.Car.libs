@@ -14,41 +14,38 @@
  * limitations under the License.
  */
 
-package com.android.car.ui.matchers;
+package com.android.car.ui.testing.matchers;
 
 import android.view.View;
-import android.view.ViewGroup;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-public class NthChildMatcher extends TypeSafeMatcher<View> {
+/**
+ * A custom matcher that allows for the specification of an index when multiple views meet the
+ * criteria of a matcher.
+ */
+public class IndexMatcher extends TypeSafeMatcher<View> {
 
-    private Matcher<View> mParentMatcher;
-    private int mPosition;
+    private final Matcher<View> mMatcher;
+    private final int mIndex;
+    int mCurrentIndex = 0;
 
-    public NthChildMatcher(Matcher<View> parentMatcher, int position) {
-        mParentMatcher = parentMatcher;
-        mPosition = position;
+    public IndexMatcher(Matcher<View> matcher, int index) {
+        mMatcher = matcher;
+        mIndex = index;
     }
 
     @Override
     public void describeTo(Description description) {
-        description.appendText("position " + mPosition + " of parent ");
-        mParentMatcher.describeTo(description);
+        description.appendText("with index: ");
+        description.appendValue(mIndex);
+        mMatcher.describeTo(description);
     }
 
     @Override
     public boolean matchesSafely(View view) {
-        if (!(view.getParent() instanceof ViewGroup)) {
-            return false;
-        }
-
-        ViewGroup parent = (ViewGroup) view.getParent();
-
-        return mParentMatcher.matches(parent)
-                && parent.getChildCount() > mPosition
-                && view.equals(parent.getChildAt(mPosition));
+        return mMatcher.matches(view) && mCurrentIndex++ == mIndex;
     }
 }

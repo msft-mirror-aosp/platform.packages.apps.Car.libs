@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.car.ui.matchers;
+package com.android.car.ui.testing.matchers;
 
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.car.ui.pluginsupport.PluginFactorySingleton;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
 
 import org.hamcrest.Description;
@@ -39,6 +40,18 @@ public class CarUiRecyclerViewMatcher extends TypeSafeMatcher<View> {
 
     @Override
     public boolean matchesSafely(View view) {
+        // Needs to use the root view's context to access the application's resource. Otherwise will
+        // run into errors when call context.getString(
+        //                R.string.car_ui_plugin_package_provider_authority_name).
+        if (PluginFactorySingleton.isPluginEnabled(view.getRootView().getContext())) {
+            try {
+                return PluginFactorySingleton.class.getClassLoader()
+                        .loadClass(CarUiRecyclerView.class.getName())
+                        .isAssignableFrom(view.getClass());
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
         return CarUiRecyclerView.class.isAssignableFrom(view.getClass());
     }
 

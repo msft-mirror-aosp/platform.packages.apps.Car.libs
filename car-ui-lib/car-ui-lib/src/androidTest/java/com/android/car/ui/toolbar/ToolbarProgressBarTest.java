@@ -20,7 +20,7 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 
-import static com.android.car.ui.matchers.ViewMatchers.hasIndeterminateProgress;
+import static com.android.car.ui.testing.matchers.ViewMatchers.hasIndeterminateProgress;
 
 import static com.google.common.truth.Truth.assertThat;
 

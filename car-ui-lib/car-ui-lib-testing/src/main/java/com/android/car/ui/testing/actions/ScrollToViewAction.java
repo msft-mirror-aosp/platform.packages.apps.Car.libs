@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.car.ui.actions;
+package com.android.car.ui.testing.actions;
 
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 
-import static com.android.car.ui.actions.CarUiRecyclerViewActions.itemsMatching;
+import static com.android.car.ui.testing.actions.CarUiRecyclerViewActions.itemsMatching;
 
 import static org.hamcrest.Matchers.allOf;
 
@@ -29,8 +29,8 @@ import androidx.test.espresso.UiController;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.espresso.util.HumanReadables;
 
-import com.android.car.ui.matchers.CarUiRecyclerViewMatcher;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
+import com.android.car.ui.testing.matchers.CarUiRecyclerViewMatcher;
 
 import org.hamcrest.Matcher;
 

@@ -23,7 +23,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static com.android.car.ui.actions.CarUiRecyclerViewActions.scrollToPosition;
+import static com.android.car.ui.testing.actions.CarUiRecyclerViewActions.scrollToPosition;
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 

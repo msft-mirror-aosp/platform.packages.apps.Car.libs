@@ -13,27 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.car.ui.matchers;
+
+package com.android.car.ui.testing.matchers;
 
 import android.view.View;
-import android.widget.ProgressBar;
-
-import androidx.test.espresso.matcher.BoundedMatcher;
 
 import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 
-public class ProgressBarIndeterminateMatcher extends BoundedMatcher<View, ProgressBar> {
-    public ProgressBarIndeterminateMatcher() {
-        super(ProgressBar.class);
-    }
+public final class IsActivatedMatcher extends TypeSafeMatcher<View> {
+    public IsActivatedMatcher() {}
 
     @Override
-    protected boolean matchesSafely(ProgressBar item) {
-        return item.isIndeterminate();
+    public boolean matchesSafely(View view) {
+        return view.isActivated();
     }
 
     @Override
     public void describeTo(Description description) {
-        description.appendText("is indeterminate");
+        description.appendText("is activated");
     }
 }

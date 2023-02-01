@@ -24,10 +24,10 @@ import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static com.android.car.ui.actions.ViewActions.waitForNoMatchingView;
-import static com.android.car.ui.actions.ViewActions.waitForView;
-import static com.android.car.ui.matchers.ViewMatchers.doesNotExistOrIsNotDisplayed;
-import static com.android.car.ui.matchers.ViewMatchers.withDrawable;
+import static com.android.car.ui.testing.actions.ViewActions.waitForNoMatchingView;
+import static com.android.car.ui.testing.actions.ViewActions.waitForView;
+import static com.android.car.ui.testing.matchers.ViewMatchers.doesNotExistOrIsNotDisplayed;
+import static com.android.car.ui.testing.matchers.ViewMatchers.withDrawable;
 
 import static junit.framework.TestCase.fail;
 

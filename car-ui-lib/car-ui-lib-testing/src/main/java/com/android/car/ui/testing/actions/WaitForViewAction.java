@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 The Android Open Source Project
+ * Copyright (C) 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.car.ui.actions;
+package com.android.car.ui.testing.actions;
 
 import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
 
@@ -32,11 +32,12 @@ import org.hamcrest.StringDescription;
 
 import java.util.concurrent.TimeoutException;
 
-public class WaitForNoMatchingViewAction implements ViewAction {
+public class WaitForViewAction implements ViewAction {
+
     private Matcher<View> mMatcher;
     private long mWaitTimeMillis;
 
-    public WaitForNoMatchingViewAction(Matcher<View> matcher, long waitTimeMillis) {
+    public WaitForViewAction(Matcher<View> matcher, long waitTimeMillis) {
         mMatcher = matcher;
         mWaitTimeMillis = waitTimeMillis;
     }
@@ -50,7 +51,7 @@ public class WaitForNoMatchingViewAction implements ViewAction {
     public String getDescription() {
         Description description = new StringDescription();
         mMatcher.describeTo(description);
-        return "wait at most " + mWaitTimeMillis + " milliseconds for no views matching "
+        return "wait at most " + mWaitTimeMillis + " milliseconds for view "
                 + description.toString();
     }
 
@@ -61,16 +62,10 @@ public class WaitForNoMatchingViewAction implements ViewAction {
         final long endTime = startTime + mWaitTimeMillis;
 
         do {
-            boolean isViewFound = false;
             for (View child : TreeIterables.breadthFirstViewTraversal(view)) {
                 if (mMatcher.matches(child)) {
-                    isViewFound = true;
-                    break;
+                    return;
                 }
-            }
-
-            if (!isViewFound) {
-                return;
             }
 
             uiController.loopMainThreadForAtLeast(50);
