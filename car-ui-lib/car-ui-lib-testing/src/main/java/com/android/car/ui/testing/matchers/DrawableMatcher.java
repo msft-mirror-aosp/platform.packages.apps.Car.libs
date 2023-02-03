@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.car.ui.matchers;
+package com.android.car.ui.testing.matchers;
 
 import android.content.Context;
 import android.graphics.Bitmap;

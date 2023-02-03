@@ -25,8 +25,8 @@ import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.isNotChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static com.android.car.ui.matchers.ViewMatchers.isActivated;
-import static com.android.car.ui.matchers.ViewMatchers.withDrawable;
+import static com.android.car.ui.testing.matchers.ViewMatchers.isActivated;
+import static com.android.car.ui.testing.matchers.ViewMatchers.withDrawable;
 
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.instanceOf;

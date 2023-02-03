@@ -31,3 +31,4 @@ project(':oem-demo-rro').projectDir = new File('./oem-tokens/rro')
 
 rootProject.name='Chassis'
 include ':car-rotary-lib'
+include ':car-ui-lib-testing'

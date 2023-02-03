@@ -241,13 +241,9 @@ android_library {
     min_sdk_version: "28",
     target_sdk_version: "30",
 
-    manifest: "car-ui-lib/src/androidTest/AndroidManifest.xml",
+    manifest: "car-ui-lib-testing/src/main/AndroidManifest.xml",
     srcs: [
-        "car-ui-lib/src/androidTest/java/**/actions/*.java",
-        "car-ui-lib/src/androidTest/java/**/matchers/*.java",
-    ],
-    resource_dirs: [
-        "car-ui-lib/src/androidTest/res",
+        "car-ui-lib-testing/src/**/*.java",
     ],
     optimize: {
         enabled: false,
@@ -284,6 +280,7 @@ android_test {
         "androidx.test.espresso.contrib",
         "androidx.test.ext.junit",
         "car-ui-lib-source",
+        "car-ui-lib-testing",
         "platform-test-annotations",
         "mockito-target-inline-minus-junit4",
         "truth-prebuilt",

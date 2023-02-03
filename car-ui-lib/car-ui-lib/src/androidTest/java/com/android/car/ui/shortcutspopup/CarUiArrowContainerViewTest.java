@@ -23,7 +23,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
-import static com.android.car.ui.actions.ViewActions.waitForView;
+import static com.android.car.ui.testing.actions.ViewActions.waitForView;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -37,8 +37,8 @@ import android.widget.LinearLayout;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.android.car.ui.matchers.ViewMatchers;
 import com.android.car.ui.test.R;
+import com.android.car.ui.testing.matchers.ViewMatchers;
 
 import junit.framework.AssertionFailedError;
 

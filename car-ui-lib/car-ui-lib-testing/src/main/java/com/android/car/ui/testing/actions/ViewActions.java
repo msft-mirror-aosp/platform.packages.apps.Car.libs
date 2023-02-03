@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.car.ui.actions;
+package com.android.car.ui.testing.actions;
 
 import android.view.View;
 

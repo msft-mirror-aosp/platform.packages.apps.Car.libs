@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.car.ui.actions;
+package com.android.car.ui.testing.actions;
 
 import android.util.SparseArray;
 import android.view.View;
@@ -24,8 +24,8 @@ import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.espresso.util.HumanReadables;
 
-import com.android.car.ui.matchers.ViewHolderMatcher;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
+import com.android.car.ui.testing.matchers.ViewHolderMatcher;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;

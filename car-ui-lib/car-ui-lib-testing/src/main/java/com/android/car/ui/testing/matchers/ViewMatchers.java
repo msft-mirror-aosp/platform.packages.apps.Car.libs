@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.car.ui.matchers;
+package com.android.car.ui.testing.matchers;
 
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -29,8 +29,6 @@ import android.view.View;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.test.espresso.ViewAssertion;
-
-import com.android.car.ui.matchers.PaddingMatcher.Side;
 
 import org.hamcrest.Matcher;
 
@@ -63,11 +61,11 @@ public class ViewMatchers {
         return new IndexMatcher(matcher, index);
     }
 
-    public static Matcher<View> withPadding(Side side, int exactly) {
+    public static Matcher<View> withPadding(PaddingMatcher.Side side, int exactly) {
         return new PaddingMatcher(side, exactly, exactly);
     }
 
-    public static Matcher<View> withPaddingAtLeast(Side side, int min) {
+    public static Matcher<View> withPaddingAtLeast(PaddingMatcher.Side side, int min) {
         return new PaddingMatcher(side, min, -1);
     }
 

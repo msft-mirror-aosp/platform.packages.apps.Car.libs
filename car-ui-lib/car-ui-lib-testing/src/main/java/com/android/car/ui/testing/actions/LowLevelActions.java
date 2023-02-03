@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.car.ui.actions;
+package com.android.car.ui.testing.actions;
 
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayingAtLeast;

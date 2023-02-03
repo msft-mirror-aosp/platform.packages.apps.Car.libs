@@ -27,7 +27,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withChild;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static com.android.car.ui.actions.ViewActions.waitForView;
+import static com.android.car.ui.testing.actions.ViewActions.waitForView;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.mock;
