@@ -27,7 +27,7 @@ import com.android.car.ui.plugin.oemapis.FocusParkingViewOEMV1;
 import com.android.car.ui.plugin.oemapis.Function;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5;
-import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV2;
+import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.ListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewAttributesOEMV1;
@@ -91,7 +91,7 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
     }
 
     @Override
-    public AppStyledViewControllerOEMV2 createAppStyledView(@NonNull Context sourceContext) {
+    public AppStyledViewControllerOEMV3 createAppStyledView(@NonNull Context sourceContext) {
         return new AppStyleViewControllerImpl(mPluginContext);
     }
 
