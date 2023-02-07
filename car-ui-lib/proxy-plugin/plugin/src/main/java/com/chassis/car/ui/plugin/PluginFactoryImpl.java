@@ -33,7 +33,7 @@ import com.android.car.ui.plugin.PluginContextWrapper;
 import com.android.car.ui.plugin.oemapis.FocusAreaOEMV1;
 import com.android.car.ui.plugin.oemapis.FocusParkingViewOEMV1;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
-import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6;
+import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5;
 import com.android.car.ui.plugin.oemapis.TextOEMV1;
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
@@ -68,7 +68,7 @@ import java.util.WeakHashMap;
  * without the need to target each app specifically. Note: it only applies to the components that
  * come through the plugin system.
  */
-public class PluginFactoryImpl implements PluginFactoryOEMV6 {
+public class PluginFactoryImpl implements PluginFactoryOEMV5 {
 
     private final Context mPluginContext;
     Map<Context, Context> mAppToPluginContextMap = new WeakHashMap<>();

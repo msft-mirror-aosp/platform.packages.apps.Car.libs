@@ -28,14 +28,14 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 
-import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV2;
+import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
 
 import com.chassis.car.ui.plugin.R;
 
 /**
- * The OEM implementation for {@link AppStyledViewControllerOEMV2} for a AppStyledView.
+ * The OEM implementation for {@link AppStyledViewControllerOEMV3} for a AppStyledView.
  */
-public class AppStyleViewControllerImpl implements AppStyledViewControllerOEMV2 {
+public class AppStyleViewControllerImpl implements AppStyledViewControllerOEMV3 {
     private static final double VISIBLE_SCREEN_PERCENTAGE = 0.9;
     private final Context mPluginContext;
     private final View mAppStyleView;
@@ -152,5 +152,10 @@ public class AppStyleViewControllerImpl implements AppStyledViewControllerOEMV2 
 
         return mHeight - mPluginContext.getResources().getDimensionPixelSize(
                 R.dimen.app_styled_dialog_nav_bar_height);
+    }
+
+    @Override
+    public void setSceneType(int sceneType) {
+        // Plugin does not support different scene types
     }
 }

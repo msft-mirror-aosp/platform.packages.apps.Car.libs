@@ -21,7 +21,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV2;
+import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.ListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewAttributesOEMV1;
@@ -40,10 +40,7 @@ import java.util.List;
  * <p>
  * Multiple of these can be provided via {@link PluginVersionProviderOEMV1} to allow plugins
  * to provide an old implementation for old apps, and a newer implementation for newer apps.
- *
- * @deprecated Use {@link PluginFactoryOEMV6} instead
  */
-@Deprecated
 public interface PluginFactoryOEMV5 {
     /**
      * Gives the plugin access to two factories that will create FocusParkingViews and
@@ -109,7 +106,7 @@ public interface PluginFactoryOEMV5 {
      * @return the view used for app styled view.
      */
     @Nullable
-    AppStyledViewControllerOEMV2 createAppStyledView(@NonNull Context sourceContext);
+    AppStyledViewControllerOEMV3 createAppStyledView(@NonNull Context sourceContext);
 
     /**
      * Creates an instance of CarUiRecyclerView
