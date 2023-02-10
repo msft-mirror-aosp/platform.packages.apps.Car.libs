@@ -39,6 +39,7 @@ import android.view.ViewGroup;
 
 import androidx.core.content.ContextCompat;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.android.car.ui.CarUiText;
 import com.android.car.ui.R;
@@ -47,6 +48,7 @@ import com.android.car.ui.TestActivity;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +56,7 @@ import java.util.List;
 /**
  * Unit tests for {@link CarUiTextViewTest}.
  */
+@RunWith(AndroidJUnit4.class)
 public class CarUiTextViewTest {
     private static final String ELLIPSIS = "…";
     private static final CharSequence LONG_CHAR_SEQUENCE =

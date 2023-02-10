@@ -43,6 +43,7 @@ import androidx.preference.ListPreference;
 import androidx.preference.MultiSelectListPreference;
 import androidx.preference.PreferenceScreen;
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.android.car.ui.baselayout.Insets;
@@ -53,7 +54,9 @@ import com.android.car.ui.testing.matchers.PaddingMatcher.Side;
 import com.android.car.ui.toolbar.ToolbarController;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(AndroidJUnit4.class)
 public class NonFullscreenPreferenceFragmentTest {
 
     private static final String EXTRA_FULLSCREEN = "fullscreen";
