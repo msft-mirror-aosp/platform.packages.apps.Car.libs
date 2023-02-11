@@ -23,6 +23,14 @@ package com.android.car.media.common;
 public final class MediaConstants {
 
     // TODO(b/222362032): Replace with androidx reference.
+    public static final String KEY_SUBTITLE_LINK_MEDIA_ID =
+            "androidx.car.app.mediaextensions.KEY_SUBTITLE_LINK_MEDIA_ID";
+
+    // TODO(b/222362032): Replace with androidx reference.
+    public static final String KEY_DESCRIPTION_LINK_MEDIA_ID =
+            "androidx.car.app.mediaextensions.KEY_DESCRIPTION_LINK_MEDIA_ID";
+
+    // TODO(b/222362032): Replace with androidx reference.
     public static final String
             BROWSER_SERVICE_EXTRAS_KEY_APPLICATION_PREFERENCES_USING_CAR_APP_LIBRARY_INTENT =
             "androidx.media.BrowserRoot.Extras"
