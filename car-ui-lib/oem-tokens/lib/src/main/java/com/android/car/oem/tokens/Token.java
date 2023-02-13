@@ -96,6 +96,17 @@ public class Token {
     }
 
     /**
+     * Return the OEM provided text appearance resource id corresponding to the styleable resource.
+     * <p>
+     * If OEM customized token text appearance values are unavailable on the system , the library
+     * default text appearance token value is returned.
+     */
+    public static int getTextAppearance(@NonNull Context context, @StyleableRes int styleableId) {
+        TypedValue tv = getStyleableTypedValue(context, styleableId);
+        return tv.resourceId;
+    }
+
+    /**
      * Return the OEM provided color value corresponding to the styleable resource.
      * <p>
      * If OEM customized token color values are unavailable on the system , the library default
@@ -103,21 +114,7 @@ public class Token {
      */
     @ColorInt
     public static int getColor(@NonNull Context context, @StyleableRes int styleableId) {
-        TypedValue tv = new TypedValue();
-        context.getTheme().resolveAttribute(R.attr.oemTokenOverrideEnabled, tv, true);
-        boolean oemOverrideDisabled = tv.data == 0;
-        if (oemOverrideDisabled) {
-            context = createOemStyledContext(context);
-        }
-
-        TypedArray libAttrs = context.obtainStyledAttributes(R.style.OemTokens,
-                R.styleable.OemTokens);
-        libAttrs.getValue(styleableId, tv);
-
-        if (tv.resourceId == 0) {
-            return tv.data;
-        }
-        libAttrs.recycle();
+        TypedValue tv = getStyleableTypedValue(context, styleableId);
         return ContextCompat.getColor(context, tv.resourceId);
     }
 
@@ -150,5 +147,22 @@ public class Token {
         libAttributes.recycle();
         sharedLibAttributes.recycle();
         return isOemStyled;
+    }
+
+    private static TypedValue getStyleableTypedValue(@NonNull Context context,
+            @StyleableRes int styleableId) {
+        TypedValue tv = new TypedValue();
+        context.getTheme().resolveAttribute(R.attr.oemTokenOverrideEnabled, tv, true);
+        boolean oemOverrideDisabled = tv.data == 0;
+        if (oemOverrideDisabled) {
+            context = createOemStyledContext(context);
+        }
+
+        TypedArray libAttrs = context.obtainStyledAttributes(R.style.OemTokens,
+                R.styleable.OemTokens);
+        libAttrs.getValue(styleableId, tv);
+
+        libAttrs.recycle();
+        return tv;
     }
 }
