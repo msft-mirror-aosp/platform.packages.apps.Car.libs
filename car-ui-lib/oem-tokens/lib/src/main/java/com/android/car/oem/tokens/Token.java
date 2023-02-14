@@ -115,6 +115,11 @@ public class Token {
     @ColorInt
     public static int getColor(@NonNull Context context, @StyleableRes int styleableId) {
         TypedValue tv = getStyleableTypedValue(context, styleableId);
+
+        if (tv.resourceId == 0) {
+            return tv.data;
+        }
+
         return ContextCompat.getColor(context, tv.resourceId);
     }
 
