@@ -131,4 +131,11 @@
     <public name="textAppearanceBodyLarge" id="0x00770072" type="attr" />
     <public name="textAppearanceBodyMedium" id="0x00770073" type="attr" />
     <public name="textAppearanceBodySmall" id="0x00770074" type="attr" />
+    <public name="shapeCornerNone" id="0x00770075" type="attr" />
+    <public name="shapeCornerExtraSmall" id="0x00770076" type="attr" />
+    <public name="shapeCornerSmall" id="0x00770077" type="attr" />
+    <public name="shapeCornerMedium" id="0x00770078" type="attr" />
+    <public name="shapeCornerLarge" id="0x00770079" type="attr" />
+    <public name="shapeCornerExtraLarge" id="0x0077007A" type="attr" />
+    <public name="shapeCornerFull" id="0x0077007B" type="attr" />
 </resources>

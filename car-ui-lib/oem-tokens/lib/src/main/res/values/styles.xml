@@ -139,6 +139,14 @@
         <item name="oemTextAppearanceBodyMedium">?com.android.oem.tokens:attr/textAppearanceBodyMedium</item>
         <item name="oemTextAppearanceBodySmall">?com.android.oem.tokens:attr/textAppearanceBodySmall</item>
 
+        <item name="oemShapeCornerNone">?com.android.oem.tokens:attr/shapeCornerNone</item>
+        <item name="oemShapeCornerExtraSmall">?com.android.oem.tokens:attr/shapeCornerExtraSmall</item>
+        <item name="oemShapeCornerSmall">?com.android.oem.tokens:attr/shapeCornerSmall</item>
+        <item name="oemShapeCornerMedium">?com.android.oem.tokens:attr/shapeCornerMedium</item>
+        <item name="oemShapeCornerLarge">?com.android.oem.tokens:attr/shapeCornerLarge</item>
+        <item name="oemShapeCornerExtraLarge">?com.android.oem.tokens:attr/shapeCornerExtraLarge</item>
+        <item name="oemShapeCornerFull">?com.android.oem.tokens:attr/shapeCornerFull</item>
+
         <item name="com.android.oem.tokens:colorPrimary">?attr/oemColorPrimaryPalette80</item>
         <item name="com.android.oem.tokens:colorOnPrimary">?attr/oemColorPrimaryPalette20</item>
         <item name="com.android.oem.tokens:colorPrimaryContainer">?attr/oemColorPrimaryPalette30</item>
@@ -260,6 +268,14 @@
         <item name="com.android.oem.tokens:textAppearanceBodyLarge">@style/TextAppearance.Body.Large</item>
         <item name="com.android.oem.tokens:textAppearanceBodyMedium">@style/TextAppearance.Body.Medium</item>
         <item name="com.android.oem.tokens:textAppearanceBodySmall">@style/TextAppearance.Body.Small</item>
+
+        <item name="com.android.oem.tokens:shapeCornerNone">0dp</item>
+        <item name="com.android.oem.tokens:shapeCornerExtraSmall">8dp</item>
+        <item name="com.android.oem.tokens:shapeCornerSmall">16dp</item>
+        <item name="com.android.oem.tokens:shapeCornerMedium">24dp</item>
+        <item name="com.android.oem.tokens:shapeCornerLarge">48dp</item>
+        <item name="com.android.oem.tokens:shapeCornerExtraLarge">48dp</item>
+        <item name="com.android.oem.tokens:shapeCornerFull">128dp</item>
     </style>
 
     <style name="BaseTextAppearance">

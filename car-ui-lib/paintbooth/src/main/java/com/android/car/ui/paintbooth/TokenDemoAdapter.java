@@ -16,6 +16,7 @@
 
 package com.android.car.ui.paintbooth;
 
+import android.graphics.drawable.GradientDrawable;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +38,8 @@ public class TokenDemoAdapter extends
 
     static final int VIEW_TYPE_LIST_COLOR = 1;
     static final int VIEW_TYPE_LIST_TEXT = 2;
+    static final int VIEW_TYPE_LIST_SHAPE = 3;
+
 
     private final List<Pair<String, Integer>> mItems;
 
@@ -68,6 +71,16 @@ public class TokenDemoAdapter extends
                         tokenInfo.second);
                 holder.mText.setTextAppearance(textAppearanceId);
                 break;
+            case VIEW_TYPE_LIST_SHAPE:
+                int cornerRadius = Token.getCornerRadius(holder.itemView.getContext(),
+                        tokenInfo.second);
+                GradientDrawable background = new GradientDrawable();
+                background.setColor(
+                        holder.itemView.getResources().getColor(android.R.color.holo_blue_dark));
+                background.setCornerRadius(cornerRadius);
+                holder.mText.setText(tokenInfo.first);
+                holder.mText.setBackground(background);
+                break;
             default:
                 throw new IllegalStateException("Unexpected value: " + holder.getItemViewType());
         }
@@ -80,6 +93,8 @@ public class TokenDemoAdapter extends
             return VIEW_TYPE_LIST_COLOR;
         } else if (tokenInfo.first.contains("textAppearance")) {
             return VIEW_TYPE_LIST_TEXT;
+        } else if (tokenInfo.first.contains("shapeCorner")) {
+            return VIEW_TYPE_LIST_SHAPE;
         }
 
         throw new IllegalStateException("Unknown view type.");
