@@ -26,6 +26,8 @@ import android.view.ContextThemeWrapper;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.annotation.Px;
+import androidx.annotation.StyleRes;
 import androidx.annotation.StyleableRes;
 import androidx.core.content.ContextCompat;
 
@@ -96,11 +98,25 @@ public class Token {
     }
 
     /**
+     * Return the OEM provided corner radius corresponding to the styleable resource.
+     * <p>
+     * If OEM customized token corner radius values are unavailable on the system , the library
+     * default corner radius token value is returned.
+     */
+    @Px
+    public static int getCornerRadius(@NonNull Context context, @StyleableRes int styleableId) {
+        TypedValue tv = getStyleableTypedValue(context, styleableId);
+        return TypedValue.complexToDimensionPixelOffset(tv.data,
+                context.getResources().getDisplayMetrics());
+    }
+
+    /**
      * Return the OEM provided text appearance resource id corresponding to the styleable resource.
      * <p>
      * If OEM customized token text appearance values are unavailable on the system , the library
      * default text appearance token value is returned.
      */
+    @StyleRes
     public static int getTextAppearance(@NonNull Context context, @StyleableRes int styleableId) {
         TypedValue tv = getStyleableTypedValue(context, styleableId);
         return tv.resourceId;

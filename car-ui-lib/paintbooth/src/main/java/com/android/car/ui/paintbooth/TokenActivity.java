@@ -61,6 +61,9 @@ public class TokenActivity extends Activity {
         tabs.add(Tab.builder().setText("Text").setIcon(
                 getDrawable(R.drawable.car_ui_icon_edit)).setSelectedListener(
                 tab -> list.setAdapter(new TokenDemoAdapter(createTextList()))).build());
+        tabs.add(Tab.builder().setText("Shape").setIcon(
+                getDrawable(R.drawable.car_ui_icon_edit)).setSelectedListener(
+                tab -> list.setAdapter(new TokenDemoAdapter(createCornerRadiusList()))).build());
         toolbar.setTabs(tabs, 0);
 
         Switch oemSwitch = requireViewById(R.id.oem_switch1);
@@ -182,6 +185,26 @@ public class TokenActivity extends Activity {
                 R.styleable.OemTokens_oemTextAppearanceBodyMedium));
         list.add(new Pair<>("textAppearanceBodySmall",
                 R.styleable.OemTokens_oemTextAppearanceBodySmall));
+
+        return list;
+    }
+
+    private List<Pair<String, Integer>> createCornerRadiusList() {
+        List<Pair<String, Integer>> list = new ArrayList<>();
+        list.add(new Pair<>("shapeCornerNone",
+                R.styleable.OemTokens_oemShapeCornerNone));
+        list.add(new Pair<>("shapeCornerExtraSmall",
+                R.styleable.OemTokens_oemShapeCornerExtraSmall));
+        list.add(new Pair<>("shapeCornerSmall",
+                R.styleable.OemTokens_oemShapeCornerSmall));
+        list.add(new Pair<>("shapeCornerMedium",
+                R.styleable.OemTokens_oemShapeCornerMedium));
+        list.add(new Pair<>("shapeCornerLarge",
+                R.styleable.OemTokens_oemShapeCornerLarge));
+        list.add(new Pair<>("shapeCornerExtraLarge",
+                R.styleable.OemTokens_oemShapeCornerExtraLarge));
+        list.add(new Pair<>("shapeCornerFull",
+                R.styleable.OemTokens_oemShapeCornerFull));
 
         return list;
     }
