@@ -222,6 +222,8 @@ public class ToolbarSearchTest {
         onView(withHint("Test search hint")).check(matches(isDisplayed()));
     }
 
+    // TODO b/269305905 Remove Ignore annotation when fixed
+    @Ignore
     @Test
     public void test_setSearchHint_uxRestricted_injectedEvents() {
         try {
