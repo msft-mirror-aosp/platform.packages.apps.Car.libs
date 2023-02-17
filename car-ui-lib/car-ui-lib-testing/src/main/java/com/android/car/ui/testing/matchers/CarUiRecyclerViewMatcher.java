@@ -20,7 +20,6 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.car.ui.pluginsupport.PluginFactorySingleton;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
 
 import org.hamcrest.Description;
@@ -40,19 +39,13 @@ public class CarUiRecyclerViewMatcher extends TypeSafeMatcher<View> {
 
     @Override
     public boolean matchesSafely(View view) {
-        // Needs to use the root view's context to access the application's resource. Otherwise will
-        // run into errors when call context.getString(
-        //                R.string.car_ui_plugin_package_provider_authority_name).
-        if (PluginFactorySingleton.isPluginEnabled(view.getRootView().getContext())) {
-            try {
-                return PluginFactorySingleton.class.getClassLoader()
-                        .loadClass(CarUiRecyclerView.class.getName())
-                        .isAssignableFrom(view.getClass());
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+        try {
+            Class<?> carUiRecyclerViewClass = CarUiRecyclerView.class.getClassLoader()
+                    .loadClass(CarUiRecyclerView.class.getName());
+            return carUiRecyclerViewClass.isAssignableFrom(view.getClass());
+        } catch (ClassNotFoundException e) {
+            return false;
         }
-        return CarUiRecyclerView.class.isAssignableFrom(view.getClass());
     }
 
     public static Matcher<View> atPosition(final int position,
