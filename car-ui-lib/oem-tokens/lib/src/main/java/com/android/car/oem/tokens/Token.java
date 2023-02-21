@@ -83,8 +83,13 @@ public class Token {
      * returned with library default token values.
      */
     @NonNull
-    public static Context createOemStyledContext(@NonNull Context context) {
+    public static Context createOemStyledContext(@NonNull Context context,
+            boolean oemOverrideDisabled) {
         ContextThemeWrapper oemContext = new ContextThemeWrapper(context, R.style.OemTokens);
+
+        if (oemOverrideDisabled) {
+            oemContext.getTheme().applyStyle(R.style.OemTokens, true);
+        }
 
         int oemStyleOverride = context.getResources().getIdentifier("OemStyle",
                 "style", Token.getTokenSharedLibraryName());
@@ -176,7 +181,7 @@ public class Token {
         context.getTheme().resolveAttribute(R.attr.oemTokenOverrideEnabled, tv, true);
         boolean oemOverrideDisabled = tv.data == 0;
         if (oemOverrideDisabled) {
-            context = createOemStyledContext(context);
+            context = createOemStyledContext(context, true);
         }
 
         TypedArray libAttrs = context.obtainStyledAttributes(R.style.OemTokens,
