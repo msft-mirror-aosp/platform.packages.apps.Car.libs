@@ -39,7 +39,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
 import com.android.car.ui.TestActivity;
-import com.android.car.ui.appstyledview.AppStyledViewController.AppStyledViewNavIcon;
+import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
 import com.android.car.ui.pluginsupport.PluginFactorySingleton;
 import com.android.car.ui.test.R;
 
@@ -106,7 +106,7 @@ public class AppStyledDialogControllerTest {
 
         mActivity.runOnUiThread(() -> {
             mAppStyledDialogController.setContentView(appStyledTestView);
-            mAppStyledDialogController.setNavIcon(AppStyledViewNavIcon.CLOSE);
+            mAppStyledDialogController.setNavIconType(NavIcon.CLOSE);
             mAppStyledDialogController.show();
         });
 
@@ -125,7 +125,7 @@ public class AppStyledDialogControllerTest {
 
         mActivity.runOnUiThread(() -> {
             mAppStyledDialogController.setContentView(appStyledTestView);
-            mAppStyledDialogController.setNavIcon(AppStyledViewNavIcon.BACK);
+            mAppStyledDialogController.setNavIconType(NavIcon.BACK);
             mAppStyledDialogController.setOnNavIconClickListener(callback);
             mAppStyledDialogController.show();
         });
@@ -147,7 +147,7 @@ public class AppStyledDialogControllerTest {
 
         mActivity.runOnUiThread(() -> {
             mAppStyledDialogController.setContentView(appStyledTestView);
-            mAppStyledDialogController.setNavIcon(AppStyledViewNavIcon.BACK);
+            mAppStyledDialogController.setNavIconType(NavIcon.BACK);
             mAppStyledDialogController.setOnDismissListener(callback);
             mAppStyledDialogController.show();
         });

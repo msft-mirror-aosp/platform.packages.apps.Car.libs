@@ -46,6 +46,7 @@ import com.android.car.apps.common.imaging.ImageBinder;
 import com.android.car.apps.common.imaging.ImageBinder.PlaceholderType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -466,6 +467,20 @@ public class MediaItemMetadata implements Parcelable {
             }
         }
         return null;
+    }
+
+    /** Returns list of browse custom actions if present, empty if not present */
+    public List<String> getBrowseCustomActionIds() {
+        Bundle extras = mMediaDescription.getExtras();
+        if (extras != null) {
+            if (extras.containsKey(
+                    com.android.car.media.common.MediaConstants.BROWSE_CUSTOM_ACTIONS_ITEM_LIST)) {
+                return extras.getStringArrayList(
+                        com.android.car.media.common.MediaConstants
+                                .BROWSE_CUSTOM_ACTIONS_ITEM_LIST);
+            }
+        }
+        return Collections.emptyList();
     }
 
     @Override

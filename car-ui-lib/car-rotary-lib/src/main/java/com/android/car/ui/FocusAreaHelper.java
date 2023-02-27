@@ -535,6 +535,10 @@ class FocusAreaHelper {
     void onDetachedFromWindow() {
         mFocusArea.getViewTreeObserver().removeOnTouchModeChangeListener(mTouchModeChangeListener);
         mFocusArea.getViewTreeObserver().removeOnGlobalFocusChangeListener(mFocusChangeListener);
+        // Release the reference to the focused view and focus area to avoid memory leak.
+        mRotaryCache.clearFocusAreaHistory();
+        mRotaryCache.saveFocusedView(null, /* elapsedRealtime= */ 0);
+
     }
 
     boolean onWindowFocusChanged(boolean hasWindowFocus) {

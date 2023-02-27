@@ -21,7 +21,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV2;
+import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.ListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewAttributesOEMV1;
@@ -106,7 +106,7 @@ public interface PluginFactoryOEMV5 {
      * @return the view used for app styled view.
      */
     @Nullable
-    AppStyledViewControllerOEMV2 createAppStyledView(@NonNull Context sourceContext);
+    AppStyledViewControllerOEMV3 createAppStyledView(@NonNull Context sourceContext);
 
     /**
      * Creates an instance of CarUiRecyclerView

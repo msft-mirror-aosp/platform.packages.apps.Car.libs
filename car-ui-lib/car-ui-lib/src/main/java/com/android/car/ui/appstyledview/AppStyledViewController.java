@@ -24,16 +24,24 @@ import android.view.WindowManager;
 import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
 
+import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
+import com.android.car.ui.appstyledview.AppStyledDialogController.SceneType;
+
 import java.lang.annotation.Retention;
 
 /**
- * An interface for accessing a Chassis AppStyledView, regardless of how the underlying views are
- * represented.
+ * An internal interface for accessing a Chassis AppStyledView, regardless of how the underlying
+ * views are represented.
+ * <p>
+ * Apps should not use this directly. Apps should use {@link AppStyledDialogController}.
  */
 public interface AppStyledViewController {
     /**
      * The possible values for AppStyledViewNavIcon.
+     *
+     * @deprecated Use {@link NavIcon} instead.
      */
+    @Deprecated
     @IntDef({
             AppStyledViewNavIcon.BACK,
             AppStyledViewNavIcon.CLOSE,
@@ -62,7 +70,7 @@ public interface AppStyledViewController {
     /**
      * Sets the nav icon to be used.
      */
-    void setNavIcon(@AppStyledViewNavIcon int navIcon);
+    void setNavIcon(@NavIcon int navIcon);
 
     /**
      * Sets a runnable that will be invoked when a nav icon is clicked.
@@ -83,4 +91,9 @@ public interface AppStyledViewController {
      * Returns the maximum height for content to be rendered in the AppStyledView.
      */
     int getContentAreaHeight();
+
+    /**
+     * Sets the {@link AppStyledDialogController.SceneType} for the app styled view.
+     */
+    void setSceneType(@SceneType int sceneType);
 }

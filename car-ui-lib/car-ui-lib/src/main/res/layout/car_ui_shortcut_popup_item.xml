@@ -31,7 +31,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/car_ui_shortcuts_contentView"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="wrap_content"
         android:focusable="true"
         android:layout_gravity="center"
         android:paddingBottom="24dp"
@@ -43,6 +43,7 @@
             android:id="@+id/car_ui_content_left_drawable"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            app:tint="@color/car_ui_shortcuts_item_text_color"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -52,7 +53,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
-            android:enabled="true"
             android:textColor="@color/car_ui_shortcuts_item_text_color"
             app:layout_constraintBottom_toBottomOf="@id/car_ui_content_left_drawable"
             app:layout_constraintEnd_toEndOf="parent"

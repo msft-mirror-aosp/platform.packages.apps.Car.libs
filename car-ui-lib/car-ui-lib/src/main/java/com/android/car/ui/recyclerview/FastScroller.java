@@ -122,8 +122,11 @@ class FastScroller implements View.OnTouchListener {
         }
         // percentage of data to be scrolled.
         float percentage = ((newDragPos - thumbCenter) / (float) scrollbarLength);
+        // TODO(b/259996453)
+        // scrollable area does not include toolbar, so subtract RecyclerView padding from height
         int totalPossibleOffset =
-                mRecyclerView.computeVerticalScrollRange() - mRecyclerView.getHeight();
+                mRecyclerView.computeVerticalScrollRange() - (mRecyclerView.getHeight()
+                        - mRecyclerView.getPaddingTop() - mRecyclerView.getPaddingBottom());
         return (int) (percentage * totalPossibleOffset);
     }
 

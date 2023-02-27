@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2022 The Android Open Source Project
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<resources>
+    <declare-styleable name="OemTokens">
+        <attr name="oemTokenOverrideEnabled" format="boolean" />
+
+        <attr name="oemColorSeed" format="color" />
+
+        <attr name="oemColorPrimary" format="color" />
+        <attr name="oemColorOnPrimary" format="color" />
+        <attr name="oemColorPrimaryContainer" format="color" />
+        <attr name="oemColorOnPrimaryContainer" format="color" />
+
+        <attr name="oemColorSecondary" format="color" />
+        <attr name="oemColorOnSecondary" format="color" />
+        <attr name="oemColorSecondaryContainer" format="color" />
+        <attr name="oemColorOnSecondaryContainer" format="color" />
+
+        <attr name="oemColorTertiary" format="color" />
+        <attr name="oemColorOnTertiary" format="color" />
+        <attr name="oemColorTertiaryContainer" format="color" />
+        <attr name="oemColorOnTertiaryContainer" format="color" />
+
+        <attr name="oemColorError" format="color" />
+        <attr name="oemColorOnError" format="color" />
+        <attr name="oemColorErrorContainer" format="color" />
+        <attr name="oemColorOnErrorContainer" format="color" />
+
+        <attr name="oemColorBackground" format="color" />
+        <attr name="oemColorOnBackground" format="color" />
+        <attr name="oemColorSurface" format="color" />
+        <attr name="oemColorOnSurface" format="color" />
+        <attr name="oemColorSurfaceVariant" format="color" />
+        <attr name="oemColorOnSurfaceVariant" format="color" />
+        <attr name="oemColorOutline" format="color" />
+
+        <attr name="oemColorPrimaryPalette100" format="color" />
+        <attr name="oemColorPrimaryPalette99" format="color" />
+        <attr name="oemColorPrimaryPalette95" format="color" />
+        <attr name="oemColorPrimaryPalette90" format="color" />
+        <attr name="oemColorPrimaryPalette80" format="color" />
+        <attr name="oemColorPrimaryPalette70" format="color" />
+        <attr name="oemColorPrimaryPalette60" format="color" />
+        <attr name="oemColorPrimaryPalette50" format="color" />
+        <attr name="oemColorPrimaryPalette40" format="color" />
+        <attr name="oemColorPrimaryPalette30" format="color" />
+        <attr name="oemColorPrimaryPalette20" format="color" />
+        <attr name="oemColorPrimaryPalette10" format="color" />
+        <attr name="oemColorPrimaryPalette0" format="color" />
+
+        <attr name="oemColorSecondaryPalette100" format="color" />
+        <attr name="oemColorSecondaryPalette99" format="color" />
+        <attr name="oemColorSecondaryPalette95" format="color" />
+        <attr name="oemColorSecondaryPalette90" format="color" />
+        <attr name="oemColorSecondaryPalette80" format="color" />
+        <attr name="oemColorSecondaryPalette70" format="color" />
+        <attr name="oemColorSecondaryPalette60" format="color" />
+        <attr name="oemColorSecondaryPalette50" format="color" />
+        <attr name="oemColorSecondaryPalette40" format="color" />
+        <attr name="oemColorSecondaryPalette30" format="color" />
+        <attr name="oemColorSecondaryPalette20" format="color" />
+        <attr name="oemColorSecondaryPalette10" format="color" />
+        <attr name="oemColorSecondaryPalette0" format="color" />
+
+        <attr name="oemColorTertiaryPalette100" format="color" />
+        <attr name="oemColorTertiaryPalette99" format="color" />
+        <attr name="oemColorTertiaryPalette95" format="color" />
+        <attr name="oemColorTertiaryPalette90" format="color" />
+        <attr name="oemColorTertiaryPalette80" format="color" />
+        <attr name="oemColorTertiaryPalette70" format="color" />
+        <attr name="oemColorTertiaryPalette60" format="color" />
+        <attr name="oemColorTertiaryPalette50" format="color" />
+        <attr name="oemColorTertiaryPalette40" format="color" />
+        <attr name="oemColorTertiaryPalette30" format="color" />
+        <attr name="oemColorTertiaryPalette20" format="color" />
+        <attr name="oemColorTertiaryPalette10" format="color" />
+        <attr name="oemColorTertiaryPalette0" format="color" />
+
+        <attr name="oemColorErrorPalette100" format="color" />
+        <attr name="oemColorErrorPalette99" format="color" />
+        <attr name="oemColorErrorPalette95" format="color" />
+        <attr name="oemColorErrorPalette90" format="color" />
+        <attr name="oemColorErrorPalette80" format="color" />
+        <attr name="oemColorErrorPalette70" format="color" />
+        <attr name="oemColorErrorPalette60" format="color" />
+        <attr name="oemColorErrorPalette50" format="color" />
+        <attr name="oemColorErrorPalette40" format="color" />
+        <attr name="oemColorErrorPalette30" format="color" />
+        <attr name="oemColorErrorPalette20" format="color" />
+        <attr name="oemColorErrorPalette10" format="color" />
+        <attr name="oemColorErrorPalette0" format="color" />
+
+        <attr name="oemColorNeutralPalette100" format="color" />
+        <attr name="oemColorNeutralPalette99" format="color" />
+        <attr name="oemColorNeutralPalette95" format="color" />
+        <attr name="oemColorNeutralPalette90" format="color" />
+        <attr name="oemColorNeutralPalette80" format="color" />
+        <attr name="oemColorNeutralPalette70" format="color" />
+        <attr name="oemColorNeutralPalette60" format="color" />
+        <attr name="oemColorNeutralPalette50" format="color" />
+        <attr name="oemColorNeutralPalette40" format="color" />
+        <attr name="oemColorNeutralPalette30" format="color" />
+        <attr name="oemColorNeutralPalette20" format="color" />
+        <attr name="oemColorNeutralPalette10" format="color" />
+        <attr name="oemColorNeutralPalette0" format="color" />
+
+        <attr name="oemColorNeutralVariantPalette100" format="color" />
+        <attr name="oemColorNeutralVariantPalette99" format="color" />
+        <attr name="oemColorNeutralVariantPalette95" format="color" />
+        <attr name="oemColorNeutralVariantPalette90" format="color" />
+        <attr name="oemColorNeutralVariantPalette80" format="color" />
+        <attr name="oemColorNeutralVariantPalette70" format="color" />
+        <attr name="oemColorNeutralVariantPalette60" format="color" />
+        <attr name="oemColorNeutralVariantPalette50" format="color" />
+        <attr name="oemColorNeutralVariantPalette40" format="color" />
+        <attr name="oemColorNeutralVariantPalette30" format="color" />
+        <attr name="oemColorNeutralVariantPalette20" format="color" />
+        <attr name="oemColorNeutralVariantPalette10" format="color" />
+        <attr name="oemColorNeutralVariantPalette0" format="color" />
+
+        <attr name="oemTextAppearanceDisplayLarge" format="reference" />
+        <attr name="oemTextAppearanceDisplayMedium" format="reference" />
+        <attr name="oemTextAppearanceDisplaySmall" format="reference" />
+        <attr name="oemTextAppearanceHeadlineLarge" format="reference" />
+        <attr name="oemTextAppearanceHeadlineMedium" format="reference" />
+        <attr name="oemTextAppearanceHeadlineSmall" format="reference" />
+        <attr name="oemTextAppearanceTitleLarge" format="reference" />
+        <attr name="oemTextAppearanceTitleMedium" format="reference" />
+        <attr name="oemTextAppearanceTitleSmall" format="reference" />
+        <attr name="oemTextAppearanceLabelLarge" format="reference" />
+        <attr name="oemTextAppearanceLabelMedium" format="reference" />
+        <attr name="oemTextAppearanceLabelSmall" format="reference" />
+        <attr name="oemTextAppearanceBodyLarge" format="reference" />
+        <attr name="oemTextAppearanceBodyMedium" format="reference" />
+        <attr name="oemTextAppearanceBodySmall" format="reference" />
+    </declare-styleable>
+</resources>

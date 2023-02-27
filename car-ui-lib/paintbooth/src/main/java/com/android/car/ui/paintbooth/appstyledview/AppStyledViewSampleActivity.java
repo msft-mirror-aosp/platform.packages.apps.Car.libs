@@ -15,11 +15,7 @@
  */
 package com.android.car.ui.paintbooth.appstyledview;
 
-import android.content.Context;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -31,7 +27,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.android.car.ui.appstyledview.AppStyledDialogController;
-import com.android.car.ui.appstyledview.AppStyledViewController.AppStyledViewNavIcon;
+import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
 import com.android.car.ui.core.CarUi;
 import com.android.car.ui.paintbooth.R;
 import com.android.car.ui.toolbar.NavButtonMode;
@@ -56,19 +52,8 @@ public class AppStyledViewSampleActivity extends AppCompatActivity {
         toolbar.setLogo(R.drawable.ic_launcher);
 
         mAppStyledDialogController = new AppStyledDialogController(this);
-        int width = mAppStyledDialogController.getContentAreaWidth();
-        Resources resources = getResources();
-        Configuration config = resources.getConfiguration();
-
-        config.smallestScreenWidthDp = width;
-        // fake the min screen size so resources load from the corresponding folders. For eg.
-        // layout-sw400dp
-        Context testContext = createConfigurationContext(config);
-
-        Context contextThemeWrapper = new ContextThemeWrapper(testContext,
-                R.style.AppStyledDialogThemeSample);
-
-        View appStyledTestView = LayoutInflater.from(contextThemeWrapper)
+        View appStyledTestView = LayoutInflater.from(
+                        mAppStyledDialogController.createContentViewConfigurationContext(this))
                 .inflate(R.layout.app_styled_view_test_sample, null, false);
 
         mAppStyledDialogController.setOnNavIconClickListener(
@@ -78,7 +63,7 @@ public class AppStyledViewSampleActivity extends AppCompatActivity {
         Button btn = findViewById(R.id.show_app_styled_fragment);
         btn.setOnClickListener(v -> {
             mAppStyledDialogController.setContentView(appStyledTestView);
-            mAppStyledDialogController.setNavIcon(AppStyledViewNavIcon.CLOSE);
+            mAppStyledDialogController.setNavIconType(NavIcon.CLOSE);
             hideSystemBars();
             mAppStyledDialogController.show();
         });

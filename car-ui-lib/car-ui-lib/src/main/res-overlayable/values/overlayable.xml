@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--Copyright (C) 2022 The Android Open Source Project
+<!--Copyright (C) 2023 The Android Open Source Project
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ limitations under the License.-->
       <item type="attr" name="carUiClickableWhileDisabled"/>
       <item type="attr" name="carUiIcon"/>
       <item type="attr" name="carUiLayout"/>
-      <item type="attr" name="carUiOmitDisplayCutOutInsets"/>
       <item type="attr" name="carUiPreferenceStyle"/>
       <item type="attr" name="carUiRecyclerViewStyle"/>
       <item type="attr" name="carUiShowChevron"/>
@@ -148,6 +147,7 @@ limitations under the License.-->
       <item type="bool" name="car_ui_ime_wide_screen_allow_app_hide_content_area"/>
       <item type="bool" name="car_ui_is_light_theme"/>
       <item type="bool" name="car_ui_list_item_single_line_title"/>
+      <item type="bool" name="car_ui_omit_display_cut_out_insets"/>
       <item type="bool" name="car_ui_preference_list_instant_change_callback"/>
       <item type="bool" name="car_ui_preference_list_show_full_screen"/>
       <item type="bool" name="car_ui_preference_show_chevron"/>
@@ -604,6 +604,9 @@ limitations under the License.-->
       <item type="style" name="Widget.CarUi.AlertDialog.TitleContainer"/>
       <item type="style" name="Widget.CarUi.AppStyledView"/>
       <item type="style" name="Widget.CarUi.AppStyledView.WindowAnimations"/>
+      <item type="style" name="Widget.CarUi.AppStyledView.WindowAnimations.Enter"/>
+      <item type="style" name="Widget.CarUi.AppStyledView.WindowAnimations.Exit"/>
+      <item type="style" name="Widget.CarUi.AppStyledView.WindowAnimations.Intermediate"/>
       <item type="style" name="Widget.CarUi.Button"/>
       <item type="style" name="Widget.CarUi.Button.Borderless.Colored"/>
       <item type="style" name="Widget.CarUi.CarUiRecyclerView"/>

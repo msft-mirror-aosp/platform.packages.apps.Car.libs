@@ -2961,8 +2961,10 @@ public class CarUiRecyclerViewTest {
     private int getId(String resourceName) {
         if (mIsPluginEnabled) {
             Context pluginContext = PluginFactorySingleton.getPluginContext();
+            // Since we are using proxy-plugin, which loads resources from car-ui-lib
+            // sharedlibrary wrapper, we pass sharedlibrary package name when loading resources
             return pluginContext.getResources().getIdentifier(
-                    resourceName.replace("car_ui_", ""), "id", pluginContext.getPackageName());
+                    resourceName, "id", "com.android.car.ui.sharedlibrary");
         } else {
             Context context = getInstrumentation().getTargetContext();
             return context.getResources()

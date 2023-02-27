@@ -19,7 +19,6 @@ package com.android.car.ui.appstyledview;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.util.DisplayMetrics;
-import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,8 +31,9 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.car.ui.CarUiLayoutInflaterFactory;
 import com.android.car.ui.R;
+import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
+import com.android.car.ui.appstyledview.AppStyledDialogController.SceneType;
 
 /**
  * Controller to interact with the app styled view.
@@ -42,10 +42,14 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
     private static final double VISIBLE_SCREEN_PERCENTAGE = 0.9;
 
     private final Context mContext;
-    @AppStyledViewNavIcon
+    @NavIcon
     private int mAppStyleViewNavIcon;
-    @Nullable private Runnable mAppStyledVCloseClickListener;
-    @Nullable private View mAppStyledView;
+    @SceneType
+    private int mSceneType;
+    @Nullable
+    private Runnable mAppStyledVCloseClickListener;
+    @Nullable
+    private View mAppStyledView;
     private int mWidth;
     private int mHeight;
 
@@ -54,10 +58,9 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
     }
 
     @Override
-    public void setNavIcon(@AppStyledViewNavIcon int navIcon) {
+    public void setNavIcon(@NavIcon int navIcon) {
         mAppStyleViewNavIcon = navIcon;
         updateNavIcon();
-
     }
 
     /**
@@ -109,7 +112,22 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
             params.y = posY;
         }
 
-        params.windowAnimations = R.style.Widget_CarUi_AppStyledView_WindowAnimations;
+        switch (mSceneType) {
+            case SceneType.ENTER:
+                params.windowAnimations = R.style.Widget_CarUi_AppStyledView_WindowAnimations_Enter;
+                break;
+            case SceneType.EXIT:
+                params.windowAnimations = R.style.Widget_CarUi_AppStyledView_WindowAnimations_Exit;
+                break;
+            case SceneType.INTERMEDIATE:
+                params.windowAnimations =
+                        R.style.Widget_CarUi_AppStyledView_WindowAnimations_Intermediate;
+                break;
+            case SceneType.SINGLE:
+            default:
+                params.windowAnimations = R.style.Widget_CarUi_AppStyledView_WindowAnimations;
+                break;
+        }
 
         return params;
     }
@@ -137,17 +155,14 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
     }
 
     @Override
-    public View getAppStyledView(@Nullable View contentView) {
-        // create ContextThemeWrapper from the original Activity Context with the custom theme
-        final Context contextThemeWrapper = new ContextThemeWrapper(mContext, R.style.Theme_CarUi);
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        if (inflater.getFactory2() == null) {
-            inflater.setFactory2(new CarUiLayoutInflaterFactory());
-        }
-        // clone the inflater using the ContextThemeWrapper
-        LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
+    public void setSceneType(int sceneType) {
+        mSceneType = sceneType;
+    }
 
-        mAppStyledView = localInflater.inflate(R.layout.car_ui_app_styled_view, null, false);
+    @Override
+    public View getAppStyledView(@Nullable View contentView) {
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        mAppStyledView = inflater.inflate(R.layout.car_ui_app_styled_view, null, false);
         mAppStyledView.setClipToOutline(true);
         RecyclerView rv = mAppStyledView.findViewById(R.id.car_ui_app_styled_content);
 
@@ -167,9 +182,9 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
         }
 
         ImageView close = mAppStyledView.findViewById(R.id.car_ui_app_styled_view_icon_close);
-        if (mAppStyleViewNavIcon == AppStyledViewNavIcon.BACK) {
+        if (mAppStyleViewNavIcon == NavIcon.BACK) {
             close.setImageResource(R.drawable.car_ui_icon_arrow_back);
-        } else if (mAppStyleViewNavIcon == AppStyledViewNavIcon.CLOSE) {
+        } else if (mAppStyleViewNavIcon == NavIcon.CLOSE) {
             close.setImageResource(R.drawable.car_ui_icon_close);
         } else {
             close.setImageResource(R.drawable.car_ui_icon_close);

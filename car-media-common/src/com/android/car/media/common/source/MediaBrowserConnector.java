@@ -17,6 +17,7 @@
 package com.android.car.media.common.source;
 
 import static com.android.car.apps.common.util.CarAppsDebugUtils.idHash;
+import static com.android.car.media.common.MediaConstants.BROWSE_CUSTOM_ACTIONS_ACTION_LIMIT;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -29,6 +30,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.util.Preconditions;
 import androidx.media.utils.MediaConstants;
+
+import com.android.car.media.common.R;
 
 import java.util.Objects;
 
@@ -256,7 +259,10 @@ public class MediaBrowserConnector {
         Bundle rootHints = new Bundle();
         rootHints.putInt(MediaConstants.BROWSER_ROOT_HINTS_KEY_MEDIA_ART_SIZE_PIXELS,
                 mMaxBitmapSizePx);
+        rootHints.putInt(BROWSE_CUSTOM_ACTIONS_ACTION_LIMIT,
+                mContext.getResources().getInteger(R.integer.max_custom_actions));
         ComponentName browseService = mediaSource.getBrowseServiceComponentName();
         return new MediaBrowserCompat(mContext, browseService, callback, rootHints);
     }
 }
+

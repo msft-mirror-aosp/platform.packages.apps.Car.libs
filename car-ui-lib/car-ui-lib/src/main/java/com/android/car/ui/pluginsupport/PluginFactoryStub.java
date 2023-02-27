@@ -19,6 +19,7 @@ import static com.android.car.ui.utils.CarUiUtils.requireViewByRefId;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -45,7 +46,6 @@ import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.recyclerview.CarUiRecyclerViewImpl;
 import com.android.car.ui.toolbar.ToolbarController;
 import com.android.car.ui.toolbar.ToolbarControllerImpl;
-import com.android.car.ui.utils.CarUiUtils;
 import com.android.car.ui.widget.CarUiTextView;
 import com.android.car.ui.widget.CarUiTextViewImpl;
 
@@ -122,21 +122,23 @@ public final class PluginFactoryStub implements PluginFactory {
     }
 
     private void handleDisplayCutOut(View contentView) {
-        if (!(contentView.getContext() instanceof Activity)) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
             return;
         }
 
-        Activity activity = ((Activity) contentView.getContext());
-        if (!CarUiUtils.getThemeBoolean(activity, R.attr.carUiOmitDisplayCutOutInsets)) {
+        // Unwrap context to account for ContextWrapper
+        Context context = unwrapContext(contentView.getContext());
+        if (!(context instanceof Activity)) {
+            return;
+        }
+
+        Activity activity = (Activity) context;
+        if (!activity.getResources().getBoolean(R.bool.car_ui_omit_display_cut_out_insets)) {
             return;
         }
 
         Window baseLayoutWindow = activity.getWindow();
         WindowManager.LayoutParams lp = baseLayoutWindow.getAttributes();
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
-            return;
-        }
 
         if (lp.layoutInDisplayCutoutMode
                 != WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS) {
@@ -149,6 +151,14 @@ public final class PluginFactoryStub implements PluginFactory {
                     WindowInsets.Type.displayCutout(), android.graphics.Insets.NONE).build();
             return v.onApplyWindowInsets(insets);
         });
+    }
+
+    private Context unwrapContext(Context context) {
+        while (!(context instanceof Activity) && context instanceof ContextWrapper) {
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+
+        return context;
     }
 
     @NonNull

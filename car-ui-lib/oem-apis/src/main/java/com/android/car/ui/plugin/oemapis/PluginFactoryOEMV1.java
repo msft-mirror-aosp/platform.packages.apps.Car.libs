@@ -37,7 +37,7 @@ import java.util.function.Function;
  * Multiple of these can be provided via {@link PluginVersionProviderOEMV1} to allow plugins
  * to provide an old implementation for old apps, and a newer implementation for newer apps.
  *
- * @deprecated Use {@link PluginFactoryOEMV3} instead
+ * @deprecated Use {@link PluginFactoryOEMV5} instead
  */
 @SuppressWarnings("AndroidJdkLibsChecker")
 @Deprecated

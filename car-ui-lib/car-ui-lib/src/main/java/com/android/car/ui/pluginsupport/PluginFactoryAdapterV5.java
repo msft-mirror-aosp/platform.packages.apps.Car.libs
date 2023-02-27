@@ -34,7 +34,7 @@ import com.android.car.ui.FocusParkingView;
 import com.android.car.ui.FocusParkingViewAdapterV1;
 import com.android.car.ui.R;
 import com.android.car.ui.appstyledview.AppStyledViewController;
-import com.android.car.ui.appstyledview.AppStyledViewControllerAdapterV2;
+import com.android.car.ui.appstyledview.AppStyledViewControllerAdapterV3;
 import com.android.car.ui.appstyledview.AppStyledViewControllerImpl;
 import com.android.car.ui.baselayout.Insets;
 import com.android.car.ui.baselayout.InsetsChangedListener;
@@ -42,7 +42,7 @@ import com.android.car.ui.plugin.oemapis.Consumer;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5;
 import com.android.car.ui.plugin.oemapis.TextOEMV1;
-import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV2;
+import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.ContentListItemOEMV2;
 import com.android.car.ui.plugin.oemapis.recyclerview.HeaderListItemOEMV1;
@@ -70,7 +70,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This class is an wrapper around {@link PluginFactoryOEMV5} that implements {@link PluginFactory},
+ * This class is a wrapper around {@link PluginFactoryOEMV5} that implements {@link PluginFactory},
  * to provide a version-agnostic way of interfacing with the OEM's PluginFactory.
  */
 public final class PluginFactoryAdapterV5 implements PluginFactory {
@@ -125,11 +125,11 @@ public final class PluginFactoryAdapterV5 implements PluginFactory {
 
     @Override
     public AppStyledViewController createAppStyledView(Context activityContext) {
-        AppStyledViewControllerOEMV2 appStyledViewControllerOEMV2 = mOem.createAppStyledView(
+        AppStyledViewControllerOEMV3 appStyledViewControllerOEMV3 = mOem.createAppStyledView(
                 activityContext);
-        return appStyledViewControllerOEMV2 == null ? new AppStyledViewControllerImpl(
-                activityContext) : new AppStyledViewControllerAdapterV2(
-                appStyledViewControllerOEMV2);
+        return appStyledViewControllerOEMV3 == null ? new AppStyledViewControllerImpl(
+                activityContext) : new AppStyledViewControllerAdapterV3(
+                appStyledViewControllerOEMV3);
     }
 
     private Insets adaptInsets(InsetsOEMV1 insetsOEM) {

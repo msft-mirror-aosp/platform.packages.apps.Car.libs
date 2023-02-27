@@ -27,7 +27,6 @@ car_ui_lib_static_libs = [
     "androidx.recyclerview_recyclerview",
     "androidx-constraintlayout_constraintlayout-solver",
     "androidx.asynclayoutinflater_asynclayoutinflater",
-    "car-ui-lib-resources",
     "car-rotary-lib",
 ]
 
@@ -41,7 +40,6 @@ android_library {
     manifest: "car-ui-lib/src/main/AndroidManifest.xml",
     resource_dirs: [
         "car-ui-lib/src/main/res",
-        "car-ui-lib/src/main/res-overlayable",
         "car-ui-lib/src/main/res-private"
     ],
 
@@ -56,6 +54,77 @@ android_library {
         "com.android.permission",
         "//apex_available:platform",
     ],
+}
+
+android_library {
+    name: "car-ui-lib-overlayable-resources",
+
+    sdk_version: "current",
+    min_sdk_version: "28",
+    target_sdk_version: "30",
+
+    manifest: "car-ui-lib/src/main/AndroidManifest.xml",
+    resource_dirs: [
+        "car-ui-lib/src/main/res-overlayable",
+    ],
+
+    static_libs: [
+        "car-ui-lib-resources",
+    ],
+    apex_available: [
+        "com.android.permission",
+        "//apex_available:platform",
+    ],
+}
+
+android_library {
+    name: "car-ui-lib-source-no-overlayable",
+
+    sdk_version: "current",
+    min_sdk_version: "28",
+    target_sdk_version: "30",
+
+    manifest: "car-ui-lib/src/main/AndroidManifest.xml",
+    srcs: ["car-ui-lib/src/main/java/**/*.java"],
+    optimize: {
+        proguard_flags_files: [
+            "car-ui-lib/proguard-rules.pro",
+            "car-ui-lib/proguard-rules-platform.pro",
+        ],
+    },
+    libs: [
+        "android.car-stubs",
+        "car-ui-lib-oem-apis-source",
+    ],
+    static_libs: ["car-ui-lib-resources",] + car_ui_lib_static_libs,
+    apex_available: [
+        "com.android.permission",
+        "//apex_available:platform",
+    ],
+}
+
+java_genrule {
+    name: "car-ui-lib-no-overlayable-aar",
+    srcs: [
+        ":car-ui-lib-source-no-overlayable{.aar}",
+        "car-ui-lib/src/main/res/**/*",
+        "car-ui-lib/src/main/res-private/**/*",
+        "car-rotary-lib/src/main/res/**/*",
+    ],
+    out: ["car-ui-lib-no-overlayable.aar"],
+    tools: [
+        "make_slim_aar",
+    ],
+    cmd: "dir=packages/apps/Car/libs/car-ui-lib && " +
+        "$(location make_slim_aar) --classes-allowlist com/android/car/ui $(out) " +
+        "$(location :car-ui-lib-source-no-overlayable{.aar}) " +
+        "$$dir/car-ui-lib/src/main/res $$dir/car-ui-lib/src/main/res-private " +
+        "$$dir/car-rotary-lib/src/main/res " +
+        "--proguard-files $$dir/car-ui-lib/proguard-rules.pro " +
+        "$$dir/car-ui-lib/proguard-rules-platform.pro",
+    dist: {
+        targets: ["car-ui-lib-no-overlayable-aar",]
+    },
 }
 
 android_library {
@@ -75,9 +144,9 @@ android_library {
     },
     libs: [
         "android.car-stubs",
-        "car-ui-lib-oem-apis-jar",
+        "car-ui-lib-oem-apis-source",
     ],
-    static_libs: car_ui_lib_static_libs,
+    static_libs: ["car-ui-lib-overlayable-resources",] + car_ui_lib_static_libs,
     apex_available: [
         "com.android.permission",
         "//apex_available:platform",
@@ -92,6 +161,7 @@ java_genrule {
         "car-ui-lib/src/main/res-overlayable/**/*",
         "car-ui-lib/src/main/res-private/**/*",
         "car-rotary-lib/src/main/res/**/*",
+        "car-rotary-lib/src/main/res-overlayable/**/*",
     ],
     out: ["car-ui-lib.aar"],
     tools: [
@@ -102,6 +172,7 @@ java_genrule {
         "$(location :car-ui-lib-source{.aar}) " +
         "$$dir/car-ui-lib/src/main/res $$dir/car-ui-lib/src/main/res-overlayable " +
         "$$dir/car-ui-lib/src/main/res-private $$dir/car-rotary-lib/src/main/res " +
+        "$$dir/car-rotary-lib/src/main/res-overlayable " +
         "--proguard-files $$dir/car-ui-lib/proguard-rules.pro " +
         "$$dir/car-ui-lib/proguard-rules-platform.pro",
     dist: {
@@ -113,7 +184,7 @@ android_library_import {
     name: "car-ui-lib-prebuilt",
     aars: [":car-ui-lib-aar"],
     sdk_version: "current",
-    static_libs: car_ui_lib_static_libs,
+    static_libs: ["car-ui-lib-overlayable-resources",] + car_ui_lib_static_libs,
 }
 
 car_ui_lib_testing_support_static_libs = [
@@ -243,9 +314,13 @@ android_app {
 
     required: ["allowed_privapp_com.android.car.ui.paintbooth"],
 
-    libs: ["android.car-stubs"],
+    libs: [
+         "android.car-stubs",
+	 "token-shared-lib"
+    ],
     static_libs: [
-        "car-ui-lib-prebuilt",
+        "oem-token-lib",
+        "car-ui-lib-source",
         "androidx.annotation_annotation",
         "androidx.appcompat_appcompat",
         "androidx-constraintlayout_constraintlayout",
@@ -259,6 +334,10 @@ android_app {
     certificate: CERTIFICATE,
     privileged: true,
 
+    enforce_uses_libs:false,
+    dex_preopt: {
+        enabled: false,
+    },
     export_package_resources: true,
 
     optimize: {

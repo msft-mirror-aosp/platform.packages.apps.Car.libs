@@ -21,6 +21,7 @@ import android.view.WindowManager.LayoutParams;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV1;
 
 /**
@@ -45,12 +46,12 @@ public class AppStyledViewControllerAdapterV1 implements AppStyledViewController
     }
 
     @Override
-    public void setNavIcon(@AppStyledViewNavIcon int navIcon) {
+    public void setNavIcon(@NavIcon int navIcon) {
         switch (navIcon) {
-            case AppStyledViewNavIcon.BACK:
+            case NavIcon.BACK:
                 mOemController.setNavIcon(AppStyledViewControllerOEMV1.NAV_ICON_BACK);
                 break;
-            case AppStyledViewNavIcon.CLOSE:
+            case NavIcon.CLOSE:
                 mOemController.setNavIcon(AppStyledViewControllerOEMV1.NAV_ICON_CLOSE);
                 break;
             default:
@@ -76,5 +77,10 @@ public class AppStyledViewControllerAdapterV1 implements AppStyledViewController
     @Override
     public int getContentAreaHeight() {
         return -1;
+    }
+
+    @Override
+    public void setSceneType(int sceneType) {
+        // Do nothing. Scene type not supported in AppStyledViewControllerOEMV2.
     }
 }

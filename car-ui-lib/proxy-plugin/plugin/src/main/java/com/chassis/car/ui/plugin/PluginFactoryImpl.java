@@ -29,12 +29,13 @@ import androidx.annotation.Nullable;
 
 import com.android.car.ui.CarUiText;
 import com.android.car.ui.appstyledview.AppStyledViewControllerImpl;
+import com.android.car.ui.plugin.PluginContextWrapper;
 import com.android.car.ui.plugin.oemapis.FocusAreaOEMV1;
 import com.android.car.ui.plugin.oemapis.FocusParkingViewOEMV1;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5;
 import com.android.car.ui.plugin.oemapis.TextOEMV1;
-import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV2;
+import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.ContentListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.HeaderListItemOEMV1;
@@ -101,7 +102,7 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
 
     @Nullable
     @Override
-    public AppStyledViewControllerOEMV2 createAppStyledView(@NonNull Context context) {
+    public AppStyledViewControllerOEMV3 createAppStyledView(@NonNull Context context) {
         Context pluginContext = getPluginUiContext(context, mPluginContext);
         // build the app styled controller that will be delegated to
         AppStyledViewControllerImpl appStyledViewController = new AppStyledViewControllerImpl(
@@ -266,6 +267,8 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
         if (currentConfiguration.diff(newConfiguration) != 0) {
             uiContext = uiContext.createConfigurationContext(newConfiguration);
         }
+
+        uiContext = new PluginContextWrapper(uiContext);
 
         // add a custom layout inflater that can handle things like CarUiTextView that is in the
         // layout files of the car-ui-lib static implementation

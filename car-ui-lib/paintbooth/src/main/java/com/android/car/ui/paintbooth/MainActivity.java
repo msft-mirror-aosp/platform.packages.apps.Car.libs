@@ -82,6 +82,7 @@ public class MainActivity extends Activity implements InsetsChangedListener {
             new ServiceElement("Simulate Screen Bounds", VisibleBoundsSimulator.class),
             new SwitchElement("Add PaintBooth to plugin deny-list", this::isInPluginDenyList,
                     this::onPluginSwitchChanged),
+            new ActivityElement("Token samples", TokenActivity.class),
             new ActivityElement("Theme samples", TextSamples.class),
             new ActivityElement("Dialogs sample", DialogsActivity.class),
             new ActivityElement("App Styled View Modal", AppStyledViewSampleActivity.class),
