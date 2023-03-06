@@ -26,6 +26,8 @@ android_app {
 android_robolectric_test {
     name: "CarMediaCommonRoboTests",
 
+    upstream: true,
+
     srcs: ["src/**/*.java"],
 
     java_resource_dirs: ["config"],
