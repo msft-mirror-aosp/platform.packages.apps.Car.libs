@@ -189,7 +189,7 @@ android_library_import {
 
 car_ui_lib_testing_support_static_libs = [
     "car-ui-lib-source",
-    "Robolectric_all-target",
+    "Robolectric_all-target_upstream",
 ]
 
 android_library {
