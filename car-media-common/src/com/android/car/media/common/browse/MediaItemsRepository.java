@@ -226,6 +226,7 @@ public class MediaItemsRepository {
                 String rootId = mBrowsingState.mBrowser.getRoot();
                 getCache().mRootId = rootId;
                 getMediaChildren(rootId);
+                mCustomBrowseActions.postValue(parseBrowseActions(mBrowsingState));
                 break;
             case DISCONNECTING:
                 unsubscribeNodes();
@@ -279,7 +280,6 @@ public class MediaItemsRepository {
 
         if (Objects.equals(parentId, cache.mRootId)) {
             mRootMediaItems.onDataLoaded(old, list);
-            mCustomBrowseActions.postValue(parseBrowseActions(mBrowsingState));
         }
     }
 
