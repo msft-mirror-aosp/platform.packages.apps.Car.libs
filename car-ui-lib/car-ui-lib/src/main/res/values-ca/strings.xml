@@ -22,7 +22,7 @@ limitations under the License.
     <string name="car_ui_toolbar_nav_icon_content_description" msgid="6116610935599234725">"Enrere"</string>
     <string name="car_ui_toolbar_menu_item_search_title" msgid="2988075382498202155">"Cerca"</string>
     <string name="car_ui_toolbar_menu_item_settings_title" msgid="5206858558664840197">"Configuració"</string>
-    <string name="car_ui_toolbar_menu_item_overflow_title" msgid="9132512843297732890">"Menú addicional"</string>
+    <string name="car_ui_toolbar_menu_item_overflow_title" msgid="9132512843297732890">"Menú de desbordament"</string>
     <string name="car_ui_preference_switch_on" msgid="2091385466752081649">"Activat"</string>
     <string name="car_ui_preference_switch_off" msgid="511096411523593697">"Desactivat"</string>
     <string name="car_ui_alert_dialog_default_button" msgid="399078418913970003">"Tanca"</string>
