@@ -32,6 +32,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 
+import com.android.car.apps.common.TappableTextView;
 import com.android.car.apps.common.imaging.ImageViewBinder;
 import com.android.car.apps.common.util.ViewUtils;
 import com.android.car.media.common.browse.MediaItemsRepository;
@@ -207,11 +208,15 @@ public class MetadataController {
                         if (hasDescriptionText) {
                             ViewUtils.setVisible(description, true);
                         } else if (hasTime) {
-                            // In layout file, subtitle is constrained to description. When album
-                            // name is empty but progress is not empty, the visibility of
-                            // description should be INVISIBLE instead of GONE, otherwise the
-                            // constraint will be broken.
-                            ViewUtils.setInvisible(description, true);
+                            if (description instanceof TappableTextView) {
+                                ((TappableTextView) description).hideView(true);
+                            } else {
+                                // In layout file, subtitle is constrained to description. When
+                                // album name is empty but progress is not empty, the visibility of
+                                // description should be INVISIBLE instead of GONE, otherwise the
+                                // constraint will be broken.
+                                ViewUtils.setInvisible(description, true);
+                            }
                         } else {
                             ViewUtils.setVisible(description, false);
                         }
