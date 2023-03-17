@@ -39,13 +39,9 @@ import com.android.car.ui.recyclerview.CarUiContentListItem;
 import com.android.car.ui.recyclerview.CarUiListItem;
 import com.android.car.ui.recyclerview.CarUiListItemAdapter;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
-import com.android.car.ui.toolbar.NavButtonMode;
-import com.android.car.ui.toolbar.Toolbar;
-import com.android.car.ui.toolbar.ToolbarController;
 import com.android.car.ui.utils.CarUiUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -86,25 +82,9 @@ public class ListPreferenceFragment extends Fragment implements InsetsChangedLis
         final CarUiRecyclerView carUiRecyclerView = CarUiUtils.requireViewByRefId(view, R.id.list);
         mUseInstantPreferenceChangeCallback =
                 getResources().getBoolean(R.bool.car_ui_preference_list_instant_change_callback);
-        ToolbarController toolbar = null;
-        if (getTargetFragment() instanceof PreferenceFragment) {
-            toolbar = ((PreferenceFragment) getTargetFragment()).getPreferenceToolbar(this);
-        }
 
         carUiRecyclerView.setClipToPadding(false);
         mPreference = getListPreference();
-        if (toolbar != null) {
-            toolbar.setTitle(mPreference.getTitle());
-            toolbar.setSubtitle("");
-            if (toolbar.isStateSet()) {
-                toolbar.setState(Toolbar.State.SUBPAGE);
-            } else {
-                toolbar.setNavButtonMode(NavButtonMode.BACK);
-            }
-            toolbar.setLogo(null);
-            toolbar.setMenuItems(null);
-            toolbar.setTabs(Collections.emptyList());
-        }
 
         CharSequence[] entries = mPreference.getEntries();
         CharSequence[] entryValues = mPreference.getEntryValues();

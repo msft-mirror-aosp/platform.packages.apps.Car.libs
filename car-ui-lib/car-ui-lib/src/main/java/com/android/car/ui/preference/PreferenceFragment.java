@@ -50,6 +50,7 @@ import com.android.car.ui.baselayout.Insets;
 import com.android.car.ui.baselayout.InsetsChangedListener;
 import com.android.car.ui.core.CarUi;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
+import com.android.car.ui.toolbar.NavButtonMode;
 import com.android.car.ui.toolbar.Toolbar;
 import com.android.car.ui.toolbar.ToolbarController;
 import com.android.car.ui.utils.CarUiUtils;
@@ -57,6 +58,7 @@ import com.android.car.ui.utils.CarUiUtils;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -250,6 +252,29 @@ public abstract class PreferenceFragment extends PreferenceFragmentCompat implem
                     .replace(((ViewGroup) getView().getParent()).getId(), f)
                     .addToBackStack(null)
                     .commit();
+
+            setupChildFragmentToolbar(preference);
+        }
+    }
+
+    /**
+     * Sets up toolbar for {@link ListPreferenceFragment}
+     * and {@link MultiSelectListPreferenceFragment}
+     */
+    protected void setupChildFragmentToolbar(@NonNull Preference preference) {
+        ToolbarController toolbar = null;
+        toolbar = getPreferenceToolbar(this);
+        if (toolbar != null) {
+            toolbar.setTitle(preference.getTitle());
+            toolbar.setSubtitle("");
+            if (toolbar.isStateSet()) {
+                toolbar.setState(Toolbar.State.SUBPAGE);
+            } else {
+                toolbar.setNavButtonMode(NavButtonMode.BACK);
+            }
+            toolbar.setLogo(null);
+            toolbar.setMenuItems(null);
+            toolbar.setTabs(Collections.emptyList());
         }
     }
 
