@@ -316,7 +316,7 @@ android_app {
 	 "token-shared-lib"
     ],
     static_libs: [
-        "oem-token-lib",
+        "oem-token-lib-source",
         "car-ui-lib-source",
         "androidx.annotation_annotation",
         "androidx.appcompat_appcompat",
