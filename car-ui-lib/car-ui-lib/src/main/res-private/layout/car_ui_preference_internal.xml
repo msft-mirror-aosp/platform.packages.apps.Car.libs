@@ -24,40 +24,44 @@
     android:tag="carUiPreference"
     android:paddingStart="?android:attr/listPreferredItemPaddingStart">
 
-  <ImageView
+  <com.android.car.ui.uxr.DrawableStateImageView
       android:id="@android:id/icon"
-      android:layout_width="44dp"
-      android:layout_height="44dp"
+      android:layout_width="@dimen/car_ui_preference_icon_size"
+      android:layout_height="@dimen/car_ui_preference_icon_size"
       android:layout_alignParentStart="true"
       android:layout_centerVertical="true"
-      android:layout_marginBottom="16dp"
-      android:layout_marginEnd="16dp"
-      android:layout_marginTop="16dp"
-      android:scaleType="fitCenter" />
+      android:layout_marginBottom="@dimen/car_ui_preference_content_margin_bottom"
+      android:layout_marginEnd="@dimen/car_ui_preference_icon_margin_end"
+      android:layout_marginTop="@dimen/car_ui_preference_content_margin_top"
+      android:scaleType="fitCenter"
+      style="@style/Preference.CarUi.Icon"/>
+
   <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_centerVertical="true"
-      android:layout_marginBottom="16dp"
-      android:layout_marginTop="16dp"
+      android:layout_marginBottom="@dimen/car_ui_preference_content_margin_bottom"
+      android:layout_marginTop="@dimen/car_ui_preference_content_margin_top"
       android:layout_marginEnd="?android:attr/listPreferredItemPaddingEnd"
       android:layout_toEndOf="@android:id/icon"
       android:layout_toStartOf="@android:id/widget_frame"
       android:orientation="vertical">
-    <TextView
+
+    <com.android.car.ui.uxr.DrawableStateTextView
         android:id="@android:id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:singleLine="true"
-        android:textColor="@android:color/holo_blue_dark"
-        android:textAppearance="@android:style/TextAppearance.DeviceDefault"/>
-    <TextView
+        android:textAppearance="@style/TextAppearance.CarUi.PreferenceTitle"/>
+
+    <com.android.car.ui.uxr.DrawableStateTextView
         android:id="@android:id/summary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/holo_orange_light"
-        android:textAppearance="@android:style/TextAppearance.DeviceDefault"/>
+        android:textAppearance="@style/TextAppearance.CarUi.PreferenceSummary"/>
+
   </LinearLayout>
+
   <!-- Preference should place its actual preference widget here. -->
   <FrameLayout
       android:id="@android:id/widget_frame"
