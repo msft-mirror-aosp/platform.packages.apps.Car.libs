@@ -14,7 +14,7 @@
 
 // MUST be a resource only library
 android_library {
-    name: "oem-token-lib",
+    name: "oem-token-lib-source",
     min_sdk_version: "28",
     target_sdk_version: "33",
     sdk_version: "current",
@@ -32,3 +32,21 @@ android_library {
     ],
 }
 
+java_genrule {
+    name: "oem-token-lib-aar",
+    srcs: [
+        ":oem-token-lib-source{.aar}",
+        "src/main/res/**/*",
+    ],
+    out: ["oem-token-lib.aar"],
+    tools: [
+        "make_slim_aar",
+    ],
+    cmd: "dir=packages/apps/Car/libs/car-ui-lib/oem-tokens/lib && " +
+        "$(location make_slim_aar) --classes-allowlist com/android/car/oem/tokens $(out) " +
+        "$(location :oem-token-lib-source{.aar}) " +
+        "$$dir/src/main/res ",
+    dist: {
+        targets: ["oem-token-lib-aar",]
+    },
+}
