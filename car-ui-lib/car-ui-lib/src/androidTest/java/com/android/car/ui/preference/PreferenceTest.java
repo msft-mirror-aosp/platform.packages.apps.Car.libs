@@ -709,7 +709,7 @@ public class PreferenceTest {
         preference.setTitle(R.string.title_twoaction_preference);
         preference.setSummary(R.string.summary_twoaction_preference);
         preference.setOrder(0);
-        preference.setSecondaryActionIcon(R.drawable.avd_show_password);
+        preference.setSecondaryActionIcon(R.drawable.ic_settings_gear);
         Runnable clickListener = mock(Runnable.class);
         preference.setOnSecondaryActionClickListener(clickListener);
         mActivity.addPreference(preference);
@@ -736,7 +736,7 @@ public class PreferenceTest {
         preference.setTitle(R.string.title_twoaction_preference);
         preference.setSummary(R.string.summary_twoaction_preference);
         preference.setOrder(0);
-        preference.setSecondaryActionIcon(R.drawable.avd_show_password);
+        preference.setSecondaryActionIcon(R.drawable.ic_settings_gear);
         Runnable clickListener = mock(Runnable.class);
         preference.setOnSecondaryActionClickListener(clickListener);
         preference.setUxRestricted(true);
@@ -769,7 +769,7 @@ public class PreferenceTest {
         preference.setTitle(R.string.title_twoaction_preference);
         preference.setSummary(R.string.summary_twoaction_preference);
         preference.setOrder(0);
-        preference.setSecondaryActionIcon(R.drawable.avd_show_password);
+        preference.setSecondaryActionIcon(R.drawable.ic_settings_gear);
         Runnable clickListener = mock(Runnable.class);
         preference.setOnSecondaryActionClickListener(clickListener);
         preference.setEnabled(false);
@@ -1076,7 +1076,7 @@ public class PreferenceTest {
         preference.setPositiveButtonText(positiveButtonText);
         preference.setDialogTitle(R.string.dialog_title_edit_text_preference);
         preference.setSummaryProvider(EditTextPreference.SimpleSummaryProvider.getInstance());
-        preference.setDialogIcon(R.drawable.avd_hide_password);
+        preference.setDialogIcon(R.drawable.ic_settings_gear);
         mActivity.addPreference(preference);
 
         // Check title is displayed as expected.
