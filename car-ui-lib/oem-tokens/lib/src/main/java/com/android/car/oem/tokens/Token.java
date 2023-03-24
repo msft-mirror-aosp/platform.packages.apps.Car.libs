@@ -94,7 +94,7 @@ public class Token {
         int oemStyleOverride = context.getResources().getIdentifier("OemStyle",
                 "style", Token.getTokenSharedLibraryName());
         if (oemStyleOverride == 0) {
-            return context;
+            return oemContext;
         }
 
         oemContext.getTheme().applyStyle(oemStyleOverride, true);
