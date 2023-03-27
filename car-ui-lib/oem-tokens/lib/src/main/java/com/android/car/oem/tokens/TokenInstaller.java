@@ -97,8 +97,8 @@ public class TokenInstaller extends ContentProvider {
                             return;
                         }
 
-                        Log.i(TAG, "Applying OEM token library values to activity");
-                        activity.getTheme().applyStyle(R.style.OemTokens, true);
+                        Log.i(TAG, "Setting OEM token default values");
+                        activity.getTheme().applyStyle(R.style.OemTokensBase, true);
 
                         int useOemTokenId = activity.getResources().getIdentifier(
                                 "enable_oem_tokens",

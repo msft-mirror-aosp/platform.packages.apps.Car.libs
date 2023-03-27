@@ -188,6 +188,12 @@ public class Token {
                 R.styleable.OemTokens);
         libAttrs.getValue(styleableId, tv);
 
+        // If type attribute, the shared lib style was not applied, read it from the base style
+        if (tv.type == TYPE_ATTRIBUTE) {
+            libAttrs = context.obtainStyledAttributes(R.style.OemTokensBase, R.styleable.OemTokens);
+            libAttrs.getValue(styleableId, tv);
+        }
+
         libAttrs.recycle();
         return tv;
     }
