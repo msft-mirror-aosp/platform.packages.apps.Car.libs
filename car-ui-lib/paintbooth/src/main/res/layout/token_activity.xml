@@ -27,6 +27,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:enabled="false"
+        android:textColor="?oemColorPrimary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Use OEM color scheme 1"/>

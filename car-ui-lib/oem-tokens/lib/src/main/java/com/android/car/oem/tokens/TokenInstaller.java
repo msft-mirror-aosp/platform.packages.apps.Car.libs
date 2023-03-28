@@ -109,6 +109,8 @@ public class TokenInstaller extends ContentProvider {
 
                         if (useOemToken && Token.isTokenSharedLibInstalled(
                                 activity.getPackageManager())) {
+                            Log.i(TAG, "Setting shared lib OEM token default values");
+                            activity.getTheme().applyStyle(R.style.OemTokens, true);
                             int oemStyleOverride = activity.getResources().getIdentifier("OemStyle",
                                     "style", Token.getTokenSharedLibraryName());
                             if (oemStyleOverride == 0) {
