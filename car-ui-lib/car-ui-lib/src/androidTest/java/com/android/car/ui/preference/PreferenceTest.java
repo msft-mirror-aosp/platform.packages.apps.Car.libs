@@ -801,8 +801,17 @@ public class PreferenceTest {
 
     @Test
     public void testTwoActionTextPreference() {
-        // Create CarUiTwoActionTextPreference preference and add it to screen.
-        CarUiTwoActionTextPreference preference = new CarUiTwoActionTextPreference(mActivity);
+        testTwoActionTextPreference(new CarUiTwoActionTextPreference(mActivity));
+    }
+
+    @Test
+    public void testTwoActionTextPreference_customConstructor() {
+        testTwoActionTextPreference(new CarUiTwoActionTextPreference(mActivity,
+                CarUiTwoActionTextPreference.SECONDARY_ACTION_STYLE_BORDERLESS));
+    }
+
+    public void testTwoActionTextPreference(CarUiTwoActionTextPreference preference) {
+        // Setup CarUiTwoActionTextPreference
         preference.setKey("twoaction");
         preference.setTitle(R.string.title_twoaction_preference);
         preference.setSummary(R.string.summary_twoaction_preference);
