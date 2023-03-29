@@ -27,6 +27,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.ui.pluginsupport.PluginFactorySingleton;
+import com.android.car.ui.preference.CarUiPreferenceViewStub;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.widget.CarUiTextView;
 
@@ -35,18 +36,16 @@ import com.android.car.ui.widget.CarUiTextView;
  * CarUiRecyclerView}. It extends AppCompatViewInflater so that it can still let AppCompat
  * components be created correctly.
  */
-public class CarUiLayoutInflaterFactory extends AppCompatViewInflater
-        implements LayoutInflater.Factory2 {
+public class CarUiLayoutInflaterFactory extends AppCompatViewInflater implements
+        LayoutInflater.Factory2 {
 
     @Nullable
     protected View createView(Context context, String name, AttributeSet attrs) {
         View view = null;
-
         // Don't use CarUiTextView.class.getSimpleName(), as when proguard obfuscates the class name
         // it will no longer match what's in xml.
         if (CarUiRecyclerView.class.getName().equals(name)) {
-            view = PluginFactorySingleton.get(context)
-                    .createRecyclerView(context, attrs).getView();
+            view = PluginFactorySingleton.get(context).createRecyclerView(context, attrs).getView();
         } else if (name.contentEquals("CarUiTextView")) {
             view = PluginFactorySingleton.get(context).createTextView(context, attrs);
         } else if (("androidx.recyclerview.widget." + "RecyclerView").equals(name)) {
@@ -61,8 +60,9 @@ public class CarUiLayoutInflaterFactory extends AppCompatViewInflater
             // Replace all TextView occurrences with CarUiTextView to support older RROs that still
             // use TextView where CarUiTextView is now expected. ie. `car_ui_list_item.xml`.
             view = PluginFactorySingleton.get(context).createTextView(context, attrs);
+        } else if (CarUiPreferenceViewStub.class.getName().equals(name)) {
+            view = PluginFactorySingleton.get(context).createCarUiPreferenceView(context, attrs);
         }
-
         return view;
     }
 
@@ -81,8 +81,7 @@ public class CarUiLayoutInflaterFactory extends AppCompatViewInflater
     }
 
     @Override
-    public View onCreateView(View parent, String name, Context context,
-            AttributeSet attrs) {
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
         return createView(context, name, attrs);
     }
 }

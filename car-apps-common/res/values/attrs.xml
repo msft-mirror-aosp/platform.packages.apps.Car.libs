@@ -45,6 +45,24 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="TappableTextView">
+        <!-- The drawable rendered after the text when the view is tappable. -->
+        <attr name="endDrawable" format="reference"/>
+
+        <!-- The text appearance when the view is tappable -->
+        <attr name="tappableTextStyle" format="reference"/>
+
+        <!-- The text appearance when the view is NOT tappable -->
+        <attr name="normalTextStyle" format="reference"/>
+
+        <!-- The value given to setVisibility in TappableTextView#hideView(boolean hidden) when
+             hidden is true. -->
+        <attr name="hideViewMode" format="enum">
+            <enum name="invisible" value="4"/>
+            <enum name="gone" value="8"/>
+        </attr>
+    </declare-styleable>
+
     <!-- Attributes for UX restrictions compliant Button. -->
     <declare-styleable name="UxrButton">
         <attr name="carUxRestrictions">

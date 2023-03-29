@@ -71,12 +71,14 @@ def main():
     resources = get_all_resources(os.path.join(ROOT_FOLDER, 'car-ui-lib/src/main/res'))
     check_resource_names(resources, get_resources_from_single_file(os.path.join(OUTPUT_FILE_PATH, 'resource_name_allowed.xml')))
     removed_resources = get_resources_from_single_file(os.path.join(ROOT_FOLDER, 'car-ui-lib/src/main/res-overlayable/values/removed_resources.xml'))
+    resources_exception = get_resources_from_single_file(os.path.join(ROOT_FOLDER, 'car-ui-lib/src/main/res-overlayable/values/res_exceptions.xml'))
     OVERLAYABLE_OUTPUT_FILE_PATH = os.path.join(ROOT_FOLDER, 'car-ui-lib/src/main/res-overlayable/values/overlayable.xml')
     output_file = args.file or 'current.xml'
 
     if args.compare:
         check_removed_resources(resources, removed_resources)
         merge_resources(resources, removed_resources)
+        merge_resources(resources, resources_exception)
 
         old_mapping = get_resources_from_single_file(os.path.join(OUTPUT_FILE_PATH, 'current.xml'))
         compare_resources(old_mapping, resources, os.path.join(OUTPUT_FILE_PATH, 'current.xml'))
@@ -86,6 +88,7 @@ def main():
         compare_resources(old_mapping, resources, OVERLAYABLE_OUTPUT_FILE_PATH)
     else:
         merge_resources(resources, removed_resources)
+        merge_resources(resources, resources_exception)
         generate_current_file(resources, output_file)
         generate_overlayable_file(resources, OVERLAYABLE_OUTPUT_FILE_PATH)
 

@@ -43,7 +43,7 @@ import static com.android.car.ui.imewidescreen.CarUiImeWideScreenController.WIDE
 import static com.android.car.ui.imewidescreen.CarUiImeWideScreenController.WIDE_SCREEN_HIDE_EXTRACTED_TEXT_VIEW;
 import static com.android.car.ui.imewidescreen.CarUiImeWideScreenController.WIDE_SCREEN_SEARCH_RESULTS;
 import static com.android.car.ui.imewidescreen.CarUiImeWideScreenTestActivity.sCarUiImeWideScreenController;
-import static com.android.car.ui.matchers.CarUiRecyclerViewMatcher.atPosition;
+import static com.android.car.ui.testing.matchers.CarUiRecyclerViewMatcher.atPosition;
 import static com.android.car.ui.utils.CarUiUtils.drawableToBitmap;
 import static com.android.car.ui.utils.CarUiUtils.getBytesFromBitmap;
 

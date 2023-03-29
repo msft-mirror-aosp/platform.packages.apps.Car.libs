@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  Adapts a {@link CarUiListItemAdapter} into a {@link AdapterOEMV1}
+ * Adapts a {@link CarUiListItemAdapter} into a {@link AdapterOEMV1}
  */
 public class CarListItemAdapterAdapterProxy implements
         AdapterOEMV1<CarListItemAdapterAdapterProxy.ViewHolderWrapper> {

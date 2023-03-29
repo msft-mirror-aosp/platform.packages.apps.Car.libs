@@ -21,8 +21,12 @@ import static org.junit.Assert.assertNull;
 import android.content.ContentValues;
 import android.net.Uri;
 
-import org.junit.Test;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+@RunWith(AndroidJUnit4.class)
 public class CarUiInstallerTest {
     @Test
     public void test_CarUiInstallerCRUDMethods_DoNothing() {

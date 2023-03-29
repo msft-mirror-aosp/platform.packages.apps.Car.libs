@@ -24,6 +24,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
 
+import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.preference.PreferenceViewHolder;
@@ -43,6 +44,12 @@ public class CarUiTwoActionTextPreference extends CarUiTwoActionBasePreference {
     @Nullable
     private CharSequence mSecondaryActionText;
 
+    public static final int SECONDARY_ACTION_STYLE_BORDERED = 0;
+    public static final int SECONDARY_ACTION_STYLE_BORDERLESS = 1;
+
+    @IntDef({SECONDARY_ACTION_STYLE_BORDERED, SECONDARY_ACTION_STYLE_BORDERLESS})
+    public @interface SecondaryActionStyle {}
+
     public CarUiTwoActionTextPreference(Context context,
             AttributeSet attrs,
             int defStyleAttr, int defStyleRes) {
@@ -59,6 +66,18 @@ public class CarUiTwoActionTextPreference extends CarUiTwoActionBasePreference {
 
     public CarUiTwoActionTextPreference(Context context) {
         super(context);
+    }
+
+    /**
+     * A custom constructor which initializes this preference with secondaryActionStyle.
+     */
+    public CarUiTwoActionTextPreference(Context context,
+                @SecondaryActionStyle int secondaryActionStyle) {
+        super(context);
+        // Override layout set in super's call to init based on style passed directly
+        setLayoutResourceInternal(secondaryActionStyle == 0
+                ? R.layout.car_ui_preference_two_action_text
+                : R.layout.car_ui_preference_two_action_text_borderless);
     }
 
     @Override

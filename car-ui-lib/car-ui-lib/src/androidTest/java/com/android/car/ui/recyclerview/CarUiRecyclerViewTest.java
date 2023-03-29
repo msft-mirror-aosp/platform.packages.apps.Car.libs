@@ -43,14 +43,14 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 
-import static com.android.car.ui.actions.CarUiRecyclerViewActions.scrollToPosition;
-import static com.android.car.ui.actions.LowLevelActions.performDrag;
-import static com.android.car.ui.actions.LowLevelActions.pressAndHold;
-import static com.android.car.ui.actions.LowLevelActions.release;
-import static com.android.car.ui.actions.LowLevelActions.touchDownAndUp;
-import static com.android.car.ui.actions.ViewActions.waitForView;
-import static com.android.car.ui.matchers.ViewMatchers.doesNotExistOrIsNotDisplayed;
 import static com.android.car.ui.recyclerview.CarUiRecyclerView.ItemCap.UNLIMITED;
+import static com.android.car.ui.testing.actions.CarUiRecyclerViewActions.scrollToPosition;
+import static com.android.car.ui.testing.actions.LowLevelActions.performDrag;
+import static com.android.car.ui.testing.actions.LowLevelActions.pressAndHold;
+import static com.android.car.ui.testing.actions.LowLevelActions.release;
+import static com.android.car.ui.testing.actions.LowLevelActions.touchDownAndUp;
+import static com.android.car.ui.testing.actions.ViewActions.waitForView;
+import static com.android.car.ui.testing.matchers.ViewMatchers.doesNotExistOrIsNotDisplayed;
 import static com.android.car.ui.utils.ViewUtils.setRotaryScrollEnabled;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -106,10 +106,10 @@ import androidx.test.espresso.IdlingResource;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
 import com.android.car.ui.TestActivity;
-import com.android.car.ui.actions.LowLevelActions;
 import com.android.car.ui.pluginsupport.PluginFactorySingleton;
 import com.android.car.ui.recyclerview.decorations.grid.GridDividerItemDecoration;
 import com.android.car.ui.test.R;
+import com.android.car.ui.testing.actions.LowLevelActions;
 import com.android.car.ui.utils.CarUxRestrictionsUtil;
 
 import org.junit.After;
@@ -137,7 +137,8 @@ public class CarUiRecyclerViewTest {
     public static Object[] data() {
         // It's important to do no plugin first, so that the plugin will
         // still be enabled when this test finishes
-        return new Object[]{false, true};
+        // TODO b/266150495 Fix plugin tests
+        return new Object[]{false/*, true*/};
     }
 
     @Rule

@@ -36,6 +36,7 @@ import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5;
 import com.android.car.ui.plugin.oemapis.TextOEMV1;
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
+import com.android.car.ui.plugin.oemapis.preference.PreferenceOEM1;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.ContentListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.HeaderListItemOEMV1;
@@ -53,6 +54,7 @@ import com.android.car.ui.toolbar.ToolbarControllerImpl;
 import com.android.car.ui.utils.CarUiUtils;
 
 import com.chassis.car.ui.plugin.appstyledview.AppStyledViewControllerAdapterProxy;
+import com.chassis.car.ui.plugin.preference.PreferenceAdapterProxy;
 import com.chassis.car.ui.plugin.recyclerview.CarListItemAdapterAdapterProxy;
 import com.chassis.car.ui.plugin.recyclerview.RecyclerViewAdapterProxy;
 import com.chassis.car.ui.plugin.toolbar.ToolbarAdapterProxy;
@@ -100,6 +102,12 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
         return false;
     }
 
+    @Override
+    public PreferenceOEM1 createCarUiPreference(@NonNull Context sourceContext) {
+        Context pluginContext = getPluginUiContext(sourceContext, mPluginContext);
+        return new PreferenceAdapterProxy(pluginContext, sourceContext);
+    }
+
     @Nullable
     @Override
     public AppStyledViewControllerOEMV3 createAppStyledView(@NonNull Context context) {
@@ -135,6 +143,7 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
     /**
      * The plugin was passed the list items as {@link ListItemOEMV1}s and thus must be converted
      * back to use the "original" {@link CarUiListItem}s that's expected by the {
+     *
      * @link CarUiListItemAdapter}
      */
     private static CarUiListItem toStaticListItem(ListItemOEMV1 item) {

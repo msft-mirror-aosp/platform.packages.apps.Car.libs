@@ -22,14 +22,13 @@ import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.ui.R;
 import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
@@ -164,11 +163,8 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         mAppStyledView = inflater.inflate(R.layout.car_ui_app_styled_view, null, false);
         mAppStyledView.setClipToOutline(true);
-        RecyclerView rv = mAppStyledView.findViewById(R.id.car_ui_app_styled_content);
-
-        AppStyledRecyclerViewAdapter adapter = new AppStyledRecyclerViewAdapter(contentView);
-        rv.setLayoutManager(new LinearLayoutManager(mContext));
-        rv.setAdapter(adapter);
+        ViewGroup contentHolder = mAppStyledView.findViewById(R.id.car_ui_app_styled_content);
+        contentHolder.addView(contentView);
 
         updateNavIcon();
         updateNavIconClickListener();

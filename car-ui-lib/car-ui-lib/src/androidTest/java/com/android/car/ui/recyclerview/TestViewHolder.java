@@ -28,17 +28,17 @@ public class TestViewHolder extends RecyclerView.ViewHolder {
 
     private CharSequence mText;
 
-    TestViewHolder(@NonNull View itemView) {
+    public TestViewHolder(@NonNull View itemView) {
         super(itemView);
     }
 
-    void bind(CharSequence text) {
+    public void bind(CharSequence text) {
         mText = text;
         TextView textView = itemView.requireViewById(R.id.textTitle);
         textView.setText(text);
     }
 
-    CharSequence getText() {
+    public CharSequence getText() {
         return mText;
     }
 }

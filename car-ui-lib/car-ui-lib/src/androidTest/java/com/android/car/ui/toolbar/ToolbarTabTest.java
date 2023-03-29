@@ -19,7 +19,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static com.android.car.ui.matchers.ViewMatchers.doesNotExistOrIsNotDisplayed;
+import static com.android.car.ui.testing.matchers.ViewMatchers.doesNotExistOrIsNotDisplayed;
 
 import static com.google.common.truth.Truth.assertThat;
 

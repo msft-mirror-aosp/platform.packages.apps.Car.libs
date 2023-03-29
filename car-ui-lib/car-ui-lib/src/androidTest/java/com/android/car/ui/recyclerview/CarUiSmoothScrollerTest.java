@@ -21,16 +21,19 @@ import static com.google.common.truth.Truth.assertThat;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.android.car.ui.TestActivity;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Unit tests for {@link CarUiSmoothScroller}.
  */
+@RunWith(AndroidJUnit4.class)
 public class CarUiSmoothScrollerTest {
 
     @Rule

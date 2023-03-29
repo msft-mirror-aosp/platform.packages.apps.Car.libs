@@ -65,6 +65,14 @@ public interface PluginFactory {
     CarUiTextView createTextView(Context context, AttributeSet attrs);
 
     /**
+     * Creates a preference view
+     *
+     * @param context the visual context to create views with.
+     * @param attrs An object containing initial attributes for the preference.
+     */
+    View createCarUiPreferenceView(Context context, AttributeSet attrs);
+
+    /**
      * Creates a app styled view.
      *
      * @return the view used for app styled view.

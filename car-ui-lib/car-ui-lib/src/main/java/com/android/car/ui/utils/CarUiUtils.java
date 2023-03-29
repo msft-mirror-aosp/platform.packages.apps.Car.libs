@@ -346,8 +346,8 @@ public final class CarUiUtils {
             return;
         }
         initializeRestrictedState(view);
-        int[] statesToAdd = enabled ? new int[] {android.R.attr.state_enabled} : null;
-        int[] statesToRemove = enabled ? null : new int[] {android.R.attr.state_enabled};
+        int[] statesToAdd = enabled ? new int[]{android.R.attr.state_enabled} : null;
+        int[] statesToRemove = enabled ? null : new int[]{android.R.attr.state_enabled};
         applyDrawableStatesToAllViews(view, statesToAdd, statesToRemove);
     }
 
@@ -371,12 +371,12 @@ public final class CarUiUtils {
                 statesToAdd[0] = android.R.attr.state_enabled;
                 System.arraycopy(sRestrictedState, 0, statesToAdd, 1, sRestrictedState.length);
             } else {
-                statesToAdd = new int[] {android.R.attr.state_enabled};
+                statesToAdd = new int[]{android.R.attr.state_enabled};
             }
         } else if (restricted) {
             statesToAdd = sRestrictedState;
         }
-        int[] statesToRemove = enabled ? null : new int[] {android.R.attr.state_enabled};
+        int[] statesToRemove = enabled ? null : new int[]{android.R.attr.state_enabled};
         applyDrawableStatesToAllViews(view, statesToAdd, statesToRemove);
     }
 
@@ -408,9 +408,9 @@ public final class CarUiUtils {
                 .getIdentifier("state_ux_restricted", "attr", "android");
 
         if (androidStateUxRestricted == 0) {
-            sRestrictedState = new int[] { R.attr.state_ux_restricted };
+            sRestrictedState = new int[]{R.attr.state_ux_restricted};
         } else {
-            sRestrictedState = new int[] {
+            sRestrictedState = new int[]{
                     R.attr.state_ux_restricted,
                     androidStateUxRestricted
             };

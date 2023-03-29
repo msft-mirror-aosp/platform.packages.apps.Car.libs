@@ -61,7 +61,7 @@ public class PluginVersionProviderImpl implements PluginVersionProviderOEMV1 {
             }
             if (SHARED_LIBRARY_PACKAGE.equals(r.valueAt(i))) {
                 Log.d(TAG, "PluginVersionProviderImpl : getPluginFactory: rewriting R prefix"
-                        + " values for " +  SHARED_LIBRARY_PACKAGE + " to: "
+                        + " values for " + SHARED_LIBRARY_PACKAGE + " to: "
                         + Integer.toHexString(id));
                 rewriteRValues(context.getClassLoader(), r.valueAt(i), id);
             }
@@ -97,12 +97,12 @@ public class PluginVersionProviderImpl implements PluginVersionProviderOEMV1 {
 
     /**
      * The aapt compiler generates a "onResourcesLoaded" method for R classes when the
-     *  --shared-lib flag is set. It also sets the first octet of the resources to
-     *  0x00 with the assumption that when the package is loaded into memory the onResourcesLoaded
-     *  method will be called to set the octet to the correct value. This normally happens in
-     *  android.app.LoadedApk but since this plugin gets loaded "manually" thus it must be set here.
-     *  Currently, shared libraries use 0x02. If this is not done the "constants" in the R files
-     *  will not match that of what's loaded through the xml parsers.
+     * --shared-lib flag is set. It also sets the first octet of the resources to
+     * 0x00 with the assumption that when the package is loaded into memory the onResourcesLoaded
+     * method will be called to set the octet to the correct value. This normally happens in
+     * android.app.LoadedApk but since this plugin gets loaded "manually" thus it must be set here.
+     * Currently, shared libraries use 0x02. If this is not done the "constants" in the R files
+     * will not match that of what's loaded through the xml parsers.
      */
     private static void rewriteRValues(ClassLoader cl, String packageName, int id) {
         Throwable cause;
