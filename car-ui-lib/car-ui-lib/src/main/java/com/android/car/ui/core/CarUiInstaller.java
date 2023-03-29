@@ -86,13 +86,7 @@ public class CarUiInstaller extends ContentProvider {
             return false;
         }
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                PluginFactorySingleton.loadPlugin(context.getApplicationContext());
-            }
-        });
-        thread.start();
+        new Thread(() -> PluginFactorySingleton.get(context.getApplicationContext())).start();
 
         Application application = (Application) context.getApplicationContext();
         register(application);
