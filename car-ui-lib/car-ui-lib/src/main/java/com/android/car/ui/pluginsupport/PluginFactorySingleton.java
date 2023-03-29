@@ -34,6 +34,7 @@ import android.os.Trace;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -60,7 +61,9 @@ public final class PluginFactorySingleton {
     }
 
     private static final String TAG = "carui";
+    @GuardedBy("LOCK")
     private static PluginFactory sInstance;
+    private static final Object LOCK = new Object();
     private static TestingOverride sTestingOverride = TestingOverride.NOT_SET;
 
     /**
@@ -80,53 +83,19 @@ public final class PluginFactorySingleton {
     public static PluginFactory get(Context context) {
         try {
             Trace.beginSection("car-ui-plugin-load");
-            return getImpl(context);
+            PluginFactory result = sInstance;
+            if (result == null) {
+                synchronized (LOCK) {
+                    result = sInstance;
+                    if (result == null) {
+                        loadPlugin(context.getApplicationContext());
+                    }
+                }
+            }
+            return result;
         } finally {
             Trace.endSection();
         }
-    }
-
-    private static PluginFactory getImpl(Context context) {
-        loadPlugin(context);
-        if (sInstance != null) {
-            return sInstance;
-        }
-
-        context = context.getApplicationContext();
-
-        boolean isPluginEnabled;
-        switch (sTestingOverride) {
-            case ENABLED:
-                isPluginEnabled = true;
-                break;
-            case DISABLED:
-                isPluginEnabled = false;
-                break;
-            case NOT_SET:
-            default:
-                isPluginEnabled = isPluginEnabled(context);
-                break;
-        }
-
-        if (!isPluginEnabled) {
-            sInstance = new PluginFactoryStub();
-            return sInstance;
-        }
-
-        String pluginPackageName = getPluginPackageName(context);
-
-        if (TextUtils.isEmpty(pluginPackageName)) {
-            sInstance = new PluginFactoryStub();
-            return sInstance;
-        }
-
-        if (sInstance == null) {
-            Log.e(TAG, "Could not load CarUi plugin");
-            sInstance = new PluginFactoryStub();
-            return sInstance;
-        }
-
-        return sInstance;
     }
 
     /**
@@ -160,16 +129,36 @@ public final class PluginFactorySingleton {
     }
 
     /**
-     * creates and loads the plugin factory statically. This method is synchronized to
-     * protect multiple reads while initializing. This should be called as soon as app can get the
-     * access to the context, preferably content providers.
+     * creates and loads the plugin factory statically. This should be called as soon as app can get
+     * the access to the context, preferably content providers.
      */
-    public static synchronized void loadPlugin(@NonNull Context context) {
+    private static void loadPlugin(@NonNull Context context) {
         if (sInstance != null) {
             return;
         }
+
+        boolean isPluginEnabled;
+        switch (sTestingOverride) {
+            case ENABLED:
+                isPluginEnabled = true;
+                break;
+            case DISABLED:
+                isPluginEnabled = false;
+                break;
+            case NOT_SET:
+            default:
+                isPluginEnabled = isPluginEnabled(context);
+                break;
+        }
+
+        if (!isPluginEnabled) {
+            Log.i(TAG, "CarUi plugin is disabled");
+            sInstance = new PluginFactoryStub();
+            return;
+        }
+
         String pluginPackageName = getPluginPackageName(context);
-        PackageInfo pluginPackageInfo = null;
+        PackageInfo pluginPackageInfo;
         try {
             pluginPackageInfo = context.getPackageManager()
                     .getPackageInfo(pluginPackageName, 0);
@@ -184,9 +173,8 @@ public final class PluginFactorySingleton {
         if (applicationContext instanceof PluginConfigProvider) {
             Set<PluginSpecifier> deniedPackages =
                     ((PluginConfigProvider) applicationContext).getPluginDenyList();
-            PackageInfo finalPluginPackageInfo = pluginPackageInfo;
             if (deniedPackages != null && deniedPackages.stream()
-                    .anyMatch(specs -> specs.matches(finalPluginPackageInfo))) {
+                    .anyMatch(specs -> specs.matches(pluginPackageInfo))) {
                 Log.i(TAG, "Package " + context.getPackageName()
                         + " denied loading plugin " + pluginPackageName);
                 sInstance = new PluginFactoryStub();
@@ -199,6 +187,7 @@ public final class PluginFactorySingleton {
                 sPluginContext = context.createPackageContext(pluginPackageName,
                         Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY);
             } catch (Exception e) {
+                Log.e(TAG, "Could not load CarUi plugin", e);
                 sInstance = new PluginFactoryStub();
                 return;
             }
