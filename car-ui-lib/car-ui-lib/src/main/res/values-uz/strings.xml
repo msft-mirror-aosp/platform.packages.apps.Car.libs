@@ -24,7 +24,7 @@ limitations under the License.
     <string name="car_ui_toolbar_menu_item_settings_title" msgid="5206858558664840197">"Sozlamalar"</string>
     <string name="car_ui_toolbar_menu_item_overflow_title" msgid="9132512843297732890">"Kengaytirilgan"</string>
     <string name="car_ui_preference_switch_on" msgid="2091385466752081649">"Yoniq"</string>
-    <string name="car_ui_preference_switch_off" msgid="511096411523593697">"Yoqilmagan"</string>
+    <string name="car_ui_preference_switch_off" msgid="511096411523593697">"Oʻchiq"</string>
     <string name="car_ui_alert_dialog_default_button" msgid="399078418913970003">"Yopish"</string>
     <string name="car_ui_scrolling_limited_message" msgid="5978003166159186378">"Avtomobilda harakatlanayotganda aylantirish funksiyasi cheklangan"</string>
     <string name="car_ui_restricted_while_driving" msgid="7490306547860308268">"Avtomobilda harakatlanayotganda bu funksiya ishlamaydi"</string>
