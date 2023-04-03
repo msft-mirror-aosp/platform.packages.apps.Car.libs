@@ -38,7 +38,7 @@ import com.android.car.ui.plugin.oemapis.TextOEMV1;
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
 import com.android.car.ui.plugin.oemapis.preference.PreferenceOEM1;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
-import com.android.car.ui.plugin.oemapis.recyclerview.ContentListItemOEMV1;
+import com.android.car.ui.plugin.oemapis.recyclerview.ContentListItemOEMV2;
 import com.android.car.ui.plugin.oemapis.recyclerview.HeaderListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.ListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewAttributesOEMV1;
@@ -150,8 +150,8 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
         if (item instanceof HeaderListItemOEMV1) {
             HeaderListItemOEMV1 header = (HeaderListItemOEMV1) item;
             return new CarUiHeaderListItem(header.getTitle(), header.getBody());
-        } else if (item instanceof ContentListItemOEMV1) {
-            ContentListItemOEMV1 contentItem = (ContentListItemOEMV1) item;
+        } else if (item instanceof ContentListItemOEMV2) {
+            ContentListItemOEMV2 contentItem = (ContentListItemOEMV2) item;
 
             CarUiContentListItem listItem = new CarUiContentListItem(
                     toCarUiContentListItemAction(contentItem.getAction()));
@@ -168,7 +168,7 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
             listItem.setPrimaryIconType(
                     toCarUiConteentListItemIconType(contentItem.getPrimaryIconType()));
 
-            if (contentItem.getAction() == ContentListItemOEMV1.Action.ICON) {
+            if (contentItem.getAction() == ContentListItemOEMV2.Action.ICON) {
                 CarUiContentListItem.OnClickListener listener =
                         contentItem.getSupplementalIconOnClickListener() != null
                                 ? carUiContentListItem ->
@@ -217,7 +217,7 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
     }
 
     private static CarUiContentListItem.Action toCarUiContentListItemAction(
-            ContentListItemOEMV1.Action action) {
+            ContentListItemOEMV2.Action action) {
         switch (action) {
             case NONE:
                 return CarUiContentListItem.Action.NONE;
@@ -237,7 +237,7 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
     }
 
     private static CarUiContentListItem.IconType toCarUiConteentListItemIconType(
-            ContentListItemOEMV1.IconType iconType) {
+            ContentListItemOEMV2.IconType iconType) {
         switch (iconType) {
             case CONTENT:
                 return CarUiContentListItem.IconType.CONTENT;
