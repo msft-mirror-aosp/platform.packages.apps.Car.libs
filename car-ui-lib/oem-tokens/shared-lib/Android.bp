@@ -21,7 +21,8 @@ android_app {
     aaptflags: ["--shared-lib"],
     manifest: "src/main/AndroidManifest.xml",
     resource_dirs: [
-        "src/main/res"
+        "src/main/res",
+        "src/main/res-shared-lib"
     ]
 }
 
@@ -31,4 +32,36 @@ override_android_app {
     package_name: "oem.demo.sharedlib",
     rename_resources_package: false
 }
+
+
+android_library {
+    name: "token-sharedlibrary-base",
+    min_sdk_version: "28",
+    target_sdk_version: "33",
+    sdk_version: "current",
+    manifest: "src/main/AndroidManifest.xml",
+    resource_dirs: [
+        "src/main/res"
+    ]
+}
+
+java_genrule {
+    name: "token-sharedlibrary-aar",
+    srcs: [
+        ":token-sharedlibrary-base{.aar}",
+        "src/main/res/**/*",
+    ],
+    out: ["token-sharedlibrary.aar"],
+    tools: [
+        "make_slim_aar",
+    ],
+    cmd: "dir=packages/apps/Car/libs/car-ui-lib/oem-tokens/shared-lib && " +
+        "$(location make_slim_aar) --classes-allowlist com/android/car/oem/tokens $(out) " +
+        "$(location :token-sharedlibrary-base{.aar}) " +
+        "$$dir/src/main/res ",
+    dist: {
+        targets: ["token-sharedlibrary-aar",]
+    },
+}
+
 
