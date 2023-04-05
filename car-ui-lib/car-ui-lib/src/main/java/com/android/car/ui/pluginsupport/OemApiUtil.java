@@ -84,7 +84,7 @@ final class OemApiUtil {
         PluginFactory oemPluginFactory = null;
         if (versionProvider != null) {
             Object factory = versionProvider.getPluginFactory(
-                    1, pluginContext, appPackageName);
+                    5, pluginContext, appPackageName);
             if (factory instanceof PluginFactoryOEMV1) {
                 oemPluginFactory = new PluginFactoryAdapterV1(
                         (PluginFactoryOEMV1) factory);
