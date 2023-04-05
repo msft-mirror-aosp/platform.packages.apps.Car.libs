@@ -26,6 +26,7 @@ import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV2;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV3;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV4;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5;
+import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6;
 import com.android.car.ui.plugin.oemapis.PluginVersionProviderOEMV1;
 
 /**
@@ -84,7 +85,7 @@ final class OemApiUtil {
         PluginFactory oemPluginFactory = null;
         if (versionProvider != null) {
             Object factory = versionProvider.getPluginFactory(
-                    5, pluginContext, appPackageName);
+                    6, pluginContext, appPackageName);
             if (factory instanceof PluginFactoryOEMV1) {
                 oemPluginFactory = new PluginFactoryAdapterV1(
                         (PluginFactoryOEMV1) factory);
@@ -108,7 +109,13 @@ final class OemApiUtil {
                     && factory instanceof PluginFactoryOEMV5) {
                 oemPluginFactory = new PluginFactoryAdapterV5(
                     (PluginFactoryOEMV5) factory);
+            } else if (classExists(
+                    "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6")
+                    && factory instanceof PluginFactoryOEMV6) {
+                oemPluginFactory = new PluginFactoryAdapterV6(
+                    (PluginFactoryOEMV6) factory);
             } else {
+
                 Log.e(TAG, "PluginVersionProvider found, but did not provide a"
                         + " factory implementing any known interfaces!");
             }

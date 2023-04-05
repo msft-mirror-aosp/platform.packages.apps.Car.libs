@@ -21,7 +21,7 @@ import android.view.View;
 /**
  * The OEM interface for preferences
  */
-public interface PreferenceOEM1 {
+public interface PreferenceOEMV1 {
 
     /**
      * Gets a preference view to be inflated depending on preference type.

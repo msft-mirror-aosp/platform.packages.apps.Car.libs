@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The Android Open Source Project
+ * Copyright (C) 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package com.android.car.ui.pluginsupport;
+
+import static com.android.car.ui.preference.CarUiPreferenceViewStub.PREFERENCE;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -40,9 +42,11 @@ import com.android.car.ui.baselayout.Insets;
 import com.android.car.ui.baselayout.InsetsChangedListener;
 import com.android.car.ui.plugin.oemapis.Consumer;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
-import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5;
+import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6;
 import com.android.car.ui.plugin.oemapis.TextOEMV1;
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
+import com.android.car.ui.plugin.oemapis.preference.PreferenceOEMV1;
+import com.android.car.ui.plugin.oemapis.preference.PreferenceViewAttributesOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.ContentListItemOEMV2;
 import com.android.car.ui.plugin.oemapis.recyclerview.HeaderListItemOEMV1;
@@ -70,16 +74,16 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This class is a wrapper around {@link PluginFactoryOEMV5} that implements {@link PluginFactory},
+ * This class is a wrapper around {@link PluginFactoryOEMV6} that implements {@link PluginFactory},
  * to provide a version-agnostic way of interfacing with the OEM's PluginFactory.
  */
-public final class PluginFactoryAdapterV5 implements PluginFactory {
+public final class PluginFactoryAdapterV6 implements PluginFactory {
     @NonNull
-    private final PluginFactoryOEMV5 mOem;
+    private final PluginFactoryOEMV6 mOem;
     @NonNull
     private final PluginFactoryStub mFactoryStub = new PluginFactoryStub();
 
-    public PluginFactoryAdapterV5(@NonNull PluginFactoryOEMV5 oem) {
+    public PluginFactoryAdapterV6(@NonNull PluginFactoryOEMV6 oem) {
         mOem = oem;
         mOem.setRotaryFactories(
                 c -> new FocusParkingViewAdapterV1(new FocusParkingView(c)),
@@ -125,7 +129,33 @@ public final class PluginFactoryAdapterV5 implements PluginFactory {
 
     @Override
     public View createCarUiPreferenceView(Context context, AttributeSet attrs) {
-        return mFactoryStub.createCarUiPreferenceView(context, attrs);
+        PreferenceOEMV1 preferenceOEMV1 = mOem.createCarUiPreference(context);
+        if (preferenceOEMV1 == null) {
+            return mFactoryStub.createCarUiPreferenceView(context, attrs);
+        }
+        try {
+            int preferenceType = getPreferenceType(context, attrs);
+            return preferenceOEMV1.createCarUiPreferenceView(
+                    new PreferenceViewAttributesOEMV1() {
+                        @Override
+                        public int getPreferenceType() {
+                            return preferenceType;
+                        }
+                    });
+        } catch (Exception ex) {
+            // Fallback
+            return mFactoryStub.createCarUiPreferenceView(context, attrs);
+        }
+    }
+
+    int getPreferenceType(Context context, AttributeSet attrs) {
+        TypedArray a = context.obtainStyledAttributes(
+                attrs, R.styleable.Preference, 0, 0);
+
+        int preferenceType = a.getInt(R.styleable.Preference_carUiPreferenceType, PREFERENCE);
+        a.recycle();
+
+        return preferenceType;
     }
 
     @Override
@@ -160,7 +190,7 @@ public final class PluginFactoryAdapterV5 implements PluginFactory {
     public RecyclerView.Adapter<? extends RecyclerView.ViewHolder> createListItemAdapter(
             List<? extends CarUiListItem> items) {
         List<ListItemOEMV1> oemItems = CarUiUtils.convertList(items,
-                PluginFactoryAdapterV5::toOemListItem);
+                PluginFactoryAdapterV6::toOemListItem);
 
         AdapterOEMV1<? extends ViewHolderOEMV1> oemAdapter = mOem.createListItemAdapter(oemItems);
 
@@ -175,7 +205,7 @@ public final class PluginFactoryAdapterV5 implements PluginFactory {
             public void onChanged() {
                 oemItems.clear();
                 oemItems.addAll(
-                        CarUiUtils.convertList(items, PluginFactoryAdapterV5::toOemListItem));
+                        CarUiUtils.convertList(items, PluginFactoryAdapterV6::toOemListItem));
             }
 
             @Override
