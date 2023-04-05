@@ -22,7 +22,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
-import com.android.car.ui.plugin.oemapis.preference.PreferenceOEM1;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.ListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewAttributesOEMV1;
@@ -41,7 +40,10 @@ import java.util.List;
  * <p>
  * Multiple of these can be provided via {@link PluginVersionProviderOEMV1} to allow plugins
  * to provide an old implementation for old apps, and a newer implementation for newer apps.
+ *
+ * @deprecated Use {@link PluginFactoryOEMV6} instead
  */
+@Deprecated
 public interface PluginFactoryOEMV5 {
     /**
      * Gives the plugin access to two factories that will create FocusParkingViews and
@@ -93,21 +95,6 @@ public interface PluginFactoryOEMV5 {
      * @return false if {@link #installBaseLayoutAround} should not be called for this library
      */
     boolean customizesBaseLayout();
-
-    /**
-     * Creates a preference.
-     *
-     * @param sourceContext The context that will end up using this component. This context must not
-     *                      be used for inflating views, use the plugin context for that. This
-     *                      is used for two purposes: to add the correct configuration to the plugin
-     *                      context via {@code pluginContext.createConfigurationContext(
-     *                      sourceContext.getResources().getConfiguration()} before inflating views,
-     *                      and to pass to the rotary factories provided via
-     *                      {@link #setRotaryFactories}.
-     * @return A {@link PreferenceOEM1} or null if not implemented.
-     */
-    @Nullable
-    PreferenceOEM1 createCarUiPreference(@NonNull Context sourceContext);
 
     /**
      * Creates a app styled view.
