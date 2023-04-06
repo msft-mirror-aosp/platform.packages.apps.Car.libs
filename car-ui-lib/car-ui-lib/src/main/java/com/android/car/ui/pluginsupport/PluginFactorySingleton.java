@@ -89,6 +89,7 @@ public final class PluginFactorySingleton {
                     result = sInstance;
                     if (result == null) {
                         loadPlugin(context.getApplicationContext());
+                        result = sInstance;
                     }
                 }
             }
