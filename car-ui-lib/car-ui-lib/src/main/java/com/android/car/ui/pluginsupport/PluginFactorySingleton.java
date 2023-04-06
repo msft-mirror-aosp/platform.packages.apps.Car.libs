@@ -34,7 +34,6 @@ import android.os.Trace;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -61,7 +60,6 @@ public final class PluginFactorySingleton {
     }
 
     private static final String TAG = "carui";
-    @GuardedBy("LOCK")
     private static PluginFactory sInstance;
     private static final Object LOCK = new Object();
     private static TestingOverride sTestingOverride = TestingOverride.NOT_SET;

@@ -86,7 +86,9 @@ public class CarUiInstaller extends ContentProvider {
             return false;
         }
 
-        new Thread(() -> PluginFactorySingleton.get(context.getApplicationContext())).start();
+        new Thread(() -> {
+            Object unused = PluginFactorySingleton.get(context.getApplicationContext());
+        }).start();
 
         Application application = (Application) context.getApplicationContext();
         register(application);
