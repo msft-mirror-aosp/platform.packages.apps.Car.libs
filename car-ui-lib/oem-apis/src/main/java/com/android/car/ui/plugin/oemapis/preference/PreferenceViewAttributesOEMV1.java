@@ -22,7 +22,7 @@ package com.android.car.ui.plugin.oemapis.preference;
 public interface PreferenceViewAttributesOEMV1 {
 
     /**
-     * Returns the {@link PreferenceType} for the preference
+     * Returns the {@code PreferenceType} for the preference
      */
     int getPreferenceType();
 }
