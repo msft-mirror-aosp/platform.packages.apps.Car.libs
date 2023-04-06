@@ -22,7 +22,6 @@ android_app {
     manifest: "src/main/AndroidManifest.xml",
     resource_dirs: [
         "src/main/res",
-        "src/main/res-shared-lib"
     ]
 }
 
@@ -33,16 +32,27 @@ override_android_app {
     rename_resources_package: false
 }
 
+genrule {
+    name: "token-sharedlibrary-res",
+    tools: ["soong_zip"],
+    srcs: [
+        "src/main/res/**/*",
+    ],
+    out: ["token-sharedlibrary-res.zip"],
+    cmd: "INPUTS=($(in)) && "
+        + "RES_DIR=$$(dirname $$(dirname $${INPUTS[0]})) && "
+        + "$(location soong_zip) -o $(out) -C $$RES_DIR -D $$RES_DIR",
+    dist: {
+        targets: ["token-sharedlibrary-res"]
+    },
+}
 
 android_library {
     name: "token-sharedlibrary-base",
     min_sdk_version: "28",
     target_sdk_version: "33",
     sdk_version: "current",
-    manifest: "src/main/AndroidManifest.xml",
-    resource_dirs: [
-        "src/main/res"
-    ]
+    manifest: "src/main/AndroidManifest.xml"
 }
 
 java_genrule {
