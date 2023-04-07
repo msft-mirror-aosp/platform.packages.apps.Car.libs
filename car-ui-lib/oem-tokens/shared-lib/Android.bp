@@ -52,14 +52,13 @@ android_library {
     min_sdk_version: "28",
     target_sdk_version: "33",
     sdk_version: "current",
-    manifest: "src/main/AndroidManifest.xml"
+    manifest: "src/main/AndroidManifest.xml",
 }
 
 java_genrule {
     name: "token-sharedlibrary-aar",
     srcs: [
         ":token-sharedlibrary-base{.aar}",
-        "src/main/res/**/*",
     ],
     out: ["token-sharedlibrary.aar"],
     tools: [
@@ -67,11 +66,9 @@ java_genrule {
     ],
     cmd: "dir=packages/apps/Car/libs/car-ui-lib/oem-tokens/shared-lib && " +
         "$(location make_slim_aar) --classes-allowlist com/android/car/oem/tokens $(out) " +
-        "$(location :token-sharedlibrary-base{.aar}) " +
-        "$$dir/src/main/res ",
+        "$(location :token-sharedlibrary-base{.aar})",
     dist: {
         targets: ["token-sharedlibrary-aar",]
     },
 }
-
 
