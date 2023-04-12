@@ -59,13 +59,14 @@ import com.chassis.car.ui.plugin.recyclerview.CarListItemAdapterAdapterProxy;
 import com.chassis.car.ui.plugin.recyclerview.RecyclerViewAdapterProxy;
 import com.chassis.car.ui.plugin.toolbar.ToolbarAdapterProxy;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * An implication of the plugin factory that delegates back to the car-ui-lib implementation.
+ * An implementation of the plugin factory that delegates back to the car-ui-lib implementation.
  * The main benefit of this is so that customizations can be applied to the car-ui-lib via a RRO
  * without the need to target each app specifically. Note: it only applies to the components that
  * come through the plugin system.
@@ -73,6 +74,7 @@ import java.util.WeakHashMap;
 public class PluginFactoryImpl implements PluginFactoryOEMV6 {
 
     private final Context mPluginContext;
+    private WeakReference<Context> mRecentUiContext;
     Map<Context, Context> mAppToPluginContextMap = new WeakHashMap<>();
 
     public PluginFactoryImpl(Context pluginContext) {
@@ -87,12 +89,12 @@ public class PluginFactoryImpl implements PluginFactoryOEMV6 {
 
     @Nullable
     @Override
-    public ToolbarControllerOEMV2 installBaseLayoutAround(@NonNull Context context,
+    public ToolbarControllerOEMV2 installBaseLayoutAround(@NonNull Context sourceContext,
             @NonNull View view,
             @Nullable com.android.car.ui.plugin.oemapis.Consumer<InsetsOEMV1> consumer,
             boolean b,
             boolean b1) {
-        Context pluginContext = getPluginUiContext(context, mPluginContext);
+        Context pluginContext = getPluginUiContext(sourceContext);
         ToolbarControllerImpl toolbarController = new ToolbarControllerImpl(view);
         return new ToolbarAdapterProxy(pluginContext, toolbarController);
     }
@@ -104,14 +106,14 @@ public class PluginFactoryImpl implements PluginFactoryOEMV6 {
 
     @Override
     public PreferenceOEMV1 createCarUiPreference(@NonNull Context sourceContext) {
-        Context pluginContext = getPluginUiContext(sourceContext, mPluginContext);
+        Context pluginContext = getPluginUiContext(sourceContext);
         return new PreferenceAdapterProxy(pluginContext, sourceContext);
     }
 
     @Nullable
     @Override
-    public AppStyledViewControllerOEMV3 createAppStyledView(@NonNull Context context) {
-        Context pluginContext = getPluginUiContext(context, mPluginContext);
+    public AppStyledViewControllerOEMV3 createAppStyledView(@NonNull Context sourceContext) {
+        Context pluginContext = getPluginUiContext(sourceContext);
         // build the app styled controller that will be delegated to
         AppStyledViewControllerImpl appStyledViewController = new AppStyledViewControllerImpl(
                 pluginContext);
@@ -120,9 +122,9 @@ public class PluginFactoryImpl implements PluginFactoryOEMV6 {
 
     @Nullable
     @Override
-    public RecyclerViewOEMV2 createRecyclerView(@NonNull Context context,
+    public RecyclerViewOEMV2 createRecyclerView(@NonNull Context sourceContext,
             @Nullable RecyclerViewAttributesOEMV1 recyclerViewAttributesOEMV1) {
-        Context pluginContext = getPluginUiContext(context, mPluginContext);
+        Context pluginContext = getPluginUiContext(sourceContext);
         CarUiRecyclerViewImpl recyclerView =
                 new CarUiRecyclerViewImpl(pluginContext, recyclerViewAttributesOEMV1);
         return new RecyclerViewAdapterProxy(pluginContext, recyclerView,
@@ -132,19 +134,17 @@ public class PluginFactoryImpl implements PluginFactoryOEMV6 {
     @Override
     public AdapterOEMV1<? extends ViewHolderOEMV1> createListItemAdapter(
             List<ListItemOEMV1> items) {
-        // TODO: add this here? Context pluginContext = getPluginUiContext(context, mPluginContext);
         List<? extends CarUiListItem> staticItems = CarUiUtils.convertList(items,
                 PluginFactoryImpl::toStaticListItem);
         // Build the CarUiListItemAdapter that will be delegated to
         CarUiListItemAdapter carUiListItemAdapter = new CarUiListItemAdapter(staticItems);
-        return new CarListItemAdapterAdapterProxy(carUiListItemAdapter, mPluginContext);
+        return new CarListItemAdapterAdapterProxy(carUiListItemAdapter, mRecentUiContext.get());
     }
 
     /**
      * The plugin was passed the list items as {@link ListItemOEMV1}s and thus must be converted
-     * back to use the "original" {@link CarUiListItem}s that's expected by the {
-     *
-     * @link CarUiListItemAdapter}
+     * back to use the "original" {@link CarUiListItem}s that's expected by the
+     * {@link CarUiListItemAdapter}
      */
     private static CarUiListItem toStaticListItem(ListItemOEMV1 item) {
         if (item instanceof HeaderListItemOEMV1) {
@@ -251,35 +251,35 @@ public class PluginFactoryImpl implements PluginFactoryOEMV6 {
     }
 
     /**
-     * This method tries to return a ui-context for usage in the plugin that has the same
+     * This method tries to return a ui context for usage in the plugin that has the same
      * configuration as the given source ui context.
      *
-     * @param sourceContext a UI context, normally an Activity context.
+     * @param sourceContext A ui context, normally an Activity context.
      */
-    private Context getPluginUiContext(@NonNull Context sourceContext,
-            @NonNull Context pluginContext) {
-
+    private Context getPluginUiContext(@Nullable Context sourceContext) {
         Context uiContext = mAppToPluginContextMap.get(sourceContext);
 
         if (uiContext == null) {
-            uiContext = pluginContext;
+            uiContext = mPluginContext;
             if (VERSION.SDK_INT >= 34 /* Android U */ && !uiContext.isUiContext()) {
                 // On U and above we need a UiContext for initializing the proxy plugin.
-                uiContext = pluginContext
+                uiContext = uiContext
                         .createWindowContext(sourceContext.getDisplay(), TYPE_APPLICATION, null);
             }
         }
 
-        Configuration currentConfiguration = uiContext.getResources()
-                .getConfiguration();
+        Configuration currentConfiguration = uiContext.getResources().getConfiguration();
         Configuration newConfiguration = sourceContext.getResources().getConfiguration();
         if (currentConfiguration.diff(newConfiguration) != 0) {
             uiContext = uiContext.createConfigurationContext(newConfiguration);
         }
 
-        uiContext = new PluginContextWrapper(uiContext);
+        // Only wrap uiContext the first time it's configured
+        if (!(uiContext instanceof PluginContextWrapper)) {
+            uiContext = new PluginContextWrapper(uiContext);
+        }
 
-        // add a custom layout inflater that can handle things like CarUiTextView that is in the
+        // Add a custom layout inflater that can handle things like CarUiTextView that is in the
         // layout files of the car-ui-lib static implementation
         LayoutInflater inflater = LayoutInflater.from(uiContext);
         if (inflater.getFactory2() == null) {
@@ -287,6 +287,13 @@ public class PluginFactoryImpl implements PluginFactoryOEMV6 {
         }
 
         mAppToPluginContextMap.put(sourceContext, uiContext);
+
+        // Store this uiContext as the most recently used uiContext. This is so that it's possible
+        // to obtain a relevant plugin ui context without a source context. This is used with
+        // createListItemAdapter, which does not receive a context as a parameter. Note: list items
+        // are always used with a RecyclerView, so mRecentUiContext will be set in
+        // createRecyclerView method, which should happen before createListItemAdapter.
+        mRecentUiContext = new WeakReference<Context>(uiContext);
 
         return uiContext;
     }
