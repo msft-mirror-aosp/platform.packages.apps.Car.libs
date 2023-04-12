@@ -131,6 +131,7 @@ public final class PluginFactoryAdapterV5 implements PluginFactory {
         return mFactoryStub.createCarUiPreferenceView(context, attrs);
     }
 
+    @SuppressWarnings("AndroidJdkLibsChecker")
     @Override
     public AppStyledViewController createAppStyledView(Context activityContext) {
         AppStyledViewControllerOEMV3 appStyledViewControllerOEMV3 = null;
