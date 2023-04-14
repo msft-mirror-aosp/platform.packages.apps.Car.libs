@@ -189,8 +189,25 @@ public final class ToolbarControllerAdapterV2 implements ToolbarController {
         } else if (selectedTab < 0 || selectedTab >= tabs.size()) {
             throw new IllegalArgumentException("Tab position is invalid: " + selectedTab);
         }
+
+        // Need to receive the calls here so we can update the internal selected tab
+        List<Tab> newTabs = convertList(tabs, tab -> {
+            final Consumer<Tab> originalListener = tab.getSelectedListener();
+            return tab.copy().setSelectedListener(tab1 -> {
+                // Calling {@code #selectTab} would trigger a unnecessary call to the plugin update
+                // method.
+                int position = tabs.indexOf(tab);
+                mAdapterState = mAdapterState.copy()
+                        .setSelectedTab(position)
+                        .build();
+                if (originalListener != null) {
+                    originalListener.accept(tab);
+                }
+            }).build();
+        });
+
         update(mAdapterState.copy()
-                .setTabs(convertList(tabs, TabAdapterV1::new))
+                .setTabs(convertList(newTabs, TabAdapterV1::new))
                 .setSelectedTab(selectedTab)
                 .build());
     }
@@ -235,7 +252,23 @@ public final class ToolbarControllerAdapterV2 implements ToolbarController {
             modernTabs.add(tab.getModernTab());
         }
 
-        update(mAdapterState.copy().setTabs(convertList(modernTabs, TabAdapterV1::new)).build());
+        // Need to receive the calls here so we can update the internal selected tab
+        List<Tab> newTabs = convertList(modernTabs, tab -> {
+            final Consumer<Tab> originalListener = tab.getSelectedListener();
+            return tab.copy().setSelectedListener(tab1 -> {
+                int position = modernTabs.indexOf(tab);
+                 // Calling {@code #selectTab} would trigger a unnecessary call to the plugin update
+                 // method.
+                mAdapterState = mAdapterState.copy()
+                        .setSelectedTab(position)
+                        .build();
+                if (originalListener != null) {
+                    originalListener.accept(tab);
+                }
+            }).build();
+        });
+
+        update(mAdapterState.copy().setTabs(convertList(newTabs, TabAdapterV1::new)).build());
     }
 
     @Override
