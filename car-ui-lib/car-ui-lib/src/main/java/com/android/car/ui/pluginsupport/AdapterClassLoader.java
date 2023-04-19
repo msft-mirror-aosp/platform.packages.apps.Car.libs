@@ -39,7 +39,8 @@ class AdapterClassLoader extends PathClassLoader {
     private static final Pattern PATTERN = Pattern.compile(
             "^com\\.android\\.car\\.ui\\..*AdapterV[0-9]+(\\$.*)?$"
             + "|Lambda"
-            + "|^" + Pattern.quote(OemApiUtil.class.getName()) + "$");
+            + "|^" + Pattern.quote(OemApiUtil.class.getName())
+            + "|^" + Pattern.quote(OemApi.class.getName()) + "$");
 
     private static final Pattern PLUGIN_PATTERN = Pattern.compile(
             "^com\\.android\\.car\\.ui\\.plugin\\.(oemapis\\..*|PluginVersionProviderImpl)$");

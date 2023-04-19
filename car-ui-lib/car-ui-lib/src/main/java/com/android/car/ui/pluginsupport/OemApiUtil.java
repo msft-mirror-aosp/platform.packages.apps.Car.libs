@@ -19,15 +19,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.annotation.Nullable;
-
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV1;
-import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV2;
-import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV3;
-import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV4;
-import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5;
-import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6;
 import com.android.car.ui.plugin.oemapis.PluginVersionProviderOEMV1;
+
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Helper class for accessing oem-apis without reflection.
@@ -84,38 +80,17 @@ final class OemApiUtil {
 
         PluginFactory oemPluginFactory = null;
         if (versionProvider != null) {
+            SortedSet<OemApi> oemApis = getAvailableOemApis();
+            int maxSupportedVersion = oemApis.stream().findFirst().get().version;
             Object factory = versionProvider.getPluginFactory(
-                    6, pluginContext, appPackageName);
-            if (factory instanceof PluginFactoryOEMV1) {
-                oemPluginFactory = new PluginFactoryAdapterV1(
-                        (PluginFactoryOEMV1) factory);
-            } else if (classExists(
-                    "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV2")
-                    && factory instanceof PluginFactoryOEMV2) {
-                oemPluginFactory = new PluginFactoryAdapterV2(
-                        (PluginFactoryOEMV2) factory);
-            } else if (classExists(
-                    "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV3")
-                    && factory instanceof PluginFactoryOEMV3) {
-                oemPluginFactory = new PluginFactoryAdapterV3(
-                        (PluginFactoryOEMV3) factory);
-            } else if (classExists(
-                    "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV4")
-                    && factory instanceof PluginFactoryOEMV4) {
-                oemPluginFactory = new PluginFactoryAdapterV4(
-                        (PluginFactoryOEMV4) factory);
-            } else if (classExists(
-                    "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5")
-                    && factory instanceof PluginFactoryOEMV5) {
-                oemPluginFactory = new PluginFactoryAdapterV5(
-                    (PluginFactoryOEMV5) factory);
-            } else if (classExists(
-                    "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6")
-                    && factory instanceof PluginFactoryOEMV6) {
-                oemPluginFactory = new PluginFactoryAdapterV6(
-                    (PluginFactoryOEMV6) factory);
-            } else {
-
+                    maxSupportedVersion, pluginContext, appPackageName);
+            for (OemApi oemApi : oemApis) {
+                if (oemApi.oemFactoryClass != null && oemApi.oemFactoryClass.isInstance(factory)) {
+                    oemPluginFactory = oemApi.getAdapter(factory);
+                    break;
+                }
+            }
+            if (oemPluginFactory == null) {
                 Log.e(TAG, "PluginVersionProvider found, but did not provide a"
                         + " factory implementing any known interfaces!");
             }
@@ -124,17 +99,34 @@ final class OemApiUtil {
         return oemPluginFactory;
     }
 
-    private static boolean classExists(@Nullable String className) {
-        if (className == null) {
-            return false;
-        }
-        try {
-            Class.forName(className);
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
-
     private OemApiUtil() {}
+
+    private static SortedSet<OemApi> getAvailableOemApis() {
+        SortedSet<OemApi> oemApis = new TreeSet<>();
+        oemApis.add(new OemApi(
+                "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV1",
+                PluginFactoryAdapterV1.class,
+                1));
+        oemApis.add(new OemApi(
+                "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV2",
+                PluginFactoryAdapterV2.class,
+                2));
+        oemApis.add(new OemApi(
+                "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV3",
+                PluginFactoryAdapterV3.class,
+                3));
+        oemApis.add(new OemApi(
+                "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV4",
+                PluginFactoryAdapterV4.class,
+                4));
+        oemApis.add(new OemApi(
+                "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5",
+                PluginFactoryAdapterV5.class,
+                5));
+        oemApis.add(new OemApi(
+                "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6",
+                PluginFactoryAdapterV6.class,
+                6));
+        return oemApis;
+    }
 }
