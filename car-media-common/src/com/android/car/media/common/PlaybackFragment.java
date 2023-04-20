@@ -19,6 +19,7 @@ package com.android.car.media.common;
 import static android.car.media.CarMediaManager.MEDIA_SOURCE_MODE_PLAYBACK;
 
 import static com.android.car.apps.common.util.LiveDataFunctions.mapNonNull;
+import static com.android.car.media.common.source.MediaBrowserConnector.ConnectionStatus.CONNECTED;
 
 import android.app.Application;
 import android.app.PendingIntent;
@@ -251,8 +252,13 @@ public class PlaybackFragment extends Fragment {
             mTitle = mapNonNull(playbackViewModel.getMetadata(), MediaItemMetadata::getTitle);
             mSubtitle = mapNonNull(playbackViewModel.getMetadata(), MediaItemMetadata::getSubtitle);
 
-            mMediaItemsRepository.getRootMediaItems()
-                    .observe(activity, this::onRootMediaItemsUpdate);
+            mMediaItemsRepository.getBrowsingState().observeForever(browsingState -> {
+                if ((browsingState != null) && (browsingState.mConnectionStatus == CONNECTED)) {
+                    String rootId = browsingState.mBrowser.getRoot();
+                    mMediaItemsRepository.getMediaChildren(rootId, new Bundle())
+                            .observe(activity, this::onRootMediaItemsUpdate);
+                }
+            });
         }
 
         LiveData<CharSequence> getAppName() {
