@@ -30,8 +30,10 @@ import androidx.annotation.Nullable;
 import com.android.car.ui.CarUiText;
 import com.android.car.ui.appstyledview.AppStyledViewControllerImpl;
 import com.android.car.ui.plugin.PluginContextWrapper;
+import com.android.car.ui.plugin.oemapis.Consumer;
 import com.android.car.ui.plugin.oemapis.FocusAreaOEMV1;
 import com.android.car.ui.plugin.oemapis.FocusParkingViewOEMV1;
+import com.android.car.ui.plugin.oemapis.Function;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6;
 import com.android.car.ui.plugin.oemapis.TextOEMV1;
@@ -50,14 +52,14 @@ import com.android.car.ui.recyclerview.CarUiHeaderListItem;
 import com.android.car.ui.recyclerview.CarUiListItem;
 import com.android.car.ui.recyclerview.CarUiListItemAdapter;
 import com.android.car.ui.recyclerview.CarUiRecyclerViewImpl;
-import com.android.car.ui.toolbar.ToolbarControllerImpl;
 import com.android.car.ui.utils.CarUiUtils;
+
 
 import com.chassis.car.ui.plugin.appstyledview.AppStyledViewControllerAdapterProxy;
 import com.chassis.car.ui.plugin.preference.PreferenceAdapterProxy;
 import com.chassis.car.ui.plugin.recyclerview.CarListItemAdapterAdapterProxy;
 import com.chassis.car.ui.plugin.recyclerview.RecyclerViewAdapterProxy;
-import com.chassis.car.ui.plugin.toolbar.ToolbarAdapterProxy;
+import com.chassis.car.ui.plugin.toolbar.BaseLayoutInstallerProxy;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -83,25 +85,31 @@ public class PluginFactoryImpl implements PluginFactoryOEMV6 {
 
     @Override
     public void setRotaryFactories(
-            com.android.car.ui.plugin.oemapis.Function<Context, FocusParkingViewOEMV1> function,
-            com.android.car.ui.plugin.oemapis.Function<Context, FocusAreaOEMV1> function1) {
+            Function<Context, FocusParkingViewOEMV1> focusParkingViewFactory,
+            Function<Context, FocusAreaOEMV1> focusAreaFactory) {
     }
 
     @Nullable
     @Override
-    public ToolbarControllerOEMV2 installBaseLayoutAround(@NonNull Context sourceContext,
-            @NonNull View view,
-            @Nullable com.android.car.ui.plugin.oemapis.Consumer<InsetsOEMV1> consumer,
-            boolean b,
-            boolean b1) {
+    public ToolbarControllerOEMV2 installBaseLayoutAround(
+            @NonNull Context sourceContext,
+            @NonNull View contentView,
+            @Nullable Consumer<InsetsOEMV1> insetsChangedListener,
+            boolean toolbarEnabled,
+            boolean fullscreen) {
+
         Context pluginContext = getPluginUiContext(sourceContext);
-        ToolbarControllerImpl toolbarController = new ToolbarControllerImpl(view);
-        return new ToolbarAdapterProxy(pluginContext, toolbarController);
+        return BaseLayoutInstallerProxy.installBaseLayoutAround(
+                pluginContext,
+                contentView,
+                insetsChangedListener,
+                toolbarEnabled,
+                fullscreen);
     }
 
     @Override
     public boolean customizesBaseLayout() {
-        return false;
+        return true;
     }
 
     @Override
@@ -166,7 +174,7 @@ public class PluginFactoryImpl implements PluginFactoryOEMV6 {
 
             listItem.setIcon(contentItem.getIcon());
             listItem.setPrimaryIconType(
-                    toCarUiConteentListItemIconType(contentItem.getPrimaryIconType()));
+                    toCarUiContentListItemIconType(contentItem.getPrimaryIconType()));
 
             if (contentItem.getAction() == ContentListItemOEMV2.Action.ICON) {
                 CarUiContentListItem.OnClickListener listener =
@@ -236,7 +244,7 @@ public class PluginFactoryImpl implements PluginFactoryOEMV6 {
         }
     }
 
-    private static CarUiContentListItem.IconType toCarUiConteentListItemIconType(
+    private static CarUiContentListItem.IconType toCarUiContentListItemIconType(
             ContentListItemOEMV2.IconType iconType) {
         switch (iconType) {
             case CONTENT:

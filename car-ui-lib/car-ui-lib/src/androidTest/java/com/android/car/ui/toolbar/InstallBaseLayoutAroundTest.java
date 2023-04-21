@@ -18,13 +18,15 @@ package com.android.car.ui.toolbar;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
+
+import static org.hamcrest.CoreMatchers.endsWith;
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
@@ -60,7 +62,7 @@ public class InstallBaseLayoutAroundTest {
 
     @Test
     public void test_installBaseLayoutAround_createsToolbar() {
-        onView(isAssignableFrom(FocusParkingView.class)).check(doesNotExist());
+        onView(withClassName(endsWith(FocusParkingView.class.getName()))).check(doesNotExist());
 
         ToolbarController[] toolbar = new ToolbarController[] { null };
         Insets[] insets = new Insets[] { null };
@@ -80,12 +82,13 @@ public class InstallBaseLayoutAroundTest {
         assertNotNull(insets[0]);
         // Technically this doesn't have to be true depending on the OEM's customizations
         assertTrue(insets[0].getTop() > 0);
-        onView(isAssignableFrom(FocusParkingView.class)).check(matches(isDisplayed()));
+        onView(withClassName(endsWith(FocusParkingView.class.getName())))
+                .check(matches(isDisplayed()));
     }
 
     @Test
     public void test_installBaseLayoutAround_doesntCreateToolbar() {
-        onView(isAssignableFrom(FocusParkingView.class)).check(doesNotExist());
+        onView(withClassName(endsWith(FocusParkingView.class.getName()))).check(doesNotExist());
 
         ToolbarController[] toolbar = new ToolbarController[] { null };
         mScenarioRule.getScenario().onActivity(activity ->
@@ -95,11 +98,12 @@ public class InstallBaseLayoutAroundTest {
                         false));
 
         assertNull(toolbar[0]);
-        onView(isAssignableFrom(FocusParkingView.class)).check(matches(isDisplayed()));
+        onView(withClassName(endsWith(FocusParkingView.class.getName())))
+                .check(matches(isDisplayed()));
     }
 
     @Test
-    public void test_emptyactivity_doesnthaveinsetsortoolbar() {
+    public void test_emptyActivity_doesntHaveInsetsOrToolbar() {
         Insets[] insets = new Insets[] { new Insets() };
         mScenarioRule.getScenario().onActivity(activity -> insets[0] = CarUi.getInsets(activity));
         assertNull(insets[0]);
