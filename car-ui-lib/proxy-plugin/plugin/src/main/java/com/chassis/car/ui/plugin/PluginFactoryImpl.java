@@ -109,7 +109,7 @@ public class PluginFactoryImpl implements PluginFactoryOEMV6 {
 
     @Override
     public boolean customizesBaseLayout() {
-        return true;
+        return false;
     }
 
     @Override
@@ -284,7 +284,7 @@ public class PluginFactoryImpl implements PluginFactoryOEMV6 {
 
         // Only wrap uiContext the first time it's configured
         if (!(uiContext instanceof PluginContextWrapper)) {
-            uiContext = new PluginContextWrapper(uiContext);
+            uiContext = new PluginContextWrapper(uiContext, sourceContext.getPackageName());
         }
 
         // Add a custom layout inflater that can handle things like CarUiTextView that is in the

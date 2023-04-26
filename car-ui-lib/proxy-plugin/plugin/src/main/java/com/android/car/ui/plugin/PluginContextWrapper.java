@@ -19,17 +19,35 @@ package com.android.car.ui.plugin;
 import android.content.Context;
 import android.content.ContextWrapper;
 
+import androidx.annotation.NonNull;
+
 /**
- * A wrapper class around the plugin context so it can provide {@link android.app.Application}
- * context.
+ * A wrapper class around the plugin context
  */
 public class PluginContextWrapper extends ContextWrapper {
-    public PluginContextWrapper(Context base) {
-        super(base);
+    String mApplicationPackageName;
+
+    public PluginContextWrapper(@NonNull Context pluginContext,
+                                @NonNull String applicationPackageName) {
+        super(pluginContext);
+        mApplicationPackageName = applicationPackageName;
     }
 
+    /**
+     * Return this plugin context as the application context so that it doesn't return null when
+     * called in the static implementation, for example, {@code MenuItem}
+     */
     @Override
     public Context getApplicationContext() {
         return this;
+    }
+
+    /**
+     * Return the application package name instead of the plugin package name because
+     * {@code SearchResultsProvider} in static implementation needs application id for authority
+     */
+    @Override
+    public String getPackageName() {
+        return mApplicationPackageName;
     }
 }
