@@ -85,8 +85,8 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
     public void setModel(@NonNull PlaybackViewModel model, @NonNull LifecycleOwner owner,
             @NonNull Size maxArtSize) {
         mMediaButtonController.setModel(model, owner);
-        mMetadataController = new MetadataController(owner, model, mTitle, mSubtitle, null, null,
-                null, null, null, null, mContentTile, mAppIcon, maxArtSize);
+        mMetadataController = new MetadataController(owner, model, null, mTitle, mSubtitle, null,
+                null, null, null, null, null, mContentTile, mAppIcon, maxArtSize, null);
         mPlaybackViewModel = model;
 
         ControlBarHelper.initProgressBar(getContext(), owner, mPlaybackViewModel,

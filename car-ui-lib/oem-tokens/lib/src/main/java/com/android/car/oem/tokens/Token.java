@@ -26,6 +26,8 @@ import android.view.ContextThemeWrapper;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.annotation.Px;
+import androidx.annotation.StyleRes;
 import androidx.annotation.StyleableRes;
 import androidx.core.content.ContextCompat;
 
@@ -81,18 +83,48 @@ public class Token {
      * returned with library default token values.
      */
     @NonNull
-    public static Context createOemStyledContext(@NonNull Context context) {
+    public static Context createOemStyledContext(@NonNull Context context,
+            boolean oemOverrideDisabled) {
         ContextThemeWrapper oemContext = new ContextThemeWrapper(context, R.style.OemTokens);
+
+        if (oemOverrideDisabled) {
+            oemContext.getTheme().applyStyle(R.style.OemTokens, true);
+        }
 
         int oemStyleOverride = context.getResources().getIdentifier("OemStyle",
                 "style", Token.getTokenSharedLibraryName());
         if (oemStyleOverride == 0) {
-            return context;
+            return oemContext;
         }
 
         oemContext.getTheme().applyStyle(oemStyleOverride, true);
 
         return oemContext;
+    }
+
+    /**
+     * Return the OEM provided corner radius corresponding to the styleable resource.
+     * <p>
+     * If OEM customized token corner radius values are unavailable on the system , the library
+     * default corner radius token value is returned.
+     */
+    @Px
+    public static int getCornerRadius(@NonNull Context context, @StyleableRes int styleableId) {
+        TypedValue tv = getStyleableTypedValue(context, styleableId);
+        return TypedValue.complexToDimensionPixelOffset(tv.data,
+                context.getResources().getDisplayMetrics());
+    }
+
+    /**
+     * Return the OEM provided text appearance resource id corresponding to the styleable resource.
+     * <p>
+     * If OEM customized token text appearance values are unavailable on the system , the library
+     * default text appearance token value is returned.
+     */
+    @StyleRes
+    public static int getTextAppearance(@NonNull Context context, @StyleableRes int styleableId) {
+        TypedValue tv = getStyleableTypedValue(context, styleableId);
+        return tv.resourceId;
     }
 
     /**
@@ -103,21 +135,12 @@ public class Token {
      */
     @ColorInt
     public static int getColor(@NonNull Context context, @StyleableRes int styleableId) {
-        TypedValue tv = new TypedValue();
-        context.getTheme().resolveAttribute(R.attr.oemTokenOverrideEnabled, tv, true);
-        boolean oemOverrideDisabled = tv.data == 0;
-        if (oemOverrideDisabled) {
-            context = createOemStyledContext(context);
-        }
-
-        TypedArray libAttrs = context.obtainStyledAttributes(R.style.OemTokens,
-                R.styleable.OemTokens);
-        libAttrs.getValue(styleableId, tv);
+        TypedValue tv = getStyleableTypedValue(context, styleableId);
 
         if (tv.resourceId == 0) {
             return tv.data;
         }
-        libAttrs.recycle();
+
         return ContextCompat.getColor(context, tv.resourceId);
     }
 
@@ -150,5 +173,28 @@ public class Token {
         libAttributes.recycle();
         sharedLibAttributes.recycle();
         return isOemStyled;
+    }
+
+    private static TypedValue getStyleableTypedValue(@NonNull Context context,
+            @StyleableRes int styleableId) {
+        TypedValue tv = new TypedValue();
+        context.getTheme().resolveAttribute(R.attr.oemTokenOverrideEnabled, tv, true);
+        boolean oemOverrideDisabled = tv.data == 0;
+        if (oemOverrideDisabled) {
+            context = createOemStyledContext(context, true);
+        }
+
+        TypedArray libAttrs = context.obtainStyledAttributes(R.style.OemTokens,
+                R.styleable.OemTokens);
+        libAttrs.getValue(styleableId, tv);
+
+        // If type attribute, the shared lib style was not applied, read it from the base style
+        if (tv.type == TYPE_ATTRIBUTE) {
+            libAttrs = context.obtainStyledAttributes(R.style.OemTokensBase, R.styleable.OemTokens);
+            libAttrs.getValue(styleableId, tv);
+        }
+
+        libAttrs.recycle();
+        return tv;
     }
 }

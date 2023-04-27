@@ -31,9 +31,9 @@ import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static com.android.car.ui.actions.ViewActions.setProgress;
-import static com.android.car.ui.matchers.ViewMatchers.isActivated;
-import static com.android.car.ui.matchers.ViewMatchers.withIndex;
+import static com.android.car.ui.testing.actions.ViewActions.setProgress;
+import static com.android.car.ui.testing.matchers.ViewMatchers.isActivated;
+import static com.android.car.ui.testing.matchers.ViewMatchers.withIndex;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertEquals;
@@ -65,6 +65,7 @@ import androidx.preference.Preference;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.android.car.ui.test.R;
@@ -73,6 +74,7 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -81,6 +83,7 @@ import java.util.function.Consumer;
 /**
  * Unit tests for {@link CarUiPreference}.
  */
+@RunWith(AndroidJUnit4.class)
 public class PreferenceTest {
     private PreferenceTestActivity mActivity;
     private String[] mEntries;
@@ -706,7 +709,7 @@ public class PreferenceTest {
         preference.setTitle(R.string.title_twoaction_preference);
         preference.setSummary(R.string.summary_twoaction_preference);
         preference.setOrder(0);
-        preference.setSecondaryActionIcon(R.drawable.avd_show_password);
+        preference.setSecondaryActionIcon(R.drawable.ic_settings_gear);
         Runnable clickListener = mock(Runnable.class);
         preference.setOnSecondaryActionClickListener(clickListener);
         mActivity.addPreference(preference);
@@ -733,7 +736,7 @@ public class PreferenceTest {
         preference.setTitle(R.string.title_twoaction_preference);
         preference.setSummary(R.string.summary_twoaction_preference);
         preference.setOrder(0);
-        preference.setSecondaryActionIcon(R.drawable.avd_show_password);
+        preference.setSecondaryActionIcon(R.drawable.ic_settings_gear);
         Runnable clickListener = mock(Runnable.class);
         preference.setOnSecondaryActionClickListener(clickListener);
         preference.setUxRestricted(true);
@@ -766,7 +769,7 @@ public class PreferenceTest {
         preference.setTitle(R.string.title_twoaction_preference);
         preference.setSummary(R.string.summary_twoaction_preference);
         preference.setOrder(0);
-        preference.setSecondaryActionIcon(R.drawable.avd_show_password);
+        preference.setSecondaryActionIcon(R.drawable.ic_settings_gear);
         Runnable clickListener = mock(Runnable.class);
         preference.setOnSecondaryActionClickListener(clickListener);
         preference.setEnabled(false);
@@ -798,8 +801,17 @@ public class PreferenceTest {
 
     @Test
     public void testTwoActionTextPreference() {
-        // Create CarUiTwoActionTextPreference preference and add it to screen.
-        CarUiTwoActionTextPreference preference = new CarUiTwoActionTextPreference(mActivity);
+        testTwoActionTextPreference(new CarUiTwoActionTextPreference(mActivity));
+    }
+
+    @Test
+    public void testTwoActionTextPreference_customConstructor() {
+        testTwoActionTextPreference(new CarUiTwoActionTextPreference(mActivity,
+                CarUiTwoActionTextPreference.SECONDARY_ACTION_STYLE_BORDERLESS));
+    }
+
+    public void testTwoActionTextPreference(CarUiTwoActionTextPreference preference) {
+        // Setup CarUiTwoActionTextPreference
         preference.setKey("twoaction");
         preference.setTitle(R.string.title_twoaction_preference);
         preference.setSummary(R.string.summary_twoaction_preference);
@@ -1073,7 +1085,7 @@ public class PreferenceTest {
         preference.setPositiveButtonText(positiveButtonText);
         preference.setDialogTitle(R.string.dialog_title_edit_text_preference);
         preference.setSummaryProvider(EditTextPreference.SimpleSummaryProvider.getInstance());
-        preference.setDialogIcon(R.drawable.avd_hide_password);
+        preference.setDialogIcon(R.drawable.ic_settings_gear);
         mActivity.addPreference(preference);
 
         // Check title is displayed as expected.

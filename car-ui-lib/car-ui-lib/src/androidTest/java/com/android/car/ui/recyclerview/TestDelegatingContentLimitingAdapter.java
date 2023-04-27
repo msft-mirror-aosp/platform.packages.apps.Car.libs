@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class TestDelegatingContentLimitingAdapter
+public class TestDelegatingContentLimitingAdapter
         extends RecyclerView.Adapter<TestViewHolder> {
 
     private final List<String> mItems;
@@ -102,12 +102,12 @@ class TestDelegatingContentLimitingAdapter
         notifyDataSetChanged();
     }
 
-    static class WithContentLimiting extends TestDelegatingContentLimitingAdapter
+    public static class WithContentLimiting extends TestDelegatingContentLimitingAdapter
             implements DelegatingContentLimitingAdapter.ContentLimiting {
 
         private int mScrollPositionWhenRestricted = -1;
 
-        WithContentLimiting(int numItems) {
+        public WithContentLimiting(int numItems) {
             super(numItems);
         }
 

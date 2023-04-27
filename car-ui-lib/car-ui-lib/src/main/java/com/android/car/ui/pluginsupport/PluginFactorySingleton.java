@@ -61,6 +61,7 @@ public final class PluginFactorySingleton {
 
     private static final String TAG = "carui";
     private static PluginFactory sInstance;
+    private static final Object LOCK = new Object();
     private static TestingOverride sTestingOverride = TestingOverride.NOT_SET;
 
     /**
@@ -80,130 +81,20 @@ public final class PluginFactorySingleton {
     public static PluginFactory get(Context context) {
         try {
             Trace.beginSection("car-ui-plugin-load");
-            return getImpl(context);
+            PluginFactory result = sInstance;
+            if (result == null) {
+                synchronized (LOCK) {
+                    result = sInstance;
+                    if (result == null) {
+                        loadPlugin(context.getApplicationContext());
+                        result = sInstance;
+                    }
+                }
+            }
+            return result;
         } finally {
             Trace.endSection();
         }
-    }
-
-    private static PluginFactory getImpl(Context context) {
-        if (sInstance != null) {
-            return sInstance;
-        }
-
-        context = context.getApplicationContext();
-
-        boolean isPluginEnabled;
-        switch (sTestingOverride) {
-            case ENABLED:
-                isPluginEnabled = true;
-                break;
-            case DISABLED:
-                isPluginEnabled = false;
-                break;
-            case NOT_SET:
-            default:
-                isPluginEnabled = isPluginEnabled(context);
-                break;
-        }
-
-        if (!isPluginEnabled) {
-            sInstance = new PluginFactoryStub();
-            return sInstance;
-        }
-
-        // Check if the factory is already on the classpath and if so use it. Note: this would
-        // only happen if the plugin was added as a library to the apk
-        try {
-            Class<?> oemApiUtilClass = Class
-                    .forName("com.android.car.ui.pluginsupport.OemApiUtil");
-            Method getPluginFactoryMethod = oemApiUtilClass.getDeclaredMethod(
-                    "getPluginFactory", Context.class, String.class);
-            getPluginFactoryMethod.setAccessible(true);
-            sInstance = (PluginFactory) getPluginFactoryMethod
-                    .invoke(null, context, context.getPackageName());
-            return sInstance;
-        } catch (ReflectiveOperationException e) {
-            // plugin not found in current classpath
-        }
-
-        String pluginPackageName = getPluginPackageName(context);
-
-        if (TextUtils.isEmpty(pluginPackageName)) {
-            sInstance = new PluginFactoryStub();
-            return sInstance;
-        }
-
-        final PackageInfo pluginPackageInfo;
-        try {
-            pluginPackageInfo = context.getPackageManager()
-                    .getPackageInfo(pluginPackageName, 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Could not load CarUi plugin, package "
-                    + pluginPackageName + " was not found.");
-            sInstance = new PluginFactoryStub();
-            return sInstance;
-        }
-
-        Context applicationContext = context.getApplicationContext();
-        if (applicationContext instanceof PluginConfigProvider) {
-            Set<PluginSpecifier> deniedPackages =
-                    ((PluginConfigProvider) applicationContext).getPluginDenyList();
-            if (deniedPackages != null && deniedPackages.stream()
-                    .anyMatch(specs -> specs.matches(pluginPackageInfo))) {
-                Log.i(TAG, "Package " + context.getPackageName()
-                        + " denied loading plugin " + pluginPackageName);
-                sInstance = new PluginFactoryStub();
-                return sInstance;
-            }
-        }
-
-        Context pluginContext;
-        try {
-            pluginContext = context.createPackageContext(
-                    pluginPackageName,
-                    Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY);
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Could not load CarUi plugin, package "
-                    + pluginPackageName + " was not found.");
-            sInstance = new PluginFactoryStub();
-            return sInstance;
-        }
-
-        AdapterClassLoader adapterClassLoader =
-                instantiateClassLoader(context.getApplicationInfo(),
-                        requireNonNull(PluginFactorySingleton.class.getClassLoader()),
-                        pluginContext.getClassLoader());
-
-        try {
-            Class<?> oemApiUtilClass = adapterClassLoader
-                    .loadClass("com.android.car.ui.pluginsupport.OemApiUtil");
-            Method getPluginFactoryMethod = oemApiUtilClass.getDeclaredMethod(
-                    "getPluginFactory", Context.class, String.class);
-            getPluginFactoryMethod.setAccessible(true);
-            sInstance = (PluginFactory) getPluginFactoryMethod
-                    .invoke(null, pluginContext, context.getPackageName());
-        } catch (ReflectiveOperationException e) {
-            Log.e(TAG, "Could not load CarUi plugin", e);
-            sInstance = new PluginFactoryStub();
-            return sInstance;
-        }
-
-        if (sInstance == null) {
-            Log.e(TAG, "Could not load CarUi plugin");
-            sInstance = new PluginFactoryStub();
-            return sInstance;
-        }
-
-        Log.i(TAG, "Loaded plugin " + pluginPackageName
-                + " version " + pluginPackageInfo.getLongVersionCode()
-                + " for package " + context.getPackageName());
-
-        if (sTestingOverride != TestingOverride.NOT_SET) {
-            sPluginContext = pluginContext;
-        }
-
-        return sInstance;
     }
 
     /**
@@ -236,7 +127,94 @@ public final class PluginFactorySingleton {
     private PluginFactorySingleton() {
     }
 
-    @NonNull
+    /**
+     * creates and loads the plugin factory statically. This should be called as soon as app can get
+     * the access to the context, preferably content providers.
+     */
+    private static void loadPlugin(@NonNull Context context) {
+        if (sInstance != null) {
+            return;
+        }
+
+        boolean isPluginEnabled;
+        switch (sTestingOverride) {
+            case ENABLED:
+                isPluginEnabled = true;
+                break;
+            case DISABLED:
+                isPluginEnabled = false;
+                break;
+            case NOT_SET:
+            default:
+                isPluginEnabled = isPluginEnabled(context);
+                break;
+        }
+
+        if (!isPluginEnabled) {
+            Log.i(TAG, "CarUi plugin is disabled");
+            sInstance = new PluginFactoryStub();
+            return;
+        }
+
+        String pluginPackageName = getPluginPackageName(context);
+        PackageInfo pluginPackageInfo;
+        try {
+            pluginPackageInfo = context.getPackageManager()
+                    .getPackageInfo(pluginPackageName, 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Could not load CarUi plugin, package "
+                    + pluginPackageName + " was not found.");
+            sInstance = new PluginFactoryStub();
+            return;
+        }
+
+        Context applicationContext = context.getApplicationContext();
+        if (applicationContext instanceof PluginConfigProvider) {
+            Set<PluginSpecifier> deniedPackages =
+                    ((PluginConfigProvider) applicationContext).getPluginDenyList();
+            if (deniedPackages != null && deniedPackages.stream()
+                    .anyMatch(specs -> specs.matches(pluginPackageInfo))) {
+                Log.i(TAG, "Package " + context.getPackageName()
+                        + " denied loading plugin " + pluginPackageName);
+                sInstance = new PluginFactoryStub();
+                return;
+            }
+        }
+
+        if (sPluginContext == null) {
+            try {
+                sPluginContext = context.createPackageContext(pluginPackageName,
+                        Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY);
+            } catch (Exception e) {
+                Log.e(TAG, "Could not load CarUi plugin", e);
+                sInstance = new PluginFactoryStub();
+                return;
+            }
+        }
+
+        AdapterClassLoader adapterClassLoader =
+                instantiateClassLoader(context.getApplicationInfo(),
+                        requireNonNull(PluginFactorySingleton.class.getClassLoader()),
+                        sPluginContext.getClassLoader());
+
+        try {
+            Class<?> oemApiUtilClass = adapterClassLoader
+                    .loadClass("com.android.car.ui.pluginsupport.OemApiUtil");
+            Method getPluginFactoryMethod = oemApiUtilClass.getDeclaredMethod(
+                    "getPluginFactory", Context.class, String.class);
+            getPluginFactoryMethod.setAccessible(true);
+            sInstance = (PluginFactory) getPluginFactoryMethod
+                    .invoke(null, sPluginContext, context.getPackageName());
+        } catch (ReflectiveOperationException e) {
+            Log.e(TAG, "Could not load CarUi plugin", e);
+            sInstance = new PluginFactoryStub();
+        }
+
+        Log.i(TAG, "Loaded plugin " + pluginPackageName
+                + " version " + pluginPackageInfo.getLongVersionCode()
+                + " for package " + context.getPackageName());
+    }
+
     private static AdapterClassLoader instantiateClassLoader(@NonNull ApplicationInfo appInfo,
             @NonNull ClassLoader parent, @NonNull ClassLoader sharedlibraryClassLoader) {
         // All this apk loading code is copied from another Google app

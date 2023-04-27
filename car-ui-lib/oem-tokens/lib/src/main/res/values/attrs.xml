@@ -146,5 +146,13 @@
         <attr name="oemTextAppearanceBodyLarge" format="reference" />
         <attr name="oemTextAppearanceBodyMedium" format="reference" />
         <attr name="oemTextAppearanceBodySmall" format="reference" />
+
+        <attr name="oemShapeCornerNone" format="dimension" />
+        <attr name="oemShapeCornerExtraSmall" format="dimension" />
+        <attr name="oemShapeCornerSmall" format="dimension" />
+        <attr name="oemShapeCornerMedium" format="dimension" />
+        <attr name="oemShapeCornerLarge" format="dimension" />
+        <attr name="oemShapeCornerExtraLarge" format="dimension" />
+        <attr name="oemShapeCornerFull" format="dimension" />
     </declare-styleable>
 </resources>

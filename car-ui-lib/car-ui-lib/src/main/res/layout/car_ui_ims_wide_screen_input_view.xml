@@ -147,6 +147,7 @@
         android:background="@drawable/car_ui_ime_wide_screen_no_content_background">
         <com.android.car.ui.recyclerview.CarUiRecyclerView
             android:id="@id/car_ui_wideScreenSearchResultList"
+            android:scrollbars="vertical"
             android:requiresFadingEdge="vertical"
             android:paddingTop="@dimen/car_ui_ime_wide_screen_input_area_padding_top"
             android:layout_width="match_parent"

@@ -18,11 +18,15 @@ package com.android.car.ui.core;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
 import com.android.car.ui.test.R;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /** A test for {@link com.android.car.ui.core.CarUi} */
+@RunWith(AndroidJUnit4.class)
 public class CarUiTest {
 
     @Test

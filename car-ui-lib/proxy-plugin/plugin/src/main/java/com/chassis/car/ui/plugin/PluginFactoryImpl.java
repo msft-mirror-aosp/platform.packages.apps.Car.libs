@@ -33,9 +33,10 @@ import com.android.car.ui.plugin.PluginContextWrapper;
 import com.android.car.ui.plugin.oemapis.FocusAreaOEMV1;
 import com.android.car.ui.plugin.oemapis.FocusParkingViewOEMV1;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
-import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5;
+import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6;
 import com.android.car.ui.plugin.oemapis.TextOEMV1;
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
+import com.android.car.ui.plugin.oemapis.preference.PreferenceOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.ContentListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.HeaderListItemOEMV1;
@@ -53,6 +54,7 @@ import com.android.car.ui.toolbar.ToolbarControllerImpl;
 import com.android.car.ui.utils.CarUiUtils;
 
 import com.chassis.car.ui.plugin.appstyledview.AppStyledViewControllerAdapterProxy;
+import com.chassis.car.ui.plugin.preference.PreferenceAdapterProxy;
 import com.chassis.car.ui.plugin.recyclerview.CarListItemAdapterAdapterProxy;
 import com.chassis.car.ui.plugin.recyclerview.RecyclerViewAdapterProxy;
 import com.chassis.car.ui.plugin.toolbar.ToolbarAdapterProxy;
@@ -68,7 +70,7 @@ import java.util.WeakHashMap;
  * without the need to target each app specifically. Note: it only applies to the components that
  * come through the plugin system.
  */
-public class PluginFactoryImpl implements PluginFactoryOEMV5 {
+public class PluginFactoryImpl implements PluginFactoryOEMV6 {
 
     private final Context mPluginContext;
     Map<Context, Context> mAppToPluginContextMap = new WeakHashMap<>();
@@ -98,6 +100,12 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
     @Override
     public boolean customizesBaseLayout() {
         return false;
+    }
+
+    @Override
+    public PreferenceOEMV1 createCarUiPreference(@NonNull Context sourceContext) {
+        Context pluginContext = getPluginUiContext(sourceContext, mPluginContext);
+        return new PreferenceAdapterProxy(pluginContext, sourceContext);
     }
 
     @Nullable
@@ -135,6 +143,7 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
     /**
      * The plugin was passed the list items as {@link ListItemOEMV1}s and thus must be converted
      * back to use the "original" {@link CarUiListItem}s that's expected by the {
+     *
      * @link CarUiListItemAdapter}
      */
     private static CarUiListItem toStaticListItem(ListItemOEMV1 item) {

@@ -97,6 +97,9 @@ public class TokenInstaller extends ContentProvider {
                             return;
                         }
 
+                        Log.i(TAG, "Setting OEM token default values");
+                        activity.getTheme().applyStyle(R.style.OemTokensBase, true);
+
                         int useOemTokenId = activity.getResources().getIdentifier(
                                 "enable_oem_tokens",
                                 "bool", Token.getTokenSharedLibraryName());
@@ -106,7 +109,7 @@ public class TokenInstaller extends ContentProvider {
 
                         if (useOemToken && Token.isTokenSharedLibInstalled(
                                 activity.getPackageManager())) {
-                            Log.i(TAG, "Setting OEM token values");
+                            Log.i(TAG, "Setting shared lib OEM token default values");
                             activity.getTheme().applyStyle(R.style.OemTokens, true);
                             int oemStyleOverride = activity.getResources().getIdentifier("OemStyle",
                                     "style", Token.getTokenSharedLibraryName());
@@ -114,7 +117,10 @@ public class TokenInstaller extends ContentProvider {
                                 Log.e(TAG,
                                         "Unable to apply OEM design token overrides. Style with "
                                                 + "name OemStyle not found.");
+                                return;
                             }
+
+                            Log.i(TAG, "Overriding OEM tokens with OEM values");
                             activity.getTheme().applyStyle(oemStyleOverride, true);
                         }
                     }

@@ -35,6 +35,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import com.android.car.ui.CarUiLayoutInflaterFactory;
 import com.android.car.ui.R;
 import com.android.car.ui.baselayout.Insets;
+import com.android.car.ui.pluginsupport.PluginFactorySingleton;
 import com.android.car.ui.utils.CarUiUtils;
 
 import java.lang.reflect.Constructor;
@@ -81,9 +82,13 @@ public class CarUiInstaller extends ContentProvider {
         Context context = getContext();
         if (context == null || !(context.getApplicationContext() instanceof Application)) {
             Log.e(TAG, "CarUiInstaller had a null context, unable to call register!"
-                        + " Need app to call register by itself");
+                    + " Need app to call register by itself");
             return false;
         }
+
+        new Thread(() -> {
+            Object unused = PluginFactorySingleton.get(context.getApplicationContext());
+        }).start();
 
         Application application = (Application) context.getApplicationContext();
         register(application);

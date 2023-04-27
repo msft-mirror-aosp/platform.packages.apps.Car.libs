@@ -169,17 +169,12 @@
     <attr name="textAppearanceBodyMedium" format="reference" />
     <attr name="textAppearanceBodySmall" format="reference" />
 
-    <!-- Shape scales -->
-    <attr name="shapeAppearanceCornerNone" format="reference" />
-    <attr name="shapeAppearanceCornerExtraSmall" format="reference" />
-    <attr name="shapeAppearanceCornerExtraSmallTop" format="reference" />
-    <attr name="shapeAppearanceCornerSmall" format="reference" />
-    <attr name="shapeAppearanceCornerMedium" format="reference" />
-    <attr name="shapeAppearanceCornerLarge" format="reference" />
-    <attr name="shapeAppearanceCornerLargeTop" format="reference" />
-    <attr name="shapeAppearanceCornerLargeStart" format="reference" />
-    <attr name="shapeAppearanceCornerLargeEnd" format="reference" />
-    <attr name="shapeAppearanceCornerExtraLarge" format="reference" />
-    <attr name="shapeAppearanceCornerExtraLargeTop" format="reference" />
-    <attr name="shapeAppearanceCornerFull" format="reference" />
+    <!-- Shape corner scales -->
+    <attr name="shapeCornerNone" format="dimension" />
+    <attr name="shapeCornerExtraSmall" format="dimension" />
+    <attr name="shapeCornerSmall" format="dimension" />
+    <attr name="shapeCornerMedium" format="dimension" />
+    <attr name="shapeCornerLarge" format="dimension" />
+    <attr name="shapeCornerExtraLarge" format="dimension" />
+    <attr name="shapeCornerFull" format="dimension" />
 </resources>

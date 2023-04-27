@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Copyright (C) 2023 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources>
+    <color name="oem_default_color_primary_palette_100">#FFFFFF</color>
+    <color name="oem_default_color_primary_palette_99">#FDFBFF</color>
+    <color name="oem_default_color_primary_palette_95">#EDF0FF</color>
+    <color name="oem_default_color_primary_palette_90">#D9E2FF</color>
+    <color name="oem_default_color_primary_palette_80">#B0C5FF</color>
+    <color name="oem_default_color_primary_palette_70">#86A9FF</color>
+    <color name="oem_default_color_primary_palette_60">#588CFF</color>
+    <color name="oem_default_color_primary_palette_50">#3670E9</color>
+    <color name="oem_default_color_primary_palette_40">#0856CF</color>
+    <color name="oem_default_color_primary_palette_30">#003FA4</color>
+    <color name="oem_default_color_primary_palette_20">#002B76</color>
+    <color name="oem_default_color_primary_palette_10">#00184A</color>
+    <color name="oem_default_color_primary_palette_0">#000000</color>
+
+    <color name="oem_default_color_secondary_palette_100">#FFFFFF</color>
+    <color name="oem_default_color_secondary_palette_99">#FDFBFF</color>
+    <color name="oem_default_color_secondary_palette_95">#EDF0FF</color>
+    <color name="oem_default_color_secondary_palette_90">#DDE2FA</color>
+    <color name="oem_default_color_secondary_palette_80">#C0C6DD</color>
+    <color name="oem_default_color_secondary_palette_70">#A5ABC1</color>
+    <color name="oem_default_color_secondary_palette_60">#8A90A6</color>
+    <color name="oem_default_color_secondary_palette_50">#70768B</color>
+    <color name="oem_default_color_secondary_palette_40">#585E71</color>
+    <color name="oem_default_color_secondary_palette_30">#404659</color>
+    <color name="oem_default_color_secondary_palette_20">#2A3042</color>
+    <color name="oem_default_color_secondary_palette_10">#151B2C</color>
+    <color name="oem_default_color_secondary_palette_0">#000000</color>
+
+    <color name="oem_default_color_tertiary_palette_100">#FFFFFF</color>
+    <color name="oem_default_color_tertiary_palette_99">#FCFCFC</color>
+    <color name="oem_default_color_tertiary_palette_95">#FFEBFB</color>
+    <color name="oem_default_color_tertiary_palette_90">#FED7F9</color>
+    <color name="oem_default_color_tertiary_palette_80">#E1BBDD</color>
+    <color name="oem_default_color_tertiary_palette_70">#C4A0C1</color>
+    <color name="oem_default_color_tertiary_palette_60">#A886A5</color>
+    <color name="oem_default_color_tertiary_palette_50">#8D6C8B</color>
+    <color name="oem_default_color_tertiary_palette_40">#735571</color>
+    <color name="oem_default_color_tertiary_palette_30">#5A3D59</color>
+    <color name="oem_default_color_tertiary_palette_20">#422742</color>
+    <color name="oem_default_color_tertiary_palette_10">#2B122C</color>
+    <color name="oem_default_color_tertiary_palette_0">#000000</color>
+
+    <color name="oem_default_color_error_palette_100">#FFFFFF</color>
+    <color name="oem_default_color_error_palette_99">#FCFCFC</color>
+    <color name="oem_default_color_error_palette_95">#FFEDE9</color>
+    <color name="oem_default_color_error_palette_90">#FFDAD4</color>
+    <color name="oem_default_color_error_palette_80">#FFB4A9</color>
+    <color name="oem_default_color_error_palette_70">#FF897A</color>
+    <color name="oem_default_color_error_palette_60">#FF5449</color>
+    <color name="oem_default_color_error_palette_50">#DD3730</color>
+    <color name="oem_default_color_error_palette_40">#BA1B1B</color>
+    <color name="oem_default_color_error_palette_30">#930006</color>
+    <color name="oem_default_color_error_palette_20">#680003</color>
+    <color name="oem_default_color_error_palette_10">#410001</color>
+    <color name="oem_default_color_error_palette_0">#000000</color>
+
+    <color name="oem_default_color_neutral_palette_100">#FFFFFF</color>
+    <color name="oem_default_color_neutral_palette_99">#FEFBFF</color>
+    <color name="oem_default_color_neutral_palette_95">#F2F0F5</color>
+    <color name="oem_default_color_neutral_palette_90">#E4E2E6</color>
+    <color name="oem_default_color_neutral_palette_80">#C8C6CA</color>
+    <color name="oem_default_color_neutral_palette_70">#ACABAF</color>
+    <color name="oem_default_color_neutral_palette_60">#919094</color>
+    <color name="oem_default_color_neutral_palette_50">#77767A</color>
+    <color name="oem_default_color_neutral_palette_40">#5E5E62</color>
+    <color name="oem_default_color_neutral_palette_30">#46464A</color>
+    <color name="oem_default_color_neutral_palette_20">#303033</color>
+    <color name="oem_default_color_neutral_palette_10">#1B1B1E</color>
+    <color name="oem_default_color_neutral_palette_0">#000000</color>
+
+    <color name="oem_default_color_neutral_variant_palette_100">#FFFFFF</color>
+    <color name="oem_default_color_neutral_variant_palette_99">#FDFBFF</color>
+    <color name="oem_default_color_neutral_variant_palette_95">#F0F0FA</color>
+    <color name="oem_default_color_neutral_variant_palette_90">#E2E2EC</color>
+    <color name="oem_default_color_neutral_variant_palette_80">#C5C6D0</color>
+    <color name="oem_default_color_neutral_variant_palette_70">#A9AAB4</color>
+    <color name="oem_default_color_neutral_variant_palette_60">#8F909A</color>
+    <color name="oem_default_color_neutral_variant_palette_50">#75767F</color>
+    <color name="oem_default_color_neutral_variant_palette_40">#5C5E67</color>
+    <color name="oem_default_color_neutral_variant_palette_30">#44464E</color>
+    <color name="oem_default_color_neutral_variant_palette_20">#2E3038</color>
+    <color name="oem_default_color_neutral_variant_palette_10">#191B23</color>
+    <color name="oem_default_color_neutral_variant_palette_0">#000000</color>
+</resources>

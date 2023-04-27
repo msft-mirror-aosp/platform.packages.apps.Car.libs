@@ -16,6 +16,12 @@
 
 package com.android.car.media.common;
 
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION;
+import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE;
+
+import static com.android.car.media.common.MediaConstants.KEY_DESCRIPTION_LINK_MEDIA_ID;
+import static com.android.car.media.common.MediaConstants.KEY_SUBTITLE_LINK_MEDIA_ID;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -25,8 +31,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -58,7 +62,7 @@ import java.util.Objects;
  * For media art, only local uris are supported so downloads can be attributed to the media app.
  * Bitmaps are not supported because they slow down the binder.
  */
-public class MediaItemMetadata implements Parcelable {
+public class MediaItemMetadata {
     private static final String TAG = "MediaItemMetadata";
 
     static final int INVALID_MEDIA_ART_TINT_COLOR = Color.argb(200, 255, 0, 0);
@@ -68,52 +72,44 @@ public class MediaItemMetadata implements Parcelable {
 
     @NonNull
     private final MediaDescriptionCompat mMediaDescription;
+    /**
+     * Stores the bundle from {@link MediaMetadataCompat#getBundle} to access its extras since they
+     * are not included in the {@link MediaMetadataCompat#getDescription}.
+     */
+    @Nullable
+    private final Bundle mMetadataCompatBundle;
     @Nullable
     private final Long mQueueId;
     private final boolean mIsBrowsable;
     private final boolean mIsPlayable;
-    private final String mAlbumTitle;
-    private final String mArtist;
     private final ArtworkRef mArtworkKey = new ArtworkRef();
 
 
     /** Creates an instance based on a {@link MediaMetadataCompat} */
     public MediaItemMetadata(@NonNull MediaMetadataCompat metadata) {
         this(metadata.getDescription(), null, false, false,
-                metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM),
-                metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST));
+                metadata.getBundle());
     }
 
     /** Creates an instance based on a {@link MediaSessionCompat.QueueItem} */
     public MediaItemMetadata(@NonNull MediaSessionCompat.QueueItem queueItem) {
-        this(queueItem.getDescription(), queueItem.getQueueId(), false, true, null, null);
+        this(queueItem.getDescription(), queueItem.getQueueId(), false, true, null);
     }
 
     /** Creates an instance based on a {@link MediaBrowserCompat.MediaItem} */
     public MediaItemMetadata(@NonNull MediaBrowserCompat.MediaItem item) {
-        this(item.getDescription(), null, item.isBrowsable(), item.isPlayable(), null, null);
-    }
-
-    /** Creates an instance based on a {@link Parcel} */
-    public MediaItemMetadata(@NonNull Parcel in) {
-        mMediaDescription = (MediaDescriptionCompat) in.readValue(
-                MediaDescriptionCompat.class.getClassLoader());
-        mQueueId = in.readByte() == 0x00 ? null : in.readLong();
-        mIsBrowsable = in.readByte() != 0x00;
-        mIsPlayable = in.readByte() != 0x00;
-        mAlbumTitle = in.readString();
-        mArtist = in.readString();
+        this(item.getDescription(), null, item.isBrowsable(), item.isPlayable(), null);
     }
 
     @VisibleForTesting
-    public MediaItemMetadata(MediaDescriptionCompat description, Long queueId, boolean isBrowsable,
-            boolean isPlayable, String albumTitle, String artist) {
+    public MediaItemMetadata(@NonNull MediaDescriptionCompat description, @Nullable Long queueId,
+                             boolean isBrowsable, boolean isPlayable,
+                             @Nullable Bundle metadataCompatBundle) {
         mMediaDescription = description;
         mQueueId = queueId;
         mIsPlayable = isPlayable;
         mIsBrowsable = isBrowsable;
-        mAlbumTitle = albumTitle;
-        mArtist = artist;
+        mMetadataCompatBundle = metadataCompatBundle;
     }
 
     /**
@@ -207,22 +203,46 @@ public class MediaItemMetadata implements Parcelable {
         return mMediaDescription.getSubtitle();
     }
 
+    /**
+     * Returns the media ID of the item associated with the subtitle.
+     * Note: apps must explicitly set the subtitle string and the link, otherwise null is returned.
+     */
+    @Nullable
+    public String getSubtitleLinkMediaId() {
+        if (mMetadataCompatBundle == null) {
+            return null;
+        }
+
+        String subtitle = mMetadataCompatBundle.getString(METADATA_KEY_DISPLAY_SUBTITLE);
+        if (TextUtils.isEmpty(subtitle)) {
+            return null;
+        }
+
+        return mMetadataCompatBundle.getString(KEY_SUBTITLE_LINK_MEDIA_ID);
+    }
+
+    /**
+     * Returns the media ID of the item associated with the description.
+     * Note: apps must explicitly set the description string and the link, or null is returned.
+     */
+    @Nullable
+    public String getDescriptionLinkMediaId() {
+        if (mMetadataCompatBundle == null) {
+            return null;
+        }
+
+        String description = mMetadataCompatBundle.getString(METADATA_KEY_DISPLAY_DESCRIPTION);
+        if (TextUtils.isEmpty(description)) {
+            return null;
+        }
+
+        return mMetadataCompatBundle.getString(KEY_DESCRIPTION_LINK_MEDIA_ID);
+    }
+
     /** @return media item description */
     @Nullable
     public CharSequence getDescription() {
         return mMediaDescription.getDescription();
-    }
-
-    /** @return the album title for the media */
-    @Nullable
-    public String getAlbumTitle() {
-        return mAlbumTitle;
-    }
-
-    /** @return the artist of the media */
-    @Nullable
-    public CharSequence getArtist() {
-        return mArtist;
     }
 
     /**
@@ -494,13 +514,13 @@ public class MediaItemMetadata implements Parcelable {
                 && Objects.equals(getTitle(), that.getTitle())
                 && Objects.equals(getSubtitle(), that.getSubtitle())
                 && Objects.equals(getDescription(), that.getDescription())
-                && Objects.equals(getAlbumTitle(), that.getAlbumTitle())
-                && Objects.equals(getArtist(), that.getArtist())
                 && Objects.equals(getNonEmptyArtworkUri(), that.getNonEmptyArtworkUri())
                 && Objects.equals(mQueueId, that.mQueueId)
                 && Objects.equals(hasPlaybackStatus(), that.hasPlaybackStatus())
                 && Objects.equals(hasProgress(), that.hasProgress())
-                && areDoublesClose(getProgress(), that.getProgress(),  .0001);
+                && areDoublesClose(getProgress(), that.getProgress(),  .0001)
+                && Objects.equals(getSubtitleLinkMediaId(), that.getSubtitleLinkMediaId())
+                && Objects.equals(getDescriptionLinkMediaId(), that.getDescriptionLinkMediaId());
     }
 
     /**
@@ -521,43 +541,10 @@ public class MediaItemMetadata implements Parcelable {
     @Override
     public int hashCode() {
         return Objects.hash(mIsBrowsable, mIsPlayable, getId(), getTitle(), getSubtitle(),
-                getDescription(), getAlbumTitle(), getArtist(), getNonEmptyArtworkUri(),
-                mQueueId, hasPlaybackStatus(), hasProgress(), getProgress());
+                getDescription(), getNonEmptyArtworkUri(), mQueueId, hasPlaybackStatus(),
+                hasProgress(), getProgress(), getSubtitleLinkMediaId(),
+                getDescriptionLinkMediaId());
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(mMediaDescription);
-        if (mQueueId == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeLong(mQueueId);
-        }
-        dest.writeByte((byte) (mIsBrowsable ? 0x01 : 0x00));
-        dest.writeByte((byte) (mIsPlayable ? 0x01 : 0x00));
-        dest.writeString(mAlbumTitle);
-        dest.writeString(mArtist);
-    }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<MediaItemMetadata> CREATOR =
-            new Parcelable.Creator<MediaItemMetadata>() {
-                @Override
-                public MediaItemMetadata createFromParcel(Parcel in) {
-                    return new MediaItemMetadata(in);
-                }
-
-                @Override
-                public MediaItemMetadata[] newArray(int size) {
-                    return new MediaItemMetadata[size];
-                }
-            };
 
     @Override
     public String toString() {
@@ -569,10 +556,6 @@ public class MediaItemMetadata implements Parcelable {
                 + mMediaDescription != null ? mMediaDescription.getTitle().toString() : "-"
                 + ", subtitle: "
                 + mMediaDescription != null ? mMediaDescription.getSubtitle().toString() : "-"
-                + ", album title: "
-                + mAlbumTitle != null ? mAlbumTitle : "-"
-                + ", artist: "
-                + mArtist != null ? mArtist : "-"
                 + ", album art URI: "
                 + (mMediaDescription != null ? mMediaDescription.getIconUri() : "-")
                 + "]";

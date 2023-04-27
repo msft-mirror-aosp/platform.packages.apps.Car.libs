@@ -26,6 +26,7 @@ import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV2;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV3;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV4;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5;
+import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6;
 import com.android.car.ui.plugin.oemapis.PluginVersionProviderOEMV1;
 
 /**
@@ -46,9 +47,9 @@ final class OemApiUtil {
      * factory object, and checking if it's instanceof each version of
      * {@link PluginFactoryOEMV1}, casting to the correct one when found.
      *
-     * @param pluginContext The plugin's context. This context will return
-     *                             the plugin's classloader from
-     *                             {@link Context#getClassLoader()}.
+     * @param pluginContext  The plugin's context. This context will return
+     *                       the plugin's classloader from
+     *                       {@link Context#getClassLoader()}.
      * @param appPackageName The package name of the application. This is passed to the plugin
      *                       so that it can provide unique customizations per-app.
      * @return A {@link PluginFactory}
@@ -84,7 +85,7 @@ final class OemApiUtil {
         PluginFactory oemPluginFactory = null;
         if (versionProvider != null) {
             Object factory = versionProvider.getPluginFactory(
-                    1, pluginContext, appPackageName);
+                    6, pluginContext, appPackageName);
             if (factory instanceof PluginFactoryOEMV1) {
                 oemPluginFactory = new PluginFactoryAdapterV1(
                         (PluginFactoryOEMV1) factory);
@@ -102,13 +103,19 @@ final class OemApiUtil {
                     "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV4")
                     && factory instanceof PluginFactoryOEMV4) {
                 oemPluginFactory = new PluginFactoryAdapterV4(
-                    (PluginFactoryOEMV4) factory);
+                        (PluginFactoryOEMV4) factory);
             } else if (classExists(
                     "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5")
                     && factory instanceof PluginFactoryOEMV5) {
                 oemPluginFactory = new PluginFactoryAdapterV5(
                     (PluginFactoryOEMV5) factory);
+            } else if (classExists(
+                    "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6")
+                    && factory instanceof PluginFactoryOEMV6) {
+                oemPluginFactory = new PluginFactoryAdapterV6(
+                    (PluginFactoryOEMV6) factory);
             } else {
+
                 Log.e(TAG, "PluginVersionProvider found, but did not provide a"
                         + " factory implementing any known interfaces!");
             }

@@ -35,6 +35,7 @@ import android.view.View;
 
 import androidx.test.espresso.Root;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.android.car.ui.recyclerview.CarUiContentListItem;
 import com.android.car.ui.recyclerview.CarUiListItemAdapter;
@@ -46,12 +47,14 @@ import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
+@RunWith(AndroidJUnit4.class)
 public class AlertDialogBuilderTest {
 
     @Rule

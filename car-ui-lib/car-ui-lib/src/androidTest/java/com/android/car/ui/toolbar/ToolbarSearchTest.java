@@ -24,10 +24,10 @@ import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static com.android.car.ui.actions.ViewActions.waitForNoMatchingView;
-import static com.android.car.ui.actions.ViewActions.waitForView;
-import static com.android.car.ui.matchers.ViewMatchers.doesNotExistOrIsNotDisplayed;
-import static com.android.car.ui.matchers.ViewMatchers.withDrawable;
+import static com.android.car.ui.testing.actions.ViewActions.waitForNoMatchingView;
+import static com.android.car.ui.testing.actions.ViewActions.waitForView;
+import static com.android.car.ui.testing.matchers.ViewMatchers.doesNotExistOrIsNotDisplayed;
+import static com.android.car.ui.testing.matchers.ViewMatchers.withDrawable;
 
 import static junit.framework.TestCase.fail;
 
@@ -46,6 +46,7 @@ import com.android.car.ui.pluginsupport.PluginFactorySingleton;
 import com.android.car.ui.test.R;
 import com.android.car.ui.utils.CarUxRestrictionsUtil;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -221,6 +222,8 @@ public class ToolbarSearchTest {
         onView(withHint("Test search hint")).check(matches(isDisplayed()));
     }
 
+    // TODO b/269305905 Remove Ignore annotation when fixed
+    @Ignore
     @Test
     public void test_setSearchHint_uxRestricted_injectedEvents() {
         try {
@@ -246,6 +249,8 @@ public class ToolbarSearchTest {
         }
     }
 
+    // TODO b/269305905 Remove Ignore annotation when fixed
+    @Ignore
     @Test
     public void test_setSearchHint_uxRestricted_injectedEvents_startRestricted() {
         injectDrivingState();

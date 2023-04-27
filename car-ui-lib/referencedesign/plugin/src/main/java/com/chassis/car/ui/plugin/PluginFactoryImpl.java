@@ -26,8 +26,9 @@ import com.android.car.ui.plugin.oemapis.FocusAreaOEMV1;
 import com.android.car.ui.plugin.oemapis.FocusParkingViewOEMV1;
 import com.android.car.ui.plugin.oemapis.Function;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
-import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV5;
+import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6;
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
+import com.android.car.ui.plugin.oemapis.preference.PreferenceOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.ListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewAttributesOEMV1;
@@ -46,7 +47,7 @@ import java.util.List;
  * An implementation of {@link PluginFactoryImpl} for creating the reference design
  * car-ui-lib components.
  */
-public class PluginFactoryImpl implements PluginFactoryOEMV5 {
+public class PluginFactoryImpl implements PluginFactoryOEMV6 {
 
     private final Context mPluginContext;
     @Nullable
@@ -88,6 +89,12 @@ public class PluginFactoryImpl implements PluginFactoryOEMV5 {
     @Override
     public boolean customizesBaseLayout() {
         return true;
+    }
+
+    @Nullable
+    @Override
+    public PreferenceOEMV1 createCarUiPreference(Context sourceContext) {
+        return null;
     }
 
     @Override

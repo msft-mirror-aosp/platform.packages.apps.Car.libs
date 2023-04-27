@@ -37,4 +37,23 @@
         <attr name="carUiContentViewDrawable" format="reference" />
     </declare-styleable>
 
+    <declare-styleable name="Preference">
+
+        <attr name="carUiPreferenceType" format="enum">
+            <enum name="preference" value="0" />
+            <enum name="dropdown" value="1" />
+            <enum name="primarySwitch" value="2" />
+            <enum name="twoaction" value="3" />
+            <enum name="twoactiontext" value="4" />
+            <enum name="twoactiontextborderless" value="5" />
+            <enum name="twoactionicon" value="6" />
+            <enum name="twoactionswitch" value="7" />
+            <enum name="edittext" value="8" />
+            <enum name="seekbardialog" value="9" />
+            <enum name="footer" value="10" />
+            <enum name="category" value="11" />
+        </attr>
+
+    </declare-styleable>
+
 </resources>

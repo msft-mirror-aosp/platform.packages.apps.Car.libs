@@ -22,12 +22,15 @@ import static org.mockito.Mockito.verify;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.Adapter;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+@RunWith(AndroidJUnit4.class)
 public class RangeFilterImplTest {
     private static final int EVEN_MAX_ITEMS = 10;
     private static final int ODD_MAX_ITEMS = 9;

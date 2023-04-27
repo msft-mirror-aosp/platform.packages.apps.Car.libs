@@ -100,6 +100,10 @@ public final class PluginFactoryAdapterV1 implements PluginFactory {
         return mFactoryStub.createTextView(context, attrs);
     }
 
+    @Override
+    public View createCarUiPreferenceView(Context context, AttributeSet attrs) {
+        return mFactoryStub.createCarUiPreferenceView(context, attrs);
+    }
 
     @Override
     public AppStyledViewController createAppStyledView(Context activityContext) {

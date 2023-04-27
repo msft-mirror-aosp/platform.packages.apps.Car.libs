@@ -32,16 +32,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 
+import com.android.car.apps.common.TappableTextView;
 import com.android.car.apps.common.imaging.ImageViewBinder;
 import com.android.car.apps.common.util.ViewUtils;
+import com.android.car.media.common.browse.MediaItemsRepository;
 import com.android.car.media.common.playback.PlaybackViewModel;
 
 /**
  * Common controller for displaying current track's metadata.
  */
 public class MetadataController {
+
     private PlaybackViewModel.PlaybackController mController;
     private final ImageViewBinder<MediaItemMetadata.ArtworkRef> mAlbumArtBinder;
+
+    private final MediaLinkHandler mSubtitleLinker;
+    private final MediaLinkHandler mDescriptionLinker;
 
     private boolean mTrackingTouch;
     private final SeekBar.OnSeekBarChangeListener mOnSeekBarChangeListener =
@@ -79,6 +85,7 @@ public class MetadataController {
      *
      * @param lifecycleOwner    The lifecycle scope for the Views provided to this controller.
      * @param playbackViewModel The Model to provide metadata for display.
+     * @param repository        Optional {@link MediaItemsRepository}.
      * @param title             Displays the track's title. Must not be {@code null}.
      * @param subtitle          Displays the track's subtitle. May be {@code null}.
      * @param description       Displays the track's description. May be {@code null}.
@@ -92,14 +99,18 @@ public class MetadataController {
      * @param albumArt          Displays the track's album art. May be {@code null}.
      * @param appIcon           Displays the app icon.
      * @param maxArtSize        Maximum size of the track's album art.
+     * @param delegate          Optional {@link MediaLinkHandler.MediaLinkDelegate}.
      */
     public MetadataController(@NonNull LifecycleOwner lifecycleOwner,
-            @NonNull PlaybackViewModel playbackViewModel, @NonNull TextView title,
-            @Nullable TextView subtitle, @Nullable TextView description,
+            @NonNull PlaybackViewModel playbackViewModel, @Nullable MediaItemsRepository repository,
+            @NonNull TextView title, @Nullable TextView subtitle, @Nullable TextView description,
             @Nullable TextView outerSeparator, @Nullable TextView currentTime,
             @Nullable TextView innerSeparator, @Nullable TextView maxTime,
-            @Nullable SeekBar seekBar, @Nullable ImageView albumArt,
-            @Nullable ImageView appIcon, Size maxArtSize) {
+            @Nullable SeekBar seekBar, @Nullable ImageView albumArt, @Nullable ImageView appIcon,
+            Size maxArtSize, @Nullable MediaLinkHandler.MediaLinkDelegate delegate) {
+
+        mSubtitleLinker = new MediaLinkHandler(repository, delegate, subtitle);
+        mDescriptionLinker = new MediaLinkHandler(repository, delegate, description);
 
         Context context = title.getContext();
         mAlbumArtBinder = new ImageViewBinder<>(maxArtSize, albumArt);
@@ -127,7 +138,11 @@ public class MetadataController {
                         CharSequence subtitleText = metadata.getSubtitle();
                         subtitle.setText(subtitleText);
                         ViewUtils.setVisible(subtitle, !TextUtils.isEmpty(subtitleText));
+
+                        mSubtitleLinker.setLinkedMediaId(metadata.getSubtitleLinkMediaId());
                     }
+
+                    mDescriptionLinker.setLinkedMediaId(metadata.getDescriptionLinkMediaId());
 
                     ViewUtils.setVisible(albumArt, true);
 
@@ -193,11 +208,15 @@ public class MetadataController {
                         if (hasDescriptionText) {
                             ViewUtils.setVisible(description, true);
                         } else if (hasTime) {
-                            // In layout file, subtitle is constrained to description. When album
-                            // name is empty but progress is not empty, the visibility of
-                            // description should be INVISIBLE instead of GONE, otherwise the
-                            // constraint will be broken.
-                            ViewUtils.setInvisible(description, true);
+                            if (description instanceof TappableTextView) {
+                                ((TappableTextView) description).hideView(true);
+                            } else {
+                                // In layout file, subtitle is constrained to description. When
+                                // album name is empty but progress is not empty, the visibility of
+                                // description should be INVISIBLE instead of GONE, otherwise the
+                                // constraint will be broken.
+                                ViewUtils.setInvisible(description, true);
+                            }
                         } else {
                             ViewUtils.setVisible(description, false);
                         }
@@ -215,4 +234,5 @@ public class MetadataController {
                     });
         }
     }
+
 }

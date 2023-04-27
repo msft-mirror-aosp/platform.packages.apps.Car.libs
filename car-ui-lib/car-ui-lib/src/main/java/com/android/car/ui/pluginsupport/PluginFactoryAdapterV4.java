@@ -124,6 +124,11 @@ public final class PluginFactoryAdapterV4 implements PluginFactory {
     }
 
     @Override
+    public View createCarUiPreferenceView(Context context, AttributeSet attrs) {
+        return mFactoryStub.createCarUiPreferenceView(context, attrs);
+    }
+
+    @Override
     public AppStyledViewController createAppStyledView(Context activityContext) {
         AppStyledViewControllerOEMV2 appStyledViewControllerOEMV2 = mOem.createAppStyledView(
                 activityContext);
