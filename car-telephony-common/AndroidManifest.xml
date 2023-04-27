@@ -16,7 +16,7 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.android.car.telephony.common">
+          package="com.android.car.telephony">
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 </manifest>

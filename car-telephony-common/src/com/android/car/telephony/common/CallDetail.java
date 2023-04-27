@@ -30,6 +30,9 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.Arrays;
+import java.util.function.Predicate;
+
 /**
  * Represents details of {@link Call.Details}.
  */
@@ -55,6 +58,9 @@ public class CallDetail {
      */
     private static final String EXTRA_CALL_IMAGE_URI = "android.telecom.extra.CALL_IMAGE_URI";
     private static final String EXTRA_SCO_STATE = "com.android.bluetooth.hfpclient.SCO_STATE";
+    private static final String[] HFP_CLIENT_CONNECTION_SERVICE_CLASS_NAMES = new String[]{
+            /* S= */"com.android.bluetooth.hfpclient.connserv.HfpClientConnectionService",
+            /* T= */"com.android.bluetooth.hfpclient.HfpClientConnectionService"};
     private static final int EXTRA_INTEGER_INVALID = -1;
     public static final int STATE_AUDIO_ERROR = EXTRA_INTEGER_INVALID;
     public static final int STATE_AUDIO_DISCONNECTED = 0;
@@ -196,6 +202,12 @@ public class CallDetail {
     @Nullable
     public PhoneAccountHandle getPhoneAccountHandle() {
         return mPhoneAccountHandle;
+    }
+
+    /** Returns if the call is a bluetooth call. */
+    public boolean isBluetoothCall() {
+        return Arrays.stream(HFP_CLIENT_CONNECTION_SERVICE_CLASS_NAMES).anyMatch(
+                s -> s.equals(mPhoneAccountHandle.getComponentName().getClassName()));
     }
 
     private static String getNumber(Call.Details callDetail) {
