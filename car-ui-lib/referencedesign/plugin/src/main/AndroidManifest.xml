@@ -26,6 +26,7 @@
         <provider
             android:name="com.android.car.ui.plugin.PluginNameProvider"
             android:authorities="com.android.car.ui.plugin"
+            android:directBootAware="true"
             android:enabled="false"
             android:exported="true" />
     </application>
