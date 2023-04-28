@@ -65,9 +65,9 @@ import androidx.preference.Preference;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.android.car.ui.pluginsupport.PluginFactorySingleton;
 import com.android.car.ui.test.R;
 
 import org.hamcrest.Matcher;
@@ -75,6 +75,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -83,11 +84,25 @@ import java.util.function.Consumer;
 /**
  * Unit tests for {@link CarUiPreference}.
  */
-@RunWith(AndroidJUnit4.class)
+@RunWith(Parameterized.class)
 public class PreferenceTest {
+
+    @Parameterized.Parameters
+    public static Object[] data() {
+        // It's important to do no plugin first, so that the plugin will
+        // still be enabled when this test finishes
+        return new Object[] { false, true };
+    }
+
+    private final boolean mPluginEnabled;
     private PreferenceTestActivity mActivity;
     private String[] mEntries;
     private String[] mEntriesValues;
+
+    public PreferenceTest(boolean pluginEnabled) {
+        mPluginEnabled = pluginEnabled;
+        PluginFactorySingleton.setPluginEnabledForTesting(pluginEnabled);
+    }
 
     @Rule
     public ActivityScenarioRule<PreferenceTestActivity> mActivityRule =
