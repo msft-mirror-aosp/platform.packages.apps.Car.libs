@@ -20,9 +20,9 @@ import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.os.Build.VERSION;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -269,8 +269,7 @@ public class PluginFactoryImpl implements PluginFactoryOEMV6 {
 
         if (uiContext == null) {
             uiContext = mPluginContext;
-            if (VERSION.SDK_INT >= 34 /* Android U */ && !uiContext.isUiContext()) {
-                // On U and above we need a UiContext for initializing the proxy plugin.
+            if (!uiContext.isUiContext()) {
                 uiContext = uiContext
                         .createWindowContext(sourceContext.getDisplay(), TYPE_APPLICATION, null);
             }
@@ -285,6 +284,8 @@ public class PluginFactoryImpl implements PluginFactoryOEMV6 {
         // Only wrap uiContext the first time it's configured
         if (!(uiContext instanceof PluginContextWrapper)) {
             uiContext = new PluginContextWrapper(uiContext, sourceContext.getPackageName());
+            ((PluginContextWrapper) uiContext).setWindowManager((WindowManager) sourceContext
+                    .getSystemService(Context.WINDOW_SERVICE));
         }
 
         // Add a custom layout inflater that can handle things like CarUiTextView that is in the
