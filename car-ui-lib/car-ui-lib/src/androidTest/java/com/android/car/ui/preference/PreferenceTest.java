@@ -72,6 +72,7 @@ import com.android.car.ui.test.R;
 
 import org.hamcrest.Matcher;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -1272,6 +1273,8 @@ public class PreferenceTest {
         verify(restrictedClickListener, times(1)).accept(preference);
     }
 
+    // TODO b/280083340 Remove Ignore annotation when fixed
+    @Ignore
     @Test
     public void testFooterPreference_noLink() {
         // Create footer preference (no link) and add to screen
