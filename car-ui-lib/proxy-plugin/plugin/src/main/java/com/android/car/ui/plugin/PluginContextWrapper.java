@@ -25,7 +25,9 @@ import androidx.annotation.NonNull;
  * A wrapper class around the plugin context
  */
 public class PluginContextWrapper extends ContextWrapper {
-    String mApplicationPackageName;
+
+    @NonNull
+    private final String mApplicationPackageName;
 
     public PluginContextWrapper(@NonNull Context pluginContext,
                                 @NonNull String applicationPackageName) {
