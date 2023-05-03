@@ -161,6 +161,7 @@ public class Token {
                 new int[]{attr});
         TypedValue tv = new TypedValue();
         if (libAttributes.getType(0) != TYPE_ATTRIBUTE) {
+            libAttributes.recycle();
             return false;
         }
         libAttributes.getValue(0, tv);
@@ -181,7 +182,7 @@ public class Token {
             return;
         }
 
-        throw new IllegalStateException(
+        throw new IllegalArgumentException(
                 "Must use an OEM styled Context. Use Token#createOemStyledContext()");
     }
 
