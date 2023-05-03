@@ -17,7 +17,7 @@
     <!-- General -->
 
     <!-- Background drawable to use on full screen activities -->
-    <drawable name="car_ui_activity_background">?android:attr/colorBackground</drawable>
+    <drawable name="car_ui_activity_background">@color/car_ui_activity_background_color</drawable>
 
     <!-- Toolbar -->
 
