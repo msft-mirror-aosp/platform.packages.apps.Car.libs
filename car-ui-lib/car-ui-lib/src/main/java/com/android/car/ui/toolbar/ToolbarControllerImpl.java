@@ -101,6 +101,7 @@ public final class ToolbarControllerImpl implements ToolbarController {
     private CharSequence mSearchHint;
     private Drawable mSearchIcon;
     private String mSearchQuery;
+    @NonNull
     private final Context mContext;
     private final Set<Consumer<String>> mOnSearchListeners = new HashSet<>();
     private final Set<Runnable> mOnSearchCompletedListeners = new HashSet<>();
@@ -142,8 +143,8 @@ public final class ToolbarControllerImpl implements ToolbarController {
     };
 
 
-    public ToolbarControllerImpl(View view) {
-        mContext = view.getContext();
+    public ToolbarControllerImpl(@NonNull View view, @NonNull Context context) {
+        mContext = context;
         mOverflowButton = MenuItem.builder(getContext())
                 .setIcon(R.drawable.car_ui_icon_overflow_menu)
                 .setTitle(R.string.car_ui_toolbar_menu_item_overflow_title)
