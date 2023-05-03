@@ -17,7 +17,9 @@ package com.android.car.oem.tokens;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.GradientDrawable;
 import android.util.TypedValue;
 
 import androidx.test.core.app.ActivityScenario;
@@ -84,8 +86,8 @@ public final class TokenTest {
         try (ActivityScenario<TokenTestActivity> scenario = ActivityScenario.launch(
                 TokenTestActivity.class)) {
             scenario.onActivity(activity -> {
-                int colorStaticApi = Token.getColor(activity,
-                        R.styleable.OemTokens_oemColorPrimary);
+                Context oemContext = Token.createOemStyledContext(activity);
+                int colorStaticApi = Token.getColor(oemContext, R.attr.oemColorPrimary);
                 TypedValue tv = new TypedValue();
                 activity.getTheme().resolveAttribute(R.attr.oemColorPrimary, tv, true);
 
@@ -99,12 +101,14 @@ public final class TokenTest {
         try (ActivityScenario<TokenTestNoOverrideActivity> scenario = ActivityScenario.launch(
                 TokenTestNoOverrideActivity.class)) {
             scenario.onActivity(activity -> {
-                int colorStaticApi = Token.getColor(activity,
-                        R.styleable.OemTokens_oemColorPrimary);
-                TypedValue tv = new TypedValue();
-                activity.getTheme().resolveAttribute(R.attr.oemColorPrimary, tv, true);
+                TypedValue tv1 = new TypedValue();
+                TypedValue tv2 = new TypedValue();
+                activity.getTheme().resolveAttribute(R.attr.oemColorPrimary, tv1, true);
+                TypedArray attributes = activity.obtainStyledAttributes(
+                        R.style.TestTokenTheme_NoOverride, R.styleable.OemTokens);
+                attributes.getValue(R.styleable.OemTokens_oemColorPrimary, tv2);
 
-                assertThat(colorStaticApi).isEqualTo(tv.data);
+                assertThat(tv1.data).isEqualTo(tv2.data);
             });
         }
     }
@@ -114,8 +118,9 @@ public final class TokenTest {
         try (ActivityScenario<TokenTestActivity> scenario = ActivityScenario.launch(
                 TokenTestActivity.class)) {
             scenario.onActivity(activity -> {
-                int textStaticApi = Token.getTextAppearance(activity,
-                        R.styleable.OemTokens_oemTextAppearanceDisplayLarge);
+                Context oemContext = Token.createOemStyledContext(activity);
+                int textStaticApi = Token.getTextAppearance(oemContext,
+                        R.attr.oemTextAppearanceDisplayLarge);
                 TypedValue tv = new TypedValue();
                 activity.getTheme().resolveAttribute(R.attr.oemTextAppearanceDisplayLarge, tv,
                         true);
@@ -130,13 +135,17 @@ public final class TokenTest {
         try (ActivityScenario<TokenTestNoOverrideActivity> scenario = ActivityScenario.launch(
                 TokenTestNoOverrideActivity.class)) {
             scenario.onActivity(activity -> {
-                int textStaticApi = Token.getTextAppearance(activity,
-                        R.styleable.OemTokens_oemTextAppearanceDisplayLarge);
-                TypedValue tv = new TypedValue();
-                activity.getTheme().resolveAttribute(R.attr.oemTextAppearanceDisplayLarge, tv,
+                TypedValue tv1 = new TypedValue();
+                TypedValue tv2 = new TypedValue();
+                activity.getTheme().resolveAttribute(R.attr.oemTextAppearanceDisplayLarge, tv1,
                         true);
+                TypedArray attributes = activity.obtainStyledAttributes(
+                        R.style.TestTokenTheme_NoOverride, R.styleable.OemTokens);
+                attributes.getValue(R.styleable.OemTokens_oemTextAppearanceDisplayLarge, tv2);
 
-                assertThat(textStaticApi).isEqualTo(tv.data);
+                assertThat(tv1.data).isEqualTo(tv2.data);
+                assertThat(tv1.data).isEqualTo(0);
+                assertThat(tv2.data).isEqualTo(0);
             });
         }
     }
@@ -146,27 +155,13 @@ public final class TokenTest {
         try (ActivityScenario<TokenTestActivity> scenario = ActivityScenario.launch(
                 TokenTestActivity.class)) {
             scenario.onActivity(activity -> {
-                int cornerStaticApi = Token.getCornerRadius(activity,
-                        R.styleable.OemTokens_oemShapeCornerLarge);
-                TypedValue tv = new TypedValue();
-                activity.getTheme().resolveAttribute(R.attr.oemShapeCornerLarge, tv, true);
+                Context oemContext = Token.createOemStyledContext(activity);
+                float cornerStaticApi = Token.getCornerRadius(oemContext,
+                        R.attr.oemShapeCornerLarge);
+                GradientDrawable background = (GradientDrawable) activity.getDrawable(
+                        R.drawable.corner_test);
 
-                assertThat(cornerStaticApi).isEqualTo(tv.data);
-            });
-        }
-    }
-
-    @Test
-    public void testCorner_tokenInstallerRunNoOverride() {
-        try (ActivityScenario<TokenTestNoOverrideActivity> scenario = ActivityScenario.launch(
-                TokenTestNoOverrideActivity.class)) {
-            scenario.onActivity(activity -> {
-                int cornerStaticApi = Token.getCornerRadius(activity,
-                        R.styleable.OemTokens_oemShapeCornerLarge);
-                TypedValue tv = new TypedValue();
-                activity.getTheme().resolveAttribute(R.attr.oemShapeCornerLarge, tv, true);
-
-                assertThat(cornerStaticApi).isEqualTo(tv.data);
+                assertThat(cornerStaticApi).isEqualTo(background.getCornerRadius());
             });
         }
     }

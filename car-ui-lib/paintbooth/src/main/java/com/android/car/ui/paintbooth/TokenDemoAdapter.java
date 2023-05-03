@@ -16,6 +16,7 @@
 
 package com.android.car.ui.paintbooth;
 
+import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -40,7 +41,6 @@ public class TokenDemoAdapter extends
     static final int VIEW_TYPE_LIST_TEXT = 2;
     static final int VIEW_TYPE_LIST_SHAPE = 3;
 
-
     private final List<Pair<String, Integer>> mItems;
 
     public TokenDemoAdapter(List<Pair<String, Integer>> items) {
@@ -58,21 +58,22 @@ public class TokenDemoAdapter extends
     @Override
     public void onBindViewHolder(@NonNull TokenDemoItemViewHolder holder, int position) {
         Pair<String, Integer> tokenInfo = mItems.get(position);
+        Context oemContext = Token.createOemStyledContext(holder.itemView.getContext());
 
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_LIST_COLOR:
                 holder.mText.setText(tokenInfo.first);
-                int color = Token.getColor(holder.itemView.getContext(), tokenInfo.second);
+                int color = Token.getColor(oemContext, tokenInfo.second);
                 holder.mText.setTextColor(color);
                 break;
             case VIEW_TYPE_LIST_TEXT:
                 holder.mText.setText(tokenInfo.first);
-                int textAppearanceId = Token.getTextAppearance(holder.itemView.getContext(),
+                int textAppearanceId = Token.getTextAppearance(oemContext,
                         tokenInfo.second);
                 holder.mText.setTextAppearance(textAppearanceId);
                 break;
             case VIEW_TYPE_LIST_SHAPE:
-                int cornerRadius = Token.getCornerRadius(holder.itemView.getContext(),
+                float cornerRadius = Token.getCornerRadius(oemContext,
                         tokenInfo.second);
                 GradientDrawable background = new GradientDrawable();
                 background.setColor(
