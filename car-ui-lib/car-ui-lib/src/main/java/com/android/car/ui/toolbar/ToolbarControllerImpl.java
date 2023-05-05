@@ -143,7 +143,7 @@ public final class ToolbarControllerImpl implements ToolbarController {
     };
 
 
-    public ToolbarControllerImpl(@NonNull View view, @NonNull Context context) {
+    public ToolbarControllerImpl(@NonNull Context context, @NonNull View view) {
         mContext = context;
         mOverflowButton = MenuItem.builder(getContext())
                 .setIcon(R.drawable.car_ui_icon_overflow_menu)
