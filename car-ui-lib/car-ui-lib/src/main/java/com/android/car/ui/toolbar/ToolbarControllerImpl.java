@@ -142,6 +142,9 @@ public final class ToolbarControllerImpl implements ToolbarController {
         update();
     };
 
+    private Consumer<TextView> mSearchTextViewConsumer = null;
+    private BiConsumer<String, Bundle> mOnPrivateImeCommandListener = null;
+
 
     public ToolbarControllerImpl(@NonNull Context context, @NonNull View view) {
         mContext = context;
@@ -974,6 +977,16 @@ public final class ToolbarControllerImpl implements ToolbarController {
         searchView.setSearchConfig(mSearchConfigForWidescreen);
 
         mSearchView = searchView;
+
+        // These consumers should only be set once search view has been inflated
+        if (mSearchTextViewConsumer != null) {
+            mSearchView.setSearchTextViewConsumer(
+                    (TextView tv) -> mSearchTextViewConsumer.accept(tv));
+        }
+        if (mOnPrivateImeCommandListener != null) {
+            mSearchView.setOnPrivateImeCommandListener(
+                    (String s, Bundle b) -> mOnPrivateImeCommandListener.accept(s, b));
+        }
     }
 
     /**
@@ -1169,23 +1182,13 @@ public final class ToolbarControllerImpl implements ToolbarController {
             @Override
             public void setSearchTextViewConsumer(
                     @Nullable com.android.car.ui.plugin.oemapis.Consumer<TextView> consumer) {
-                mSearchView.setSearchTextViewConsumer(new Consumer<TextView>() {
-                    @Override
-                    public void accept(TextView textView) {
-                        consumer.accept(textView);
-                    }
-                });
+                mSearchTextViewConsumer = (TextView tv) -> consumer.accept(tv);
             }
 
             @Override
             public void setOnPrivateImeCommandListener(@Nullable
                     com.android.car.ui.plugin.oemapis.BiConsumer<String, Bundle> biConsumer) {
-                mSearchView.setOnPrivateImeCommandListener(new BiConsumer<String, Bundle>() {
-                    @Override
-                    public void accept(String s, Bundle b) {
-                        biConsumer.accept(s, b);
-                    }
-                });
+                mOnPrivateImeCommandListener = (String s, Bundle b) -> biConsumer.accept(s, b);
             }
         };
     }
