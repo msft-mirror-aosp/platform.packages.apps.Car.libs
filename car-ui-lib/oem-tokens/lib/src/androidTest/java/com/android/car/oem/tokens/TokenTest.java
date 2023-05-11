@@ -19,7 +19,6 @@ import static com.google.common.truth.Truth.assertThat;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.drawable.GradientDrawable;
 import android.util.TypedValue;
 
 import androidx.test.core.app.ActivityScenario;
@@ -27,11 +26,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.android.car.oem.tokens.test.R;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public final class TokenTest {
+    @Before
+    public void setUp() {
+        Token.setTestingOverride(true);
+    }
 
     @Test
     public void testTokenInstallerNotRun() {
@@ -88,10 +92,14 @@ public final class TokenTest {
             scenario.onActivity(activity -> {
                 Context oemContext = Token.createOemStyledContext(activity);
                 int colorStaticApi = Token.getColor(oemContext, R.attr.oemColorPrimary);
+
                 TypedValue tv = new TypedValue();
-                activity.getTheme().resolveAttribute(R.attr.oemColorPrimary, tv, true);
+                TypedArray attributes = activity.getTheme().obtainStyledAttributes(
+                        R.style.OemStyle, new int[]{R.attr.testColorPrimary});
+                attributes.getValue(0, tv);
 
                 assertThat(colorStaticApi).isEqualTo(tv.data);
+                attributes.recycle();
             });
         }
     }
@@ -121,11 +129,15 @@ public final class TokenTest {
                 Context oemContext = Token.createOemStyledContext(activity);
                 int textStaticApi = Token.getTextAppearance(oemContext,
                         R.attr.oemTextAppearanceDisplayLarge);
+
                 TypedValue tv = new TypedValue();
-                activity.getTheme().resolveAttribute(R.attr.oemTextAppearanceDisplayLarge, tv,
-                        true);
+                TypedArray attributes = activity.getTheme().obtainStyledAttributes(
+                        R.style.OemStyle, new int[]{R.attr.testTextAppearanceDisplayLarge});
+                attributes.getValue(0, tv);
 
                 assertThat(textStaticApi).isEqualTo(tv.data);
+                assertThat(textStaticApi).isEqualTo(R.style.FakeTextAppearance);
+                attributes.recycle();
             });
         }
     }
@@ -158,10 +170,41 @@ public final class TokenTest {
                 Context oemContext = Token.createOemStyledContext(activity);
                 float cornerStaticApi = Token.getCornerRadius(oemContext,
                         R.attr.oemShapeCornerLarge);
-                GradientDrawable background = (GradientDrawable) activity.getDrawable(
-                        R.drawable.corner_test);
 
-                assertThat(cornerStaticApi).isEqualTo(background.getCornerRadius());
+                TypedValue tv = new TypedValue();
+                TypedArray attributes = activity.getTheme().obtainStyledAttributes(
+                        R.style.OemStyle, new int[]{R.attr.testShapeCornerLarge});
+                attributes.getValue(0, tv);
+
+                assertThat(cornerStaticApi).isEqualTo(
+                        activity.getResources().getDimension(R.dimen.fake_corner));
+                attributes.recycle();
+            });
+        }
+    }
+
+    @Test
+    public void testIsOemStyled() {
+        try (ActivityScenario<TokenTestActivity> scenario = ActivityScenario.launch(
+                TokenTestActivity.class)) {
+            scenario.onActivity(activity -> {
+
+                boolean isColorPrimaryOemStyled = Token.isOemStyled(activity,
+                        R.attr.oemColorPrimary);
+                assertThat(isColorPrimaryOemStyled).isTrue();
+            });
+        }
+    }
+
+    @Test
+    public void testIsNotOemStyled() {
+        try (ActivityScenario<TokenTestActivity> scenario = ActivityScenario.launch(
+                TokenTestActivity.class)) {
+            scenario.onActivity(activity -> {
+
+                boolean isColorPrimaryOemStyled = Token.isOemStyled(activity,
+                        R.attr.oemColorOnPrimary);
+                assertThat(isColorPrimaryOemStyled).isFalse();
             });
         }
     }
