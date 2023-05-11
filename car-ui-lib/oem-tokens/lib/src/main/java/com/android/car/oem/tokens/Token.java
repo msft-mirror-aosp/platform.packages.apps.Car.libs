@@ -29,6 +29,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Px;
 import androidx.annotation.StyleRes;
+import androidx.annotation.VisibleForTesting;
 import androidx.core.content.ContextCompat;
 
 import java.util.List;
@@ -38,21 +39,37 @@ import java.util.List;
  */
 public class Token {
     private static final String TOKEN_SHARED_LIBRARY_NAME = "com.android.oem.tokens";
+    private static final String TEST_TOKEN_SHARED_LIBRARY_NAME = "com.android.car.oem.tokens.test";
+
+    private static boolean sTestingOverrideEnabled = false;
 
     /**
      * Return the library name for the OEM design token shared library installed on device.
      */
     static String getTokenSharedLibraryName() {
+        if (sTestingOverrideEnabled) {
+            return TEST_TOKEN_SHARED_LIBRARY_NAME;
+        }
+
         return TOKEN_SHARED_LIBRARY_NAME;
+    }
+
+    @VisibleForTesting
+    static void setTestingOverride(boolean enabled) {
+        sTestingOverrideEnabled = enabled;
     }
 
     /**
      * Return the package name for the OEM design token shared library installed on device.
      */
     public static String getTokenSharedLibPackageName(@NonNull PackageManager packageManager) {
+        if (sTestingOverrideEnabled) {
+            return TEST_TOKEN_SHARED_LIBRARY_NAME;
+        }
+
         List<SharedLibraryInfo> sharedLibs = packageManager.getSharedLibraries(0);
         for (SharedLibraryInfo info : sharedLibs) {
-            if (info.getName().equals(TOKEN_SHARED_LIBRARY_NAME)) {
+            if (info.getName().equals(getTokenSharedLibraryName())) {
                 return info.getDeclaringPackage().getPackageName();
             }
         }
@@ -110,7 +127,7 @@ public class Token {
     public static float getCornerRadius(@NonNull Context context, @AttrRes int attr) {
         checkContext(context);
         TypedValue tv = getThemeTypedValue(context, attr);
-        return TypedValue.complexToDimensionPixelOffset(tv.data,
+        return TypedValue.complexToDimension(tv.data,
                 context.getResources().getDisplayMetrics());
     }
 

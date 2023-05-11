@@ -34,5 +34,25 @@
     <style name="TestTokenTheme.NoOverride">
         <item name="oemTokenOverrideEnabled">false</item>
     </style>
+
+    <bool name="enable_oem_tokens">true</bool>
+
+    <attr name="testColorPrimary" format="color"/>
+    <attr name="testTextAppearanceDisplayLarge" format="reference"/>
+    <attr name="testShapeCornerLarge" format="dimension"/>
+
+    <style name="OemStyle">
+        <item name="com.android.oem.tokens:colorPrimary">?testColorPrimary</item>
+        <item name="testColorPrimary">@android:color/holo_green_dark</item>
+        <item name="com.android.oem.tokens:textAppearanceDisplayLarge">?testTextAppearanceDisplayLarge</item>
+        <item name="testTextAppearanceDisplayLarge">@style/FakeTextAppearance</item>
+        <item name="com.android.oem.tokens:shapeCornerLarge">?testShapeCornerLarge</item>
+        <item name="testShapeCornerLarge">@dimen/fake_corner</item>
+    </style>
+
+    <style name="FakeTextAppearance">
+    </style>
+
+    <dimen name="fake_corner">10dp</dimen>
 </resources>
 
