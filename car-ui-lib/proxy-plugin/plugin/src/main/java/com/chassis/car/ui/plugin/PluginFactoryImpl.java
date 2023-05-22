@@ -27,7 +27,6 @@ import android.view.WindowManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.android.car.ui.CarUiText;
 import com.android.car.ui.appstyledview.AppStyledViewControllerImpl;
 import com.android.car.ui.plugin.PluginContextWrapper;
 import com.android.car.ui.plugin.oemapis.Consumer;
@@ -36,19 +35,14 @@ import com.android.car.ui.plugin.oemapis.FocusParkingViewOEMV1;
 import com.android.car.ui.plugin.oemapis.Function;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6;
-import com.android.car.ui.plugin.oemapis.TextOEMV1;
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
 import com.android.car.ui.plugin.oemapis.preference.PreferenceOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
-import com.android.car.ui.plugin.oemapis.recyclerview.ContentListItemOEMV2;
-import com.android.car.ui.plugin.oemapis.recyclerview.HeaderListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.ListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewAttributesOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewOEMV2;
 import com.android.car.ui.plugin.oemapis.recyclerview.ViewHolderOEMV1;
 import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV2;
-import com.android.car.ui.recyclerview.CarUiContentListItem;
-import com.android.car.ui.recyclerview.CarUiHeaderListItem;
 import com.android.car.ui.recyclerview.CarUiListItem;
 import com.android.car.ui.recyclerview.CarUiListItemAdapter;
 import com.android.car.ui.recyclerview.CarUiRecyclerViewImpl;
@@ -58,11 +52,11 @@ import com.android.car.ui.utils.CarUiUtils;
 import com.chassis.car.ui.plugin.appstyledview.AppStyledViewControllerAdapterProxy;
 import com.chassis.car.ui.plugin.preference.PreferenceAdapterProxy;
 import com.chassis.car.ui.plugin.recyclerview.CarListItemAdapterAdapterProxy;
+import com.chassis.car.ui.plugin.recyclerview.ListItemUtils;
 import com.chassis.car.ui.plugin.recyclerview.RecyclerViewAdapterProxy;
 import com.chassis.car.ui.plugin.toolbar.BaseLayoutInstallerProxy;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -143,119 +137,10 @@ public class PluginFactoryImpl implements PluginFactoryOEMV6 {
     public AdapterOEMV1<? extends ViewHolderOEMV1> createListItemAdapter(
             List<ListItemOEMV1> items) {
         List<? extends CarUiListItem> staticItems = CarUiUtils.convertList(items,
-                PluginFactoryImpl::toStaticListItem);
+                ListItemUtils::toStaticListItem);
         // Build the CarUiListItemAdapter that will be delegated to
         CarUiListItemAdapter carUiListItemAdapter = new CarUiListItemAdapter(staticItems);
         return new CarListItemAdapterAdapterProxy(carUiListItemAdapter, mRecentUiContext.get());
-    }
-
-    /**
-     * The plugin was passed the list items as {@link ListItemOEMV1}s and thus must be converted
-     * back to use the "original" {@link CarUiListItem}s that's expected by the
-     * {@link CarUiListItemAdapter}
-     */
-    private static CarUiListItem toStaticListItem(ListItemOEMV1 item) {
-        if (item instanceof HeaderListItemOEMV1) {
-            HeaderListItemOEMV1 header = (HeaderListItemOEMV1) item;
-            return new CarUiHeaderListItem(header.getTitle(), header.getBody());
-        } else if (item instanceof ContentListItemOEMV2) {
-            ContentListItemOEMV2 contentItem = (ContentListItemOEMV2) item;
-
-            CarUiContentListItem listItem = new CarUiContentListItem(
-                    toCarUiContentListItemAction(contentItem.getAction()));
-
-            if (contentItem.getTitle() != null) {
-                listItem.setTitle(toCarUiText(contentItem.getTitle()));
-            }
-
-            if (contentItem.getBody() != null) {
-                listItem.setBody(toCarUiText(contentItem.getBody()));
-            }
-
-            listItem.setIcon(contentItem.getIcon());
-            listItem.setPrimaryIconType(
-                    toCarUiContentListItemIconType(contentItem.getPrimaryIconType()));
-
-            if (contentItem.getAction() == ContentListItemOEMV2.Action.ICON) {
-                CarUiContentListItem.OnClickListener listener =
-                        contentItem.getSupplementalIconOnClickListener() != null
-                                ? carUiContentListItem ->
-                                contentItem.getSupplementalIconOnClickListener().accept(
-                                        contentItem) : null;
-
-
-                listItem.setSupplementalIcon(contentItem.getSupplementalIcon(), listener);
-            }
-
-            if (contentItem.getOnClickListener() != null) {
-                CarUiContentListItem.OnClickListener listener =
-                        contentItem.getOnClickListener() != null
-                                ? carUiContentListItem ->
-                                contentItem.getOnClickListener().accept(
-                                        contentItem) : null;
-                listItem.setOnItemClickedListener(listener);
-            }
-
-            listItem.setOnCheckedChangeListener((carUiContentListItem, checked) ->
-                    carUiContentListItem.setChecked(checked));
-            listItem.setActionDividerVisible(contentItem.isActionDividerVisible());
-            listItem.setEnabled(contentItem.isEnabled());
-            listItem.setChecked(contentItem.isChecked());
-            listItem.setActivated(contentItem.isActivated());
-            listItem.setSecure(contentItem.isSecure());
-            return listItem;
-        } else {
-            throw new IllegalStateException("Unknown view type.");
-        }
-    }
-
-    private static CarUiText toCarUiText(TextOEMV1 text) {
-        return new CarUiText.Builder(text.getTextVariants()).setMaxChars(
-                text.getMaxChars()).setMaxLines(text.getMaxLines()).build();
-    }
-
-    private static List<CarUiText> toCarUiText(List<TextOEMV1> lines) {
-        List<CarUiText> oemLines = new ArrayList<>();
-
-        for (TextOEMV1 line : lines) {
-            oemLines.add(new CarUiText.Builder(line.getTextVariants()).setMaxChars(
-                    line.getMaxChars()).setMaxLines(line.getMaxLines()).build());
-        }
-        return oemLines;
-    }
-
-    private static CarUiContentListItem.Action toCarUiContentListItemAction(
-            ContentListItemOEMV2.Action action) {
-        switch (action) {
-            case NONE:
-                return CarUiContentListItem.Action.NONE;
-            case SWITCH:
-                return CarUiContentListItem.Action.SWITCH;
-            case CHECK_BOX:
-                return CarUiContentListItem.Action.CHECK_BOX;
-            case RADIO_BUTTON:
-                return CarUiContentListItem.Action.RADIO_BUTTON;
-            case ICON:
-                return CarUiContentListItem.Action.ICON;
-            case CHEVRON:
-                return CarUiContentListItem.Action.CHEVRON;
-            default:
-                throw new IllegalStateException("Unexpected list item action type");
-        }
-    }
-
-    private static CarUiContentListItem.IconType toCarUiContentListItemIconType(
-            ContentListItemOEMV2.IconType iconType) {
-        switch (iconType) {
-            case CONTENT:
-                return CarUiContentListItem.IconType.CONTENT;
-            case STANDARD:
-                return CarUiContentListItem.IconType.STANDARD;
-            case AVATAR:
-                return CarUiContentListItem.IconType.AVATAR;
-            default:
-                throw new IllegalStateException("Unexpected list item icon type");
-        }
     }
 
     /**
