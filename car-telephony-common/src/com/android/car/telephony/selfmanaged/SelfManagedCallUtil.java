@@ -21,7 +21,7 @@ import android.telecom.Call;
 
 import androidx.annotation.NonNull;
 
-import com.android.car.telephony.common.R;
+import com.android.car.telephony.R;
 import com.android.car.ui.utils.CarUxRestrictionsUtil;
 
 import javax.inject.Inject;
