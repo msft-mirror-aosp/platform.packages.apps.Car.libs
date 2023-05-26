@@ -17,6 +17,7 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace 'oem.brand.model.rro'
     compileSdkVersion 32
     defaultConfig {
         applicationId "oem.brand.model.rro"

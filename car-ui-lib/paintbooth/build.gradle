@@ -17,6 +17,7 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace 'com.android.car.ui.paintbooth'
     compileSdkVersion 32
     defaultConfig {
         applicationId "com.android.car.ui.paintbooth"

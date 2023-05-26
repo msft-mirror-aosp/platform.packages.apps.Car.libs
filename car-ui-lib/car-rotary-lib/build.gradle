@@ -62,6 +62,8 @@ android {
     useLibrary 'android.test.runner'
     useLibrary 'android.test.base'
     useLibrary 'android.test.mock'
+    namespace 'com.android.car.ui'
+    testNamespace 'com.android.car.rotary.test'
 }
 
 dependencies {
