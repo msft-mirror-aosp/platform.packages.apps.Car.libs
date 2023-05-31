@@ -21,6 +21,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
@@ -49,7 +50,8 @@ import java.lang.ref.WeakReference;
  */
 public class MenuItem {
 
-    private final Context mContext;
+    @NonNull
+    private final WeakReference<Context> mContext;
     private final boolean mIsCheckable;
     private final boolean mIsActivatable;
     private final boolean mIsSearch;
@@ -104,7 +106,7 @@ public class MenuItem {
         mIsPrimary = builder.mIsPrimary;
         mUxRestrictions = builder.mUxRestrictions;
 
-        CarUxRestrictionsUtil.getInstance(mContext).register(mUxRestrictionsListener);
+        CarUxRestrictionsUtil.getInstance(mContext.get()).register(mUxRestrictionsListener);
     }
 
     private void update() {
@@ -219,7 +221,7 @@ public class MenuItem {
 
     /** Sets the title of this MenuItem to a string resource. */
     public void setTitle(int resId) {
-        setTitle(mContext.getString(resId));
+        setTitle(mContext.get().getString(resId));
     }
 
     /** Sets the UxRestrictions of this MenuItem. */
@@ -263,7 +265,7 @@ public class MenuItem {
         }
 
         if (isRestricted()) {
-            Toast.makeText(mContext,
+            Toast.makeText(mContext.get(),
                     R.string.car_ui_restricted_while_driving, Toast.LENGTH_LONG).show();
             return;
         }
@@ -302,7 +304,7 @@ public class MenuItem {
     public void setIcon(int resId) {
         setIcon(resId == 0
                 ? null
-                : mContext.getDrawable(resId));
+                : mContext.get().getDrawable(resId));
     }
 
     /**
@@ -320,7 +322,8 @@ public class MenuItem {
 
     /** Builder class */
     public static final class Builder {
-        private final Context mContext;
+        @NonNull
+        private final WeakReference<Context> mContext;
 
         private String mSearchTitle;
         private String mSettingsTitle;
@@ -346,10 +349,8 @@ public class MenuItem {
         @CarUxRestrictions.CarUxRestrictionsInfo
         private int mUxRestrictions = CarUxRestrictions.UX_RESTRICTIONS_BASELINE;
 
-        public Builder(Context c) {
-            // Must use getApplicationContext to avoid leaking activities when the MenuItem
-            // is held onto for longer than the Activity's lifecycle
-            mContext = c.getApplicationContext();
+        public Builder(@NonNull Context c) {
+            mContext = new WeakReference<>(c);
         }
 
         /** Builds a {@link MenuItem} from the current state of the Builder */
@@ -398,7 +399,7 @@ public class MenuItem {
 
         /** Sets the title to a string resource id */
         public Builder setTitle(int resId) {
-            setTitle(mContext.getString(resId));
+            setTitle(mContext.get().getString(resId));
             return this;
         }
 
@@ -416,7 +417,7 @@ public class MenuItem {
         public Builder setIcon(int resId) {
             mIcon = resId == 0
                     ? null
-                    : mContext.getDrawable(resId);
+                    : mContext.get().getDrawable(resId);
             return this;
         }
 
@@ -549,8 +550,8 @@ public class MenuItem {
          * <p>If using this, you should only change the id, visibility, or onClickListener.
          */
         public Builder setToSearch() {
-            mSearchTitle = mContext.getString(R.string.car_ui_toolbar_menu_item_search_title);
-            mSearchIcon = mContext.getDrawable(R.drawable.car_ui_icon_search);
+            mSearchTitle = mContext.get().getString(R.string.car_ui_toolbar_menu_item_search_title);
+            mSearchIcon = mContext.get().getDrawable(R.drawable.car_ui_icon_search);
             mIsSearch = true;
             setTitle(mSearchTitle);
             setIcon(mSearchIcon);
@@ -567,8 +568,9 @@ public class MenuItem {
          * <p>If using this, you should only change the id, visibility, or onClickListener.
          */
         public Builder setToSettings() {
-            mSettingsTitle = mContext.getString(R.string.car_ui_toolbar_menu_item_settings_title);
-            mSettingsIcon = mContext.getDrawable(R.drawable.car_ui_icon_settings);
+            mSettingsTitle = mContext.get()
+                    .getString(R.string.car_ui_toolbar_menu_item_settings_title);
+            mSettingsIcon = mContext.get().getDrawable(R.drawable.car_ui_icon_settings);
             mIsSettings = true;
             setTitle(mSettingsTitle);
             setIcon(mSettingsIcon);

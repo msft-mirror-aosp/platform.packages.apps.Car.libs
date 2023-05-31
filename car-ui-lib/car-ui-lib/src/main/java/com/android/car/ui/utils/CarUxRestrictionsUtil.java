@@ -64,10 +64,10 @@ public class CarUxRestrictionsUtil {
             };
     private static CarUxRestrictionsUtil sInstance = null;
 
-    private CarUxRestrictionsUtil(Context context) {
+    private CarUxRestrictionsUtil(@Nullable Context context) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                Car.createCar(context.getApplicationContext(), null,
+                Car.createCar(context, null,
                         Car.CAR_WAIT_TIMEOUT_DO_NOT_WAIT,
                         (Car car, boolean ready) -> {
                             if (ready) {
@@ -79,7 +79,7 @@ public class CarUxRestrictionsUtil {
                             }
                         });
             } else {
-                Car car = Car.createCar(context.getApplicationContext());
+                Car car = Car.createCar(context);
                 registerCarUxRestrictionsListener(car, mListener);
             }
         } catch (RuntimeException e) {

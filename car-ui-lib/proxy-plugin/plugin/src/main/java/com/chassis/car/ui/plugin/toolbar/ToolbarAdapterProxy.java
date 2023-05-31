@@ -39,7 +39,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Wrapper class that passes the data to car-ui via ToolbarControllerOEMV1 interface
+ * Wrapper class that passes the data to car-ui via ToolbarControllerOEMV2 interface
  */
 public final class ToolbarAdapterProxy implements ToolbarControllerOEMV2 {
 
@@ -165,20 +165,17 @@ public final class ToolbarAdapterProxy implements ToolbarControllerOEMV2 {
 
     private MenuItem createMenuItem(@NonNull MenuItemOEMV1 menuItemOEMV1) {
         MenuItem.Builder menuItemBuilder = MenuItem.builder(mPluginContext);
-        if (menuItemOEMV1.isActivatable()) menuItemBuilder.setActivatable();
-        if (menuItemOEMV1.isCheckable()) menuItemBuilder.setCheckable();
 
         menuItemBuilder
-                .setActivated(menuItemOEMV1.isActivated())
-                .setChecked(menuItemOEMV1.isChecked())
                 .setEnabled(menuItemOEMV1.isEnabled())
                 .setVisible(menuItemOEMV1.isVisible())
                 .setPrimary(menuItemOEMV1.isPrimary())
                 .setTinted(menuItemOEMV1.isTinted())
                 .setTitle(menuItemOEMV1.getTitle())
                 .setIcon(menuItemOEMV1.getIcon())
-                .setDisplayBehavior(menuItemOEMV1.getDisplayBehavior() == 1
-                        ? MenuItem.DisplayBehavior.ALWAYS : MenuItem.DisplayBehavior.NEVER)
+                .setDisplayBehavior(
+                        menuItemOEMV1.getDisplayBehavior() == MenuItemOEMV1.DISPLAY_BEHAVIOR_ALWAYS
+                                ? MenuItem.DisplayBehavior.ALWAYS : MenuItem.DisplayBehavior.NEVER)
                 .setShowIconAndTitle(menuItemOEMV1.isShowingIconAndTitle())
                 .setOnClickListener(menuItem -> {
                     if (menuItemOEMV1.getOnClickListener() != null) {
@@ -186,6 +183,14 @@ public final class ToolbarAdapterProxy implements ToolbarControllerOEMV2 {
                     }
                 })
                 .setId(menuItemOEMV1.getKey());
+        // Calling setActivated/setChecked also calls setActivatible/setCheckable, which can lead to
+        // illegal MenuItem state, so only set state when "able" state is true
+        if (menuItemOEMV1.isActivatable()) {
+            menuItemBuilder.setActivated(menuItemOEMV1.isActivated());
+        }
+        if (menuItemOEMV1.isCheckable()) {
+            menuItemBuilder.setChecked(menuItemOEMV1.isChecked());
+        }
 
         menuItemBuilder.setUxRestrictions(menuItemOEMV1.isRestricted()
                 ? CarUxRestrictions.UX_RESTRICTIONS_FULLY_RESTRICTED
@@ -193,6 +198,7 @@ public final class ToolbarAdapterProxy implements ToolbarControllerOEMV2 {
 
         return menuItemBuilder.build();
     }
+
     @Override
     public void setSearchListener(Consumer<String> consumer) {
         if (consumer != null) {

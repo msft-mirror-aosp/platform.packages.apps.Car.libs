@@ -106,10 +106,10 @@ public final class PluginFactoryStub implements PluginFactory {
         ToolbarController toolbarController = null;
         if (toolbarEnabled) {
             if (legacyToolbar) {
-                toolbarController = new ToolbarControllerImpl(
+                toolbarController = new ToolbarControllerImpl(contentView.getContext(),
                         requireViewByRefId(baseLayout, R.id.car_ui_toolbar));
             } else {
-                toolbarController = new ToolbarControllerImpl(baseLayout);
+                toolbarController = new ToolbarControllerImpl(contentView.getContext(), baseLayout);
             }
         }
 

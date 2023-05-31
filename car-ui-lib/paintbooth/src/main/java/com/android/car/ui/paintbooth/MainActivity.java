@@ -59,6 +59,9 @@ import com.android.car.ui.paintbooth.toolbar.ToolbarActivity;
 import com.android.car.ui.paintbooth.widescreenime.WideScreenImeActivity;
 import com.android.car.ui.paintbooth.widescreenime.WideScreenTestView;
 import com.android.car.ui.paintbooth.widgets.WidgetActivity;
+import com.android.car.ui.pluginsupport.PluginFactory;
+import com.android.car.ui.pluginsupport.PluginFactorySingleton;
+import com.android.car.ui.pluginsupport.PluginFactoryStub;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.toolbar.ToolbarController;
 
@@ -82,6 +85,8 @@ public class MainActivity extends Activity implements InsetsChangedListener {
             new ServiceElement("Simulate Screen Bounds", VisibleBoundsSimulator.class),
             new SwitchElement("Add PaintBooth to plugin deny-list", this::isInPluginDenyList,
                     this::onPluginSwitchChanged),
+            new SwitchElement("Set plugin enabled state", this::isPluginEnabled,
+                    this::onPluginEnabledStateChanged),
             new ActivityElement("Token samples", TokenActivity.class),
             new ActivityElement("Theme samples", TextSamples.class),
             new ActivityElement("Dialogs sample", DialogsActivity.class),
@@ -304,6 +309,32 @@ public class MainActivity extends Activity implements InsetsChangedListener {
                         checked ? Collections.singleton("com.chassis.car.ui.plugin") : null)
                 .apply();
         Toast.makeText(this, "Relaunch PaintBooth to see effects", Toast.LENGTH_SHORT).show();
+    }
+
+    private boolean isPluginEnabled() {
+        PluginFactory factory = PluginFactorySingleton.get(this);
+        if (factory instanceof PluginFactoryStub) {
+            return false;
+        }
+        return true; // factory instanceof PluginFactoryAdapterV#
+    }
+
+    private void onPluginEnabledStateChanged(CompoundButton switchWidget, boolean checked) {
+        PluginFactorySingleton.setPluginEnabledForTesting(true);
+        if (!isPluginEnabled()) {
+            switchWidget.setText("Try to enable plugin");
+            switchWidget.setEnabled(false);
+            switchWidget.setChecked(false);
+            Toast.makeText(this, "Plugin is disabled or does not exist",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        PluginFactorySingleton.setPluginEnabledForTesting(checked);
+        switchWidget.setEnabled(true);
+        switchWidget.setText("Set plugin enabled state");
+        switchWidget.setChecked(checked);
+        Toast.makeText(this, "All newly loaded plugin compatible components will "
+                + (isPluginEnabled() ? "" : "NOT ") + "use the plugin", Toast.LENGTH_SHORT).show();
     }
 
     @Override

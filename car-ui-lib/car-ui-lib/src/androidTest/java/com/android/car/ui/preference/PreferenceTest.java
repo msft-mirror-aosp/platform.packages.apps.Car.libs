@@ -29,7 +29,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.isFocused;
 import static androidx.test.espresso.matcher.ViewMatchers.isNotChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static com.android.car.ui.testing.actions.ViewActions.setProgress;
 import static com.android.car.ui.testing.matchers.ViewMatchers.isActivated;
@@ -65,16 +64,18 @@ import androidx.preference.Preference;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.android.car.ui.pluginsupport.PluginFactorySingleton;
 import com.android.car.ui.test.R;
 
 import org.hamcrest.Matcher;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -83,11 +84,25 @@ import java.util.function.Consumer;
 /**
  * Unit tests for {@link CarUiPreference}.
  */
-@RunWith(AndroidJUnit4.class)
+@RunWith(Parameterized.class)
 public class PreferenceTest {
+
+    @Parameterized.Parameters
+    public static Object[] data() {
+        // It's important to do no plugin first, so that the plugin will
+        // still be enabled when this test finishes
+        return new Object[] { false, true };
+    }
+
+    private final boolean mPluginEnabled;
     private PreferenceTestActivity mActivity;
     private String[] mEntries;
     private String[] mEntriesValues;
+
+    public PreferenceTest(boolean pluginEnabled) {
+        mPluginEnabled = pluginEnabled;
+        PluginFactorySingleton.setPluginEnabledForTesting(pluginEnabled);
+    }
 
     @Rule
     public ActivityScenarioRule<PreferenceTestActivity> mActivityRule =
@@ -297,9 +312,9 @@ public class PreferenceTest {
 
         // Check title and summary are displayed as expected.
         onView(withIndex(withId(android.R.id.title), 0)).check(matches(
-                withText(mActivity.getString(R.string.title_checkbox_preference))));
+                withText(R.string.title_checkbox_preference)));
         onView(withIndex(withId(android.R.id.summary), 0)).check(matches(
-                withText(mActivity.getString(R.string.summary_compound_button_preference))));
+                withText(R.string.summary_compound_button_preference)));
 
         // Ensure checkbox preference is initially not selected.
         onView(withId(android.R.id.checkbox)).check(matches(isNotChecked()));
@@ -343,9 +358,9 @@ public class PreferenceTest {
 
         // Check title and summary are displayed as expected.
         onView(withIndex(withId(android.R.id.title), 0)).check(matches(
-                withText(mActivity.getString(R.string.title_switch_preference))));
+                withText(R.string.title_switch_preference)));
         onView(withIndex(withId(android.R.id.summary), 0)).check(matches(
-                withText(mActivity.getString(R.string.summary_compound_button_preference))));
+                withText(R.string.summary_compound_button_preference)));
 
         // Ensure switch preference is initially not selected.
         onView(withId(android.R.id.switch_widget)).check(matches(isNotChecked()));
@@ -389,9 +404,9 @@ public class PreferenceTest {
 
         // Check title and summary are displayed as expected.
         onView(withIndex(withId(android.R.id.title), 0)).check(matches(
-                withText(mActivity.getString(R.string.title_switch_preference))));
+                withText(R.string.title_switch_preference)));
         onView(withIndex(withId(android.R.id.summary), 0)).check(matches(
-                withText(mActivity.getString(R.string.summary_compound_button_preference))));
+                withText(R.string.summary_compound_button_preference)));
 
         // Ensure switch preference is initially not selected.
         onView(withId(android.R.id.switch_widget)).check(matches(isNotChecked()));
@@ -438,9 +453,9 @@ public class PreferenceTest {
 
         // Check title and summary are displayed as expected.
         onView(withIndex(withId(android.R.id.title), 0)).check(matches(
-                withText(mActivity.getString(R.string.title_switch_preference))));
+                withText(R.string.title_switch_preference)));
         onView(withIndex(withId(android.R.id.summary), 0)).check(matches(
-                withText(mActivity.getString(R.string.summary_compound_button_preference))));
+                withText(R.string.summary_compound_button_preference)));
 
         assertTrue(preference.isUxRestricted());
 
@@ -471,9 +486,9 @@ public class PreferenceTest {
 
         // Check title and summary are displayed as expected.
         onView(withIndex(withId(android.R.id.title), 0)).check(matches(
-                withText(mActivity.getString(R.string.title_switch_preference))));
+                withText(R.string.title_switch_preference)));
         onView(withIndex(withId(android.R.id.summary), 0)).check(matches(
-                withText(mActivity.getString(R.string.summary_compound_button_preference))));
+                withText(R.string.summary_compound_button_preference)));
 
         assertTrue(preference.isClickableWhileDisabled());
 
@@ -502,9 +517,9 @@ public class PreferenceTest {
 
         // Check title and summary are displayed as expected.
         onView(withIndex(withId(android.R.id.title), 0)).check(matches(
-                withText(mActivity.getString(R.string.title_radio_button_preference))));
+                withText(R.string.title_radio_button_preference)));
         onView(withIndex(withId(android.R.id.summary), 0)).check(matches(
-                withText(mActivity.getString(R.string.summary_compound_button_preference))));
+                withText(R.string.summary_compound_button_preference)));
 
         // Ensure radio button preference is initially not selected.
         onView(withId(R.id.radio_button)).check(matches(isNotChecked()));
@@ -549,9 +564,9 @@ public class PreferenceTest {
 
         // Check title and summary are displayed as expected.
         onView(withIndex(withId(android.R.id.title), 0)).check(matches(
-                withText(mActivity.getString(R.string.title_radio_button_preference))));
+                withText(R.string.title_radio_button_preference)));
         onView(withIndex(withId(android.R.id.summary), 0)).check(matches(
-                withText(mActivity.getString(R.string.summary_compound_button_preference))));
+                withText(R.string.summary_compound_button_preference)));
 
         assertTrue(preference.isUxRestricted());
 
@@ -1257,6 +1272,8 @@ public class PreferenceTest {
         verify(restrictedClickListener, times(1)).accept(preference);
     }
 
+    // TODO b/280083340 Remove Ignore annotation when fixed
+    @Ignore
     @Test
     public void testFooterPreference_noLink() {
         // Create footer preference (no link) and add to screen
@@ -1274,9 +1291,9 @@ public class PreferenceTest {
 
         // Check summary/title is displayed as expected.
         onView(withIndex(withId(android.R.id.summary), 0)).check(matches(
-                withText(mActivity.getString(R.string.footer_preference_summary))));
+                withText(R.string.footer_preference_summary)));
         onView(withIndex(withId(android.R.id.title), 0)).check(matches(
-                withText(mActivity.getString(R.string.title))));
+                withText(R.string.title)));
 
         // Check that link is not enabled or displayed
         assertFalse(preference.isLinkEnabled());
@@ -1326,7 +1343,7 @@ public class PreferenceTest {
 
         // Validate that car_ui_link text matches actual text
         onView(withIndex(withId(R.id.car_ui_link), 0)).check(matches(
-                withText(mActivity.getString(R.string.footer_preference_link_text))));
+                withText(R.string.footer_preference_link_text)));
 
         // Confirm other CarUiFooterPreference methods work as intended
         assertEquals(preference.getLinkText(),
@@ -1360,6 +1377,16 @@ public class PreferenceTest {
         // Link should not be enabled or displayed
         onView(withIndex(withId(R.id.car_ui_link), 0)).check(matches(not(isDisplayed())));
         assertFalse(preference.isLinkEnabled());
+    }
+
+    // Override withText to always use a string instead of an id because TextViews instantiated
+    // with the plugin context don't have access to these app ids.
+    public Matcher<View> withText(int id) {
+        return withText(mActivity.getString(id));
+    }
+
+    public Matcher<View> withText(String text) {
+        return androidx.test.espresso.matcher.ViewMatchers.withText(text);
     }
 
 

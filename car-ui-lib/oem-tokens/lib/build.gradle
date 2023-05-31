@@ -17,6 +17,9 @@
 apply plugin: 'com.android.library'
 
 android {
+    namespace 'com.android.car.oem.tokens'
+    testNamespace 'com.android.car.oem.tokens.test'
+
     compileSdkVersion 32
     defaultConfig {
         minSdkVersion 28
