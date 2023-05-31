@@ -722,16 +722,30 @@ public final class ToolbarControllerImpl implements ToolbarController {
     }
 
     private void createOverflowDialog() {
+        // Need to check if overflow dialog is showing before the new AlertDialog is created
+        // because it will return false when checked after
+        boolean isShowing = mOverflowDialog == null ? false : mOverflowDialog.isShowing();
+
         mUiOverflowItems.clear();
         for (MenuItem menuItem : mOverflowItems) {
             if (menuItem.isVisible()) {
                 mUiOverflowItems.add(toCarUiContentListItem(menuItem));
             }
         }
-
         mOverflowDialog = new AlertDialogBuilder(getContext())
                 .setAdapter(mOverflowAdapter)
                 .create();
+
+        // When show() is called on a dialog, it is created from scratch. This means the underlying
+        // list of the dialog is instantiated and the corresponding adapter is set on it. So, any
+        // changes to the data of the dialog's list's adapter prior to the call to show() will be
+        // be shown on screen. Previously, if the dialog was being shown and the data of the adapter
+        // was changed (i.e., setMenuItems ->  setMenuItemsInternal -> createOverflowDialog), the
+        // data of the adapter would change without show() being called, causing the updated data to
+        // not be reflected on screen. So, call notifyDataSetChanged if the dialog is being shown.
+        if (isShowing) {
+            mOverflowAdapter.notifyDataSetChanged();
+        }
     }
 
     private void updateOverflowDialog(MenuItem changedItem) {
