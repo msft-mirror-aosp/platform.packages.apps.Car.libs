@@ -3043,7 +3043,7 @@ public class CarUiRecyclerViewTest {
             // Since we are using proxy-plugin, which loads resources from car-ui-lib
             // sharedlibrary wrapper, we pass sharedlibrary package name when loading resources
             return pluginContext.getResources().getIdentifier(
-                    resourceName, "id", "com.android.car.ui.sharedlibrary");
+                    resourceName, "id", "com.chassis.car.ui.plugin");
         } else {
             Context context = getInstrumentation().getTargetContext();
             return context.getResources()

@@ -36,7 +36,7 @@ android_library {
     min_sdk_version: "28",
     target_sdk_version: "30",
 
-    manifest: "car-ui-lib/src/main/AndroidManifest.xml",
+    manifest: "car-ui-lib/src/main/AndroidManifest-resourceOnly.xml",
     resource_dirs: [
         "car-ui-lib/src/main/res",
         "car-ui-lib/src/main/res-private"
@@ -62,7 +62,7 @@ android_library {
     min_sdk_version: "28",
     target_sdk_version: "30",
 
-    manifest: "car-ui-lib/src/main/AndroidManifest.xml",
+    manifest: "car-ui-lib/src/main/AndroidManifest-resourceOnly.xml",
     resource_dirs: [
         "car-ui-lib/src/main/res-overlayable",
     ],
@@ -312,7 +312,8 @@ android_app {
 
     libs: [
          "android.car-stubs",
-	 "token-shared-lib"
+         "token-shared-lib",
+         "car-ui-lib-proxyplugin",
     ],
     static_libs: [
         "oem-token-lib-source",

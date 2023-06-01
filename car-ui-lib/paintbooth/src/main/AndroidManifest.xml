@@ -44,7 +44,12 @@
       android:icon="@drawable/ic_launcher"
       android:label="@string/app_name"
       android:theme="@style/Theme.CarUi.WithToolbar">
-    <uses-library android:name="com.android.oem.tokens" android:required="false" />
+
+    <!-- TODO(b/288120202):  keep "com.chassis.car.ui.plugin" as the first shared library. -->
+    <!-- This shared library has a dependency on static library. For resources to be loaded -->
+    <!-- correctly the order matters until the bug is fixed. -->
+    <uses-library android:name="com.chassis.car.ui.plugin" android:required="false"/>
+    <uses-library android:name="com.android.oem.tokens" android:required="false"/>
 
     <activity
         android:name=".MainActivity"
