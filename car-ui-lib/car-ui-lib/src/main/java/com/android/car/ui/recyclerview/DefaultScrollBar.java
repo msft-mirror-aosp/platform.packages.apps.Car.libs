@@ -169,6 +169,7 @@ class DefaultScrollBar implements ScrollBar {
     public void setPadding(int paddingStart, int paddingEnd) {
         mScrollView.setPadding(mScrollView.getPaddingLeft(), paddingStart,
                 mScrollView.getPaddingRight(), paddingEnd);
+        updatePaginationButtons();
     }
 
     @Override
