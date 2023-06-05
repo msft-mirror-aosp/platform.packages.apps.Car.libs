@@ -20,7 +20,7 @@ package {
 car_uxr_client_lib_static_libs = [
     "androidx.recyclerview_recyclerview",
     "androidx.lifecycle_lifecycle-common-java8",
-    "car-ui-lib-source",
+    "car-ui-lib-no-overlayable",
 ]
 
 android_library {
