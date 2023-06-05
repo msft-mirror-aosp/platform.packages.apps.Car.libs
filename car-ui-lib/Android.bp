@@ -27,7 +27,6 @@ car_ui_lib_static_libs = [
     "androidx.recyclerview_recyclerview",
     "androidx-constraintlayout_constraintlayout-solver",
     "androidx.asynclayoutinflater_asynclayoutinflater",
-    "car-rotary-lib",
 ]
 
 android_library {
@@ -96,7 +95,7 @@ android_library {
         "android.car-stubs",
         "car-ui-lib-oem-apis-source",
     ],
-    static_libs: ["car-ui-lib-resources",] + car_ui_lib_static_libs,
+    static_libs: ["car-ui-lib-resources", "car-rotary-lib-no-overlayable",] + car_ui_lib_static_libs,
     apex_available: [
         "com.android.permission",
         "//apex_available:platform",
@@ -146,7 +145,7 @@ android_library {
         "android.car-stubs",
         "car-ui-lib-oem-apis-source",
     ],
-    static_libs: ["car-ui-lib-overlayable-resources",] + car_ui_lib_static_libs,
+    static_libs: ["car-ui-lib-overlayable-resources", "car-rotary-lib",] + car_ui_lib_static_libs,
     apex_available: [
         "com.android.permission",
         "//apex_available:platform",
@@ -184,7 +183,7 @@ android_library_import {
     name: "car-ui-lib-prebuilt",
     aars: [":car-ui-lib-aar"],
     sdk_version: "current",
-    static_libs: ["car-ui-lib-overlayable-resources",] + car_ui_lib_static_libs,
+    static_libs: ["car-ui-lib-overlayable-resources", "car-rotary-lib", ] + car_ui_lib_static_libs,
 }
 
 car_ui_lib_testing_support_static_libs = [
