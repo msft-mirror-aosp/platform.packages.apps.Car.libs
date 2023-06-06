@@ -145,6 +145,11 @@ public class EmptyToolbarController implements ToolbarController {
     }
 
     @Override
+    public void setOnLogoClickListener(Runnable listener) {
+
+    }
+
+    @Override
     public void setSearchHint(int resId) {
 
     }
