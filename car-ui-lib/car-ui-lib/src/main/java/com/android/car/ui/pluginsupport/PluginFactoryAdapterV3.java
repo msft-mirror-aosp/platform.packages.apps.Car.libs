@@ -87,11 +87,11 @@ public final class PluginFactoryAdapterV3 implements PluginFactory {
                 c -> new FocusAreaAdapterV1(new FocusArea(c)));
     }
 
-    @Override
     @Nullable
+    @Override
     public ToolbarController installBaseLayoutAround(
-            View contentView,
-            InsetsChangedListener insetsChangedListener,
+            @NonNull View contentView,
+            @Nullable InsetsChangedListener insetsChangedListener,
             boolean toolbarEnabled,
             boolean fullscreen) {
 
@@ -121,17 +121,19 @@ public final class PluginFactoryAdapterV3 implements PluginFactory {
 
     @NonNull
     @Override
-    public CarUiTextView createTextView(Context context, AttributeSet attrs) {
+    public CarUiTextView createTextView(@NonNull Context context, @Nullable AttributeSet attrs) {
         return mFactoryStub.createTextView(context, attrs);
     }
 
+    @NonNull
     @Override
-    public View createCarUiPreferenceView(Context context, AttributeSet attrs) {
+    public View createCarUiPreferenceView(@NonNull Context context, @NonNull AttributeSet attrs) {
         return mFactoryStub.createCarUiPreferenceView(context, attrs);
     }
 
+    @NonNull
     @Override
-    public AppStyledViewController createAppStyledView(Context activityContext) {
+    public AppStyledViewController createAppStyledView(@NonNull Context activityContext) {
         AppStyledViewControllerOEMV2 appStyledViewControllerOEMV2 = mOem.createAppStyledView(
                 activityContext);
         return appStyledViewControllerOEMV2 == null ? new AppStyledViewControllerImpl(
@@ -144,6 +146,7 @@ public final class PluginFactoryAdapterV3 implements PluginFactory {
                 insetsOEM.getRight(), insetsOEM.getBottom());
     }
 
+    @NonNull
     @Override
     public CarUiRecyclerView createRecyclerView(@NonNull Context context,
             @Nullable AttributeSet attrs) {
@@ -158,9 +161,10 @@ public final class PluginFactoryAdapterV3 implements PluginFactory {
         }
     }
 
+    @NonNull
     @Override
     public RecyclerView.Adapter<? extends RecyclerView.ViewHolder> createListItemAdapter(
-            List<? extends CarUiListItem> items) {
+            @NonNull List<? extends CarUiListItem> items) {
         List<ListItemOEMV1> oemItems = CarUiUtils.convertList(items,
                 PluginFactoryAdapterV3::toOemListItem);
 

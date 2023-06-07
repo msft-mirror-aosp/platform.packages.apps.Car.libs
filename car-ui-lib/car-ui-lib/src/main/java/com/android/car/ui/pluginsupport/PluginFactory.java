@@ -86,8 +86,8 @@ public interface PluginFactory {
      */
     @Nullable
     ToolbarController installBaseLayoutAround(
-            View contentView,
-            InsetsChangedListener insetsChangedListener,
+            @NonNull View contentView,
+            @Nullable InsetsChangedListener insetsChangedListener,
             boolean toolbarEnabled,
             boolean fullscreen);
 
@@ -98,7 +98,7 @@ public interface PluginFactory {
      * @return A {@link CarUiTextView}
      */
     @NonNull
-    CarUiTextView createTextView(Context context, AttributeSet attrs);
+    CarUiTextView createTextView(@NonNull Context context, @Nullable AttributeSet attrs);
 
     /**
      * Creates a preference view
@@ -106,14 +106,17 @@ public interface PluginFactory {
      * @param context the visual context to create views with.
      * @param attrs An object containing initial attributes for the preference.
      */
-    View createCarUiPreferenceView(Context context, AttributeSet attrs);
+    @NonNull
+    View createCarUiPreferenceView(@NonNull Context context, @NonNull AttributeSet attrs);
 
     /**
      * Creates a app styled view.
      *
      * @return the view used for app styled view.
      */
-    AppStyledViewController createAppStyledView(Context activityContext);
+
+    @NonNull
+    AppStyledViewController createAppStyledView(@NonNull Context activityContext);
 
     /**
      * Creates an instance of CarUiRecyclerView
@@ -121,11 +124,13 @@ public interface PluginFactory {
      * @param context The visual context to create views with.
      * @param attrs   An object containing initial attributes for the button.
      */
-    CarUiRecyclerView createRecyclerView(Context context, AttributeSet attrs);
+    @NonNull
+    CarUiRecyclerView createRecyclerView(@NonNull Context context, @Nullable AttributeSet attrs);
 
     /**
      * Creates an instance of list item adapter
      */
+    @NonNull
     RecyclerView.Adapter<? extends RecyclerView.ViewHolder> createListItemAdapter(
-            List<? extends CarUiListItem> items);
+            @NonNull List<? extends CarUiListItem> items);
 }
