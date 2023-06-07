@@ -79,7 +79,8 @@ public final class PluginFactoryAdapterV1 implements PluginFactory {
         ToolbarControllerOEMV1 toolbar = mOem.installBaseLayoutAround(
                 contentView.getContext(),
                 contentView,
-                insets -> insetsChangedListener.onCarUiInsetsChanged(adaptInsets(insets)),
+                insetsChangedListener == null ? null
+                        : insets -> insetsChangedListener.onCarUiInsetsChanged(adaptInsets(insets)),
                 toolbarEnabled, fullscreen);
 
         if (toolbar != null) {
