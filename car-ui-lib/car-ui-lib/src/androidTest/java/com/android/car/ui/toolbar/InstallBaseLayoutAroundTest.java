@@ -87,6 +87,26 @@ public class InstallBaseLayoutAroundTest {
     }
 
     @Test
+    public void test_installBaseLayoutAround_withNullInsets() {
+        onView(withClassName(endsWith(FocusParkingView.class.getName()))).check(doesNotExist());
+
+        ToolbarController[] toolbar = new ToolbarController[] { null };
+        mScenarioRule.getScenario().onActivity(activity -> {
+            toolbar[0] = CarUi.installBaseLayoutAround(
+                    activity.requireViewById(android.R.id.content), null, true);
+            if (toolbar[0] != null) {
+                toolbar[0].setTitle("Hello, world!");
+            }
+        });
+
+        assertNotNull(toolbar[0]);
+        onView(withText("Hello, world!")).check(matches(isDisplayed()));
+
+        onView(withClassName(endsWith(FocusParkingView.class.getName())))
+                .check(matches(isDisplayed()));
+    }
+
+    @Test
     public void test_installBaseLayoutAround_doesntCreateToolbar() {
         onView(withClassName(endsWith(FocusParkingView.class.getName()))).check(doesNotExist());
 
