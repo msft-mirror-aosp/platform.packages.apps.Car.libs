@@ -66,8 +66,8 @@ public final class PluginFactoryStub implements PluginFactory {
 
     @Nullable
     @Override
-    public ToolbarController installBaseLayoutAround(View contentView,
-            InsetsChangedListener insetsChangedListener,
+    public ToolbarController installBaseLayoutAround(@NonNull View contentView,
+            @Nullable InsetsChangedListener insetsChangedListener,
             boolean toolbarEnabled,
             boolean fullscreen) {
         boolean legacyToolbar = Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q;
@@ -164,17 +164,20 @@ public final class PluginFactoryStub implements PluginFactory {
 
     @NonNull
     @Override
-    public CarUiTextView createTextView(Context context, AttributeSet attrs) {
+    public CarUiTextView createTextView(@NonNull Context context, @Nullable AttributeSet attrs) {
         return new CarUiTextViewImpl(context, attrs);
     }
 
+    @NonNull
     @Override
-    public View createCarUiPreferenceView(Context sourceContext, AttributeSet attrs) {
+    public View createCarUiPreferenceView(@NonNull Context sourceContext,
+            @NonNull AttributeSet attrs) {
         return CarUiPreferenceViewStub.createCarUiPreferenceView(sourceContext, attrs);
     }
 
+    @NonNull
     @Override
-    public AppStyledViewController createAppStyledView(Context activityContext) {
+    public AppStyledViewController createAppStyledView(@NonNull Context activityContext) {
         return new AppStyledViewControllerImpl(activityContext);
     }
 
@@ -342,13 +345,17 @@ public final class PluginFactoryStub implements PluginFactory {
         }
     }
 
+    @NonNull
     @Override
-    public CarUiRecyclerView createRecyclerView(Context context, AttributeSet attrs) {
+    public CarUiRecyclerView createRecyclerView(@NonNull Context context,
+            @Nullable AttributeSet attrs) {
         return new CarUiRecyclerViewImpl(context, attrs);
     }
 
+    @NonNull
     @Override
-    public CarUiListItemAdapter createListItemAdapter(List<? extends CarUiListItem> items) {
+    public CarUiListItemAdapter createListItemAdapter(
+            @NonNull List<? extends CarUiListItem> items) {
         return new CarUiListItemAdapter(items);
     }
 }
