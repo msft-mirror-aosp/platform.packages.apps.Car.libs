@@ -17,8 +17,6 @@ package com.chassis.car.ui.plugin.toolbar;
 
 import android.content.Context;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -45,29 +43,14 @@ public class BaseLayoutInstallerProxy {
             boolean toolbarEnabled,
             boolean fullscreen) {
 
-        // Detach contentView from its parent
-        ViewGroup contentViewParent = (ViewGroup) contentView.getParent();
-        int contentIndex = contentViewParent.indexOfChild(contentView);
-        contentViewParent.removeView(contentView);
-
-        // Create fake parent with plugin context and add it as child to parent
-        FrameLayout fakeParent = new FrameLayout(pluginContext);
-        contentViewParent.addView(fakeParent, contentIndex, contentView.getLayoutParams());
-
-        // Add contentView back to parent
-        fakeParent.addView(contentView, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-
         InsetsChangedListenerProxy insetsChangedListenerProxy = insetsChangedListener != null
                 ? new InsetsChangedListenerProxy(insetsChangedListener) : null;
 
-        // Delegate installing base layout to PluginFactoryStub, passing fakeParent as the View so
-        // that plugin context is used to load resource instead of app context
+        // Delegate installing base layout to PluginFactoryStub
         PluginFactoryStub pluginFactoryStub = new PluginFactoryStub();
         ToolbarControllerImpl toolbarControllerImpl =
-                (ToolbarControllerImpl) pluginFactoryStub.installBaseLayoutAround(
-                        fakeParent, insetsChangedListenerProxy, toolbarEnabled, fullscreen);
+                (ToolbarControllerImpl) pluginFactoryStub.installBaseLayoutAround(pluginContext,
+                        contentView, insetsChangedListenerProxy, toolbarEnabled, fullscreen);
 
         return !toolbarEnabled ? null : new ToolbarAdapterProxy(pluginContext,
                 toolbarControllerImpl);

@@ -66,7 +66,9 @@ public final class PluginFactoryStub implements PluginFactory {
 
     @Nullable
     @Override
-    public ToolbarController installBaseLayoutAround(@NonNull View contentView,
+    public ToolbarController installBaseLayoutAround(
+            @NonNull Context context,
+            @NonNull View contentView,
             @Nullable InsetsChangedListener insetsChangedListener,
             boolean toolbarEnabled,
             boolean fullscreen) {
@@ -87,7 +89,7 @@ public final class PluginFactoryStub implements PluginFactory {
             baseLayoutRes = R.layout.car_ui_base_layout;
         }
 
-        View baseLayout = LayoutInflater.from(contentView.getContext())
+        View baseLayout = LayoutInflater.from(context)
                 .inflate(baseLayoutRes, null, false);
 
         // Replace the app's content view with a base layout
@@ -106,15 +108,15 @@ public final class PluginFactoryStub implements PluginFactory {
         ToolbarController toolbarController = null;
         if (toolbarEnabled) {
             if (legacyToolbar) {
-                toolbarController = new ToolbarControllerImpl(contentView.getContext(),
+                toolbarController = new ToolbarControllerImpl(context,
                         requireViewByRefId(baseLayout, R.id.car_ui_toolbar));
             } else {
-                toolbarController = new ToolbarControllerImpl(contentView.getContext(), baseLayout);
+                toolbarController = new ToolbarControllerImpl(context, baseLayout);
             }
         }
 
         // Update display cut out insets on DecorView
-        handleDisplayCutOut(contentView);
+        handleDisplayCutOut(context, contentView);
 
         InsetsUpdater insetsUpdater = new InsetsUpdater(baseLayout, contentView);
         insetsUpdater.replaceInsetsChangedListenerWith(insetsChangedListener);
@@ -122,18 +124,18 @@ public final class PluginFactoryStub implements PluginFactory {
         return toolbarController;
     }
 
-    private void handleDisplayCutOut(View contentView) {
+    private void handleDisplayCutOut(Context context, View contentView) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
             return;
         }
 
         // Unwrap context to account for ContextWrapper
-        Context context = unwrapContext(contentView.getContext());
-        if (!(context instanceof Activity)) {
+        Context unwrappedContext = unwrapContext(context);
+        if (!(unwrappedContext instanceof Activity)) {
             return;
         }
 
-        Activity activity = (Activity) context;
+        Activity activity = (Activity) unwrappedContext;
         if (!activity.getResources().getBoolean(R.bool.car_ui_omit_display_cut_out_insets)) {
             return;
         }

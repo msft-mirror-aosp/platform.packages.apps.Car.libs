@@ -119,6 +119,7 @@ public final class BaseLayoutController {
         mInsetsUpdater = new InsetsUpdater(activity, contentView);
         mToolbarController = PluginFactorySingleton.get(activity)
                 .installBaseLayoutAround(
+                        activity,
                         contentView,
                         mInsetsUpdater,
                         toolbarEnabled,

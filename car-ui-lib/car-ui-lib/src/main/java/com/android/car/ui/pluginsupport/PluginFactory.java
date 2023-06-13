@@ -76,6 +76,7 @@ public interface PluginFactory {
     /**
      * Creates the base layout, and optionally the toolbar.
      *
+     * @param context               The visual context to create views with.
      * @param contentView           The view to install the base layout around.
      * @param insetsChangedListener A method to call when the insets change.
      * @param toolbarEnabled        Whether or not to add a toolbar to the base layout.
@@ -86,6 +87,7 @@ public interface PluginFactory {
      */
     @Nullable
     ToolbarController installBaseLayoutAround(
+            @NonNull Context context,
             @NonNull View contentView,
             @Nullable InsetsChangedListener insetsChangedListener,
             boolean toolbarEnabled,

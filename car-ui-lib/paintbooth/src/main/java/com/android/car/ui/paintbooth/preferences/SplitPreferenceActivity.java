@@ -50,6 +50,7 @@ public class SplitPreferenceActivity extends AppCompatActivity implements Insets
 
         SplitPreferenceDemoFragment fragment = new SplitPreferenceDemoFragment();
         ToolbarController subToolbar = CarUi.installBaseLayoutAround(
+                this,
                 requireViewById(R.id.preference_fragment_container),
                 fragment, true);
         fragment.setToolbar(subToolbar);
