@@ -264,6 +264,8 @@ public final class PluginFactorySingleton {
     @Nullable
     public static String getPluginPackageName(Context context) {
         if (Build.VERSION.SDK_INT < MIN_TARGET_API) return null;
+        PackageManager packageManager = context.getPackageManager();
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) return null;
         String authority = context.getString(
                 R.string.car_ui_plugin_package_provider_authority_name);
         ProviderInfo providerInfo = context.getPackageManager().resolveContentProvider(authority,
@@ -279,9 +281,10 @@ public final class PluginFactorySingleton {
      */
     public static boolean isPluginEnabled(Context context) {
         if (Build.VERSION.SDK_INT < MIN_TARGET_API) return false;
+        PackageManager packageManager = context.getPackageManager();
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) return false;
         String authority = context.getString(
                 R.string.car_ui_plugin_package_provider_authority_name);
-        PackageManager packageManager = context.getPackageManager();
         ProviderInfo providerInfo = packageManager.resolveContentProvider(authority,
                 MATCH_ALL | MATCH_DISABLED_COMPONENTS | MATCH_SYSTEM_ONLY);
         if (providerInfo == null) {
