@@ -62,7 +62,8 @@ public class CarUiRadioButtonListItemAdapter extends CarUiListItemAdapter {
             @NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
-        if (viewType == VIEW_TYPE_LIST_ITEM) {
+        if (viewType == VIEW_TYPE_LIST_ITEM_FULL_TOUCH_INTERCEPTOR
+                || viewType == VIEW_TYPE_LIST_ITEM_SPLIT_TOUCH_INTERCEPTOR) {
             return new RadioButtonListItemViewHolder(
                     inflater.inflate(R.layout.car_ui_list_item, parent, false));
         }
@@ -73,7 +74,8 @@ public class CarUiRadioButtonListItemAdapter extends CarUiListItemAdapter {
     @SuppressLint("Correctness")
     // TODO: (b/200168151)
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (holder.getItemViewType() == VIEW_TYPE_LIST_ITEM) {
+        if (holder.getItemViewType() == VIEW_TYPE_LIST_ITEM_FULL_TOUCH_INTERCEPTOR
+                || holder.getItemViewType() == VIEW_TYPE_LIST_ITEM_SPLIT_TOUCH_INTERCEPTOR) {
             if (!(holder instanceof RadioButtonListItemViewHolder)) {
                 throw new IllegalStateException("Incorrect view holder type for list item.");
             }
@@ -134,7 +136,8 @@ public class CarUiRadioButtonListItemAdapter extends CarUiListItemAdapter {
         private OnCheckedChangeListener mListener;
 
         RadioButtonListItemViewHolder(@NonNull View itemView) {
-            super(itemView);
+            // Radio button list item will always use layout with full touch interceptor
+            super(itemView, true);
         }
 
         public void setOnCheckedChangeListener(@Nullable OnCheckedChangeListener listener) {
