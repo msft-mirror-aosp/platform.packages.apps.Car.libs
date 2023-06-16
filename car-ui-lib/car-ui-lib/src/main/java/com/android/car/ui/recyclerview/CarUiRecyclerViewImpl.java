@@ -222,9 +222,10 @@ public final class CarUiRecyclerViewImpl extends FrameLayout
         // The methods in this block should always get the value from super if the methods
         // are overridden in this class.
         // e.g. isVerticalScrollBarEnabled() becomes super.isVerticalScrollBarEnabled()
-        // We've decided to support this feature for R and below. OEMs will need to use the plugin
-        // to support this if they wanted to support this feature.
-        if (android.os.Build.VERSION.SDK_INT <= VERSION_CODES.R
+        //
+        // We've decided to support this feature for S_V2 and below. OEMs will need to use the
+        // plugin to support this if they wanted to support this feature in the future.
+        if (android.os.Build.VERSION.SDK_INT <= VERSION_CODES.S_V2
                 && android.os.Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
 
             mRecyclerView.setVerticalScrollBarEnabled(isVerticalScrollBarEnabled());
