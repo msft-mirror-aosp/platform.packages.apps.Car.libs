@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2020 The Android Open Source Project
+  ~ Copyright (C) 2023 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,11 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
-    <!-- Width of the overlay container. Setting to 0 will use full width of the screen  -->
-    <dimen name="screen_shape_container_width">0dp</dimen>
-    <!-- Height of the overlay container. Setting to 0 will use full height of the screen  -->
-    <dimen name="screen_shape_container_height">0dp</dimen>
-    <!-- Margin between buttons of transparent activity-->
-    <dimen name="transparent_activity_margin">10dp</dimen>
-</resources>
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <stroke android:width="2dp" android:color="@color/dialog_activity_background_color"/>
+</shape>
