@@ -34,7 +34,7 @@ import com.android.car.ui.plugin.oemapis.FocusAreaOEMV1;
 import com.android.car.ui.plugin.oemapis.FocusParkingViewOEMV1;
 import com.android.car.ui.plugin.oemapis.Function;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
-import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6;
+import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV7;
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
 import com.android.car.ui.plugin.oemapis.preference.PreferenceOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
@@ -42,7 +42,7 @@ import com.android.car.ui.plugin.oemapis.recyclerview.ListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewAttributesOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewOEMV2;
 import com.android.car.ui.plugin.oemapis.recyclerview.ViewHolderOEMV1;
-import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV2;
+import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV3;
 import com.android.car.ui.recyclerview.CarUiListItem;
 import com.android.car.ui.recyclerview.CarUiListItemAdapter;
 import com.android.car.ui.recyclerview.CarUiRecyclerViewImpl;
@@ -67,7 +67,7 @@ import java.util.WeakHashMap;
  * without the need to target each app specifically. Note: it only applies to the components that
  * come through the plugin system.
  */
-public class PluginFactoryImpl implements PluginFactoryOEMV6 {
+public class PluginFactoryImpl implements PluginFactoryOEMV7 {
 
     private final Context mPluginContext;
     private WeakReference<Context> mRecentUiContext;
@@ -85,7 +85,7 @@ public class PluginFactoryImpl implements PluginFactoryOEMV6 {
 
     @Nullable
     @Override
-    public ToolbarControllerOEMV2 installBaseLayoutAround(
+    public ToolbarControllerOEMV3 installBaseLayoutAround(
             @NonNull Context sourceContext,
             @NonNull View contentView,
             @Nullable Consumer<InsetsOEMV1> insetsChangedListener,

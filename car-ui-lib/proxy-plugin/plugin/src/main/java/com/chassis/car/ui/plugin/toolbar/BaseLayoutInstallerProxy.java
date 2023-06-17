@@ -23,7 +23,7 @@ import androidx.annotation.Nullable;
 
 import com.android.car.ui.plugin.oemapis.Consumer;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
-import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV2;
+import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV3;
 import com.android.car.ui.pluginsupport.PluginFactoryStub;
 import com.android.car.ui.toolbar.ToolbarControllerImpl;
 
@@ -36,7 +36,7 @@ public class BaseLayoutInstallerProxy {
      * Installs the base layout around the contentView.
      */
     @Nullable
-    public static ToolbarControllerOEMV2 installBaseLayoutAround(
+    public static ToolbarControllerOEMV3 installBaseLayoutAround(
             @NonNull Context pluginContext,
             @NonNull View contentView,
             @Nullable Consumer<InsetsOEMV1> insetsChangedListener,

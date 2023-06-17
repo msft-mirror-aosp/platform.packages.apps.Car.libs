@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 The Android Open Source Project
+ * Copyright (C) 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,9 +37,9 @@ import androidx.core.content.ContextCompat;
 
 import com.android.car.ui.CarUiText;
 import com.android.car.ui.imewidescreen.CarUiImeSearchListItem;
-import com.android.car.ui.plugin.oemapis.toolbar.ImeSearchInterfaceOEMV1;
+import com.android.car.ui.plugin.oemapis.toolbar.ImeSearchInterfaceOEMV2;
 import com.android.car.ui.plugin.oemapis.toolbar.MenuItemOEMV1;
-import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV1;
+import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV3;
 import com.android.car.ui.toolbar.Toolbar.OnBackListener;
 import com.android.car.ui.toolbar.Toolbar.OnSearchCompletedListener;
 import com.android.car.ui.toolbar.Toolbar.OnSearchListener;
@@ -58,13 +58,12 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
- * Adapts a {@link com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV1} into a
- * {@link ToolbarController}
+ * Adapts a {@link ToolbarControllerOEMV3} into a {@link ToolbarController}
  */
 @SuppressWarnings("AndroidJdkLibsChecker")
 @TargetApi(TARGET_API_R)
-public final class ToolbarControllerAdapterV1 implements ToolbarController {
-    private final ToolbarControllerOEMV1 mOemToolbar;
+public final class ToolbarControllerAdapterV3 implements ToolbarController {
+    private final ToolbarControllerOEMV3 mOemToolbar;
     private final Context mContext;
 
     private ToolbarAdapterState mAdapterState = new ToolbarAdapterState();
@@ -85,9 +84,9 @@ public final class ToolbarControllerAdapterV1 implements ToolbarController {
     private final boolean mSupportsImeSearch;
     private boolean mBackgroundShown = true;
 
-    public ToolbarControllerAdapterV1(
+    public ToolbarControllerAdapterV3(
             @NonNull Context context,
-            @NonNull ToolbarControllerOEMV1 oemToolbar) {
+            @NonNull ToolbarControllerOEMV3 oemToolbar) {
         mOemToolbar = oemToolbar;
         mProgressBar = new ProgressBarControllerAdapterV1(mOemToolbar.getProgressBar());
         mContext = context;
@@ -95,11 +94,12 @@ public final class ToolbarControllerAdapterV1 implements ToolbarController {
         Activity activity = CarUiUtils.getActivity(mContext);
 
         mSearchWidescreenController = new SearchWidescreenController(context);
-        ImeSearchInterfaceOEMV1 imeSearchInterface = mOemToolbar.getImeSearchInterface();
+        ImeSearchInterfaceOEMV2 imeSearchInterface = mOemToolbar.getImeSearchInterface();
         mSupportsImeSearch = imeSearchInterface != null;
         if (imeSearchInterface != null) {
             imeSearchInterface.setOnPrivateImeCommandListener(
-                    mSearchWidescreenController.getOnPrivateImeCommandListener());
+                    (action, data) -> mSearchWidescreenController.getOnPrivateImeCommandListener()
+                            .accept(action, data));
             imeSearchInterface.setSearchTextViewConsumer(mSearchWidescreenController::setTextView);
         }
 
@@ -255,9 +255,9 @@ public final class ToolbarControllerAdapterV1 implements ToolbarController {
         List<Tab> newTabs = convertList(modernTabs, tab -> {
             final Consumer<Tab> originalListener = tab.getSelectedListener();
             return tab.copy().setSelectedListener(tab1 -> {
+                int position = modernTabs.indexOf(tab);
                 // Calling {@code #selectTab} would trigger a unnecessary call to the plugin update
                 // method.
-                int position = modernTabs.indexOf(tab);
                 mAdapterState = mAdapterState.copy()
                         .setSelectedTab(position)
                         .build();
@@ -315,13 +315,13 @@ public final class ToolbarControllerAdapterV1 implements ToolbarController {
     }
 
     @Override
-    public void setOnLogoClickListener(@Nullable Runnable listener) {
-        // Do nothing. onLogoSelectedListener not supported in ToolbarControllerOEMV1.
+    public void setLogo(Drawable drawable) {
+        update(mAdapterState.copy().setLogo(drawable).build());
     }
 
     @Override
-    public void setLogo(Drawable drawable) {
-        update(mAdapterState.copy().setLogo(drawable).build());
+    public void setOnLogoClickListener(@Nullable Runnable listener) {
+        mOemToolbar.setOnLogoClickListener(listener);
     }
 
     @Override
@@ -465,8 +465,8 @@ public final class ToolbarControllerAdapterV1 implements ToolbarController {
     }
 
     /**
-     * This method takes a new {@link ToolbarAdapterState} and compares it to the current
-     * {@link ToolbarAdapterState}. It then sends any differences it detects to the plugin toolbar.
+     * This method takes a new {@link ToolbarAdapterState} and compares it to the current {@link
+     * ToolbarAdapterState}. It then sends any differences it detects to the plugin toolbar.
      * <p>
      * This is also the core of the logic that adapts from the client's toolbar interface to the OEM
      * apis toolbar interface. For example, when you are in the HOME state and add tabs, it will
@@ -497,25 +497,25 @@ public final class ToolbarControllerAdapterV1 implements ToolbarController {
         if (newAdapterState.getSearchMode() != oldAdapterState.getSearchMode()) {
             switch (newAdapterState.getSearchMode()) {
                 case SEARCH:
-                    mOemToolbar.setSearchMode(ToolbarControllerOEMV1.SEARCH_MODE_SEARCH);
+                    mOemToolbar.setSearchMode(ToolbarControllerOEMV3.SEARCH_MODE_SEARCH);
                     break;
                 case EDIT:
-                    mOemToolbar.setSearchMode(ToolbarControllerOEMV1.SEARCH_MODE_EDIT);
+                    mOemToolbar.setSearchMode(ToolbarControllerOEMV3.SEARCH_MODE_EDIT);
                     break;
                 default:
-                    mOemToolbar.setSearchMode(ToolbarControllerOEMV1.SEARCH_MODE_DISABLED);
+                    mOemToolbar.setSearchMode(ToolbarControllerOEMV3.SEARCH_MODE_DISABLED);
             }
         }
 
         if (oldAdapterState.getNavButtonMode() != newAdapterState.getNavButtonMode()) {
             if (newAdapterState.getNavButtonMode() == NavButtonMode.DISABLED) {
-                mOemToolbar.setNavButtonMode(ToolbarControllerOEMV1.NAV_BUTTON_MODE_DISABLED);
+                mOemToolbar.setNavButtonMode(ToolbarControllerOEMV3.NAV_BUTTON_MODE_DISABLED);
             } else if (newAdapterState.getNavButtonMode() == NavButtonMode.CLOSE) {
-                mOemToolbar.setNavButtonMode(ToolbarControllerOEMV1.NAV_BUTTON_MODE_CLOSE);
+                mOemToolbar.setNavButtonMode(ToolbarControllerOEMV3.NAV_BUTTON_MODE_CLOSE);
             } else if (newAdapterState.getNavButtonMode() == NavButtonMode.DOWN) {
-                mOemToolbar.setNavButtonMode(ToolbarControllerOEMV1.NAV_BUTTON_MODE_DOWN);
+                mOemToolbar.setNavButtonMode(ToolbarControllerOEMV3.NAV_BUTTON_MODE_DOWN);
             } else {
-                mOemToolbar.setNavButtonMode(ToolbarControllerOEMV1.NAV_BUTTON_MODE_BACK);
+                mOemToolbar.setNavButtonMode(ToolbarControllerOEMV3.NAV_BUTTON_MODE_BACK);
             }
         }
 

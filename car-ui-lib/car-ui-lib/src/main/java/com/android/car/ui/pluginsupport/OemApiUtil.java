@@ -127,6 +127,10 @@ final class OemApiUtil {
                 "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6",
                 PluginFactoryAdapterV6.class,
                 6));
+        oemApis.add(new OemApi(
+                "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV7",
+                PluginFactoryAdapterV7.class,
+                7));
         return oemApis;
     }
 }

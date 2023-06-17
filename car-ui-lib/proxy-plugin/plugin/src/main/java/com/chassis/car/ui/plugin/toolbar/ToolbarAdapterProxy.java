@@ -27,7 +27,7 @@ import com.android.car.ui.plugin.oemapis.toolbar.ImeSearchInterfaceOEMV2;
 import com.android.car.ui.plugin.oemapis.toolbar.MenuItemOEMV1;
 import com.android.car.ui.plugin.oemapis.toolbar.ProgressBarControllerOEMV1;
 import com.android.car.ui.plugin.oemapis.toolbar.TabOEMV1;
-import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV2;
+import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV3;
 import com.android.car.ui.toolbar.MenuItem;
 import com.android.car.ui.toolbar.NavButtonMode;
 import com.android.car.ui.toolbar.SearchMode;
@@ -39,9 +39,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Wrapper class that passes the data to car-ui via ToolbarControllerOEMV2 interface
+ * Wrapper class that passes the data to car-ui via ToolbarControllerOEMV3 interface
  */
-public final class ToolbarAdapterProxy implements ToolbarControllerOEMV2 {
+public final class ToolbarAdapterProxy implements ToolbarControllerOEMV3 {
 
     private final Context mPluginContext;
     private final ToolbarControllerImpl mToolbarController;
@@ -96,6 +96,11 @@ public final class ToolbarAdapterProxy implements ToolbarControllerOEMV2 {
     @Override
     public void setLogo(Drawable drawable) {
         mToolbarController.setLogo(drawable);
+    }
+
+    @Override
+    public void setOnLogoClickListener(Runnable listener) {
+        mToolbarController.setOnLogoClickListener(listener);
     }
 
     @Override

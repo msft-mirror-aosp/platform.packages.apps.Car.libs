@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 The Android Open Source Project
+ * Copyright (C) 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,12 @@ import android.graphics.drawable.Drawable;
 
 import androidx.annotation.Nullable;
 
-import java.util.List;
-import java.util.function.Consumer;
+import com.android.car.ui.plugin.oemapis.Consumer;
 
-/**
- * The OEM interface for a Toolbar.
- *
- * @deprecated Use {@link ToolbarControllerOEMV3} instead
- */
-@Deprecated
-@SuppressWarnings("AndroidJdkLibsChecker")
-public interface ToolbarControllerOEMV1 {
+import java.util.List;
+
+/**The OEM interface for a Toolbar. */
+public interface ToolbarControllerOEMV3 {
 
     /**
      * Sets the title of the toolbar to a String.
@@ -68,6 +63,9 @@ public interface ToolbarControllerOEMV1 {
      */
     void setLogo(@Nullable Drawable drawable);
 
+    /** Sets a click listener on the logo tap target. */
+    void setOnLogoClickListener(@Nullable Runnable listener);
+
     /** Sets the hint for the search bar. */
     void setSearchHint(@Nullable String hint);
 
@@ -100,7 +98,7 @@ public interface ToolbarControllerOEMV1 {
      * the same object every time it's called. It may return null if this feature is not supported.
      */
     @Nullable
-    ImeSearchInterfaceOEMV1 getImeSearchInterface();
+    ImeSearchInterfaceOEMV2 getImeSearchInterface();
 
     /** Don't show the nav button */
     int NAV_BUTTON_MODE_DISABLED = 0;
