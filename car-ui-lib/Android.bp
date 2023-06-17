@@ -289,7 +289,7 @@ android_test {
         "libdexmakerjvmtiagent",
         "libstaticjvmtiagent",
     ],
-    required: ["car-ui-lib-plugin"],
+    required: ["car-ui-lib-proxyplugin"],
     platform_apis: true,
     test_suites: ["device-tests"],
 }
