@@ -53,7 +53,8 @@ public class AppStyledViewSampleActivity extends AppCompatActivity {
 
         mAppStyledDialogController = new AppStyledDialogController(this);
         View appStyledTestView = LayoutInflater.from(
-                        mAppStyledDialogController.createContentViewConfigurationContext(this))
+                        mAppStyledDialogController.createContentViewConfigurationContext(this,
+                                R.style.AppStyledDialogThemeSample))
                 .inflate(R.layout.app_styled_view_test_sample, null, false);
 
         mAppStyledDialogController.setOnNavIconClickListener(

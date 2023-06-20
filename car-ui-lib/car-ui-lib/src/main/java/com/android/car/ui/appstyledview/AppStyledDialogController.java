@@ -21,6 +21,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 
@@ -29,6 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
+import com.android.car.ui.R;
 import com.android.car.ui.pluginsupport.PluginFactorySingleton;
 
 import java.lang.annotation.Retention;
@@ -114,7 +116,7 @@ public final class AppStyledDialogController {
     /**
      * Constructs a controller that can display an app styled view.
      *
-     * @param activity The {@code Activity} that will display the app styled view.
+     * @param activity  The {@code Activity} that will display the app styled view.
      * @param sceneType The {@link SceneType} for the app styled view.
      */
     public AppStyledDialogController(@NonNull Activity activity, @SceneType int sceneType) {
@@ -154,6 +156,15 @@ public final class AppStyledDialogController {
      */
     public void setContentView(@NonNull View contentView) {
         Objects.requireNonNull(contentView);
+
+        TypedValue tv = new TypedValue();
+        contentView.getContext().getTheme().resolveAttribute(R.attr.carUiActivity, tv, true);
+        if (tv.type != 0) {
+            throw new IllegalStateException(
+                    "Content view MUST NOT be rendered with a theme that inherits from Theme"
+                            + ".CarUi or Theme.DeviceDefault");
+        }
+
         mDialog.setContent(contentView);
     }
 
@@ -246,9 +257,25 @@ public final class AppStyledDialogController {
     /**
      * Returns a {@link Context} with a {@link Configuration} set to values that align with the
      * sizing of the content area of the AppStyledView to better facilitate resource loading
-     * appropriate for the size onf the content area.
+     * appropriate for the size onf the content area. By default,
+     * {@code R.style.Theme_AppCompat_Light} is applied to the returned theme.
+     *
+     * @deprecated Use {@link #createContentViewConfigurationContext(Context, int)} instead.
      */
+    @Deprecated
     public Context createContentViewConfigurationContext(Context context) {
+        return createContentViewConfigurationContext(context, R.style.Theme_AppCompat_Light);
+    }
+
+    /**
+     * Returns a {@link Context} with a {@link Configuration} set to values that align with the
+     * sizing of the content area of the AppStyledView to better facilitate resource loading
+     * appropriate for the size onf the content area.
+     *
+     * @param context    Base context from which to create the content view context
+     * @param themeResId Theme to be set for the returned context
+     */
+    public Context createContentViewConfigurationContext(Context context, int themeResId) {
         int width = getContentAreaWidth();
         if (width == -1) {
             int widthPx = getAppStyledViewDialogWidth();
@@ -266,7 +293,7 @@ public final class AppStyledDialogController {
         config.screenWidthDp = width;
         config.screenHeightDp = height;
         Context configContext = context.createConfigurationContext(config);
-        return new ContextThemeWrapper(configContext, context.getTheme());
+        return new ContextThemeWrapper(configContext, themeResId);
     }
 
     @VisibleForTesting
