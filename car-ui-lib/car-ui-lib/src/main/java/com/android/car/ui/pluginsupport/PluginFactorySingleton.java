@@ -18,6 +18,9 @@ package com.android.car.ui.pluginsupport;
 import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
 import static android.content.pm.PackageManager.MATCH_ALL;
 import static android.content.pm.PackageManager.MATCH_DISABLED_COMPONENTS;
+import static android.content.pm.PackageManager.MATCH_SYSTEM_ONLY;
+
+import static com.android.car.ui.core.CarUi.MIN_TARGET_API;
 
 import static java.util.Objects.requireNonNull;
 
@@ -260,10 +263,13 @@ public final class PluginFactorySingleton {
      */
     @Nullable
     public static String getPluginPackageName(Context context) {
+        if (Build.VERSION.SDK_INT < MIN_TARGET_API) return null;
+        PackageManager packageManager = context.getPackageManager();
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) return null;
         String authority = context.getString(
                 R.string.car_ui_plugin_package_provider_authority_name);
         ProviderInfo providerInfo = context.getPackageManager().resolveContentProvider(authority,
-                MATCH_ALL | MATCH_DISABLED_COMPONENTS);
+                MATCH_ALL | MATCH_DISABLED_COMPONENTS | MATCH_SYSTEM_ONLY);
         if (providerInfo == null) {
             return null;
         }
@@ -274,11 +280,13 @@ public final class PluginFactorySingleton {
      * Return if Car UI components should be loaded from the plugin implementation.
      */
     public static boolean isPluginEnabled(Context context) {
+        if (Build.VERSION.SDK_INT < MIN_TARGET_API) return false;
+        PackageManager packageManager = context.getPackageManager();
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) return false;
         String authority = context.getString(
                 R.string.car_ui_plugin_package_provider_authority_name);
-        PackageManager packageManager = context.getPackageManager();
         ProviderInfo providerInfo = packageManager.resolveContentProvider(authority,
-                MATCH_ALL | MATCH_DISABLED_COMPONENTS);
+                MATCH_ALL | MATCH_DISABLED_COMPONENTS | MATCH_SYSTEM_ONLY);
         if (providerInfo == null) {
             return false;
         }

@@ -444,6 +444,7 @@ public class CarUiRecyclerViewTest {
 
             int padding = 150;
             carUiRecyclerView.setPadding(padding, padding, padding, padding);
+            carUiRecyclerView.scrollToPosition(testPosition);
         });
 
         // Check that the scrolled to item is completely displayed.
@@ -477,6 +478,7 @@ public class CarUiRecyclerViewTest {
 
             int padding = 150;
             carUiRecyclerView.setPaddingRelative(padding, padding, padding, padding);
+            carUiRecyclerView.scrollToPosition(testPosition);
         });
 
         // Check that the scrolled to item is completely displayed.
@@ -1675,6 +1677,82 @@ public class CarUiRecyclerViewTest {
             CarUiRecyclerView carUiRecyclerView = activity.requireViewById(listId);
             assertEquals(recyclerviewHeight, carUiRecyclerView.getTotalSpace());
         });
+    }
+
+    @Test
+    public void testScrollbarVisibility_visibleOnlyAfterSetPadding() {
+        mActivityRule.getScenario().onActivity(activity -> activity.setContentView(
+                R.layout.car_ui_recycler_view_test_activity));
+
+        onView(withId(R.id.list)).check(matches(isDisplayed()));
+
+        mActivityRule.getScenario().onActivity(activity -> {
+            CarUiRecyclerView carUiRecyclerView = activity.requireViewById(R.id.list);
+            // Can't use OrientationHelper here, because it returns 0 when calling getTotalSpace
+            // methods
+            // until LayoutManager's onLayoutComplete is called. In this case waiting until the
+            // first
+            // item of the list is displayed guarantees that OrientationHelper is initialized
+            // properly.
+            int totalSpace = carUiRecyclerView.getHeight()
+                    - carUiRecyclerView.getPaddingTop()
+                    - carUiRecyclerView.getPaddingBottom();
+            PerfectFitTestAdapter adapter = new PerfectFitTestAdapter(1, totalSpace);
+            carUiRecyclerView.setAdapter(adapter);
+
+            IdlingRegistry.getInstance().register(new ScrollIdlingResource(carUiRecyclerView));
+        });
+
+        onView(withText(PerfectFitTestAdapter.getItemText(0))).check(matches(isDisplayed()));
+
+        onView(withId(getId("car_ui_scroll_bar"))).check(matches(not(isDisplayed())));
+
+        mActivityRule.getScenario().onActivity(activity -> {
+            /* any arbitrary value. just enough so we need scrolling */
+            int padding = 1;
+            CarUiRecyclerView carUiRecyclerView = activity.requireViewById(R.id.list);
+            carUiRecyclerView.setPadding(padding, padding, padding, padding);
+        });
+
+        onView(withId(getId("car_ui_scroll_bar"))).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testScrollbarVisibility_visibleOnlyAfterSetPaddingRelative() {
+        mActivityRule.getScenario().onActivity(activity -> activity.setContentView(
+                R.layout.car_ui_recycler_view_test_activity));
+
+        onView(withId(R.id.list)).check(matches(isDisplayed()));
+
+        mActivityRule.getScenario().onActivity(activity -> {
+            CarUiRecyclerView carUiRecyclerView = activity.requireViewById(R.id.list);
+            // Can't use OrientationHelper here, because it returns 0 when calling getTotalSpace
+            // methods
+            // until LayoutManager's onLayoutComplete is called. In this case waiting until the
+            // first
+            // item of the list is displayed guarantees that OrientationHelper is initialized
+            // properly.
+            int totalSpace = carUiRecyclerView.getHeight()
+                    - carUiRecyclerView.getPaddingTop()
+                    - carUiRecyclerView.getPaddingBottom();
+            PerfectFitTestAdapter adapter = new PerfectFitTestAdapter(1, totalSpace);
+            carUiRecyclerView.setAdapter(adapter);
+
+            IdlingRegistry.getInstance().register(new ScrollIdlingResource(carUiRecyclerView));
+        });
+
+        onView(withText(PerfectFitTestAdapter.getItemText(0))).check(matches(isDisplayed()));
+
+        onView(withId(getId("car_ui_scroll_bar"))).check(matches(not(isDisplayed())));
+
+        mActivityRule.getScenario().onActivity(activity -> {
+            /* any arbitrary value. just enough so we need scrolling */
+            int padding = 1;
+            CarUiRecyclerView carUiRecyclerView = activity.requireViewById(R.id.list);
+            carUiRecyclerView.setPaddingRelative(padding, padding, padding, padding);
+        });
+
+        onView(withId(getId("car_ui_scroll_bar"))).check(matches(isDisplayed()));
     }
 
     @Test

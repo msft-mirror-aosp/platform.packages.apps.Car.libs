@@ -50,6 +50,7 @@ import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 
 import com.android.car.apps.common.LetterTileDrawable;
 import com.android.car.apps.common.log.L;
+import com.android.car.telephony.R;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -684,6 +685,10 @@ public class TelecomUtils {
      * Splits the string and return the first letters of the first word and the last word.
      */
     public static String getInitials(String displayName) {
+        if (TextUtils.isEmpty(displayName)) {
+            return null;
+        }
+
         String[] words = displayName.split(" ");
         if (words == null || words.length == 0) {
             return null;

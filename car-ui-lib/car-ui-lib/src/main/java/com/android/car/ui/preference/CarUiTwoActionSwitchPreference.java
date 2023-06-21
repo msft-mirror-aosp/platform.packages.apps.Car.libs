@@ -23,6 +23,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Switch;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceViewHolder;
 
@@ -42,6 +43,8 @@ public class CarUiTwoActionSwitchPreference extends CarUiTwoActionBasePreference
     private boolean mSecondaryActionChecked;
     private final boolean mSwitchWidgetFocusable = getContext().getResources().getBoolean(
             R.bool.car_ui_preference_two_action_switch_widget_focusable);
+    @NonNull
+    private Switch mSwitchWidget;
 
     public CarUiTwoActionSwitchPreference(Context context,
             AttributeSet attrs,
@@ -77,6 +80,18 @@ public class CarUiTwoActionSwitchPreference extends CarUiTwoActionBasePreference
     }
 
     @Override
+    public void performSecondaryActionClick() {
+        super.performSecondaryActionClick();
+        // Setting a click listener on the underlying switch widget is necessary to support certain
+        // rotary configurations. This causes an unwanted toggle due to the switch's parent class
+        // (CompoundButton) always toggling when clicked. So we monitor the state of the
+        // underlying switch and override it when it doesn't match this preference's state.
+        if (mSwitchWidget.isChecked() != isSecondaryActionChecked()) {
+            mSwitchWidget.setChecked(isSecondaryActionChecked());
+        }
+    }
+
+    @Override
     public void onBindViewHolder(PreferenceViewHolder holder) {
         super.onBindViewHolder(holder);
         View firstActionContainer = requireViewByRefId(holder.itemView,
@@ -85,7 +100,7 @@ public class CarUiTwoActionSwitchPreference extends CarUiTwoActionBasePreference
                 R.id.car_ui_second_action_container);
         View secondaryAction = requireViewByRefId(holder.itemView,
                 R.id.car_ui_secondary_action);
-        Switch s = requireViewByRefId(holder.itemView,
+        mSwitchWidget = requireViewByRefId(holder.itemView,
                 R.id.car_ui_secondary_action_concrete);
 
         holder.itemView.setFocusable(false);
@@ -97,20 +112,20 @@ public class CarUiTwoActionSwitchPreference extends CarUiTwoActionBasePreference
                 isEnabled() || isUxRestricted() || isClickableWhileDisabled());
 
         secondActionContainer.setVisibility(mSecondaryActionVisible ? View.VISIBLE : View.GONE);
-        s.setChecked(mSecondaryActionChecked);
+        mSwitchWidget.setChecked(mSecondaryActionChecked);
 
         secondaryAction.setEnabled(
                 isSecondaryActionEnabled() || isUxRestricted() || isClickableWhileDisabled());
-        s.setEnabled(
+        mSwitchWidget.setEnabled(
                 isSecondaryActionEnabled() || isUxRestricted() || isClickableWhileDisabled());
         secondaryAction.setOnClickListener(v -> performSecondaryActionClick());
-        s.setOnClickListener(v -> performSecondaryActionClick());
+        mSwitchWidget.setOnClickListener(v -> performSecondaryActionClick());
         if (mSwitchWidgetFocusable) {
             secondaryAction.setFocusable(false);
-            s.setFocusable(
+            mSwitchWidget.setFocusable(
                     isSecondaryActionEnabled() || isUxRestricted() || isClickableWhileDisabled());
         } else {
-            s.setFocusable(false);
+            mSwitchWidget.setFocusable(false);
             secondaryAction.setFocusable(
                     isSecondaryActionEnabled() || isUxRestricted() || isClickableWhileDisabled());
         }

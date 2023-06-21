@@ -19,6 +19,7 @@
 apply plugin: 'com.android.library'
 
 android {
+    namespace 'com.android.car.ui.plugin.oemapis'
     compileSdkVersion 32
 
     defaultConfig {
@@ -39,6 +40,8 @@ android {
             includeAndroidResources = true
         }
     }
+
+    namespace 'com.android.car.oem.tokens'
 }
 
 dependencies {

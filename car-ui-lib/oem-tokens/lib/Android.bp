@@ -32,6 +32,26 @@ android_library {
     ],
 }
 
+android_test {
+    name: "oem-token-lib-tests",
+    manifest: "src/androidTest/AndroidManifest.xml",
+    resource_dirs: ["src/androidTest/res"],
+    srcs: ["src/androidTest/java/**/*.java"],
+    libs: [
+        "android.test.runner",
+        "android.test.base",
+        "token-shared-lib",
+    ],
+    static_libs: [
+        "androidx.test.rules",
+        "androidx.test.espresso.core",
+        "androidx.test.espresso.contrib",
+        "androidx.test.ext.junit",
+        "oem-token-lib-source",
+        "truth-prebuilt",
+    ],
+}
+
 java_genrule {
     name: "oem-token-lib-aar",
     srcs: [

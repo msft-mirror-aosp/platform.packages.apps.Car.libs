@@ -16,8 +16,11 @@
 
 package com.android.car.telephony.common;
 
+import android.content.ComponentName;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.telecom.Call;
 import android.telecom.DisconnectCause;
 import android.telecom.GatewayInfo;
@@ -27,13 +30,39 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.Arrays;
+import java.util.function.Predicate;
+
 /**
  * Represents details of {@link Call.Details}.
  */
 public class CallDetail {
-    private static final String EXTRA_SCO_STATE = "com.android.bluetooth.hfpclient.SCO_STATE";
+    /**
+     * Extra that should correspond to a {@link String} value in the {@link
+     * Call.Details#getExtras()} if a VOIP call provides it. The value should represent the
+     * current speaker in the call.
+     */
+    private static final String EXTRA_CURRENT_SPEAKER = "android.telecom.extra.CURRENT_SPEAKER";
 
-    public static final int STATE_AUDIO_ERROR = -1;
+    /**
+     * Extra that should correspond to an {@link Integer} value in the {@link
+     * Call.Details#getExtras()} if a VOIP call provides it. The value should represent the
+     * number of participants in a call.
+     */
+    private static final String EXTRA_PARTICIPANT_COUNT = "android.telecom.extra.PARTICIPANT_COUNT";
+
+    /**
+     * Extra that should correspond to a {@link Uri} value in the {@link
+     * Call.Details#getExtras()} if a VOIP call provides it. The value should be a
+     * resource/content provider URI to be displayed in the in-call view.
+     */
+    private static final String EXTRA_CALL_IMAGE_URI = "android.telecom.extra.CALL_IMAGE_URI";
+    private static final String EXTRA_SCO_STATE = "com.android.bluetooth.hfpclient.SCO_STATE";
+    private static final String[] HFP_CLIENT_CONNECTION_SERVICE_CLASS_NAMES = new String[]{
+            /* S= */"com.android.bluetooth.hfpclient.connserv.HfpClientConnectionService",
+            /* T= */"com.android.bluetooth.hfpclient.HfpClientConnectionService"};
+    private static final int EXTRA_INTEGER_INVALID = -1;
+    public static final int STATE_AUDIO_ERROR = EXTRA_INTEGER_INVALID;
     public static final int STATE_AUDIO_DISCONNECTED = 0;
     public static final int STATE_AUDIO_CONNECTING = 1;
     public static final int STATE_AUDIO_CONNECTED = 2;
@@ -48,6 +77,11 @@ public class CallDetail {
     private final int mScoState;
     private final String mCallerDisplayName;
     private final boolean mIsSelfManaged;
+    private final int mParticipantCount;
+    private final String mCurrentSpeaker;
+    private final Uri mCallerImageUri;
+    // The VoIP app can set the component name of the activity that hosts its own in call view.
+    private final ComponentName mInCallViewComponentName;
 
     private CallDetail(@Nullable Call.Details callDetails) {
         mCallDetails = callDetails;
@@ -57,9 +91,13 @@ public class CallDetail {
         mConnectTimeMillis = getConnectTimeMillis(callDetails);
         mIsConference = isConferenceCall(callDetails);
         mPhoneAccountHandle = getPhoneAccountHandle(callDetails);
-        mScoState = getScoState(callDetails);
+        mScoState = getIntegerExtra(callDetails, EXTRA_SCO_STATE);
         mCallerDisplayName = getCallerDisplayName(callDetails);
         mIsSelfManaged = isSelfManagedCall(callDetails);
+        mParticipantCount = getIntegerExtra(callDetails, EXTRA_PARTICIPANT_COUNT);
+        mCallerImageUri = getParcelable(callDetails, EXTRA_CALL_IMAGE_URI);
+        mCurrentSpeaker = getStringExtra(callDetails, EXTRA_CURRENT_SPEAKER);
+        mInCallViewComponentName = getParcelable(callDetails, Intent.EXTRA_COMPONENT_NAME);
     }
 
     /** Returns if the call supports the given capability. */
@@ -127,14 +165,49 @@ public class CallDetail {
     /**
      * Returns the caller display name.
      */
+    @Nullable
     public String getCallerDisplayName() {
         return mCallerDisplayName;
+    }
+
+    /**
+     * Returns the caller image uri for a VoIP call if any.
+     */
+    @Nullable
+    public Uri getCallerImageUri() {
+        return mCallerImageUri;
+    }
+
+    /**
+     * Returns the current speaker for a VoIP call if any.
+     */
+    @Nullable
+    public String getCurrentSpeaker() {
+        return mCurrentSpeaker;
+    }
+
+    /**
+     * Returns the participant count for a VoIP call if any.
+     */
+    public int getParticipantCount() {
+        return mParticipantCount;
+    }
+
+    /** Returns the component name for activity that hosts the VoIP in call view. */
+    public ComponentName getInCallViewComponentName() {
+        return mInCallViewComponentName;
     }
 
     /** Returns the {@link PhoneAccountHandle} for this call. */
     @Nullable
     public PhoneAccountHandle getPhoneAccountHandle() {
         return mPhoneAccountHandle;
+    }
+
+    /** Returns if the call is a bluetooth call. */
+    public boolean isBluetoothCall() {
+        return Arrays.stream(HFP_CLIENT_CONNECTION_SERVICE_CLASS_NAMES).anyMatch(
+                s -> s.equals(mPhoneAccountHandle.getComponentName().getClassName()));
     }
 
     private static String getNumber(Call.Details callDetail) {
@@ -195,14 +268,33 @@ public class CallDetail {
         return null;
     }
 
-    private static int getScoState(Call.Details callDetail) {
-        int state = STATE_AUDIO_ERROR;
+    private static String getStringExtra(Call.Details callDetail, String key) {
         if (callDetail != null) {
             Bundle extras = callDetail.getExtras();
-            if (extras != null && extras.containsKey(EXTRA_SCO_STATE)) {
-                state = extras.getInt(EXTRA_SCO_STATE);
+            if (extras != null && extras.containsKey(key)) {
+                return extras.getString(key);
             }
         }
-        return state;
+        return null;
+    }
+
+    private static int getIntegerExtra(Call.Details callDetail, String key) {
+        if (callDetail != null) {
+            Bundle extras = callDetail.getExtras();
+            if (extras != null && extras.containsKey(key)) {
+                return extras.getInt(key);
+            }
+        }
+        return EXTRA_INTEGER_INVALID;
+    }
+
+    private static <T extends Parcelable> T getParcelable(Call.Details callDetail, String key) {
+        if (callDetail != null) {
+            Bundle extras = callDetail.getExtras();
+            if (extras != null && extras.containsKey(key)) {
+                return extras.getParcelable(key);
+            }
+        }
+        return null;
     }
 }
