@@ -21,6 +21,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.View;
@@ -121,8 +122,8 @@ public final class AppStyledDialogController {
      */
     public AppStyledDialogController(@NonNull Activity activity, @SceneType int sceneType) {
         Objects.requireNonNull(activity);
-        mAppStyledViewController = PluginFactorySingleton.get(activity)
-                .createAppStyledView(activity);
+        mAppStyledViewController = PluginFactorySingleton.get(activity).createAppStyledView(
+                activity);
         mAppStyledViewController.setSceneType(sceneType);
         mDialog = new AppStyledDialog(activity, mAppStyledViewController);
     }
@@ -140,8 +141,7 @@ public final class AppStyledDialogController {
             throw new IllegalArgumentException();
         }
 
-        mAppStyledViewController = PluginFactorySingleton.get(context)
-                .createAppStyledView(context);
+        mAppStyledViewController = PluginFactorySingleton.get(context).createAppStyledView(context);
         mDialog = new AppStyledDialog((Activity) context, mAppStyledViewController);
     }
 
@@ -293,7 +293,11 @@ public final class AppStyledDialogController {
         config.screenWidthDp = width;
         config.screenHeightDp = height;
         Context configContext = context.createConfigurationContext(config);
-        return new ContextThemeWrapper(configContext, themeResId);
+
+        Resources.Theme theme = configContext.getResources().newTheme();
+        theme.applyStyle(themeResId, true);
+
+        return new ContextThemeWrapper(configContext, theme);
     }
 
     @VisibleForTesting
