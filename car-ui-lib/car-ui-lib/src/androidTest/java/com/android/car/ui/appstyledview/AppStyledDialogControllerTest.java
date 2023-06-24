@@ -31,6 +31,7 @@ import static junit.framework.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -61,6 +62,9 @@ public class AppStyledDialogControllerTest {
             new ActivityScenarioRule<>(TestActivity.class);
 
     private TestActivity mActivity;
+    // We need to use a context with a theme that doesn't inherit from Theme.CarUi for inflating the
+    // content view because AppStyledDialogController enforces this
+    private Context mContextNoCarUiTheme;
 
     @Parameterized.Parameters
     public static Object[] data() {
@@ -78,12 +82,14 @@ public class AppStyledDialogControllerTest {
             mAppStyledDialogController.setAppStyledViewController(
                     new AppStyledViewControllerImpl(activity), activity);
             mActivity = activity;
+            mContextNoCarUiTheme = mAppStyledDialogController.createContentViewConfigurationContext(
+                    mActivity, R.style.Theme_AppCompat_Light);
         });
     }
 
     @Test
     public void show_shouldDisplayDialog() {
-        LayoutInflater inflater = LayoutInflater.from(mActivity);
+        LayoutInflater inflater = LayoutInflater.from(mContextNoCarUiTheme);
         View appStyledTestView = inflater.inflate(R.layout.app_styled_view_sample, null,
                 false);
 
@@ -100,7 +106,7 @@ public class AppStyledDialogControllerTest {
 
     @Test
     public void setNavIcon_showCloseIcon() {
-        LayoutInflater inflater = LayoutInflater.from(mActivity);
+        LayoutInflater inflater = LayoutInflater.from(mContextNoCarUiTheme);
         View appStyledTestView = inflater.inflate(R.layout.app_styled_view_sample, null,
                 false);
 
@@ -117,7 +123,7 @@ public class AppStyledDialogControllerTest {
 
     @Test
     public void setOnCloseClickListener_shouldInvokeCallback() {
-        LayoutInflater inflater = LayoutInflater.from(mActivity);
+        LayoutInflater inflater = LayoutInflater.from(mContextNoCarUiTheme);
         View appStyledTestView = inflater.inflate(R.layout.app_styled_view_sample, null,
                 false);
 
@@ -139,7 +145,7 @@ public class AppStyledDialogControllerTest {
 
     @Test
     public void setOnDismissListener_shouldInvokeCallback() {
-        LayoutInflater inflater = LayoutInflater.from(mActivity);
+        LayoutInflater inflater = LayoutInflater.from(mContextNoCarUiTheme);
         View appStyledTestView = inflater.inflate(R.layout.app_styled_view_sample, null,
                 false);
 
@@ -159,7 +165,7 @@ public class AppStyledDialogControllerTest {
 
     @Test
     public void getContentView_equalsSetView() {
-        LayoutInflater inflater = LayoutInflater.from(mActivity);
+        LayoutInflater inflater = LayoutInflater.from(mContextNoCarUiTheme);
 
         View appStyledTestView = inflater.inflate(R.layout.app_styled_view_sample, null,
                 false);
@@ -178,7 +184,7 @@ public class AppStyledDialogControllerTest {
 
     @Test
     public void testContentViewSize() {
-        LayoutInflater inflater = LayoutInflater.from(mActivity);
+        LayoutInflater inflater = LayoutInflater.from(mContextNoCarUiTheme);
         View appStyledTestView = inflater.inflate(R.layout.app_styled_view_sample, null,
                 false);
         TextView testTextView = appStyledTestView.requireViewById(R.id.test_textview);
