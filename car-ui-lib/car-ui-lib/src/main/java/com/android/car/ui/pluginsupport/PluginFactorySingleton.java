@@ -208,6 +208,11 @@ public final class PluginFactorySingleton {
             getPluginFactoryMethod.setAccessible(true);
             sInstance = (PluginFactory) getPluginFactoryMethod
                     .invoke(null, sPluginContext, context.getPackageName());
+            if (sInstance == null) {
+                Log.w(TAG, "CarUi plugin loaded is null");
+                sInstance = new PluginFactoryStub();
+                return;
+            }
         } catch (ReflectiveOperationException e) {
             Log.e(TAG, "Could not load CarUi plugin", e);
             sInstance = new PluginFactoryStub();
