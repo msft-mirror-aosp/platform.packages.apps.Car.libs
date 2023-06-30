@@ -313,7 +313,6 @@ android_app {
     libs: [
          "android.car-stubs",
          "token-shared-lib",
-         "car-ui-lib-proxyplugin",
     ],
     static_libs: [
         "oem-token-lib-source",
