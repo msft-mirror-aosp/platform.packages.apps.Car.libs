@@ -19,7 +19,6 @@ package com.android.car.ui.recyclerview;
 import static android.car.drivingstate.CarUxRestrictions.UX_RESTRICTIONS_LIMIT_CONTENT;
 
 import static androidx.core.math.MathUtils.clamp;
-import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING;
 import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE;
 import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_SETTLING;
 import static androidx.test.espresso.Espresso.onView;
@@ -2993,10 +2992,7 @@ public class CarUiRecyclerViewTest {
                                 public void onScrollStateChanged(
                                         @NonNull CarUiRecyclerView recyclerView,
                                         int newState) {
-                                    mIdle = (newState == SCROLL_STATE_IDLE
-                                            // Treat dragging as idle, or Espresso will
-                                            // block itself when swiping.
-                                            || newState == SCROLL_STATE_DRAGGING);
+                                    mIdle = newState == SCROLL_STATE_IDLE;
                                     if (mIdle && mResourceCallback != null) {
                                         mResourceCallback.onTransitionToIdle();
                                     }
