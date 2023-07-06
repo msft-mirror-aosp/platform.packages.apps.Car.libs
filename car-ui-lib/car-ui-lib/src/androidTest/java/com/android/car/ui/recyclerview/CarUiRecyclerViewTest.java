@@ -136,7 +136,7 @@ public class CarUiRecyclerViewTest {
     public static Object[] data() {
         // It's important to do no plugin first, so that the plugin will
         // still be enabled when this test finishes
-        // TODO b/266150495 Fix plugin tests
+        // TODO b/290376893 Reenable plugin tests when fixed
         return new Object[]{false/*, true*/};
     }
 
