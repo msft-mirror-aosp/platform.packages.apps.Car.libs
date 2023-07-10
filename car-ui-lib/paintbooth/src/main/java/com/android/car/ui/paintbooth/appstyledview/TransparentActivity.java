@@ -41,7 +41,8 @@ public class TransparentActivity extends AppCompatActivity {
         View appStyledTestView = LayoutInflater.from(
                         mAppStyledDialogController.createContentViewConfigurationContext(this,
                                 R.style.AppStyledDialogThemeSample))
-                .inflate(R.layout.app_styled_view_test_sample, null, false);
+                .inflate(R.layout.app_styled_view_test_sample,
+                        this.findViewById(android.R.id.content), false);
 
         mAppStyledDialogController.setOnNavIconClickListener(
                 () -> mAppStyledDialogController.dismiss());
