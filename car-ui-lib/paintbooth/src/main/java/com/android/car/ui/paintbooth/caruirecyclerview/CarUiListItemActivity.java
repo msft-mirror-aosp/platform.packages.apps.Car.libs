@@ -89,7 +89,7 @@ public class CarUiListItemActivity extends Activity implements InsetsChangedList
         mData.add(item);
 
         item = new CarUiContentListItem(CarUiContentListItem.Action.NONE);
-        item.setTitle(getString(R.string.test_title));
+        item.setTitle(getString(R.string.test_title_with_icon));
         item.setBody(getString(R.string.test_body));
         item.setIcon(getDrawable(R.drawable.ic_launcher));
         mData.add(item);
