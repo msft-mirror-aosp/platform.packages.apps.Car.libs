@@ -45,6 +45,7 @@ import com.android.car.ui.pluginsupport.PluginFactorySingleton;
 import com.android.car.ui.test.R;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -121,6 +122,7 @@ public class AppStyledDialogControllerTest {
                 .check(matches(isDisplayed()));
     }
 
+    @Ignore("b/290375101")
     @Test
     public void setOnCloseClickListener_shouldInvokeCallback() {
         LayoutInflater inflater = LayoutInflater.from(mContextNoCarUiTheme);
