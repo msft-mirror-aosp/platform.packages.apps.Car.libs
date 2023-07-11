@@ -20,10 +20,10 @@ android {
     namespace 'com.android.car.oem.tokens'
     testNamespace 'com.android.car.oem.tokens.test'
 
-    compileSdkVersion 32
+    compileSdkVersion gradle.ext.aaosLatestSDK
     defaultConfig {
         minSdkVersion 28
-        targetSdkVersion 32
+        targetSdkVersion gradle.ext.aaosTargetSDK
         versionCode gradle.ext.getVersionCode()
         versionName gradle.ext.getVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

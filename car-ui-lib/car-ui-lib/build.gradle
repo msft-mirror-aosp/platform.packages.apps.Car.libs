@@ -22,11 +22,11 @@ android {
     namespace 'com.android.car.ui'
     testNamespace 'com.android.car.ui.test'
 
-    compileSdkVersion 32
+    compileSdkVersion gradle.ext.aaosLatestSDK
 
     defaultConfig {
         minSdkVersion 28
-        targetSdkVersion 32
+        targetSdkVersion gradle.ext.aaosTargetSDK
         versionCode 2
         versionName "2.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
