@@ -14,7 +14,6 @@ Resource Overlays) by OEMs.
 Project layout:
 * __car-ui-lib__: The main library that is statically linked into applications
 * __paintbooth__: A test application that contains demos of all the car-ui components
-* __referencedesign__: An RRO applied to internal google targets that does some minor car-ui customizations. It's used to make changes to car-ui that would cause backwards compatability issues if we were to create them directly in the library. It can also serve as an example RRO for OEMs, and should be kept reasonably functional and up-to-date because we use it actively.
 
 ### Building and running PaintBooth
 
