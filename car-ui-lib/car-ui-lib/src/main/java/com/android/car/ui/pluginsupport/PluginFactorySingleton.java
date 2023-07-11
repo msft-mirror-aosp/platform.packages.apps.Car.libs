@@ -16,7 +16,6 @@
 package com.android.car.ui.pluginsupport;
 
 import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
-import static android.content.pm.PackageManager.MATCH_ALL;
 import static android.content.pm.PackageManager.MATCH_DISABLED_COMPONENTS;
 import static android.content.pm.PackageManager.MATCH_SYSTEM_ONLY;
 
@@ -33,7 +32,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ProviderInfo;
 import android.os.Build;
-import android.os.Build.VERSION;
 import android.os.Process;
 import android.os.Trace;
 import android.text.TextUtils;
@@ -298,7 +296,7 @@ public final class PluginFactorySingleton {
         String authority = context.getString(
                 R.string.car_ui_plugin_package_provider_authority_name);
         ProviderInfo providerInfo = context.getPackageManager().resolveContentProvider(authority,
-                MATCH_ALL | MATCH_DISABLED_COMPONENTS | MATCH_SYSTEM_ONLY);
+                MATCH_DISABLED_COMPONENTS | MATCH_SYSTEM_ONLY);
         if (providerInfo == null) {
             return null;
         }
@@ -315,7 +313,7 @@ public final class PluginFactorySingleton {
         String authority = context.getString(
                 R.string.car_ui_plugin_package_provider_authority_name);
         ProviderInfo providerInfo = packageManager.resolveContentProvider(authority,
-                MATCH_ALL | MATCH_DISABLED_COMPONENTS | MATCH_SYSTEM_ONLY);
+                MATCH_DISABLED_COMPONENTS | MATCH_SYSTEM_ONLY);
         if (providerInfo == null) {
             return false;
         }
