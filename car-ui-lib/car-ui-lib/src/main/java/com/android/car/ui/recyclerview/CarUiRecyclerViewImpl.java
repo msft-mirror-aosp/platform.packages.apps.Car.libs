@@ -417,7 +417,7 @@ public final class CarUiRecyclerViewImpl extends FrameLayout
     /**
      * {@inheritDoc}
      * <p>
-     * Note that this method will never return true if this view has no items in it's adapter. This
+     * Note that this method will never return true if this view has no items in its adapter. This
      * is fine since an RecyclerView with empty items is not able to restore focus inside it.
      */
     @Override

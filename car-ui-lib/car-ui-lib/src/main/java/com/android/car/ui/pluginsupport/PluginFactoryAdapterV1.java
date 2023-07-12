@@ -45,7 +45,7 @@ import com.android.car.ui.widget.CarUiTextView;
 import java.util.List;
 
 /**
- * This class is an wrapper around {@link PluginFactoryOEMV1} that implements {@link
+ * This class is a wrapper around {@link PluginFactoryOEMV1} that implements {@link
  * PluginFactory}, to provide a version-agnostic way of interfacing with the OEM's
  * PluginFactory.
  */
