@@ -218,7 +218,7 @@ public final class PluginFactorySingleton {
                 oemApiUtilClass = adapterClassLoader
                         .loadClass("com.android.car.ui.pluginsupport.OemApiUtil");
             } catch (ClassNotFoundException ex) {
-                Log.e(TAG, "Could not load CarUi plugin", ex);
+                Log.e(TAG, "Could not load oemApiUtilClass: ", ex);
                 sInstance = new PluginFactoryStub();
                 return;
             }
@@ -236,8 +236,9 @@ public final class PluginFactorySingleton {
                 return;
             }
         } catch (ReflectiveOperationException e) {
-            Log.e(TAG, "Could not load CarUi plugin", e);
+            Log.e(TAG, "Could not invoke getPluginFactory: ", e);
             sInstance = new PluginFactoryStub();
+            return;
         }
 
         Log.i(TAG, "Loaded plugin " + pluginPackageName
