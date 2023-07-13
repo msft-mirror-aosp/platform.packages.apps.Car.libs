@@ -731,11 +731,13 @@ public final class CarUiRecyclerViewImpl extends FrameLayout
 
     @Override
     public void setPadding(int left, int top, int right, int bottom) {
+        // Check position before padding as clipToPadding breaks findFirstVisibleItemPosition
+        // expectation
+        int currentPosition = findFirstVisibleItemPosition();
         // This needs to happen before updating the scrollbar padding because it affects the
         // visibility of items.
         mRecyclerView.setPadding(0, top, 0, bottom);
         if (mScrollBarEnabled) {
-            int currentPosition = findFirstVisibleItemPosition();
             setScrollBarPadding(mScrollBarPaddingTop + top, mScrollBarPaddingBottom + bottom);
             // Maintain same index position after setting padding
             scrollToPosition(currentPosition);
@@ -745,11 +747,13 @@ public final class CarUiRecyclerViewImpl extends FrameLayout
 
     @Override
     public void setPaddingRelative(int start, int top, int end, int bottom) {
+        // Check position before padding as clipToPadding breaks findFirstVisibleItemPosition
+        // expectation
+        int currentPosition = findFirstVisibleItemPosition();
         // This needs to happen before updating the scrollbar padding because it affects the
         // visibility of items.
         mRecyclerView.setPaddingRelative(0, top, 0, bottom);
         if (mScrollBarEnabled) {
-            int currentPosition = findFirstVisibleItemPosition();
             setScrollBarPadding(mScrollBarPaddingTop + top, mScrollBarPaddingBottom + bottom);
             // Maintain same index position after setting padding
             scrollToPosition(currentPosition);
