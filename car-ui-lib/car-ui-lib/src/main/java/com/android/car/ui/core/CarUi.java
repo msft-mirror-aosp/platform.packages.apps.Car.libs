@@ -45,8 +45,6 @@ public class CarUi {
     // minSdk to 28. so we need to enforce minSdk to 28 in the code.
     // Also, in some cases we have to wrap the while class in RequiresApi because loading the class
     // below android 19 will cause a crash.
-    public static final int MIN_REQUIRED_API = VERSION_CODES.KITKAT;
-    public static final int MIN_TARGET_API = VERSION_CODES.P;
     public static final int TARGET_API_R = VERSION_CODES.R;
 
     /** Prevent instantiating this class */
