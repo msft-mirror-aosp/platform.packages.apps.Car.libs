@@ -33,6 +33,7 @@ import androidx.annotation.Nullable;
 import com.android.car.ui.R;
 import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
 import com.android.car.ui.appstyledview.AppStyledDialogController.SceneType;
+import com.android.car.ui.utils.CarUiUtils;
 
 /**
  * Controller to interact with the app styled view.
@@ -99,6 +100,8 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
 
         params.width = mWidth;
         params.height = mHeight;
+        params.dimAmount = CarUiUtils.getFloat(mContext.getResources(),
+                R.dimen.car_ui_app_styled_dialog_dim_amount);
 
         int posX = mContext.getResources().getDimensionPixelSize(
                 R.dimen.car_ui_app_styled_dialog_position_x);

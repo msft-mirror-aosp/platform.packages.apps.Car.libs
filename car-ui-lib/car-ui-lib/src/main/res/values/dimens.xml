@@ -244,6 +244,7 @@
     <dimen name="car_ui_app_styled_dialog_height">0dp</dimen>
     <dimen name="car_ui_app_styled_dialog_position_x">0dp</dimen>
     <dimen name="car_ui_app_styled_dialog_position_y">0dp</dimen>
+    <dimen name="car_ui_app_styled_dialog_dim_amount">0.5</dimen>
 
     <!-- ShortcutsPopup width -->
     <dimen name="car_ui_shortcuts_popup_width">366dp</dimen>
