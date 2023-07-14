@@ -16,7 +16,10 @@
 
 // Library-level build file
 
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+    id 'com.android.car.unbundled.conventions.local-publish'
+}
 
 android {
     namespace 'com.android.car.ui'
