@@ -68,6 +68,7 @@
     <activity
         android:name=".appstyledview.AppStyledViewSampleActivity"
         android:exported="false"
+        android:configChanges="orientation"
         android:parentActivityName=".MainActivity"/>
     <activity
         android:name=".appstyledview.TransparentActivity"
