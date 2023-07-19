@@ -71,4 +71,5 @@ dependencies {
     implementation files(gradle.ext.lib_car_system_stubs)
 
     implementation project(":car-apps-common")
+    implementation project(":car-media-extensions")
 }

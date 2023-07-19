@@ -48,6 +48,7 @@ import com.android.car.media.common.MediaItemMetadata;
 import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
 import com.android.car.media.common.source.MediaSource;
 import com.android.car.media.common.source.MediaSourceViewModel;
+import com.android.car.media.extensions.analytics.host.IAnalyticsManager;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -127,12 +128,12 @@ public class MediaItemsRepository {
     private final MediaItemsLiveData mSearchMediaItems = new MediaItemsLiveData(/*loading*/ false);
     private final MutableLiveData<Map<String, CustomBrowseAction>> mCustomBrowseActions =
             dataOf(Collections.emptyMap());
-
     private String mSearchQuery;
 
     @VisibleForTesting
     public MediaItemsRepository(LiveData<BrowsingState> browsingState) {
         browsingState.observeForever(this::onMediaBrowsingStateChanged);
+
     }
 
     /**
@@ -140,6 +141,18 @@ public class MediaItemsRepository {
      */
     public LiveData<BrowsingState> getBrowsingState() {
         return mBrowsingStateLiveData;
+    }
+
+    /** returns AnalyticsManager or if no browserState returns stub */
+    @NonNull
+    public IAnalyticsManager getAnalyticsManager() {
+        BrowsingState state = mBrowsingStateLiveData.getValue();
+        if (state == null) {
+            Log.i(TAG, "BrowsingState null #getAnalyticsManager() returning stub");
+            return new IAnalyticsManager() {};
+        }
+
+        return state.getAnalyticsManager();
     }
 
     /**

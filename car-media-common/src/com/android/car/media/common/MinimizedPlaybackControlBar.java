@@ -16,6 +16,9 @@
 
 package com.android.car.media.common;
 
+import static android.car.media.CarMediaManager.MEDIA_SOURCE_MODE_PLAYBACK;
+
+import android.app.Application;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Size;
@@ -30,7 +33,11 @@ import androidx.lifecycle.LifecycleOwner;
 import com.android.car.apps.common.BackgroundImageView;
 import com.android.car.apps.common.MinimizedControlBar;
 import com.android.car.apps.common.imaging.ImageBinder;
+import com.android.car.media.common.browse.MediaItemsRepository;
 import com.android.car.media.common.playback.PlaybackViewModel;
+import com.android.car.media.extensions.analytics.event.AnalyticsEvent;
+
+import java.util.ArrayList;
 
 /**
  * This is a CarControlBar used for displaying Media content, including metadata for the currently
@@ -105,6 +112,16 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
                 null, null, null, null, null, mContentTile, mAppIcon, maxArtSize,
                 mContentFormatView, null);
         mPlaybackViewModel = model;
+        model.getMetadata().observe(owner, mediaItemMetadata -> {
+            if (mediaItemMetadata != null && getVisibility() == VISIBLE) {
+                ArrayList<String> items = new ArrayList<>();
+                items.add(mediaItemMetadata.getId());
+                MediaItemsRepository.get((Application) getContext().getApplicationContext(),
+                        MEDIA_SOURCE_MODE_PLAYBACK).getAnalyticsManager().sendVisibleItemsEvents(
+                        null, AnalyticsEvent.MINI_PLAYBACK, AnalyticsEvent.SHOW,
+                        AnalyticsEvent.NONE, items);
+            }
+        });
 
         mMetadataController.setLogoSeparatorView(mSeparatorView);
         mMetadataController.setViewSeparatedFromLogo(mViewSeparatedFromExtraSlot);

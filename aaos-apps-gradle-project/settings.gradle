@@ -39,6 +39,9 @@ project(':car-apps-common').projectDir = new File('../car-apps-common')
 include ':car-media-common'
 project(':car-media-common').projectDir = new File('../car-media-common')
 
+include ':car-media-extensions'
+project(':car-media-extensions').projectDir = new File('../car-media-extensions')
+
 include ':car-uxr-client-lib'
 project(':car-uxr-client-lib').projectDir = new File('../car-uxr-client-lib')
 
