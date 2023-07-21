@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The Android Open Source Project
+ * Copyright (C) 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,11 @@ import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
 
-import com.android.car.ui.plugin.oemapis.Consumer;
-import com.android.car.ui.plugin.oemapis.toolbar.ImeSearchInterfaceOEMV2;
+import com.android.car.ui.plugin.oemapis.toolbar.ImeSearchInterfaceOEMV1;
 import com.android.car.ui.plugin.oemapis.toolbar.MenuItemOEMV1;
 import com.android.car.ui.plugin.oemapis.toolbar.ProgressBarControllerOEMV1;
 import com.android.car.ui.plugin.oemapis.toolbar.TabOEMV1;
-import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV3;
+import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV1;
 import com.android.car.ui.toolbar.MenuItem;
 import com.android.car.ui.toolbar.NavButtonMode;
 import com.android.car.ui.toolbar.SearchMode;
@@ -36,17 +35,19 @@ import com.android.car.ui.toolbar.ToolbarControllerImpl;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * Wrapper class that passes the data to car-ui via ToolbarControllerOEMV3 interface
+ * See {@code ToolbarAdapterProxyV3}. This class is for backwards compatibility with apps that use
+ * an older version of car-ui-lib.
  */
-public final class ToolbarAdapterProxy implements ToolbarControllerOEMV3 {
+public final class ToolbarAdapterProxyV1 implements ToolbarControllerOEMV1 {
 
     private final Context mPluginContext;
     private final ToolbarControllerImpl mToolbarController;
 
-    public ToolbarAdapterProxy(
+    public ToolbarAdapterProxyV1(
             @NonNull Context pluginContext, @NonNull ToolbarControllerImpl toolbarController) {
         mPluginContext = pluginContext;
         mToolbarController = toolbarController;
@@ -99,11 +100,6 @@ public final class ToolbarAdapterProxy implements ToolbarControllerOEMV3 {
     }
 
     @Override
-    public void setOnLogoClickListener(Runnable listener) {
-        mToolbarController.setOnLogoClickListener(listener);
-    }
-
-    @Override
     public void setSearchHint(String s) {
         mToolbarController.setSearchHint(s);
     }
@@ -138,8 +134,8 @@ public final class ToolbarAdapterProxy implements ToolbarControllerOEMV3 {
     }
 
     @Override
-    public ImeSearchInterfaceOEMV2 getImeSearchInterface() {
-        return mToolbarController.getImeSearchInterface();
+    public ImeSearchInterfaceOEMV1 getImeSearchInterface() {
+        return ImeSearchInterfaceProxy.getImeSearchInterfaceV1(mToolbarController);
     }
 
     @Override
