@@ -16,9 +16,14 @@
 
 // Library-level build file
 
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+    id 'com.android.car.unbundled.conventions.local-publish'
+}
 
 android {
+    // Note: This overlaps the namespace of the "car-ui-lib" package
+    namespace = "com.android.car.ui"
     compileSdkVersion gradle.ext.aaosLatestSDK
 
     defaultConfig {
