@@ -26,6 +26,7 @@ cd "$(dirname "$0")" || exit
 OUTPUT_DIR=../../../../../out/aaos-apps-gradle-build
 
 # APKs
+cp $OUTPUT_DIR/car-calendar-app/outputs/apk/platform/release/car-calendar-app-platform-release.apk $1/CarCalendarApp_platform_cert.apk
 cp $OUTPUT_DIR/car-dialer-app/outputs/apk/production/release/car-dialer-app-production-release.apk $1/CarDialerApp.apk
 cp $OUTPUT_DIR/car-dialer-app/outputs/apk/platform/release/car-dialer-app-platform-release.apk $1/CarDialerApp_platform_cert.apk
 cp $OUTPUT_DIR/car-media-app/outputs/apk/aaos/release/car-media-app-aaos-release.apk $1/CarMediaApp_aaos_cert.apk
