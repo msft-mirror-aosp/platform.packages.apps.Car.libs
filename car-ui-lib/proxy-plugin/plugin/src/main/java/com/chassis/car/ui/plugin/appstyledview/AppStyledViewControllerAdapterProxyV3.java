@@ -21,22 +21,22 @@ import android.view.WindowManager.LayoutParams;
 
 import androidx.annotation.NonNull;
 
-import com.android.car.ui.appstyledview.AppStyledViewController;
 import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
 import com.android.car.ui.appstyledview.AppStyledDialogController.SceneType;
+import com.android.car.ui.appstyledview.AppStyledViewController;
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
 
 /**
  * Adapts a {@link AppStyledViewController} into a {@link AppStyledViewControllerOEMV3}.
  */
-public class AppStyledViewControllerAdapterProxy implements AppStyledViewControllerOEMV3 {
+public class AppStyledViewControllerAdapterProxyV3 implements AppStyledViewControllerOEMV3 {
 
     @NonNull
     private final AppStyledViewController mStaticController;
     private View mContentView;
 
-    public AppStyledViewControllerAdapterProxy(@NonNull AppStyledViewController controllerOEMV3) {
-        mStaticController = controllerOEMV3;
+    public AppStyledViewControllerAdapterProxyV3(@NonNull AppStyledViewController controller) {
+        mStaticController = controller;
     }
 
     @Override

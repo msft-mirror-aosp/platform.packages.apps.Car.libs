@@ -17,27 +17,43 @@
 package com.chassis.car.ui.plugin.toolbar;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.android.car.ui.baselayout.Insets;
 import com.android.car.ui.baselayout.InsetsChangedListener;
-import com.android.car.ui.plugin.oemapis.Consumer;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
 
 /**
- * Wrapper class which converts Consumer<InsetsOEMV1> to InsetsChangedListener
+ * Wrapper class which converts Consumer<InsetsOEMV1> to InsetsChangedListener.
  */
 public final class InsetsChangedListenerProxy implements InsetsChangedListener {
+    @Nullable
+    private com.android.car.ui.plugin.oemapis.Consumer<InsetsOEMV1>
+            mPluginInsetsChangedListener = null;
+    @Nullable
+    private java.util.function.Consumer<InsetsOEMV1> mJavaInsetsChangedListener = null;
 
-    @NonNull
-    private final Consumer<InsetsOEMV1> mInsetsChangedListener;
+    /** Compatible with {@code ToolbarControllerOEMV2} and {@code ToolbarControllerOEMV3}. */
+    public InsetsChangedListenerProxy(
+            @NonNull com.android.car.ui.plugin.oemapis.Consumer<InsetsOEMV1>
+                    insetsChangedListener) {
+        mPluginInsetsChangedListener = insetsChangedListener;
+    }
 
-    public InsetsChangedListenerProxy(@NonNull Consumer<InsetsOEMV1> insetsChangedListener) {
-        mInsetsChangedListener = insetsChangedListener;
+    /** Compatible with {@code ToolbarControllerOEMV1}. */
+    public InsetsChangedListenerProxy(
+            @NonNull java.util.function.Consumer<InsetsOEMV1> insetsChangedListener) {
+        mJavaInsetsChangedListener = insetsChangedListener;
     }
 
     @Override
     public void onCarUiInsetsChanged(@NonNull Insets insets) {
-        mInsetsChangedListener.accept(new InsetsOEMV1(
-                insets.getLeft(), insets.getTop(), insets.getRight(), insets.getBottom()));
+        if (mPluginInsetsChangedListener != null) {
+            mPluginInsetsChangedListener.accept(new InsetsOEMV1(
+                    insets.getLeft(), insets.getTop(), insets.getRight(), insets.getBottom()));
+        } else {
+            mJavaInsetsChangedListener.accept(new InsetsOEMV1(
+                    insets.getLeft(), insets.getTop(), insets.getRight(), insets.getBottom()));
+        }
     }
 }

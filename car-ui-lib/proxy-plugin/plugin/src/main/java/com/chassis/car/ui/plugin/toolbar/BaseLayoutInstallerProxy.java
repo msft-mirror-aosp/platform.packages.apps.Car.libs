@@ -21,8 +21,9 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.android.car.ui.plugin.oemapis.Consumer;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
+import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV1;
+import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV2;
 import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV3;
 import com.android.car.ui.pluginsupport.PluginFactoryStub;
 import com.android.car.ui.toolbar.ToolbarControllerImpl;
@@ -30,29 +31,74 @@ import com.android.car.ui.toolbar.ToolbarControllerImpl;
 /**
  * Helper class that delegates installing base layout to car-ui-lib shared library.
  */
-public class BaseLayoutInstallerProxy {
+public final class BaseLayoutInstallerProxy {
 
     /**
-     * Installs the base layout around the contentView.
+     * Installs the base layout around the contentView. Optionally installs a toolbar and returns
+     * an implementation of {@code ToolbarControllerOEMV1} if the toolbar is enabled.
      */
     @Nullable
-    public static ToolbarControllerOEMV3 installBaseLayoutAround(
+    public static ToolbarControllerOEMV1 installBaseLayoutAroundV1(
             @NonNull Context pluginContext,
             @NonNull View contentView,
-            @Nullable Consumer<InsetsOEMV1> insetsChangedListener,
+            @Nullable java.util.function.Consumer<InsetsOEMV1> insetsChangedListener,
             boolean toolbarEnabled,
             boolean fullscreen) {
+        ToolbarControllerImpl toolbarControllerImpl = installBaseLayoutAround(
+                pluginContext, contentView, insetsChangedListener != null
+                        ? new InsetsChangedListenerProxy(insetsChangedListener) : null,
+                toolbarEnabled, fullscreen);
+        return !toolbarEnabled ? null : new ToolbarAdapterProxyV1(pluginContext,
+                toolbarControllerImpl);
+    }
 
-        InsetsChangedListenerProxy insetsChangedListenerProxy = insetsChangedListener != null
-                ? new InsetsChangedListenerProxy(insetsChangedListener) : null;
+    /**
+     * Installs the base layout around the contentView. Optionally installs a toolbar and returns
+     * an implementation of {@code ToolbarControllerOEMV2} if the toolbar is enabled.
+     */
+    @Nullable
+    public static ToolbarControllerOEMV2 installBaseLayoutAroundV2(
+            @NonNull Context pluginContext,
+            @NonNull View contentView,
+            @Nullable com.android.car.ui.plugin.oemapis.Consumer<InsetsOEMV1> insetsChangedListener,
+            boolean toolbarEnabled,
+            boolean fullscreen) {
+        ToolbarControllerImpl toolbarControllerImpl = installBaseLayoutAround(
+                pluginContext, contentView, insetsChangedListener != null
+                        ? new InsetsChangedListenerProxy(insetsChangedListener) : null,
+                toolbarEnabled, fullscreen);
+        return !toolbarEnabled ? null : new ToolbarAdapterProxyV2(pluginContext,
+                toolbarControllerImpl);
+    }
 
+    /**
+     * Installs the base layout around the contentView. Optionally installs a toolbar and returns
+     * an implementation of {@code ToolbarControllerOEMV3} if the toolbar is enabled.
+     */
+    @Nullable
+    public static ToolbarControllerOEMV3 installBaseLayoutAroundV3(
+            @NonNull Context pluginContext,
+            @NonNull View contentView,
+            @Nullable com.android.car.ui.plugin.oemapis.Consumer<InsetsOEMV1> insetsChangedListener,
+            boolean toolbarEnabled,
+            boolean fullscreen) {
+        ToolbarControllerImpl toolbarControllerImpl = installBaseLayoutAround(
+                pluginContext, contentView, insetsChangedListener != null
+                        ? new InsetsChangedListenerProxy(insetsChangedListener) : null,
+                toolbarEnabled, fullscreen);
+        return !toolbarEnabled ? null : new ToolbarAdapterProxyV3(pluginContext,
+                toolbarControllerImpl);
+    }
+
+    private static ToolbarControllerImpl installBaseLayoutAround(
+            @NonNull Context pluginContext,
+            @NonNull View contentView,
+            @Nullable InsetsChangedListenerProxy insetsChangedListenerProxy,
+            boolean toolbarEnabled,
+            boolean fullscreen) {
         // Delegate installing base layout to PluginFactoryStub
         PluginFactoryStub pluginFactoryStub = new PluginFactoryStub();
-        ToolbarControllerImpl toolbarControllerImpl =
-                (ToolbarControllerImpl) pluginFactoryStub.installBaseLayoutAround(pluginContext,
-                        contentView, insetsChangedListenerProxy, toolbarEnabled, fullscreen);
-
-        return !toolbarEnabled ? null : new ToolbarAdapterProxy(pluginContext,
-                toolbarControllerImpl);
+        return (ToolbarControllerImpl) pluginFactoryStub.installBaseLayoutAround(pluginContext,
+                contentView, insetsChangedListenerProxy, toolbarEnabled, fullscreen);
     }
 }
