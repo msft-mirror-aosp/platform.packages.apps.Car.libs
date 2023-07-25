@@ -326,17 +326,19 @@ public class TelecomUtils {
         String lookupKey = null;
 
         ContentResolver cr = context.getContentResolver();
-        try (Cursor cursor = cr.query(
+        Cursor cursor = null;
+        try {
+            cursor = cr.query(
                 Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number)),
                 new String[]{
-                        PhoneLookup.DISPLAY_NAME,
-                        PhoneLookup.DISPLAY_NAME_ALTERNATIVE,
-                        PhoneLookup.PHOTO_URI,
-                        PhoneLookup.TYPE,
-                        PhoneLookup.LABEL,
-                        PhoneLookup.LOOKUP_KEY,
+                    PhoneLookup.DISPLAY_NAME,
+                    PhoneLookup.DISPLAY_NAME_ALTERNATIVE,
+                    PhoneLookup.PHOTO_URI,
+                    PhoneLookup.TYPE,
+                    PhoneLookup.LABEL,
+                    PhoneLookup.LOOKUP_KEY,
                 },
-                null, null, null)) {
+                null, null, null);
 
             if (cursor != null && cursor.moveToFirst()) {
                 int nameColumn = cursor.getColumnIndex(PhoneLookup.DISPLAY_NAME);
@@ -356,6 +358,10 @@ public class TelecomUtils {
                 typeLabel = Phone.getTypeLabel(context.getResources(), type, label);
 
                 lookupKey = cursor.getString(lookupKeyColumn);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
             }
         }
 
