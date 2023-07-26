@@ -19,8 +19,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/focus_area"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/car_ui_activity_background">
+    android:layout_height="match_parent">
     <com.android.car.ui.recyclerview.CarUiRecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"

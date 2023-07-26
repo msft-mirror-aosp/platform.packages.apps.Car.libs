@@ -243,6 +243,26 @@ public class ToolbarMenuItemsTest {
     }
 
     @Test
+    public void menuItems_setMenuItems_worksWithOverflowDialogOpen() {
+        runWithActivityAndToolbar((activity, toolbar) -> toolbar.setMenuItems(
+                Collections.singletonList(MenuItem.builder(activity)
+                    .setTitle("Test title!")
+                    .setDisplayBehavior(MenuItem.DisplayBehavior.NEVER)
+                    .build())));
+
+        // Open overflow menu, change the menu item to have a different title by calling
+        // setMenuItems, then verify it updated correctly
+        onView(isRoot()).perform(waitForView(withContentDescription("Overflow")));
+        onView(withContentDescription("Overflow")).perform(click());
+        runWithActivityAndToolbar((activity, toolbar) -> toolbar.setMenuItems(
+                Collections.singletonList(MenuItem.builder(activity)
+                        .setTitle("Test title 2!")
+                        .setDisplayBehavior(MenuItem.DisplayBehavior.NEVER)
+                        .build())));
+        onView(withText("Test title 2!")).check(matches(isDisplayed()));
+    }
+
+    @Test
     public void menuItems_noOverflow_buttonDoesntExist() {
         runWithActivityAndToolbar((activity, toolbar) -> {
             MenuItem menuItem = MenuItem.builder(activity)

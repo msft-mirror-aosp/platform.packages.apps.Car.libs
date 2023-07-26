@@ -19,4 +19,6 @@
     <dimen name="screen_shape_container_width">0dp</dimen>
     <!-- Height of the overlay container. Setting to 0 will use full height of the screen  -->
     <dimen name="screen_shape_container_height">0dp</dimen>
+    <!-- Margin between buttons of transparent activity-->
+    <dimen name="transparent_activity_margin">10dp</dimen>
 </resources>

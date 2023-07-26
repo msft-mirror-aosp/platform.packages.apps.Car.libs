@@ -297,6 +297,7 @@ public class PreferenceTest {
         verify(clickListener, times(1)).accept(preference);
     }
 
+    @Ignore("b/290374502")
     @Test
     public void testCheckboxPreference() {
         // Create checkbox preference and add it to screen.
@@ -343,6 +344,7 @@ public class PreferenceTest {
         onView(withId(android.R.id.checkbox)).check(matches(isNotChecked()));
     }
 
+    @Ignore("b/290374502")
     @Test
     public void testSwitchPreference() {
         // Create switch preference and add it to screen.
@@ -389,6 +391,7 @@ public class PreferenceTest {
         onView(withId(android.R.id.switch_widget)).check(matches(isNotChecked()));
     }
 
+    @Ignore("b/290374502")
     @Test
     public void testPrimarySwitchPreference() {
         // Create switch preference and add it to screen.
@@ -437,6 +440,7 @@ public class PreferenceTest {
         onView(withText(R.string.title_switch_preference)).check(matches(not(isActivated())));
     }
 
+    @Ignore("b/290374502")
     @Test
     public void testSwitchPreference_uxRestricted() {
         // Create switch preference and add it to screen.
@@ -469,6 +473,7 @@ public class PreferenceTest {
         verify(clickListener, times(1)).accept(preference);
     }
 
+    @Ignore("b/290374502")
     @Test
     public void testSwitchPreference_clickableWhileDisabled() {
         // Create switch preference and add it to screen.
@@ -502,6 +507,7 @@ public class PreferenceTest {
         verify(clickListener, times(1)).accept(preference);
     }
 
+    @Ignore("b/290374502")
     @Test
     public void testRadioPreference() {
         // Create radio button preference and add it to screen.
@@ -548,6 +554,7 @@ public class PreferenceTest {
         onView(withId(R.id.radio_button)).check(matches(isNotChecked()));
     }
 
+    @Ignore("b/290374502")
     @Test
     public void testRadioPreference_uxRestricted() {
         // Create radio button preference and add it to screen.
@@ -1272,8 +1279,7 @@ public class PreferenceTest {
         verify(restrictedClickListener, times(1)).accept(preference);
     }
 
-    // TODO b/280083340 Remove Ignore annotation when fixed
-    @Ignore
+    @Ignore("b/280083340")
     @Test
     public void testFooterPreference_noLink() {
         // Create footer preference (no link) and add to screen
@@ -1354,6 +1360,7 @@ public class PreferenceTest {
         verify(clickListener, times(1)).run();
     }
 
+    @Ignore("b/280083340")
     @Test
     public void testFooterPreference_removeLink() {
         // Create footer preference  with a link

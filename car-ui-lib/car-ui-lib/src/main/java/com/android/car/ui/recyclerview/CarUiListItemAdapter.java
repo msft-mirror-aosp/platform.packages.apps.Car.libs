@@ -55,8 +55,9 @@ import java.util.List;
 public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
         CarUiRecyclerView.ItemCap {
 
-    static final int VIEW_TYPE_LIST_ITEM = 1;
-    static final int VIEW_TYPE_LIST_HEADER = 2;
+    static final int VIEW_TYPE_LIST_HEADER = 0;
+    static final int VIEW_TYPE_LIST_ITEM_FULL_TOUCH_INTERCEPTOR = 1;
+    static final int VIEW_TYPE_LIST_ITEM_SPLIT_TOUCH_INTERCEPTOR = 2;
 
     private final List<? extends CarUiListItem> mItems;
     private final boolean mCompactLayout;
@@ -78,13 +79,16 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         switch (viewType) {
-            case VIEW_TYPE_LIST_ITEM:
+            case VIEW_TYPE_LIST_ITEM_FULL_TOUCH_INTERCEPTOR:
+            case VIEW_TYPE_LIST_ITEM_SPLIT_TOUCH_INTERCEPTOR:
                 if (mCompactLayout) {
                     return new ListItemViewHolder(
-                            inflater.inflate(R.layout.car_ui_list_item_compact, parent, false));
+                            inflater.inflate(R.layout.car_ui_list_item_compact, parent, false),
+                            viewType == VIEW_TYPE_LIST_ITEM_FULL_TOUCH_INTERCEPTOR);
                 }
                 return new ListItemViewHolder(
-                        inflater.inflate(R.layout.car_ui_list_item, parent, false));
+                        inflater.inflate(R.layout.car_ui_list_item, parent, false),
+                        viewType == VIEW_TYPE_LIST_ITEM_FULL_TOUCH_INTERCEPTOR);
             case VIEW_TYPE_LIST_HEADER:
                 return new HeaderViewHolder(
                         inflater.inflate(R.layout.car_ui_header_list_item, parent, false));
@@ -107,7 +111,12 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public int getItemViewType(int position) {
         if (mItems.get(position) instanceof CarUiContentListItem) {
-            return VIEW_TYPE_LIST_ITEM;
+            CarUiContentListItem item = (CarUiContentListItem) mItems.get(position);
+            if (item.getAction() == CarUiContentListItem.Action.ICON
+                    && item.getSupplementalIconOnClickListener() != null) {
+                return VIEW_TYPE_LIST_ITEM_SPLIT_TOUCH_INTERCEPTOR;
+            }
+            return VIEW_TYPE_LIST_ITEM_FULL_TOUCH_INTERCEPTOR;
         } else if (mItems.get(position) instanceof CarUiHeaderListItem) {
             return VIEW_TYPE_LIST_HEADER;
         }
@@ -118,7 +127,8 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         switch (holder.getItemViewType()) {
-            case VIEW_TYPE_LIST_ITEM:
+            case VIEW_TYPE_LIST_ITEM_FULL_TOUCH_INTERCEPTOR:
+            case VIEW_TYPE_LIST_ITEM_SPLIT_TOUCH_INTERCEPTOR:
                 if (!(holder instanceof ListItemViewHolder)) {
                     throw new IllegalStateException("Incorrect view holder type for list item.");
                 }
@@ -167,7 +177,9 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
      * Holds views of {@link CarUiContentListItem}.
      */
     static class ListItemViewHolder extends RecyclerView.ViewHolder {
-
+        final View mTouchInterceptor;
+        final View mReducedTouchInterceptor;
+        final View mActionContainerTouchInterceptor;
         final CarUiTextView mTitle;
         final CarUiTextView mBody;
         final ImageView mIcon;
@@ -180,12 +192,30 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
         final CheckBox mCheckBox;
         final RadioButton mRadioButton;
         final ImageView mSupplementalIcon;
-        final View mTouchInterceptor;
-        final View mReducedTouchInterceptor;
-        final View mActionContainerTouchInterceptor;
 
-        ListItemViewHolder(@NonNull View itemView) {
+        ListItemViewHolder(@NonNull View itemView, boolean usesFullTouchInterceptor) {
             super(itemView);
+            // If these two ViewStubs are found in the view hierarchy, inflate either full or split
+            // touch interceptor version of list item layout by setting it to be visible. When
+            // ViewStubs are not used and a list item layout is provided with all ui elements/touch
+            // interceptors, the visibility will be set on the corresponding touch interceptor,
+            // which will essentially do nothing. This maintains backwards compatibility.
+            View touchInterceptorStub = requireViewByRefId(itemView,
+                    R.id.car_ui_list_item_touch_interceptor);
+            View reducedTouchInterceptorStub = requireViewByRefId(itemView,
+                    R.id.car_ui_list_item_reduced_touch_interceptor);
+            if (usesFullTouchInterceptor) {
+                touchInterceptorStub.setVisibility(View.VISIBLE);
+            } else {
+                reducedTouchInterceptorStub.setVisibility(View.VISIBLE);
+            }
+
+            mTouchInterceptor = requireViewByRefId(itemView,
+                    R.id.car_ui_list_item_touch_interceptor);
+            mReducedTouchInterceptor = requireViewByRefId(itemView,
+                    R.id.car_ui_list_item_reduced_touch_interceptor);
+            mActionContainerTouchInterceptor = requireViewByRefId(itemView,
+                    R.id.car_ui_list_item_action_container_touch_interceptor);
             mTitle = requireViewByRefId(itemView, R.id.car_ui_list_item_title);
             mBody = requireViewByRefId(itemView, R.id.car_ui_list_item_body);
             mIcon = requireViewByRefId(itemView, R.id.car_ui_list_item_icon);
@@ -199,12 +229,6 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
             mRadioButton = requireViewByRefId(itemView, R.id.car_ui_list_item_radio_button_widget);
             mSupplementalIcon = requireViewByRefId(itemView,
                     R.id.car_ui_list_item_supplemental_icon);
-            mReducedTouchInterceptor = requireViewByRefId(itemView,
-                    R.id.car_ui_list_item_reduced_touch_interceptor);
-            mTouchInterceptor = requireViewByRefId(itemView,
-                    R.id.car_ui_list_item_touch_interceptor);
-            mActionContainerTouchInterceptor = requireViewByRefId(itemView,
-                    R.id.car_ui_list_item_action_container_touch_interceptor);
         }
 
         void bind(@NonNull CarUiContentListItem item) {

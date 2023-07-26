@@ -68,6 +68,7 @@ public class InstallBaseLayoutAroundTest {
         Insets[] insets = new Insets[] { null };
         mScenarioRule.getScenario().onActivity(activity -> {
             toolbar[0] = CarUi.installBaseLayoutAround(
+                    activity,
                     activity.requireViewById(android.R.id.content),
                     i -> insets[0] = i,
                     true);
@@ -113,6 +114,7 @@ public class InstallBaseLayoutAroundTest {
         ToolbarController[] toolbar = new ToolbarController[] { null };
         mScenarioRule.getScenario().onActivity(activity ->
                 toolbar[0] = CarUi.installBaseLayoutAround(
+                        activity,
                         activity.requireViewById(android.R.id.content),
                         i -> {},
                         false));

@@ -93,29 +93,30 @@ public final class PluginFactoryAdapterV6 implements PluginFactory {
     @Nullable
     @Override
     public ToolbarController installBaseLayoutAround(
+            @NonNull Context context,
             @NonNull View contentView,
             @Nullable InsetsChangedListener insetsChangedListener,
             boolean toolbarEnabled,
             boolean fullscreen) {
 
         if (!mOem.customizesBaseLayout()) {
-            return mFactoryStub.installBaseLayoutAround(contentView,
+            return mFactoryStub.installBaseLayoutAround(context, contentView,
                     insetsChangedListener, toolbarEnabled, fullscreen);
         }
 
         ToolbarControllerOEMV2 toolbar = mOem.installBaseLayoutAround(
-                contentView.getContext(),
+                context,
                 contentView,
                 insetsChangedListener == null ? null
                         : insets -> insetsChangedListener.onCarUiInsetsChanged(adaptInsets(insets)),
                 toolbarEnabled, fullscreen);
 
         if (toolbar != null) {
-            return new ToolbarControllerAdapterV2(contentView.getContext(), toolbar);
+            return new ToolbarControllerAdapterV2(context, toolbar);
         }
 
         if (toolbarEnabled) {
-            return mFactoryStub.installBaseLayoutAround(contentView, insetsChangedListener,
+            return mFactoryStub.installBaseLayoutAround(context, contentView, insetsChangedListener,
                     toolbarEnabled, fullscreen);
         }
 

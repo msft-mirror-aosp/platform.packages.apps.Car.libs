@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 /**
  * The OEM interface for a Toolbar.
  *
- * @deprecated Use {@link ToolbarControllerOEMV2} instead
+ * @deprecated Use {@link ToolbarControllerOEMV3} instead
  */
 @Deprecated
 @SuppressWarnings("AndroidJdkLibsChecker")

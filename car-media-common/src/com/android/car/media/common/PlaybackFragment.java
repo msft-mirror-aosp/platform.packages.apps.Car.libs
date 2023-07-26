@@ -246,7 +246,7 @@ public class PlaybackFragment extends Fragment {
             mMediaSourceViewModel = mediaSourceViewModel;
             mMediaItemsRepository = mediaItemsRepository;
             mMediaSource = mMediaSourceViewModel.getPrimaryMediaSource();
-            mAppName = mapNonNull(mMediaSource, MediaSource::getDisplayName);
+            mAppName = mapNonNull(mMediaSource, source -> source.getDisplayName(activity));
             mAppIcon = mapNonNull(mMediaSource, MediaSource::getCroppedPackageIcon);
             mTitle = mapNonNull(playbackViewModel.getMetadata(), MediaItemMetadata::getTitle);
             mSubtitle = mapNonNull(playbackViewModel.getMetadata(), MediaItemMetadata::getSubtitle);

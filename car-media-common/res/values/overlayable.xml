@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!-- Copyright (C) 2022 The Android Open Source Project
+<!-- Copyright (C) 2023 The Android Open Source Project
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -14,8 +14,8 @@ THIS FILE WAS AUTO GENERATED, DO NOT EDIT MANUALLY.
 REGENERATE USING packages/apps/Car/tests/tools/rro/generate-overlayable.py
 -->
 <resources>
-  <overlayable name="CarMediaCommon">
-    <policy type="system|product|signature|vendor">
+  <overlayable name="car-media-common">
+    <policy type="system|product|signature">
       <item type="anim" name="trim_end_interpolator"/>
       <item type="anim" name="trim_start_interpolator"/>
       <item type="array" name="custom_media_packages"/>
@@ -24,7 +24,10 @@ REGENERATE USING packages/apps/Car/tests/tools/rro/generate-overlayable.py
       <item type="array" name="preferred_media_sources"/>
       <item type="attr" name="align_horizontal"/>
       <item type="attr" name="aspect_ratio"/>
+      <item type="attr" name="backgroundTone"/>
       <item type="attr" name="columns"/>
+      <item type="attr" name="logoSize"/>
+      <item type="attr" name="logoTint"/>
       <item type="attr" name="show_expand_button"/>
       <item type="attr" name="state_disabled"/>
       <item type="attr" name="state_pause"/>
@@ -66,6 +69,8 @@ REGENERATE USING packages/apps/Car/tests/tools/rro/generate-overlayable.py
       <item type="dimen" name="appbar_view_search_bar_end_margin"/>
       <item type="dimen" name="appbar_view_search_close_icon_margin"/>
       <item type="dimen" name="fab_spinner_size"/>
+      <item type="dimen" name="minimized_content_format_height"/>
+      <item type="dimen" name="minimized_content_format_width"/>
       <item type="dimen" name="minimized_progress_bar_track_thickness"/>
       <item type="dimen" name="playback_fragment_app_icon_margin_right"/>
       <item type="dimen" name="playback_fragment_controls_margin_bottom"/>
@@ -127,6 +132,7 @@ REGENERATE USING packages/apps/Car/tests/tools/rro/generate-overlayable.py
       <item type="integer" name="playback_subtitle_text_max_lines"/>
       <item type="integer" name="playback_title_text_max_lines"/>
       <item type="integer" name="widget_error_text_max_lines"/>
+      <item type="layout" name="minimized_content_format"/>
       <item type="layout" name="minimized_play_pause_stop_button_layout"/>
       <item type="layout" name="minimized_playback_control_bar"/>
       <item type="layout" name="play_pause_stop_button_layout"/>
@@ -147,6 +153,7 @@ REGENERATE USING packages/apps/Car/tests/tools/rro/generate-overlayable.py
       <item type="string" name="launcher_intent"/>
       <item type="string" name="launcher_popup_intent"/>
       <item type="string" name="metadata_default_title"/>
+      <item type="style" name="MinimizedContentFormat"/>
       <item type="style" name="PlaybackSubtitleStyle"/>
       <item type="style" name="PlaybackTitleStyle"/>
     </policy>
