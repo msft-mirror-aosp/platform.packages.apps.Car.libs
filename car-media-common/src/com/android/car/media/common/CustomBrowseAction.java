@@ -16,71 +16,29 @@
 
 package com.android.car.media.common;
 
-import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.android.car.apps.common.imaging.ImageBinder;
+import com.android.car.apps.common.imaging.UriArtRef;
 
 import java.util.Objects;
 
 /** Domain Model for Browse View custom actions */
 public class CustomBrowseAction {
 
-    /** Art Ref for Browse Custom Actions icons. */
-    public class BrowseActionArtRef implements ImageBinder.ImageRef {
-
-        @Override
-        public boolean equals(Context context, Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            CustomBrowseAction.BrowseActionArtRef other = (CustomBrowseAction.BrowseActionArtRef) o;
-
-            Uri myUri = getImageURI();
-            Uri otherUri = other.getImageURI();
-            if ((myUri != null) || (otherUri != null)) {
-                return Objects.equals(myUri, otherUri);
-            }
-            return Objects.equals(this, o);
-        }
-
-        @Nullable
-        @Override
-        public Uri getImageURI() {
-            return mIconUrl;
-        }
-
-        @Nullable
-        @Override
-        public Drawable getImage(Context context) {
-            return ImageBinder.ImageRef.super.getImage(context);
-        }
-
-        @Override
-        public Drawable getPlaceholder(Context context, @NonNull ImageBinder.PlaceholderType type) {
-            return null;
-        }
-    }
-
     private final String mActionId;
     private final String mLabel;
     private final Uri mIconUrl;
-    private final BrowseActionArtRef mArtRef = new BrowseActionArtRef();
+    private final UriArtRef mArtRef;
     private final Bundle mExtras;
 
-    public CustomBrowseAction(
-            String actionId,
-            String mLabel,
-            Uri mIconUrl,
-            Bundle extras) {
-        this.mActionId = actionId;
-        this.mLabel = mLabel;
-        this.mIconUrl = mIconUrl;
-        this.mExtras = extras;
+    public CustomBrowseAction(String actionId, String label, Uri iconUrl, Bundle extras) {
+        mActionId = actionId;
+        mLabel = label;
+        mIconUrl = iconUrl;
+        mExtras = extras;
+        mArtRef = new UriArtRef(mIconUrl);
     }
 
     public String getId() {
@@ -95,7 +53,7 @@ public class CustomBrowseAction {
         return mIconUrl;
     }
 
-    public BrowseActionArtRef getArtRef() {
+    public ImageBinder.ImageRef getArtRef() {
         return mArtRef;
     }
 

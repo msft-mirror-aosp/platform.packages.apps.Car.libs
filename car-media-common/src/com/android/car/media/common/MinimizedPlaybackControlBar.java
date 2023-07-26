@@ -19,6 +19,8 @@ package com.android.car.media.common;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Size;
+import android.view.LayoutInflater;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
@@ -43,6 +45,7 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
     private ProgressBar mCircularProgressBar;
     private ImageBinder<MediaItemMetadata.ArtworkRef> mArtBinder = null;
     private PlaybackViewModel mPlaybackViewModel;
+    private ContentFormatView mContentFormatView;
 
     private boolean mShowLinearProgressBar;
     private boolean mShowCircularProgressBar;
@@ -79,6 +82,13 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
             mArtBinder = new ImageBinder<>(ImageBinder.PlaceholderType.BACKGROUND, maxArtSize,
                     artBackground::setBackgroundDrawable);
         }
+
+        FrameLayout extraSlot = findViewById(R.id.minimized_control_bar_extra_slot);
+        if (extraSlot != null) {
+            mContentFormatView = (ContentFormatView) LayoutInflater.from(context).inflate(
+                    R.layout.minimized_content_format, extraSlot, false);
+            extraSlot.addView(mContentFormatView);
+        }
     }
 
     /** Connects the bar to the {@link PlaybackViewModel}. */
@@ -86,7 +96,8 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
             @NonNull Size maxArtSize) {
         mMediaButtonController.setModel(model, owner);
         mMetadataController = new MetadataController(owner, model, null, mTitle, mSubtitle, null,
-                null, null, null, null, null, mContentTile, mAppIcon, maxArtSize, null);
+                null, null, null, null, null, mContentTile, mAppIcon, maxArtSize,
+                mContentFormatView, null);
         mPlaybackViewModel = model;
 
         ControlBarHelper.initProgressBar(getContext(), owner, mPlaybackViewModel,
