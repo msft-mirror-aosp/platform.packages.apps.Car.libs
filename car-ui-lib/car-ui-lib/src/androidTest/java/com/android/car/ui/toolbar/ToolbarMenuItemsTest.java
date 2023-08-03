@@ -188,6 +188,7 @@ public class ToolbarMenuItemsTest {
 
         runWithActivityAndToolbar((activity, toolbar) -> menuItem[0].setIcon(0));
 
+        waitForViewWithText("Test!");
         onView(withText("Test!")).check(matches(isDisplayed()));
     }
 
@@ -293,6 +294,7 @@ public class ToolbarMenuItemsTest {
         onView(isRoot()).perform(waitForView(withContentDescription("Overflow")));
         onView(withContentDescription("Overflow")).perform(click());
 
+        waitForViewWithText("Test title!");
         onView(withText("Test title!")).perform(click());
 
         verify(callback).onClick(menuItem[0]);
@@ -460,6 +462,7 @@ public class ToolbarMenuItemsTest {
 
         runWithActivityAndToolbar((activity, toolbar) -> menuItem[0].setOnClickListener(callback2));
 
+        waitForViewWithText("Button!");
         onView(withText("Button!")).perform(click());
         verify(callback1, times(1)).onClick(menuItem[0]);
         verify(callback2, times(1)).onClick(menuItem[0]);
