@@ -192,24 +192,30 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
         final CheckBox mCheckBox;
         final RadioButton mRadioButton;
         final ImageView mSupplementalIcon;
+        final boolean mUsesFullTouchInterceptor;
 
         ListItemViewHolder(@NonNull View itemView, boolean usesFullTouchInterceptor) {
             super(itemView);
-            // If these two ViewStubs are found in the view hierarchy, inflate either full or split
-            // touch interceptor version of list item layout by setting it to be visible. When
-            // ViewStubs are not used and a list item layout is provided with all ui elements/touch
-            // interceptors, the visibility will be set on the corresponding touch interceptor,
-            // which will essentially do nothing. This maintains backwards compatibility.
-            View touchInterceptorStub = requireViewByRefId(itemView,
-                    R.id.car_ui_list_item_touch_interceptor);
-            View reducedTouchInterceptorStub = requireViewByRefId(itemView,
-                    R.id.car_ui_list_item_reduced_touch_interceptor);
+            // If this list item is using a full touch interceptor, set the ViewStub with the same
+            // id as the full touch interceptor to be visible so that it is inflated with a custom
+            // layout. If using a split touch interceptor, do the same for the two corresponding
+            // ViewStubs of the split touch interceptor. When ViewStubs are not used and a list item
+            // layout is provided with all ui elements/touch interceptors, the visibility will be
+            // set on the corresponding touch interceptor, which will essentially do nothing which
+            // maintains backwards compatibility.
             if (usesFullTouchInterceptor) {
-                touchInterceptorStub.setVisibility(View.VISIBLE);
+                requireViewByRefId(itemView, R.id.car_ui_list_item_touch_interceptor)
+                        .setVisibility(View.VISIBLE);
             } else {
-                reducedTouchInterceptorStub.setVisibility(View.VISIBLE);
+                requireViewByRefId(itemView, R.id.car_ui_list_item_reduced_touch_interceptor)
+                        .setVisibility(View.VISIBLE);
+                requireViewByRefId(itemView,
+                        R.id.car_ui_list_item_action_container_touch_interceptor)
+                        .setVisibility(View.VISIBLE);
             }
-
+            // It is necessary to find the touch interceptor Views in the hierarchy after inflating
+            // the ViewStubs as the ViewStubs won't be in the hierarchy anymore and will be replaced
+            // with new Views.
             mTouchInterceptor = requireViewByRefId(itemView,
                     R.id.car_ui_list_item_touch_interceptor);
             mReducedTouchInterceptor = requireViewByRefId(itemView,
@@ -229,6 +235,7 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
             mRadioButton = requireViewByRefId(itemView, R.id.car_ui_list_item_radio_button_widget);
             mSupplementalIcon = requireViewByRefId(itemView,
                     R.id.car_ui_list_item_supplemental_icon);
+            mUsesFullTouchInterceptor = usesFullTouchInterceptor;
         }
 
         void bind(@NonNull CarUiContentListItem item) {
@@ -274,24 +281,25 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
             }
 
             boolean logWarning = false;
-            if (mTouchInterceptor instanceof SecureView) {
-                ((SecureView) mTouchInterceptor).setSecure(item.isSecure());
+            if (mUsesFullTouchInterceptor) {
+                if (mTouchInterceptor instanceof SecureView) {
+                    ((SecureView) mTouchInterceptor).setSecure(item.isSecure());
+                } else {
+                    logWarning = true;
+                }
             } else {
-                logWarning = true;
-            }
+                if (mReducedTouchInterceptor instanceof SecureView) {
+                    ((SecureView) mReducedTouchInterceptor).setSecure(item.isSecure());
+                } else {
+                    logWarning = true;
+                }
 
-            if (mReducedTouchInterceptor instanceof SecureView) {
-                ((SecureView) mReducedTouchInterceptor).setSecure(item.isSecure());
-            } else {
-                logWarning = true;
+                if (mActionContainerTouchInterceptor instanceof SecureView) {
+                    ((SecureView) mActionContainerTouchInterceptor).setSecure(item.isSecure());
+                } else {
+                    logWarning = true;
+                }
             }
-
-            if (mActionContainerTouchInterceptor instanceof SecureView) {
-                ((SecureView) mActionContainerTouchInterceptor).setSecure(item.isSecure());
-            } else {
-                logWarning = true;
-            }
-
             if (logWarning) {
                 Log.w("carui", "List item doesn't have a SecureView, but security was requested!");
             }
