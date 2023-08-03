@@ -41,7 +41,7 @@ import java.util.List;
  * and firing the appropriate actions upon completion.
  */
 public class NotificationPayloadHandler {
-    private static final String TAG = "NotificationPayloadHandler";
+    private static final String TAG = "NotifPayloadHandler";
 
     /** The context used by this instance to fire actions */
     private final Context mContext;
@@ -50,7 +50,11 @@ public class NotificationPayloadHandler {
         mContext = context;
     }
 
-    /** @return The {@link StatusBarNotification}, or null if not found. */
+    /**
+     * Returns the {@link StatusBarNotification} provided in the args {@link Bundle}.
+     *
+     * @return The {@link StatusBarNotification}, or null if not found.
+     */
     @Nullable
     public StatusBarNotification getStatusBarNotification(Bundle args) {
         return args.getParcelable(CarVoiceInteractionSession.KEY_NOTIFICATION);
