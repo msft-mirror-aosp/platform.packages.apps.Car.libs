@@ -100,6 +100,11 @@ public abstract class CarVoiceInteractionSession extends VoiceInteractionSession
     public static final String VOICE_ACTION_REPLY_CONVERSATION = "VOICE_ACTION_REPLY_CONVERSATION";
 
     /**
+     * Indicates to assistant that a compose message action is being requested.
+     */
+    public static final String VOICE_ACTION_COMPOSE_MESSAGE = "VOICE_ACTION_COMPOSE_MESSAGE";
+
+    /**
      * Indicates to digital assistant that it should capture a SMS message from the user,
      * potentially finding which contact to send the message to and which device to send the message
      * from (only if the application does not send the digital assistant this information in the
