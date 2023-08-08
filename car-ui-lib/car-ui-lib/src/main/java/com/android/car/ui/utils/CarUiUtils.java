@@ -57,12 +57,16 @@ public final class CarUiUtils {
 
     private static final String TAG = "CarUiUtils";
     private static final String READ_ONLY_SYSTEM_PROPERTY_PREFIX = "ro.";
-    /** A map to cache read-only system properties. */
+    /**
+     * A map to cache read-only system properties.
+     */
     private static final SparseArray<String> READ_ONLY_SYSTEM_PROPERTY_MAP = new SparseArray<>();
 
     private static int[] sRestrictedState;
 
-    /** This is a utility class */
+    /**
+     * This is a utility class
+     */
     private CarUiUtils() {
     }
 
@@ -79,7 +83,9 @@ public final class CarUiUtils {
         return outValue.getFloat();
     }
 
-    /** Returns the identifier of the resolved resource assigned to the given attribute. */
+    /**
+     * Returns the identifier of the resolved resource assigned to the given attribute.
+     */
     public static int getAttrResourceId(Context context, int attr) {
         return getAttrResourceId(context, /*styleResId=*/ 0, attr);
     }
@@ -127,9 +133,9 @@ public final class CarUiUtils {
     }
 
     /**
-     * It behaves similarly to {@link View#findViewById(int)}, except that on Q and below,
-     * it will first resolve the id to whatever it references.
-     *
+     * It behaves similarly to {@link View#findViewById(int)}, except that on Q and below, it will
+     * first resolve the id to whatever it references.
+     * <p>
      * This is to support layout RROs before the new RRO features in R.
      *
      * @param id the ID to search for
@@ -154,9 +160,9 @@ public final class CarUiUtils {
     }
 
     /**
-     * It behaves similarly to {@link View#requireViewById(int)}, except that on Q and below,
-     * it will first resolve the id to whatever it references.
-     *
+     * It behaves similarly to {@link View#requireViewById(int)}, except that on Q and below, it
+     * will first resolve the id to whatever it references.
+     * <p>
      * This is to support layout RROs before the new RRO features in R.
      *
      * @param id the ID to search for
@@ -280,6 +286,7 @@ public final class CarUiUtils {
 
     /**
      * Exact copy from Androidx.TypedArrayUtils class
+     *
      * @return The resource ID value in the {@code context} specified by {@code attr}. If it does
      * not exist, {@code fallbackAttr}.
      */
@@ -294,9 +301,9 @@ public final class CarUiUtils {
 
     /**
      * Converts a {@link CharSequence} to a {@link String}.
-     *
-     * This is the same as calling {@link CharSequence#toString()}, except it will handle
-     * null CharSequences, returning a null string.
+     * <p>
+     * This is the same as calling {@link CharSequence#toString()}, except it will handle null
+     * CharSequences, returning a null string.
      */
     public static String charSequenceToString(@Nullable CharSequence charSequence) {
         return charSequence == null ? null : charSequence.toString();
@@ -304,7 +311,7 @@ public final class CarUiUtils {
 
     /**
      * Given a list of T and a function to convert from T to U, return a list of U.
-     *
+     * <p>
      * This will create a new list.
      */
     public static <T, U> List<U> convertList(List<T> list, Function<T, U> f) {
@@ -322,7 +329,7 @@ public final class CarUiUtils {
     /**
      * Traverses the view hierarchy, and whenever it sees a {@link DrawableStateView}, adds
      * state_ux_restricted to it.
-     *
+     * <p>
      * Note that this will remove any other drawable states added by other calls to
      * {@link DrawableStateView#setExtraDrawableState(int[], int[])}
      */
@@ -337,7 +344,7 @@ public final class CarUiUtils {
     /**
      * Traverses the view hierarchy, and whenever it sees a {@link DrawableStateView}, adds
      * state_enabled to it.
-     *
+     * <p>
      * Note that this will remove any other drawable states added by other calls to
      * {@link DrawableStateView#setExtraDrawableState(int[], int[])}
      */
@@ -352,9 +359,9 @@ public final class CarUiUtils {
     }
 
     /**
-     * Traverses the view hierarchy, and whenever it sees a {@link DrawableStateView}, adds
-     * the relevant state_enabled and state_ux_restricted to the view.
-     *
+     * Traverses the view hierarchy, and whenever it sees a {@link DrawableStateView}, adds the
+     * relevant state_enabled and state_ux_restricted to the view.
+     * <p>
      * Note that this will remove any other drawable states added by other calls to
      * {@link DrawableStateView#setExtraDrawableState(int[], int[])}
      */
@@ -383,7 +390,7 @@ public final class CarUiUtils {
     /**
      * Traverses the view hierarchy, and whenever it sees a {@link DrawableStateView}, adds and
      * removes the specified states from the view.
-     *
+     * <p>
      * Note that this will remove any other drawable states added by other calls to
      * {@link DrawableStateView#setExtraDrawableState(int[], int[])}
      */
@@ -422,9 +429,9 @@ public final class CarUiUtils {
      */
     public static float dpToPixel(@NonNull Resources res, int dp) {
         return TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            dp,
-            res.getDisplayMetrics());
+                TypedValue.COMPLEX_UNIT_DIP,
+                dp,
+                res.getDisplayMetrics());
     }
 
     /**
@@ -455,5 +462,17 @@ public final class CarUiUtils {
             }
         }
         return result;
+    }
+
+    /**
+     * Return the base Context from a wrapped {@link Context} or the context passed to the method if
+     * it is a base context.
+     */
+    public static Context unwrapContext(Context context) {
+        while (!(context instanceof Activity) && context instanceof ContextWrapper) {
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+
+        return context;
     }
 }

@@ -16,8 +16,10 @@
 
 package com.android.car.ui.appstyledview;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Insets;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -29,6 +31,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.android.car.ui.R;
 import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
@@ -41,6 +44,7 @@ import com.android.car.ui.utils.CarUiUtils;
 public class AppStyledViewControllerImpl implements AppStyledViewController {
     private static final double VISIBLE_SCREEN_PERCENTAGE = 0.9;
     private static final int DIALOG_START_MARGIN_THRESHOLD = 64;
+    private static final int DIALOG_MIN_PADDING = 32;
 
     private final Context mContext;
     @NavIcon
@@ -73,6 +77,38 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
         updateNavIconClickListener();
     }
 
+    private float getVerticalInset(Context context, DisplayMetrics displayMetrics) {
+        // Inset API not supported before Android R. Fallback to previous 90 percent of display size
+        // implementation.
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            Context unwrappedContext = CarUiUtils.unwrapContext(context);
+            Insets systemBarInsets =
+                    ((Activity) unwrappedContext).getWindow().getWindowManager()
+                            .getCurrentWindowMetrics().getWindowInsets().getInsets(
+                                    WindowInsetsCompat.Type.statusBars());
+
+            return systemBarInsets.top + systemBarInsets.bottom;
+        }
+
+        return (float) (displayMetrics.heightPixels * (1 - VISIBLE_SCREEN_PERCENTAGE));
+    }
+
+    private float getHorizontalInset(Context context, DisplayMetrics displayMetrics) {
+        // Inset API not supported before Android R. Fallback to previous 90 percent of display size
+        // implementation.
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            Context unwrappedContext = CarUiUtils.unwrapContext(context);
+            Insets systemBarInsets =
+                    ((Activity) unwrappedContext).getWindow().getWindowManager()
+                            .getCurrentWindowMetrics().getWindowInsets().getInsets(
+                                    WindowInsetsCompat.Type.statusBars());
+
+            return systemBarInsets.left + systemBarInsets.right;
+        }
+
+        return (float) (displayMetrics.widthPixels * (1 - VISIBLE_SCREEN_PERCENTAGE));
+    }
+
     @Override
     public LayoutParams getDialogWindowLayoutParam(LayoutParams params) {
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -84,8 +120,10 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
         int maxHeight = mContext.getResources().getDimensionPixelSize(
                 R.dimen.car_ui_app_styled_dialog_height_max);
 
-        int displayWidth = (int) (displayMetrics.widthPixels * VISIBLE_SCREEN_PERCENTAGE);
-        int displayHeight = (int) (displayMetrics.heightPixels * VISIBLE_SCREEN_PERCENTAGE);
+        int displayWidth = (int) (displayMetrics.widthPixels - getHorizontalInset(mContext,
+                displayMetrics));
+        int displayHeight = (int) ((int) displayMetrics.heightPixels - getVerticalInset(mContext,
+                displayMetrics));
 
         int configuredWidth = mContext.getResources().getDimensionPixelSize(
                 R.dimen.car_ui_app_styled_dialog_width);
@@ -98,7 +136,6 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
         params.height = mHeight;
         params.dimAmount = CarUiUtils.getFloat(mContext.getResources(),
                 R.dimen.car_ui_app_styled_dialog_dim_amount);
-
 
         switch (mSceneType) {
             case SceneType.ENTER:
@@ -126,15 +163,30 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
             params.gravity = Gravity.TOP | Gravity.START;
             params.x = posX;
             params.y = posY;
-        } else if (mContext.getResources().getConfiguration()
-                .orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
+            return params;
+        }
+
+        if (mContext.getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE) {
             int startMargin = (displayWidth - mWidth) / 2;
+            int topMargin = (displayHeight - mHeight) / 2;
             int startMarginThresholdPx = (int) CarUiUtils.dpToPixel(mContext.getResources(),
                     DIALOG_START_MARGIN_THRESHOLD);
+            int minPaddingPx = (int) CarUiUtils.dpToPixel(mContext.getResources(),
+                    DIALOG_MIN_PADDING);
 
             if (startMargin >= startMarginThresholdPx) {
                 params.gravity = Gravity.START;
                 params.horizontalMargin = (float) startMarginThresholdPx / displayWidth;
+            }
+
+            if (startMargin == 0) {
+                params.width = mWidth - minPaddingPx;
+            }
+
+            if (topMargin == 0) {
+                params.height = mHeight - minPaddingPx;
             }
         }
 
@@ -202,8 +254,8 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
             return;
         }
 
-        FrameLayout navContainer =
-                mAppStyledView.findViewById(R.id.car_ui_app_styled_view_nav_icon_container);
+        FrameLayout navContainer = mAppStyledView.findViewById(
+                R.id.car_ui_app_styled_view_nav_icon_container);
         if (navContainer != null) {
             navContainer.setOnClickListener((v) -> {
                 if (mAppStyledVCloseClickListener == null) {
