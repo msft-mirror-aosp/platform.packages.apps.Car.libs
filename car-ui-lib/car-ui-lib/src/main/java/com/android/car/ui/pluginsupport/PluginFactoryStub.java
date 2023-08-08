@@ -116,7 +116,7 @@ public final class PluginFactoryStub implements PluginFactory {
         }
 
         // Update display cut out insets on DecorView
-        handleDisplayCutOut(context, contentView);
+        handleDisplayCutOut(context);
 
         InsetsUpdater insetsUpdater = new InsetsUpdater(baseLayout, contentView);
         insetsUpdater.replaceInsetsChangedListenerWith(insetsChangedListener);
@@ -124,7 +124,7 @@ public final class PluginFactoryStub implements PluginFactory {
         return toolbarController;
     }
 
-    private void handleDisplayCutOut(Context context, View contentView) {
+    private void handleDisplayCutOut(Context context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
             return;
         }
