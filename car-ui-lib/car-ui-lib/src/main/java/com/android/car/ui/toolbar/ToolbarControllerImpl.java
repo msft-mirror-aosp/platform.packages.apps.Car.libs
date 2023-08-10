@@ -24,6 +24,7 @@ import static com.android.car.ui.core.CarUi.TARGET_API_R;
 import static com.android.car.ui.utils.CarUiUtils.findViewByRefId;
 import static com.android.car.ui.utils.CarUiUtils.requireViewByRefId;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -731,6 +732,10 @@ public final class ToolbarControllerImpl implements ToolbarController {
         return numVisibleItems;
     }
 
+    // When building for maven release, there is a lint error from {@code
+    // RecyclerView#notifyDataSetChanged}. However, it's necessary to use this method as any
+    // adapter data can be changed when the overflow dialog is being shown.
+    @SuppressLint("NotifyDataSetChanged")
     private void createOverflowDialog() {
         // Need to check if overflow dialog is showing before the new AlertDialog is created
         // because it will return false when checked after
