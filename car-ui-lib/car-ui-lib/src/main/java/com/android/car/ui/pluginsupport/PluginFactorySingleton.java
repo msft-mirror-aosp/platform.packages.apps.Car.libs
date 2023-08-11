@@ -132,6 +132,10 @@ public final class PluginFactorySingleton {
      * creates and loads the plugin factory statically. This should be called as soon as app can get
      * the access to the context, preferably content providers.
      */
+    // When building for maven release, there is a PrivateApi lint error from calling
+    // PluginFactorySingleton.class.getClassLoader(). However, this method is public, so it should
+    // not be a problem to use.
+    @SuppressLint("PrivateApi")
     private static void loadPlugin(@NonNull Context context) {
         if (sInstance != null) {
             return;
