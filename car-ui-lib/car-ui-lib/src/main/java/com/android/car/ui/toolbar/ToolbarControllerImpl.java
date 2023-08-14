@@ -732,8 +732,8 @@ public final class ToolbarControllerImpl implements ToolbarController {
         return numVisibleItems;
     }
 
-    // When building for maven release, there is a lint error from {@code
-    // RecyclerView#notifyDataSetChanged}. However, it's necessary to use this method as any
+    // When building for maven release, there is a lint error from
+    // {@code RecyclerView#notifyDataSetChanged}. However, it's necessary to use this method as any
     // adapter data can be changed when the overflow dialog is being shown.
     @SuppressLint("NotifyDataSetChanged")
     private void createOverflowDialog() {
