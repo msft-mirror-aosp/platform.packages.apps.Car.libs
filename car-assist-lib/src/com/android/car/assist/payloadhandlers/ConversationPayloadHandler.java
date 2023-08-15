@@ -99,8 +99,8 @@ public class ConversationPayloadHandler {
                     IconCompat.createFromIcon(context, remoteAction.getIcon());
             Action.Builder builder =
                     new Action.Builder(
-                            /* icon= */ icon,
-                            /* charSequence= */ remoteAction.getTitle(),
+                            icon,
+                            remoteAction.getTitle(),
                             remoteAction.getActionIntent())
                             .setShowsUserInterface(false)
                             .setSemanticAction(getSemanticAction(actionType));
