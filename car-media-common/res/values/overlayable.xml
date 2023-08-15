@@ -14,7 +14,7 @@ THIS FILE WAS AUTO GENERATED, DO NOT EDIT MANUALLY.
 REGENERATE USING packages/apps/Car/tests/tools/rro/generate-overlayable.py
 -->
 <resources>
-  <overlayable name="car-media-common">
+  <overlayable name="CarMediaCommon">
     <policy type="system|product|signature">
       <item type="anim" name="trim_end_interpolator"/>
       <item type="anim" name="trim_start_interpolator"/>
