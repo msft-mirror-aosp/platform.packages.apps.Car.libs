@@ -92,7 +92,7 @@ public class LiveDataFunctions {
      */
     public static <T, R> LiveData<R> switchMapNonNull(@NonNull LiveData<T> source,
             @NonNull Function<T, LiveData<R>> func) {
-        return switchMapNonNull(source, null, func);
+        return switchMapNonNull(source, null, value -> func.apply(value));
     }
 
     /**
@@ -117,7 +117,7 @@ public class LiveDataFunctions {
      */
     public static <T, R> LiveData<FutureData<R>> loadingSwitchMap(LiveData<T> trigger,
             @NonNull Function<T, LiveData<R>> func) {
-        LiveData<R> output = Transformations.switchMap(trigger, func);
+        LiveData<R> output = Transformations.switchMap(trigger, value -> func.apply(value));
         return new MediatorLiveData<FutureData<R>>() {
             {
                 addSource(trigger, data -> setValue(new FutureData<>(true, null)));
