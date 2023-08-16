@@ -23,7 +23,7 @@
     <string name="error_code_app_error" msgid="3608680401453743688">"目前无法执行该操作"</string>
     <string name="error_code_not_supported" msgid="8004310657548193089">"此应用无法执行该操作"</string>
     <string name="error_code_authentication_expired" msgid="1727285213286610186">"登录才能使用此应用"</string>
-    <string name="error_code_premium_account_required" msgid="2328664287270814966">"需要有付费帐号才能访问"</string>
+    <string name="error_code_premium_account_required" msgid="2328664287270814966">"需要有付费账号才能访问"</string>
     <string name="error_code_concurrent_stream_limit" msgid="493048763425570552">"同时使用太多设备聆听"</string>
     <string name="error_code_parental_control_restricted" msgid="325145513462419399">"该内容已遭到屏蔽"</string>
     <string name="error_code_not_available_in_region" msgid="5840935836875073145">"所在地区不提供这项内容"</string>
