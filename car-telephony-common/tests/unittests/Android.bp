@@ -17,6 +17,8 @@ android_test {
 
     static_libs: [
         "car-telephony-common-prebuilt",
+        "androidx.lifecycle_lifecycle-common-java8",
+        "androidx.lifecycle_lifecycle-extensions",
         "androidx.test.core",
         "androidx.test.rules",
         "androidx.test.runner",

@@ -244,6 +244,9 @@
   <!-- Text for toggle logo button [CHAR_LIMIT=19]-->
   <string name="toolbar_toggle_logo">Toggle logo</string>
 
+  <!-- Text for toggle logo button [CHAR_LIMIT=20]-->
+  <string name="toolbar_toggle_logo_listener">Toggle logo listener</string>
+
   <!-- Text for cycle state button [CHAR_LIMIT=20]-->
   <string name="toolbar_cycle_state">Cycle state (Deprecated)</string>
 
@@ -342,6 +345,7 @@
   <!-- ListItem related resources  -->
   <string name="first_header">First header</string>
   <string name="test_title">Test title</string>
+  <string name="test_title_with_icon">Test title with icon</string>
   <string name="test_body">Test body</string>
   <string name="test_title_no_body">Test title with no body</string>
   <string name="random_header">Random header</string>

@@ -32,6 +32,8 @@ public class MenuItemAdapterV1 {
     private ToolbarControllerAdapterV1 mToolbarV1;
     @Nullable
     private ToolbarControllerAdapterV2 mToolbarV2;
+    @Nullable
+    private ToolbarControllerAdapterV3 mToolbarV3;
     @NonNull
     private final MenuItem mClientMenuItem;
     @NonNull
@@ -57,8 +59,17 @@ public class MenuItemAdapterV1 {
         updateMenuItem();
     }
 
+    public MenuItemAdapterV1(@NonNull ToolbarControllerAdapterV3 toolbar, @NonNull MenuItem item) {
+        mToolbarV3 = toolbar;
+        mClientMenuItem = item;
+        item.setListener(mClientListener);
+        updateMenuItem();
+    }
+
     private void updateMenuItems() {
-        if (mToolbarV2 != null) {
+        if (mToolbarV3 != null) {
+            mToolbarV3.updateMenuItems();
+        } else if (mToolbarV2 != null) {
             mToolbarV2.updateMenuItems();
         } else if (mToolbarV1 != null) {
             mToolbarV1.updateMenuItems();

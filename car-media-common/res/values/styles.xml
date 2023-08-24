@@ -25,4 +25,13 @@
         <item name="android:singleLine">true</item>
         <item name="android:includeFontPadding">false</item>
     </style>
+
+    <style name="MinimizedContentFormat">
+        <item name="android:layout_width">@dimen/minimized_content_format_width</item>
+        <item name="android:layout_height">@dimen/minimized_content_format_height</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="logoTint">@color/primary_text_color</item>
+        <item name="logoSize">small</item>
+        <item name="backgroundTone">dark</item>
+    </style>
 </resources>

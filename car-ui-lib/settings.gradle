@@ -20,8 +20,6 @@ include ':PaintBooth'
 project(':PaintBooth').projectDir = new File('./paintbooth')
 include ':oem-apis'
 project(':oem-apis').projectDir = new File('./oem-apis')
-include ':plugin'
-project(':plugin').projectDir = new File('./referencedesign/plugin')
 include ':oem-token-shared-lib'
 project(':oem-token-shared-lib').projectDir = new File('./oem-tokens/shared-lib')
 include ':oem-token-lib'

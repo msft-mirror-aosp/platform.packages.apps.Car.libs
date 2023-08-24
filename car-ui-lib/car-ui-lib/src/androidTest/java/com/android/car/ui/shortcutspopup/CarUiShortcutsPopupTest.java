@@ -98,8 +98,7 @@ public class CarUiShortcutsPopupTest {
         }
     }
 
-    // TODO b/269302130 Remove Ignore annotation when fixed
-    @Ignore
+    @Ignore("b/269302130")
     @Test
     public void builderItemDataAndOnClickTest() {
         mCarUiShortcutsPopup = buildFromBuilder(mToast1Mock, mToast2Mock,
@@ -121,8 +120,7 @@ public class CarUiShortcutsPopupTest {
         verify(mToast2Mock, never()).show();
     }
 
-    // TODO b/269302130 Remove Ignore annotation when fixed
-    @Ignore
+    @Ignore("b/269302130")
     @Test
     public void onClickOutsidePopup_shouldDismissPopup() {
         Toast toast1Mock = mock(Toast.class);

@@ -56,6 +56,7 @@ public class ToolbarActivity extends AppCompatActivity implements InsetsChangedL
 
     private final List<MenuItem> mMenuItems = new ArrayList<>();
     private final List<Pair<CharSequence, View.OnClickListener>> mButtons = new ArrayList<>();
+    private boolean mHasLogoListener = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +125,20 @@ public class ToolbarActivity extends AppCompatActivity implements InsetsChangedL
         mButtons.add(Pair.create(getString(R.string.toolbar_toggle_logo), v -> {
             toolbar.setLogo(hasLogo.value ? 0 : R.drawable.ic_launcher);
             hasLogo.value = !hasLogo.value;
+        }));
+
+        mButtons.add(Pair.create(getString(R.string.toolbar_toggle_logo_listener), v -> {
+            if (mHasLogoListener) {
+                toolbar.setOnLogoClickListener(null);
+                mHasLogoListener = false;
+            } else {
+                toolbar.setOnLogoClickListener(() -> Toast.makeText(this,
+                        "Logo Clicked", Toast.LENGTH_SHORT).show());
+                mHasLogoListener = true;
+            }
+            Toast.makeText(this, "Logo listener set to "
+                            + (mHasLogoListener ? "on" : "off"),
+                    Toast.LENGTH_SHORT).show();
         }));
 
         mButtons.add(Pair.create(getString(R.string.toolbar_cycle_state), v -> {

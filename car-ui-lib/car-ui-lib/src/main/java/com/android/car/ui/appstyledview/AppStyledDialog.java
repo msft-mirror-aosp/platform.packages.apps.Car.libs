@@ -141,6 +141,9 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
 
     void setContent(View contentView) {
         mContent = contentView;
+        if (isShowing()) {
+            setContentView(mController.getAppStyledView(mContent));
+        }
     }
 
     View getContent() {

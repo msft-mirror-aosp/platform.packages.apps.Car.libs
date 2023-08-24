@@ -24,7 +24,12 @@ import com.android.car.ui.plugin.oemapis.Consumer;
 
 import java.util.List;
 
-/**The OEM interface for a Toolbar. */
+/**
+ * The OEM interface for a Toolbar.
+ *
+ * @deprecated Use {@link ToolbarControllerOEMV3} instead
+ */
+@Deprecated
 public interface ToolbarControllerOEMV2 {
 
     /**

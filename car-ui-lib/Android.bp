@@ -27,7 +27,6 @@ car_ui_lib_static_libs = [
     "androidx.recyclerview_recyclerview",
     "androidx-constraintlayout_constraintlayout-solver",
     "androidx.asynclayoutinflater_asynclayoutinflater",
-    "car-rotary-lib",
 ]
 
 android_library {
@@ -37,7 +36,7 @@ android_library {
     min_sdk_version: "28",
     target_sdk_version: "30",
 
-    manifest: "car-ui-lib/src/main/AndroidManifest.xml",
+    manifest: "car-ui-lib/src/main/AndroidManifest-resourceOnly.xml",
     resource_dirs: [
         "car-ui-lib/src/main/res",
         "car-ui-lib/src/main/res-private"
@@ -63,7 +62,7 @@ android_library {
     min_sdk_version: "28",
     target_sdk_version: "30",
 
-    manifest: "car-ui-lib/src/main/AndroidManifest.xml",
+    manifest: "car-ui-lib/src/main/AndroidManifest-resourceOnly.xml",
     resource_dirs: [
         "car-ui-lib/src/main/res-overlayable",
     ],
@@ -96,7 +95,7 @@ android_library {
         "android.car-stubs",
         "car-ui-lib-oem-apis-source",
     ],
-    static_libs: ["car-ui-lib-resources",] + car_ui_lib_static_libs,
+    static_libs: ["car-ui-lib-resources", "car-rotary-lib-no-overlayable",] + car_ui_lib_static_libs,
     apex_available: [
         "com.android.permission",
         "//apex_available:platform",
@@ -146,7 +145,7 @@ android_library {
         "android.car-stubs",
         "car-ui-lib-oem-apis-source",
     ],
-    static_libs: ["car-ui-lib-overlayable-resources",] + car_ui_lib_static_libs,
+    static_libs: ["car-ui-lib-overlayable-resources", "car-rotary-lib",] + car_ui_lib_static_libs,
     apex_available: [
         "com.android.permission",
         "//apex_available:platform",
@@ -184,7 +183,7 @@ android_library_import {
     name: "car-ui-lib-prebuilt",
     aars: [":car-ui-lib-aar"],
     sdk_version: "current",
-    static_libs: ["car-ui-lib-overlayable-resources",] + car_ui_lib_static_libs,
+    static_libs: ["car-ui-lib-overlayable-resources", "car-rotary-lib", ] + car_ui_lib_static_libs,
 }
 
 car_ui_lib_testing_support_static_libs = [
@@ -290,7 +289,7 @@ android_test {
         "libdexmakerjvmtiagent",
         "libstaticjvmtiagent",
     ],
-    required: ["car-ui-lib-plugin"],
+    required: ["car-ui-lib-proxyplugin"],
     platform_apis: true,
     test_suites: ["device-tests"],
 }
@@ -313,7 +312,7 @@ android_app {
 
     libs: [
          "android.car-stubs",
-	 "token-shared-lib"
+         "token-shared-lib",
     ],
     static_libs: [
         "oem-token-lib-source",

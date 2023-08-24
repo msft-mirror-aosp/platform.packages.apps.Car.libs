@@ -207,6 +207,9 @@ public interface ToolbarController {
      */
     void setLogo(Drawable drawable);
 
+    /** Sets a click listener on the logo tap target. */
+    void setOnLogoClickListener(@Nullable Runnable listener);
+
     /** Sets the hint for the search bar. */
     void setSearchHint(@StringRes int resId);
 

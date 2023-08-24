@@ -32,6 +32,7 @@ import java.util.TreeSet;
  * be created with the app's classloader. You must use {@link AdapterClassLoader} to load it
  * so that both the app and plugin's classes can be loaded from this class.
  */
+@SuppressWarnings("AndroidJdkLibsChecker")
 final class OemApiUtil {
 
     private static final String TAG = "carui";
@@ -127,6 +128,10 @@ final class OemApiUtil {
                 "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6",
                 PluginFactoryAdapterV6.class,
                 6));
+        oemApis.add(new OemApi(
+                "com.android.car.ui.plugin.oemapis.PluginFactoryOEMV7",
+                PluginFactoryAdapterV7.class,
+                7));
         return oemApis;
     }
 }

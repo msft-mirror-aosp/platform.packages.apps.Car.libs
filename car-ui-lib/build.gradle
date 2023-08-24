@@ -34,6 +34,9 @@ buildscript {
         // in the individual module build.gradle files
     }
 
+    gradle.ext.aaosLatestSDK = 33
+    gradle.ext.aaosTargetSDK = 33
+
     gradle.ext.repoRootPath = rootDir.parentFile.parentFile.parentFile.parentFile.parent
     gradle.ext.aaosCertPath = gradle.ext.repoRootPath + "/packages/apps/Car/libs/certs/com_android_car_apps_test.jks"
     gradle.ext.chassisCertPath = gradle.ext.repoRootPath + "/vendor/auto/embedded/prebuilts/car-ui-lib/chassis_upload_key.jks"

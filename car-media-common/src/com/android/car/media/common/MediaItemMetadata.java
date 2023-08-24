@@ -20,6 +20,7 @@ import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_
 import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE;
 
 import static com.android.car.media.common.MediaConstants.KEY_DESCRIPTION_LINK_MEDIA_ID;
+import static com.android.car.media.common.MediaConstants.KEY_IMMERSIVE_AUDIO;
 import static com.android.car.media.common.MediaConstants.KEY_SUBTITLE_LINK_MEDIA_ID;
 
 import android.content.Context;
@@ -237,6 +238,21 @@ public class MediaItemMetadata {
         }
 
         return mMetadataCompatBundle.getString(KEY_DESCRIPTION_LINK_MEDIA_ID);
+    }
+
+    /** Returns whether the IMMERSIVE_AUDIO extra is set. */
+    public boolean isImmersiveAudio() {
+        return (mMetadataCompatBundle != null) && mMetadataCompatBundle.getLong(KEY_IMMERSIVE_AUDIO)
+                == MediaConstants.METADATA_VALUE_ATTRIBUTE_PRESENT;
+    }
+
+    /** Returns the string value associated with the given key. */
+    @Nullable
+    public String getStringProperty(String key) {
+        if (mMetadataCompatBundle == null) {
+            return null;
+        }
+        return mMetadataCompatBundle.getString(key);
     }
 
     /** @return media item description */

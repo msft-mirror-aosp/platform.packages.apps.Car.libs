@@ -85,7 +85,7 @@ public class CarUiProxyLayoutInflaterFactory extends AppCompatViewInflater imple
                 attrs, R.styleable.Preference, 0, 0);
 
         int preferenceType = a.getInt(
-                com.android.car.ui.sharedlibrary.R.styleable.Preference_carUiPreferenceType,
+                com.chassis.car.ui.plugin.R.styleable.Preference_carUiPreferenceType,
                 PREFERENCE);
         a.recycle();
         return preferenceType;
@@ -95,40 +95,40 @@ public class CarUiProxyLayoutInflaterFactory extends AppCompatViewInflater imple
             @CarUiPreferenceViewStub.PreferenceType int preferenceType) {
         switch (preferenceType) {
             case SWITCH:
-                return com.android.car.ui.sharedlibrary
+                return com.chassis.car.ui.plugin
                         .R.layout.car_ui_preference_primary_switch_internal;
             case EDIT_TEXT:
-                return com.android.car.ui.sharedlibrary
+                return com.chassis.car.ui.plugin
                         .R.layout.car_ui_preference_dialog_edittext_internal;
             case CATEGORY:
-                return com.android.car.ui.sharedlibrary
+                return com.chassis.car.ui.plugin
                         .R.layout.car_ui_preference_category_internal;
             case DROPDOWN:
-                return com.android.car.ui.sharedlibrary
+                return com.chassis.car.ui.plugin
                         .R.layout.car_ui_preference_dropdown_internal;
             case TWO_ACTION:
-                return com.android.car.ui.sharedlibrary
+                return com.chassis.car.ui.plugin
                         .R.layout.car_ui_two_action_preference_internal;
             case TWO_ACTION_TEXT:
-                return com.android.car.ui.sharedlibrary
+                return com.chassis.car.ui.plugin
                         .R.layout.car_ui_preference_two_action_text_internal;
             case TWO_ACTION_TEXT_BORDERLESS:
-                return com.android.car.ui.sharedlibrary
+                return com.chassis.car.ui.plugin
                         .R.layout.car_ui_preference_two_action_text_borderless_internal;
             case TWO_ACTION_ICON:
-                return com.android.car.ui.sharedlibrary
+                return com.chassis.car.ui.plugin
                         .R.layout.car_ui_preference_two_action_icon_internal;
             case TWO_ACTION_SWITCH:
-                return com.android.car.ui.sharedlibrary
+                return com.chassis.car.ui.plugin
                         .R.layout.car_ui_preference_two_action_switch_internal;
             case SEEKBAR_DIALOG:
-                return com.android.car.ui.sharedlibrary
+                return com.chassis.car.ui.plugin
                         .R.layout.car_ui_seekbar_dialog_internal;
             case FOOTER:
-                return com.android.car.ui.sharedlibrary
+                return com.chassis.car.ui.plugin
                         .R.layout.car_ui_preference_footer_internal;
             default:
-                return com.android.car.ui.sharedlibrary
+                return com.chassis.car.ui.plugin
                         .R.layout.car_ui_preference_internal;
         }
     }
