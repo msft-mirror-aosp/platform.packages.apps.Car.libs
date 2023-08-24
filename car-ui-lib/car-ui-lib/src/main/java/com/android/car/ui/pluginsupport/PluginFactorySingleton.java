@@ -16,11 +16,8 @@
 package com.android.car.ui.pluginsupport;
 
 import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
-import static android.content.pm.PackageManager.MATCH_ALL;
 import static android.content.pm.PackageManager.MATCH_DISABLED_COMPONENTS;
 import static android.content.pm.PackageManager.MATCH_SYSTEM_ONLY;
-
-import static com.android.car.ui.core.CarUi.MIN_TARGET_API;
 
 import static java.util.Objects.requireNonNull;
 
@@ -30,6 +27,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ProviderInfo;
 import android.os.Build;
 import android.os.Process;
@@ -164,7 +162,7 @@ public final class PluginFactorySingleton {
         try {
             pluginPackageInfo = context.getPackageManager()
                     .getPackageInfo(pluginPackageName, 0);
-        } catch (PackageManager.NameNotFoundException e) {
+        } catch (NameNotFoundException e) {
             Log.e(TAG, "Could not load CarUi plugin, package "
                     + pluginPackageName + " was not found.");
             sInstance = new PluginFactoryStub();
@@ -195,22 +193,50 @@ public final class PluginFactorySingleton {
             }
         }
 
-        AdapterClassLoader adapterClassLoader =
-                instantiateClassLoader(context.getApplicationInfo(),
-                        requireNonNull(PluginFactorySingleton.class.getClassLoader()),
-                        sPluginContext.getClassLoader());
+        Class<?> oemApiUtilClass = null;
+        boolean loadedFromSharedLibrary = true;
+        try {
+            // check if PluginVersionProviderImpl can be loaded using native class loader. If
+            // loaded successfully that means shared lib can be used directly.
+            PluginFactorySingleton.class.getClassLoader()
+                    .loadClass("com.android.car.ui.plugin.PluginVersionProviderImpl");
+            oemApiUtilClass = PluginFactorySingleton.class.getClassLoader()
+                    .loadClass("com.android.car.ui.pluginsupport.OemApiUtil");
+        } catch (ClassNotFoundException e) {
+            loadedFromSharedLibrary = false;
+        }
+
+        if (!loadedFromSharedLibrary) {
+            Log.w(TAG, "loading using adapter classloader");
+            AdapterClassLoader adapterClassLoader = instantiateClassLoader(
+                    context.getApplicationInfo(),
+                    requireNonNull(PluginFactorySingleton.class.getClassLoader()),
+                    sPluginContext.getClassLoader());
+            try {
+                oemApiUtilClass = adapterClassLoader
+                        .loadClass("com.android.car.ui.pluginsupport.OemApiUtil");
+            } catch (ClassNotFoundException ex) {
+                Log.e(TAG, "Could not load oemApiUtilClass: ", ex);
+                sInstance = new PluginFactoryStub();
+                return;
+            }
+        }
 
         try {
-            Class<?> oemApiUtilClass = adapterClassLoader
-                    .loadClass("com.android.car.ui.pluginsupport.OemApiUtil");
             Method getPluginFactoryMethod = oemApiUtilClass.getDeclaredMethod(
                     "getPluginFactory", Context.class, String.class);
             getPluginFactoryMethod.setAccessible(true);
             sInstance = (PluginFactory) getPluginFactoryMethod
                     .invoke(null, sPluginContext, context.getPackageName());
+            if (sInstance == null) {
+                Log.w(TAG, "CarUi plugin loaded is null");
+                sInstance = new PluginFactoryStub();
+                return;
+            }
         } catch (ReflectiveOperationException e) {
-            Log.e(TAG, "Could not load CarUi plugin", e);
+            Log.e(TAG, "Could not invoke getPluginFactory: ", e);
             sInstance = new PluginFactoryStub();
+            return;
         }
 
         Log.i(TAG, "Loaded plugin " + pluginPackageName
@@ -263,13 +289,14 @@ public final class PluginFactorySingleton {
      */
     @Nullable
     public static String getPluginPackageName(Context context) {
-        if (Build.VERSION.SDK_INT < MIN_TARGET_API) return null;
         PackageManager packageManager = context.getPackageManager();
-        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) return null;
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) {
+            return null;
+        }
         String authority = context.getString(
                 R.string.car_ui_plugin_package_provider_authority_name);
         ProviderInfo providerInfo = context.getPackageManager().resolveContentProvider(authority,
-                MATCH_ALL | MATCH_DISABLED_COMPONENTS | MATCH_SYSTEM_ONLY);
+                MATCH_DISABLED_COMPONENTS | MATCH_SYSTEM_ONLY);
         if (providerInfo == null) {
             return null;
         }
@@ -280,13 +307,14 @@ public final class PluginFactorySingleton {
      * Return if Car UI components should be loaded from the plugin implementation.
      */
     public static boolean isPluginEnabled(Context context) {
-        if (Build.VERSION.SDK_INT < MIN_TARGET_API) return false;
         PackageManager packageManager = context.getPackageManager();
-        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) return false;
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) {
+            return false;
+        }
         String authority = context.getString(
                 R.string.car_ui_plugin_package_provider_authority_name);
         ProviderInfo providerInfo = packageManager.resolveContentProvider(authority,
-                MATCH_ALL | MATCH_DISABLED_COMPONENTS | MATCH_SYSTEM_ONLY);
+                MATCH_DISABLED_COMPONENTS | MATCH_SYSTEM_ONLY);
         if (providerInfo == null) {
             return false;
         }

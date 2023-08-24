@@ -19,14 +19,14 @@ import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
 
 /**
- * A view that cannot be clicked on when the window is obscured.
+ * A container view that cannot be clicked on when the window is obscured.
  */
-public class SecureView extends View {
+public class SecureView extends FrameLayout {
 
     private boolean mSecure = true;
 

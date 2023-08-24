@@ -33,12 +33,14 @@ import androidx.annotation.Nullable;
 import com.android.car.ui.R;
 import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
 import com.android.car.ui.appstyledview.AppStyledDialogController.SceneType;
+import com.android.car.ui.utils.CarUiUtils;
 
 /**
  * Controller to interact with the app styled view.
  */
 public class AppStyledViewControllerImpl implements AppStyledViewController {
     private static final double VISIBLE_SCREEN_PERCENTAGE = 0.9;
+    private static final int DIALOG_START_MARGIN_THRESHOLD = 64;
 
     private final Context mContext;
     @NavIcon
@@ -85,11 +87,6 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
         int displayWidth = (int) (displayMetrics.widthPixels * VISIBLE_SCREEN_PERCENTAGE);
         int displayHeight = (int) (displayMetrics.heightPixels * VISIBLE_SCREEN_PERCENTAGE);
 
-        if (mContext.getResources().getConfiguration()
-                .orientation == Configuration.ORIENTATION_LANDSCAPE && maxWidth < displayWidth) {
-            params.gravity = Gravity.START;
-        }
-
         int configuredWidth = mContext.getResources().getDimensionPixelSize(
                 R.dimen.car_ui_app_styled_dialog_width);
         mWidth = configuredWidth != 0 ? configuredWidth : Math.min(displayWidth, maxWidth);
@@ -99,17 +96,9 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
 
         params.width = mWidth;
         params.height = mHeight;
+        params.dimAmount = CarUiUtils.getFloat(mContext.getResources(),
+                R.dimen.car_ui_app_styled_dialog_dim_amount);
 
-        int posX = mContext.getResources().getDimensionPixelSize(
-                R.dimen.car_ui_app_styled_dialog_position_x);
-        int posY = mContext.getResources().getDimensionPixelSize(
-                R.dimen.car_ui_app_styled_dialog_position_y);
-
-        if (posX != 0 || posY != 0) {
-            params.gravity = Gravity.TOP | Gravity.START;
-            params.x = posX;
-            params.y = posY;
-        }
 
         switch (mSceneType) {
             case SceneType.ENTER:
@@ -126,6 +115,27 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
             default:
                 params.windowAnimations = R.style.Widget_CarUi_AppStyledView_WindowAnimations;
                 break;
+        }
+
+        int posX = mContext.getResources().getDimensionPixelSize(
+                R.dimen.car_ui_app_styled_dialog_position_x);
+        int posY = mContext.getResources().getDimensionPixelSize(
+                R.dimen.car_ui_app_styled_dialog_position_y);
+
+        if (posX != 0 || posY != 0) {
+            params.gravity = Gravity.TOP | Gravity.START;
+            params.x = posX;
+            params.y = posY;
+        } else if (mContext.getResources().getConfiguration()
+                .orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            int startMargin = (displayWidth - mWidth) / 2;
+            int startMarginThresholdPx = (int) CarUiUtils.dpToPixel(mContext.getResources(),
+                    DIALOG_START_MARGIN_THRESHOLD);
+
+            if (startMargin >= startMarginThresholdPx) {
+                params.gravity = Gravity.START;
+                params.horizontalMargin = (float) startMarginThresholdPx / displayWidth;
+            }
         }
 
         return params;

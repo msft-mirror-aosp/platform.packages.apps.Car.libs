@@ -93,7 +93,8 @@ public abstract class PlaybackErrorsHelper {
                     "handlePlaybackState(); state change: " + (mCurrentPlaybackStateWrapper != null
                             ? mCurrentPlaybackStateWrapper.getState() : null) + " -> " + (
                             state != null ? state.getState() : null) + " source: " + (
-                            mediaSource != null ? mediaSource.getDisplayName().toString() : null));
+                            mediaSource != null ? mediaSource.getDisplayName(mContext).toString()
+                                    : null));
         }
 
         if (state == null) {

@@ -91,6 +91,7 @@ public final class ToolbarControllerImpl implements ToolbarController {
     private CarUiText mSubtitleText = new CarUiText.Builder("").build();
     private ImageView mTitleLogo;
     private ViewGroup mTitleLogoContainer;
+    private Runnable mOnLogoClickListener;
     private TabLayout mTabLayout;
     private ViewGroup mMenuItemsContainer;
     private SearchConfig.SearchConfigBuilder mSearchConfigBuilder;
@@ -183,6 +184,7 @@ public final class ToolbarControllerImpl implements ToolbarController {
         mTitle = requireViewByRefId(view, R.id.car_ui_toolbar_title);
         mTitleLogoContainer = requireViewByRefId(view, R.id.car_ui_toolbar_title_logo_container);
         mTitleLogo = requireViewByRefId(view, R.id.car_ui_toolbar_title_logo);
+        mOnLogoClickListener = null;
         mSearchViewContainer = requireViewByRefId(view, R.id.car_ui_toolbar_search_view_container);
         mProgressBar = new ProgressBarControllerImpl(
                 requireViewByRefId(view, R.id.car_ui_toolbar_progress_bar));
@@ -435,6 +437,14 @@ public final class ToolbarControllerImpl implements ToolbarController {
         }
 
         update();
+    }
+
+    @Override
+    public void setOnLogoClickListener(@Nullable Runnable listener) {
+        if (mOnLogoClickListener != listener) {
+            mOnLogoClickListener = listener;
+            update();
+        }
     }
 
     /**
@@ -722,16 +732,30 @@ public final class ToolbarControllerImpl implements ToolbarController {
     }
 
     private void createOverflowDialog() {
+        // Need to check if overflow dialog is showing before the new AlertDialog is created
+        // because it will return false when checked after
+        boolean isShowing = mOverflowDialog == null ? false : mOverflowDialog.isShowing();
+
         mUiOverflowItems.clear();
         for (MenuItem menuItem : mOverflowItems) {
             if (menuItem.isVisible()) {
                 mUiOverflowItems.add(toCarUiContentListItem(menuItem));
             }
         }
-
         mOverflowDialog = new AlertDialogBuilder(getContext())
                 .setAdapter(mOverflowAdapter)
                 .create();
+
+        // When show() is called on a dialog, it is created from scratch. This means the underlying
+        // list of the dialog is instantiated and the corresponding adapter is set on it. So, any
+        // changes to the data of the dialog's list's adapter prior to the call to show() will be
+        // be shown on screen. Previously, if the dialog was being shown and the data of the adapter
+        // was changed (i.e., setMenuItems ->  setMenuItemsInternal -> createOverflowDialog), the
+        // data of the adapter would change without show() being called, causing the updated data to
+        // not be reflected on screen. So, call notifyDataSetChanged if the dialog is being shown.
+        if (isShowing) {
+            mOverflowAdapter.notifyDataSetChanged();
+        }
     }
 
     private void updateOverflowDialog(MenuItem changedItem) {
@@ -927,9 +951,28 @@ public final class ToolbarControllerImpl implements ToolbarController {
                 navButtonMode != NavButtonMode.DISABLED
                         || (hasLogo && mLogoFillsNavIconSpace)
                         ? VISIBLE : (mNavIconSpaceReserved ? INVISIBLE : GONE));
-        mNavIconContainer.setOnClickListener(
-                navButtonMode != NavButtonMode.DISABLED ? backClickListener : null);
-        mNavIconContainer.setClickable(navButtonMode != NavButtonMode.DISABLED);
+
+        boolean hasLogoWithListener = hasLogo && mOnLogoClickListener != null;
+
+        // If nav icon is not disabled, set back listener on it. If it's disabled and logo fills
+        // nav icon container, set logo listener on it. Otherwise, set null for no listener
+        if (navButtonMode != NavButtonMode.DISABLED) {
+            mNavIconContainer.setOnClickListener(backClickListener);
+        } else if (hasLogoWithListener && mLogoFillsNavIconSpace) {
+            mNavIconContainer.setOnClickListener(v -> mOnLogoClickListener.run());
+        } else {
+            mNavIconContainer.setOnClickListener(null);
+        }
+        mNavIconContainer.setClickable(mNavIconContainer.hasOnClickListeners());
+
+        // Set logo listener on logo container if the nav icon is enabled or logo doesn't fill nav
+        // icon space
+        boolean logoListenerOnLogoContainer = hasLogoWithListener
+                && (navButtonMode != NavButtonMode.DISABLED || !mLogoFillsNavIconSpace);
+        mTitleLogoContainer.setOnClickListener(logoListenerOnLogoContainer
+                ? v -> mOnLogoClickListener.run() : null);
+        mTitleLogoContainer.setClickable(logoListenerOnLogoContainer);
+
         mNavIconContainer.setContentDescription(navButtonMode != NavButtonMode.DISABLED
                 ? getContext().getString(R.string.car_ui_toolbar_nav_icon_content_description)
                 : null);

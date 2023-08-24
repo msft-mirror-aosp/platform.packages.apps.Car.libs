@@ -21,6 +21,7 @@ import static com.android.car.apps.common.util.LiveDataFunctions.pair;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Size;
 import android.view.View;
@@ -33,7 +34,9 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.android.car.apps.common.TappableTextView;
+import com.android.car.apps.common.imaging.ImageBinder;
 import com.android.car.apps.common.imaging.ImageViewBinder;
+import com.android.car.apps.common.imaging.UriArtRef;
 import com.android.car.apps.common.util.ViewUtils;
 import com.android.car.media.common.browse.MediaItemsRepository;
 import com.android.car.media.common.playback.PlaybackViewModel;
@@ -45,6 +48,7 @@ public class MetadataController {
 
     private PlaybackViewModel.PlaybackController mController;
     private final ImageViewBinder<MediaItemMetadata.ArtworkRef> mAlbumArtBinder;
+    private final ImageViewBinder<ImageBinder.ImageRef> mLogoBinder;
 
     private final MediaLinkHandler mSubtitleLinker;
     private final MediaLinkHandler mDescriptionLinker;
@@ -78,7 +82,7 @@ public class MetadataController {
 
     /**
      * Create a new MetadataController that operates on the provided Views
-     *
+     * <p>
      * Note: when the text of a TextView is empty, its visibility will be set to View.INVISIBLE
      * instead of View.GONE. Thus the views stay in the same position, and the constraint chains of
      * the layout won't be disrupted.
@@ -99,6 +103,7 @@ public class MetadataController {
      * @param albumArt          Displays the track's album art. May be {@code null}.
      * @param appIcon           Displays the app icon.
      * @param maxArtSize        Maximum size of the track's album art.
+     * @param logoView          Displays the content format logo (if any).  May be {@code null}.
      * @param delegate          Optional {@link MediaLinkHandler.MediaLinkDelegate}.
      */
     public MetadataController(@NonNull LifecycleOwner lifecycleOwner,
@@ -107,13 +112,15 @@ public class MetadataController {
             @Nullable TextView outerSeparator, @Nullable TextView currentTime,
             @Nullable TextView innerSeparator, @Nullable TextView maxTime,
             @Nullable SeekBar seekBar, @Nullable ImageView albumArt, @Nullable ImageView appIcon,
-            Size maxArtSize, @Nullable MediaLinkHandler.MediaLinkDelegate delegate) {
+            Size maxArtSize, @Nullable ContentFormatView logoView,
+            @Nullable MediaLinkHandler.MediaLinkDelegate delegate) {
 
         mSubtitleLinker = new MediaLinkHandler(repository, delegate, subtitle);
         mDescriptionLinker = new MediaLinkHandler(repository, delegate, description);
 
         Context context = title.getContext();
         mAlbumArtBinder = new ImageViewBinder<>(maxArtSize, albumArt);
+        mLogoBinder = new ImageViewBinder<>(maxArtSize, logoView);
 
         playbackViewModel.getPlaybackController().observe(lifecycleOwner,
                 controller -> mController = controller);
@@ -125,6 +132,7 @@ public class MetadataController {
                         ViewUtils.setVisible(subtitle, false);
                         ViewUtils.setVisible(description, false);
                         ViewUtils.setVisible(albumArt, false);
+                        ViewUtils.setVisible(logoView, false);
                         return;
                     }
                     CharSequence titleName = metadata.getTitle();
@@ -147,6 +155,12 @@ public class MetadataController {
                     ViewUtils.setVisible(albumArt, true);
 
                     mAlbumArtBinder.setImage(context, metadata.getArtworkKey());
+
+                    if (logoView != null) {
+                        Uri logoUri = logoView.prepareToDisplay(metadata);
+                        ViewUtils.setVisible(logoView, (logoUri != null));
+                        mLogoBinder.setImage(context, new UriArtRef(logoUri));
+                    }
                 });
 
         playbackViewModel.getProgress().observe(lifecycleOwner,
@@ -235,4 +249,17 @@ public class MetadataController {
         }
     }
 
+    /** @deprecated callers should specify the ContentFormatView.  */
+    @Deprecated
+    public MetadataController(@NonNull LifecycleOwner lifecycleOwner,
+            @NonNull PlaybackViewModel playbackViewModel, @Nullable MediaItemsRepository repository,
+            @NonNull TextView title, @Nullable TextView subtitle, @Nullable TextView description,
+            @Nullable TextView outerSeparator, @Nullable TextView currentTime,
+            @Nullable TextView innerSeparator, @Nullable TextView maxTime,
+            @Nullable SeekBar seekBar, @Nullable ImageView albumArt, @Nullable ImageView appIcon,
+            Size maxArtSize, @Nullable MediaLinkHandler.MediaLinkDelegate delegate) {
+        this(lifecycleOwner, playbackViewModel, repository, title, subtitle, description,
+                outerSeparator, currentTime, innerSeparator, maxTime, seekBar, albumArt, appIcon,
+                maxArtSize, null, delegate);
+    }
 }

@@ -375,7 +375,8 @@ public class PlaybackViewModel extends AndroidViewModel {
         private void updatePlaybackStatus() {
             if (mMediaController != null && mPlaybackState != null) {
                 mPlaybackStateWrapper.setValue(
-                        new PlaybackStateWrapper(mMediaController, mMediaMetadata, mPlaybackState));
+                        new PlaybackStateWrapper(mBrowsingState.mMediaSource, mMediaController,
+                                mMediaMetadata, mPlaybackState));
             } else {
                 mPlaybackStateWrapper.setValue(null);
             }
@@ -384,17 +385,30 @@ public class PlaybackViewModel extends AndroidViewModel {
 
     /** Convenient extension of {@link PlaybackStateCompat}. */
     public static final class PlaybackStateWrapper {
-
+        private final MediaSource mMediaSource;
         private final MediaControllerCompat mMediaController;
         @Nullable
         private final MediaMetadataCompat mMetadata;
         private final PlaybackStateCompat mState;
 
-        PlaybackStateWrapper(@NonNull MediaControllerCompat mediaController,
+        @VisibleForTesting
+        public PlaybackStateWrapper(@NonNull MediaSource mediaSource,
+                @NonNull MediaControllerCompat mediaController,
                 @Nullable MediaMetadataCompat metadata, @NonNull PlaybackStateCompat state) {
+            mMediaSource = mediaSource;
             mMediaController = mediaController;
             mMetadata = metadata;
             mState = state;
+        }
+
+        /** Returns the source that produced this playback state. */
+        public @NonNull MediaSource getMediaSource() {
+            return mMediaSource;
+        }
+
+        /** Returns the controller associated to this playback state. */
+        public MediaControllerCompat getMediaController() {
+            return mMediaController;
         }
 
         /** Returns true if there's enough information in the state to show a UI for it. */

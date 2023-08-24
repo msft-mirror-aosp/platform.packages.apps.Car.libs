@@ -37,6 +37,8 @@
 
     <!-- Minimized Progress Bar -->
     <dimen name="minimized_progress_bar_track_thickness">4dp</dimen>
+    <dimen name="minimized_content_format_width">50dp</dimen>
+    <dimen name="minimized_content_format_height">50dp</dimen>
 
     <!-- App selector -->
     <dimen name="app_selector_icon_size">@dimen/car_ui_primary_icon_size</dimen>

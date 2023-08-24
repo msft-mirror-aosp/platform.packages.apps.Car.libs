@@ -18,11 +18,11 @@ apply plugin: 'com.android.application'
 
 android {
     namespace 'oem.brand.model.rro'
-    compileSdkVersion 32
+    compileSdkVersion gradle.ext.aaosLatestSDK
     defaultConfig {
         applicationId "oem.brand.model.rro"
         minSdkVersion 28
-        targetSdkVersion 32
+        targetSdkVersion gradle.ext.aaosTargetSDK
         versionCode gradle.ext.getVersionCode()
         versionName gradle.ext.getVersionName()
     }

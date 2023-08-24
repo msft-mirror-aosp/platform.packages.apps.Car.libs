@@ -44,6 +44,7 @@ import com.android.car.ui.baselayout.Insets;
 import com.android.car.ui.baselayout.InsetsChangedListener;
 import com.android.car.ui.core.CarUi;
 import com.android.car.ui.paintbooth.appstyledview.AppStyledViewSampleActivity;
+import com.android.car.ui.paintbooth.appstyledview.TransparentActivity;
 import com.android.car.ui.paintbooth.caruirecyclerview.CarUiListItemActivity;
 import com.android.car.ui.paintbooth.caruirecyclerview.CarUiRecyclerViewActivity;
 import com.android.car.ui.paintbooth.caruirecyclerview.GridCarUiRecyclerViewActivity;
@@ -91,6 +92,7 @@ public class MainActivity extends Activity implements InsetsChangedListener {
             new ActivityElement("Theme samples", TextSamples.class),
             new ActivityElement("Dialogs sample", DialogsActivity.class),
             new ActivityElement("App Styled View Modal", AppStyledViewSampleActivity.class),
+            new ActivityElement("Transparent activity with Modal", TransparentActivity.class),
             new ActivityElement("List sample", CarUiRecyclerViewActivity.class),
             new ActivityElement("Grid sample", GridCarUiRecyclerViewActivity.class),
             new ActivityElement("Preferences sample", PreferenceActivity.class),

@@ -72,9 +72,7 @@ public class CarUiListItemTest {
     public static Object[] data() {
         // It's important to do not plugin first, so that the plugin will
         // still be enabled when this test finishes
-        // TODO b/266150495 Fix plugin tests
-        // Temporarily disabling plugin tests due to conflicting resource loading of proxy-plugin
-        return new Object[]{false/*, true*/};
+        return new Object[]{false, true};
     }
 
     private CarUiRecyclerView mCarUiRecyclerView;

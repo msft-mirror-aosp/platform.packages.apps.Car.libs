@@ -128,7 +128,7 @@ public class MediaSourcesProvider {
                         return true;
                     })
                     .sorted(Comparator.comparing(
-                            mediaSource -> mediaSource.getDisplayName().toString()))
+                            mediaSource -> mediaSource.getDisplayName(mAppContext).toString()))
                     .collect(Collectors.toList());
 
             // Concatenate the non null preferred sources and the sorted ones into the result.

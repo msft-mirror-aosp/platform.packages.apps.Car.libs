@@ -19,6 +19,16 @@
         <item name="android:background">#969696</item>
     </style>
 
+    <!-- Theme for transparent activity-->
+    <style name="Theme.Transparent" parent="Theme.CarUi.NoToolbar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
     <!--Theme for the dialog testing-->
     <style name="Theme.Testing.Dialog.Alert" parent="android:Theme.DeviceDefault.Dialog.Alert"></style>
 

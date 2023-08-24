@@ -16,14 +16,19 @@
 
 // Library-level build file
 
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+    id 'com.android.car.unbundled.conventions.local-publish'
+}
 
 android {
-    compileSdkVersion 32
+    // Note: This overlaps the namespace of the "car-ui-lib" package
+    namespace = "com.android.car.ui"
+    compileSdkVersion gradle.ext.aaosLatestSDK
 
     defaultConfig {
         minSdkVersion 28
-        targetSdkVersion 32
+        targetSdkVersion gradle.ext.aaosTargetSDK
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testApplicationId "com.android.car.rotary.test"
     }

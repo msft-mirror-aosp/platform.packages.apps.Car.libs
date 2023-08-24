@@ -159,8 +159,15 @@ public class MediaSource {
      * @return media source human readable name for display.
      */
     @NonNull
-    public CharSequence getDisplayName() {
-        return mDisplayName;
+    public CharSequence getDisplayName(Context context) {
+        ServiceInfo serviceInfo = getBrowseServiceInfo(context, mBrowseService);
+        try {
+            String packageName = mBrowseService.getPackageName();
+            return extractDisplayName(context, serviceInfo, packageName);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "getDisplayName: " + e);
+            return mDisplayName;
+        }
     }
 
     /**

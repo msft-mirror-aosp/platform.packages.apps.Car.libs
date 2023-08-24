@@ -580,7 +580,7 @@ class DefaultScrollBar implements ScrollBar {
         // required to avoid infinite loop.
         if (isLayoutRequired) {
             // If currently performing a layout pass, layout update may not be picked up until the
-            // next layout pass. Schedule another layout pass to ensure changes take affect.
+            // next layout pass. Schedule another layout pass to ensure changes take effect.
             mScrollView.post(() -> mScrollView.requestLayout());
         }
     }

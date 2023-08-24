@@ -34,12 +34,49 @@ import java.util.List;
 
 /**
  * This interface contains methods to create customizable carui components.
+ *
+ * Oftentimes, a static carui component (e.g., ToolbarControllerImpl) implements a corresponding
+ * interface (e.g., ToolbarController). A plugin implementation of a similar component (e.g.,
+ * ToolbarAdapterProxy), also implements a corresponding interface (e.g., ToolbarControllerOEMV2).
+ * The oem versions (postfixed with OEMV#) of these interfaces almost always contain a subset of
+ * methods of the static interface equivalent (e.g., plugin ToolbarControllerOEMV2 interface
+ * contains a subset of static ToolbarController interface methods). This is for two main reasons:
+ *
+ * 1. To simplify implementation of these components for oems. For example, an oem only implements
+ * one version of setTitle in ToolbarControllerOEMV2, while the carui static library implements
+ * three versions of setTitle in ToolbarController to accommodate different string types.
+ *
+ * 2. To separate the methods that apps can use to interface with carui components from the methods
+ * that are implemented (therefore customized) by oems. For example, there is a method in the
+ * ToolbarController interface called setShowMenuItemsWhileSearching which allows an app to choose
+ * whether or not they want menu items to be shown while in search mode. This is not present in
+ * ToolbarControllerOEMV2.
+ *
+ * When an application interfaces with a carui component (e.g., ToolbarController) without a plugin
+ * implementation on the system, the carui library delegates its calls to the corresponding static
+ * implementation of that component (e.g., ToolbarControllerImpl). However, if there is an existing
+ * plugin implementation on the system, the carui library keeps track of all state not relevant for
+ * oems (either because it's only to be used by applications or for simplicity for oems) in an
+ * adapter class (e.g., ToolbarControllerAdapterV2). This adapter forwards all changes relevant to
+ * oems to the plugin implementation (e.g., ToolbarAdapterProxy) in a way canonical with the
+ * corresponding interface (e.g., ToolbarControllerOEMV2).
+ *
+ * For example, the ToolbarControllerAdapterV2 keeps track of whether or not an app wants to
+ * "showMenuItemsWhileSearching", and will forward a list of menu items to be set by the oem
+ * implementation depending on the overall state of the toolbar from the app perspective. So if
+ * search mode is enabled, and an app calls setShowMenuItemsWhileSearching with true,
+ * ToolbarControllerAdapterV2 will call the plugin toolbar's implementation of setMenuItems with
+ * menu items that should be shown while searching. If search mode is enabled and an app calls it
+ * with false, the adapter will call setMenuItems with an empty list. This achieves the same effect
+ * from the app perspective, while maintaining the separation of app-specific and oem-specific
+ * customization.
  */
 public interface PluginFactory {
 
     /**
      * Creates the base layout, and optionally the toolbar.
      *
+     * @param context               The visual context to create views with.
      * @param contentView           The view to install the base layout around.
      * @param insetsChangedListener A method to call when the insets change.
      * @param toolbarEnabled        Whether or not to add a toolbar to the base layout.
@@ -50,6 +87,7 @@ public interface PluginFactory {
      */
     @Nullable
     ToolbarController installBaseLayoutAround(
+            @NonNull Context context,
             @NonNull View contentView,
             @Nullable InsetsChangedListener insetsChangedListener,
             boolean toolbarEnabled,

@@ -315,6 +315,11 @@ public final class ToolbarControllerAdapterV1 implements ToolbarController {
     }
 
     @Override
+    public void setOnLogoClickListener(@Nullable Runnable listener) {
+        // Do nothing. onLogoSelectedListener not supported in ToolbarControllerOEMV1.
+    }
+
+    @Override
     public void setLogo(Drawable drawable) {
         update(mAdapterState.copy().setLogo(drawable).build());
     }

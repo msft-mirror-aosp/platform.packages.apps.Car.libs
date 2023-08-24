@@ -58,7 +58,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
- * Adapts a {@link com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV1} into a {@link
+ * Adapts a {@link com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV2} into a {@link
  * ToolbarController}
  */
 @SuppressWarnings("AndroidJdkLibsChecker")
@@ -318,6 +318,11 @@ public final class ToolbarControllerAdapterV2 implements ToolbarController {
     @Override
     public void setLogo(Drawable drawable) {
         update(mAdapterState.copy().setLogo(drawable).build());
+    }
+
+    @Override
+    public void setOnLogoClickListener(@Nullable Runnable listener) {
+        // Do nothing. onLogoSelectedListener not supported in ToolbarControllerOEMV2.
     }
 
     @Override
