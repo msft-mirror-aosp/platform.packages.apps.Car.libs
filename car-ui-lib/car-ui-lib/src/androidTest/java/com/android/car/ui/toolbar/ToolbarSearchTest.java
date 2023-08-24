@@ -222,8 +222,7 @@ public class ToolbarSearchTest {
         onView(withHint("Test search hint")).check(matches(isDisplayed()));
     }
 
-    // TODO b/269305905 Remove Ignore annotation when fixed
-    @Ignore
+    @Ignore("b/269305905")
     @Test
     public void test_setSearchHint_uxRestricted_injectedEvents() {
         try {
@@ -249,8 +248,7 @@ public class ToolbarSearchTest {
         }
     }
 
-    // TODO b/269305905 Remove Ignore annotation when fixed
-    @Ignore
+    @Ignore("b/269305905")
     @Test
     public void test_setSearchHint_uxRestricted_injectedEvents_startRestricted() {
         injectDrivingState();

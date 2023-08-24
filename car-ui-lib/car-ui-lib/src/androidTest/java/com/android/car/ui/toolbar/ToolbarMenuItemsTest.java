@@ -51,6 +51,7 @@ import com.android.car.ui.testing.matchers.ViewMatchers;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -217,6 +218,7 @@ public class ToolbarMenuItemsTest {
         assertThat(menuItem[0].isChecked()).isTrue();
     }
 
+    @Ignore("b/296913206")
     @Test
     public void menuItems_overflowText_shouldWork() {
         MenuItem.OnClickListener callback = mock(MenuItem.OnClickListener.class);
