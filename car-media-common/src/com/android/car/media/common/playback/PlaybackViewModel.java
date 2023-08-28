@@ -40,7 +40,6 @@ import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.media.utils.MediaConstants;
@@ -48,8 +47,9 @@ import androidx.media.utils.MediaConstants;
 import com.android.car.media.common.CustomPlaybackAction;
 import com.android.car.media.common.MediaItemMetadata;
 import com.android.car.media.common.R;
-import com.android.car.media.common.source.MediaBrowserConnector;
+import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
 import com.android.car.media.common.source.MediaBrowserConnector.ConnectionStatus;
+import com.android.car.media.common.source.MediaModels;
 import com.android.car.media.common.source.MediaSource;
 import com.android.car.media.common.source.MediaSourceColors;
 import com.android.car.media.common.source.MediaSourceViewModel;
@@ -68,9 +68,9 @@ import java.util.stream.Collectors;
  * Observes changes to the provided MediaController to expose playback state and metadata
  * observables.
  * <p>
- * PlaybackViewModel is a "singleton" tied to the application to provide a single source of truth.
+ * Each application decides which instances should be created.
  */
-public class PlaybackViewModel extends AndroidViewModel {
+public class PlaybackViewModel {
     private static final String TAG = "PlaybackViewModel";
 
     private static final String ACTION_SET_RATING =
@@ -79,10 +79,16 @@ public class PlaybackViewModel extends AndroidViewModel {
 
     private static PlaybackViewModel[] sInstances = new PlaybackViewModel[2];
 
-    /** Returns the PlaybackViewModel "singleton" tied to the application for the given mode. */
+    /**
+     * @deprecated Apps should maintain their own instance(s) of PlaybackViewModel.
+     * {@link MediaModels} can help simplify this.
+     */
+    @Deprecated
     public static PlaybackViewModel get(@NonNull Application application, int mode) {
         if (sInstances[mode] == null) {
-            sInstances[mode] = new PlaybackViewModel(application, mode);
+            MediaSourceViewModel sourceModel = MediaSourceViewModel.get(application, mode);
+            LiveData<BrowsingState> browseState = sourceModel.getBrowsingState();
+            sInstances[mode] = new PlaybackViewModel(application, browseState);
         }
         return sInstances[mode];
     }
@@ -150,21 +156,23 @@ public class PlaybackViewModel extends AndroidViewModel {
 
     private final InputFactory mInputFactory;
 
-    private PlaybackViewModel(Application application, int mode) {
-        this(application, MediaSourceViewModel.get(application, mode).getBrowsingState(),
-                browser -> new MediaControllerCompat(application, browser.getSessionToken()));
+    private static InputFactory createFactory(Context context) {
+        return browser -> new MediaControllerCompat(context, browser.getSessionToken());
+    }
+
+    public PlaybackViewModel(Context context, LiveData<BrowsingState> browsingState) {
+        this(context, browsingState, createFactory(context));
     }
 
     @VisibleForTesting
-    public PlaybackViewModel(Application application,
-            LiveData<MediaBrowserConnector.BrowsingState> browsingState, InputFactory factory) {
-        super(application);
+    public PlaybackViewModel(@NonNull Context context, LiveData<BrowsingState> browsingState,
+            InputFactory factory) {
         mInputFactory =  factory;
-        mColorsFactory = new MediaSourceColors.Factory(application);
+        mColorsFactory = new MediaSourceColors.Factory(context);
         browsingState.observeForever(this::onBrowsingStateChanged);
     }
 
-    private void onBrowsingStateChanged(MediaBrowserConnector.BrowsingState browsingState) {
+    private void onBrowsingStateChanged(BrowsingState browsingState) {
         if (browsingState != null) {
             mMediaControllerCallback.onMediaBrowsingStateChanged(browsingState);
             mMediaSourceLiveData.setValue(browsingState.mMediaSource);
@@ -177,8 +185,7 @@ public class PlaybackViewModel extends AndroidViewModel {
      * @return LiveData<MediaSource>
      */
     public LiveData<MediaSource> getMediaSource() {
-        //MediaSourceViewModel.get(application, mode).getBrowsingState() which is set in
-        // constructor as browsingState.observeForever(this::onBrowsingStateChanged)
+        // Set in constructor as browsingState.observeForever(this::onBrowsingStateChanged)
         return mMediaSourceLiveData;
     }
 
@@ -256,13 +263,13 @@ public class PlaybackViewModel extends AndroidViewModel {
 
     private class MediaControllerCallback extends MediaControllerCompat.Callback {
 
-        private MediaBrowserConnector.BrowsingState mBrowsingState;
+        private BrowsingState mBrowsingState;
         private MediaControllerCompat mMediaController;
         private MediaMetadataCompat mMediaMetadata;
         private PlaybackStateCompat mPlaybackState;
 
 
-        void onMediaBrowsingStateChanged(MediaBrowserConnector.BrowsingState newBrowsingState) {
+        void onMediaBrowsingStateChanged(BrowsingState newBrowsingState) {
             if (Objects.equals(mBrowsingState, newBrowsingState)) {
                 Log.w(TAG, "onMediaBrowsingStateChanged noop ");
                 return;

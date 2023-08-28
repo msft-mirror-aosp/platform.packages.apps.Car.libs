@@ -38,7 +38,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -46,6 +45,7 @@ import com.android.car.apps.common.util.FutureData;
 import com.android.car.media.common.CustomBrowseAction;
 import com.android.car.media.common.MediaItemMetadata;
 import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
+import com.android.car.media.common.source.MediaModels;
 import com.android.car.media.common.source.MediaSource;
 import com.android.car.media.common.source.MediaSourceViewModel;
 import com.android.car.media.extensions.analytics.host.IAnalyticsManager;
@@ -68,7 +68,11 @@ public class MediaItemsRepository {
     /** One instance per MEDIA_SOURCE_MODE. */
     private static MediaItemsRepository[] sInstances = new MediaItemsRepository[2];
 
-    /** Returns the MediaItemsRepository "singleton" tied to the application for the given mode. */
+    /**
+     * @deprecated Apps should maintain their own instance(s) of MediaItemsRepository.
+     * {@link MediaModels} can help simplify this.
+     */
+    @Deprecated
     public static MediaItemsRepository get(@NonNull Application application, int mode) {
         if (sInstances[mode] == null) {
             sInstances[mode] = new MediaItemsRepository(
@@ -130,7 +134,6 @@ public class MediaItemsRepository {
             dataOf(Collections.emptyMap());
     private String mSearchQuery;
 
-    @VisibleForTesting
     public MediaItemsRepository(LiveData<BrowsingState> browsingState) {
         browsingState.observeForever(this::onMediaBrowsingStateChanged);
 

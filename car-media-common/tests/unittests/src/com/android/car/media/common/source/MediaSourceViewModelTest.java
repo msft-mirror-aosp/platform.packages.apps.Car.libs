@@ -16,9 +16,7 @@
 
 package com.android.car.media.common.source;
 
-import static android.car.media.CarMediaManager.MEDIA_SOURCE_MODE_PLAYBACK;
-
-import static com.android.car.apps.common.util.CarAppsDebugUtils.idHash;
+import static com.android.car.apps.common.util.LiveDataFunctions.dataOf;
 import static com.android.car.media.common.MediaTestUtils.newFakeMediaSource;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -26,15 +24,12 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
-import android.car.Car;
-import android.car.media.CarMediaManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.os.Looper;
 import android.support.v4.media.MediaBrowserCompat;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -58,6 +53,8 @@ public class MediaSourceViewModelTest {
 
     private static final String TAG = "MediaSourceVMTest";
 
+    private final MutableLiveData<MediaSource> mMediaSourceLiveData = dataOf(null);
+
     @Rule
     public final MockitoRule mMockitoRule = MockitoJUnit.rule();
     @Rule
@@ -67,11 +64,6 @@ public class MediaSourceViewModelTest {
 
     @Mock
     public MediaBrowserCompat mMediaBrowser;
-
-    @Mock
-    public Car mCar;
-    @Mock
-    public CarMediaManager mCarMediaManager;
 
     private MediaSourceViewModel mViewModel;
 
@@ -91,43 +83,15 @@ public class MediaSourceViewModelTest {
         if (Looper.myLooper() == null) {
             Looper.prepare();  // Needed when running with atest.
         }
-        mViewModel = new MediaSourceViewModel(application, MEDIA_SOURCE_MODE_PLAYBACK,
-                new MediaSourceViewModel.InputFactory() {
-                    @Override
-                    public MediaBrowserConnector createMediaBrowserConnector(
-                            @NonNull Application application,
-                            @NonNull MediaBrowserConnector.Callback connectedBrowserCallback) {
-                        return new MediaBrowserConnector(application, connectedBrowserCallback) {
-                            @Override
-                            protected MediaBrowserCompat createMediaBrowser(MediaSource src,
-                                    MediaBrowserCompat.ConnectionCallback callback) {
-                                mRequestedSource = src;
-                                MediaBrowserCompat bro = super.createMediaBrowser(src,
-                                        callback);
-                                Log.i(TAG, "createMediaBrowser: " + idHash(bro) + " for: " + src);
-                                return bro;
-                            }
-                        };
-                    }
 
+        mViewModel = new MediaSourceViewModel(mMediaSourceLiveData,
+                callback -> new MediaBrowserConnector(application, callback) {
+                    @NonNull
                     @Override
-                    public Car getCarApi() {
-                        return mCar;
-                    }
-
-                    @Override
-                    public CarMediaManager getCarMediaManager(Car carApi) {
-                        return mCarMediaManager;
-                    }
-
-                    @Override
-                    public MediaSource getMediaSource(ComponentName componentName) {
-                        return mMediaSource;
-                    }
-
-                    @Override
-                    public boolean isAudioMediaSource(ComponentName componentName) {
-                        return true;
+                    protected MediaBrowserCompat createMediaBrowser(@NonNull MediaSource src,
+                            @NonNull MediaBrowserCompat.ConnectionCallback callback) {
+                        mRequestedSource = src;
+                        return mMediaBrowser;
                     }
                 });
     }
@@ -149,6 +113,7 @@ public class MediaSourceViewModelTest {
         when(mMediaBrowser.isConnected()).thenReturn(true);
 
         initializeViewModel();
+        mMediaSourceLiveData.setValue(mMediaSource);
 
         mViewModel.getBrowserCallback().onBrowserConnectionChanged(
                 new BrowsingState(mContext, mMediaSource, mMediaBrowser,
@@ -167,6 +132,7 @@ public class MediaSourceViewModelTest {
         mMediaSource = newFakeMediaSource("test", "test");
         when(mMediaBrowser.isConnected()).thenReturn(false);
         initializeViewModel();
+        mMediaSourceLiveData.setValue(mMediaSource);
 
         mViewModel.getBrowserCallback().onBrowserConnectionChanged(
                 new BrowsingState(mContext, mMediaSource, mMediaBrowser,

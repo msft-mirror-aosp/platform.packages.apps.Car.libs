@@ -18,150 +18,81 @@ package com.android.car.media.common.source;
 
 import static com.android.car.apps.common.util.LiveDataFunctions.dataOf;
 
-import android.app.Application;
-import android.car.Car;
-import android.car.CarNotConnectedException;
-import android.car.media.CarMediaManager;
-import android.content.ComponentName;
-import android.os.Handler;
+import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
+import com.android.car.media.common.source.MediaBrowserConnector.ConnectionStatus;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
  * Contains observable data needed for displaying playback and browse UI.
- * MediaSourceViewModel is a singleton tied to the application to provide a single source of truth.
+ * Each application decides which instances should be created.
  */
-public class MediaSourceViewModel extends AndroidViewModel {
+public class MediaSourceViewModel {
     private static final String TAG = "MediaSourceViewModel";
 
-
+    /** @deprecated */
+    @Deprecated
+    private static CarMediaManagerHelper sCarMediaManagerHelper;
     private static MediaSourceViewModel[] sInstances = new MediaSourceViewModel[2];
-    private final Car mCar;
-    private CarMediaManager mCarMediaManager;
-
-
     // Primary media source.
     private final MutableLiveData<MediaSource> mPrimaryMediaSource = dataOf(null);
 
     // Browser for the primary media source and its connection state.
     private final MutableLiveData<BrowsingState> mBrowsingState = dataOf(null);
 
-    private final Handler mHandler;
-    private final CarMediaManager.MediaSourceChangedListener mMediaSourceListener;
-
-
     /**
      * Factory for creating dependencies. Can be swapped out for testing.
      */
     @VisibleForTesting
     interface InputFactory {
-        MediaBrowserConnector createMediaBrowserConnector(@NonNull Application application,
+        MediaBrowserConnector createMediaBrowserConnector(
                 @NonNull MediaBrowserConnector.Callback connectedBrowserCallback);
-
-        Car getCarApi();
-
-        CarMediaManager getCarMediaManager(Car carApi) throws CarNotConnectedException;
-
-        MediaSource getMediaSource(ComponentName componentName);
-
-        boolean isAudioMediaSource(ComponentName componentName);
-    }
-
-    /** Returns the MediaSourceViewModel singleton tied to the application. */
-    public static MediaSourceViewModel get(@NonNull Application application, int mode) {
-        if (sInstances[mode] == null) {
-            sInstances[mode] = new MediaSourceViewModel(application, mode);
-        }
-        return sInstances[mode];
     }
 
     /**
-     * Create a new instance of MediaSourceViewModel
-     *
-     * @see AndroidViewModel
+     * @deprecated Apps should maintain their own instance(s) of MediaSourceViewModel.
+     * {@link MediaModels} can help simplify this.
      */
-    private MediaSourceViewModel(@NonNull Application application, int mode) {
-        this(application, mode, new InputFactory() {
-            private final MediaSourceUtil mMediaSourceUtil =
-                    new MediaSourceUtil(application.getApplicationContext());
-
-            @Override
-            public MediaBrowserConnector createMediaBrowserConnector(
-                    @NonNull Application application,
-                    @NonNull MediaBrowserConnector.Callback connectedBrowserCallback) {
-                return new MediaBrowserConnector(application, connectedBrowserCallback);
+    @Deprecated
+    public static MediaSourceViewModel get(@NonNull Context context, int mode) {
+        if (sInstances[mode] == null) {
+            if (sCarMediaManagerHelper == null) {
+                sCarMediaManagerHelper = CarMediaManagerHelper.getInstance(context);
             }
-
-            @Override
-            public Car getCarApi() {
-                return Car.createCar(application);
-            }
-
-            @Override
-            public CarMediaManager getCarMediaManager(Car carApi) throws CarNotConnectedException {
-                return (CarMediaManager) carApi.getCarManager(Car.CAR_MEDIA_SERVICE);
-            }
-
-            @Override
-            public MediaSource getMediaSource(ComponentName componentName) {
-                return componentName == null ? null : MediaSource.create(application,
-                        componentName);
-            }
-
-            @Override
-            public boolean isAudioMediaSource(ComponentName componentName) {
-                return mMediaSourceUtil.isAudioMediaSource(componentName);
-            }
-        });
+            LiveData<MediaSource> srcData = sCarMediaManagerHelper.getAudioSource(mode);
+            sInstances[mode] = new MediaSourceViewModel(context, srcData);
+        }
+        return sInstances[mode];
     }
-
-    private final int mMode;
-    private final InputFactory mInputFactory;
+    private final LiveData<MediaSource> mInput;
     private final MediaBrowserConnector mBrowserConnector;
     private final MediaBrowserConnector.Callback mBrowserCallback = mBrowsingState::setValue;
 
-    @VisibleForTesting
-    MediaSourceViewModel(@NonNull Application application, int mode,
-            @NonNull InputFactory inputFactory) {
-        super(application);
-
-        mMode = mode;
-        mInputFactory = inputFactory;
-        mCar = inputFactory.getCarApi();
-
-        mBrowserConnector = inputFactory.createMediaBrowserConnector(application, mBrowserCallback);
-
-        mHandler = new Handler(application.getMainLooper());
-        mMediaSourceListener = componentName -> mHandler.post(
-                () -> updateModelState(mInputFactory.getMediaSource(componentName)));
-
-        try {
-            mCarMediaManager = mInputFactory.getCarMediaManager(mCar);
-            mCarMediaManager.addMediaSourceListener(mMediaSourceListener, mode);
-
-            MediaSource src = getInitialMediaSource(mode);
-            Log.i(TAG, "Initializing " + (mode == 0 ? "playback" : "browse")
-                    + " mode with " + src);
-            updateModelState(src);
-        } catch (CarNotConnectedException e) {
-            Log.e(TAG, "Car not connected", e);
-        }
+    /** Creates a new model. */
+    public MediaSourceViewModel(Context context, LiveData<MediaSource> source) {
+        this(source, callback -> new MediaBrowserConnector(context, callback));
     }
 
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        mCar.disconnect();
+    /** Creates a new model. */
+    @VisibleForTesting
+    public MediaSourceViewModel(LiveData<MediaSource> source, InputFactory factory) {
+        mInput = source;
+        mBrowserConnector = factory.createMediaBrowserConnector(mBrowserCallback);
+        mInput.observeForever(this::updateModelState);
+    }
+
+    /** Call to clear the model. */
+    public void onCleared() {
+        mInput.removeObserver(this::updateModelState);
+        mBrowserConnector.maybeDisconnect();
     }
 
     @VisibleForTesting
@@ -174,19 +105,6 @@ public class MediaSourceViewModel extends AndroidViewModel {
      */
     public LiveData<MediaSource> getPrimaryMediaSource() {
         return mPrimaryMediaSource;
-    }
-
-    /**
-     * Updates the primary media source.
-     */
-    public void setPrimaryMediaSource(@NonNull MediaSource mediaSource, int mode) {
-        if (mMode == mode) {
-            // Update the live data with the new value right away.
-            updateModelState(mediaSource);
-        } else if (Log.isLoggable(TAG, Log.WARN)) {
-            Log.w(TAG, "Inconsistent media source mode " + mode + " mMode: " + mMode);
-        }
-        mCarMediaManager.setMediaSource(mediaSource.getBrowseServiceComponentName(), mode);
     }
 
     /**
@@ -206,17 +124,6 @@ public class MediaSourceViewModel extends AndroidViewModel {
             return;
         }
 
-        // Skip non Audio apps
-        if (newMediaSource != null) {
-            ComponentName mbsName = newMediaSource.getBrowseServiceComponentName();
-            if (!mInputFactory.isAudioMediaSource(mbsName)) {
-                Log.i(TAG, "Skipping update from " + oldMediaSource
-                        + " for non audio app mbs:" + mbsName);
-                return;
-            }
-            Log.i(TAG, "Updating from " + oldMediaSource + " to audio app mbs:" + mbsName);
-        }
-
         // Broadcast the new source
         mPrimaryMediaSource.setValue(newMediaSource);
 
@@ -226,22 +133,11 @@ public class MediaSourceViewModel extends AndroidViewModel {
         }
     }
 
-    /**
-     * Iterate over past sources and find the first valid media source
-     */
-    private MediaSource getInitialMediaSource(int mode) {
-        List<ComponentName> lastMediaSources = mCarMediaManager.getLastMediaSources(mode);
-        if (Log.isLoggable(TAG, Log.DEBUG)) {
-            Log.d(TAG, "Found media sources history for "
-                    + (mode == 0 ? "playback" : "browse") + ":" + lastMediaSources);
+    /** Reconnects the current media source when it is {@link ConnectionStatus#SUSPENDED}. */
+    public void maybeReconnect() {
+        BrowsingState state = mBrowsingState.getValue();
+        if ((state != null) && (state.mConnectionStatus == ConnectionStatus.SUSPENDED)) {
+            mBrowserConnector.connectTo(state.mMediaSource);
         }
-        ComponentName initialMediaSource = lastMediaSources.stream()
-                .filter(Objects::nonNull)
-                .filter(mInputFactory::isAudioMediaSource)
-                .findFirst()
-                .orElse(null);
-        return mInputFactory.getMediaSource(initialMediaSource);
     }
-
-
 }
