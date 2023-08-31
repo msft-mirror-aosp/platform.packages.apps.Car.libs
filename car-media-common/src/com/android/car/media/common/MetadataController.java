@@ -35,6 +35,7 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.android.car.apps.common.TappableTextView;
 import com.android.car.apps.common.imaging.ImageBinder;
+import com.android.car.apps.common.imaging.ImageBinder.PlaceholderType;
 import com.android.car.apps.common.imaging.ImageViewBinder;
 import com.android.car.apps.common.imaging.UriArtRef;
 import com.android.car.apps.common.util.ViewUtils;
@@ -52,6 +53,10 @@ public class MetadataController {
 
     private final MediaLinkHandler mSubtitleLinker;
     private final MediaLinkHandler mDescriptionLinker;
+
+    private @Nullable View mLogoSeparatorView;
+    private @Nullable View mViewSeparatedFromLogo;
+    private boolean mVisibleLogo;
 
     private boolean mTrackingTouch;
     private final SeekBar.OnSeekBarChangeListener mOnSeekBarChangeListener =
@@ -120,7 +125,7 @@ public class MetadataController {
 
         Context context = title.getContext();
         mAlbumArtBinder = new ImageViewBinder<>(maxArtSize, albumArt);
-        mLogoBinder = new ImageViewBinder<>(maxArtSize, logoView);
+        mLogoBinder = new ImageViewBinder<>(PlaceholderType.NONE, maxArtSize, logoView, false);
 
         playbackViewModel.getPlaybackController().observe(lifecycleOwner,
                 controller -> mController = controller);
@@ -158,9 +163,12 @@ public class MetadataController {
 
                     if (logoView != null) {
                         Uri logoUri = logoView.prepareToDisplay(metadata);
-                        ViewUtils.setVisible(logoView, (logoUri != null));
+                        mVisibleLogo = (logoUri != null);
+                        ViewUtils.setVisible(logoView, mVisibleLogo);
                         mLogoBinder.setImage(context, new UriArtRef(logoUri));
                     }
+
+                    updateLogoSeparatorViewVisibility();
                 });
 
         playbackViewModel.getProgress().observe(lifecycleOwner,
@@ -183,6 +191,7 @@ public class MetadataController {
                             seekBar.setProgress((int) playbackProgress.getProgress());
                         }
                     }
+                    updateLogoSeparatorViewVisibility();
                 });
 
         if (seekBar != null) {
@@ -247,6 +256,19 @@ public class MetadataController {
                         }
                     });
         }
+    }
+
+    private void updateLogoSeparatorViewVisibility() {
+        ViewUtils.setVisible(mLogoSeparatorView,
+                mVisibleLogo && ViewUtils.isVisible(mViewSeparatedFromLogo));
+    }
+
+    public void setLogoSeparatorView(@Nullable View logoSeparatorView) {
+        mLogoSeparatorView = logoSeparatorView;
+    }
+
+    public void setViewSeparatedFromLogo(@Nullable View viewSeparatedFromLogo) {
+        mViewSeparatedFromLogo = viewSeparatedFromLogo;
     }
 
     /** @deprecated callers should specify the ContentFormatView.  */

@@ -16,21 +16,16 @@
 
 package com.android.car.media.common;
 
-import static com.android.car.media.common.MediaConstants.KEY_CONTENT_FORMAT_DARK_MODE_LARGE_ICON_URI;
-import static com.android.car.media.common.MediaConstants.KEY_CONTENT_FORMAT_DARK_MODE_SMALL_ICON_URI;
-import static com.android.car.media.common.MediaConstants.KEY_CONTENT_FORMAT_LIGHT_MODE_LARGE_ICON_URI;
-import static com.android.car.media.common.MediaConstants.KEY_CONTENT_FORMAT_LIGHT_MODE_SMALL_ICON_URI;
 import static com.android.car.media.common.MediaConstants.KEY_CONTENT_FORMAT_TINTABLE_LARGE_ICON_URI;
 import static com.android.car.media.common.MediaConstants.KEY_CONTENT_FORMAT_TINTABLE_SMALL_ICON_URI;
 import static com.android.car.media.common.R.styleable.ContentFormatView;
-import static com.android.car.media.common.R.styleable.ContentFormatView_backgroundTone;
 import static com.android.car.media.common.R.styleable.ContentFormatView_logoSize;
 import static com.android.car.media.common.R.styleable.ContentFormatView_logoTint;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -40,7 +35,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Preconditions;
 
-
 /**
  * Renders one of the content format logos defined in the {@link MediaItemMetadata}'s extras.
  * View attributes:
@@ -48,24 +42,13 @@ import androidx.core.util.Preconditions;
  * logo (if present in the extras).</li>
  * <li> ContentFormatView_logoTint specifies the color the logo will be tinted with, IIF a tintable
  * logo has been provided.</li>
- * <li> ContentFormatView_backgroundTone is considered when no tintable logo was provided, and will
- * select the logo matching the tone. </li>
  */
 public class ContentFormatView extends ImageView {
 
     private static final int LOGO_LARGE = 1;
 
-    private static final String [] KEYS_FOR_SMALL_LOGO = {
-            KEY_CONTENT_FORMAT_TINTABLE_SMALL_ICON_URI, KEY_CONTENT_FORMAT_DARK_MODE_SMALL_ICON_URI,
-            KEY_CONTENT_FORMAT_LIGHT_MODE_SMALL_ICON_URI };
-
-    private static final String [] KEYS_FOR_LARGE_LOGO = {
-            KEY_CONTENT_FORMAT_TINTABLE_LARGE_ICON_URI, KEY_CONTENT_FORMAT_DARK_MODE_LARGE_ICON_URI,
-            KEY_CONTENT_FORMAT_LIGHT_MODE_LARGE_ICON_URI };
-
     private final int mLogoTint;
     private final int mLogoSize;
-    private final int mBackgroundTone;
 
     public ContentFormatView(@NonNull Context context) {
         this(context, null);
@@ -84,27 +67,28 @@ public class ContentFormatView extends ImageView {
         try {
             mLogoTint = a.getColor(ContentFormatView_logoTint, Color.RED);
             mLogoSize = a.getInteger(ContentFormatView_logoSize, -1);
-            mBackgroundTone = a.getInteger(ContentFormatView_backgroundTone, -1);
 
             Preconditions.checkArgument(mLogoSize != -1, "Invalid logo size");
-            Preconditions.checkArgument(mBackgroundTone != -1, "Invalid background tone");
-
         } finally {
             a.recycle();
         }
     }
 
-    /** Selects the right logo to display and adjusts the tint of the view. **/
-    public Uri prepareToDisplay(MediaItemMetadata metadata) {
-        String[] keys = (mLogoSize == LOGO_LARGE) ? KEYS_FOR_LARGE_LOGO : KEYS_FOR_SMALL_LOGO;
-        String uri = metadata.getStringProperty(keys[0]);
-        if (TextUtils.isEmpty(uri)) {
-            setImageTintList(null);
-            uri = metadata.getStringProperty(keys[1 + mBackgroundTone]);
-        } else {
-            setImageTintList(ColorStateList.valueOf(mLogoTint));
+    @Override
+    public void setImageDrawable(Drawable drawable) {
+        Drawable clone = null;
+        if (drawable != null) {
+            clone = drawable.getConstantState().newDrawable();
+            clone.setTint(mLogoTint);
         }
+        super.setImageDrawable(clone);
+    }
 
+    /** Selects the right logo to display. **/
+    public Uri prepareToDisplay(MediaItemMetadata metadata) {
+        String key = (mLogoSize == LOGO_LARGE) ? KEY_CONTENT_FORMAT_TINTABLE_LARGE_ICON_URI :
+                KEY_CONTENT_FORMAT_TINTABLE_SMALL_ICON_URI;
+        String uri = metadata.getStringProperty(key);
         return TextUtils.isEmpty(uri) ? null : Uri.parse(uri);
     }
 }

@@ -24,7 +24,6 @@ REGENERATE USING packages/apps/Car/tests/tools/rro/generate-overlayable.py
       <item type="array" name="preferred_media_sources"/>
       <item type="attr" name="align_horizontal"/>
       <item type="attr" name="aspect_ratio"/>
-      <item type="attr" name="backgroundTone"/>
       <item type="attr" name="columns"/>
       <item type="attr" name="logoSize"/>
       <item type="attr" name="logoTint"/>
@@ -70,7 +69,6 @@ REGENERATE USING packages/apps/Car/tests/tools/rro/generate-overlayable.py
       <item type="dimen" name="appbar_view_search_close_icon_margin"/>
       <item type="dimen" name="fab_spinner_size"/>
       <item type="dimen" name="minimized_content_format_height"/>
-      <item type="dimen" name="minimized_content_format_width"/>
       <item type="dimen" name="minimized_progress_bar_track_thickness"/>
       <item type="dimen" name="playback_fragment_app_icon_margin_right"/>
       <item type="dimen" name="playback_fragment_controls_margin_bottom"/>
