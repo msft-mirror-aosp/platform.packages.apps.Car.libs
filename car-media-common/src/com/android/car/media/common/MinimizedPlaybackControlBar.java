@@ -20,6 +20,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Size;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
@@ -46,6 +47,8 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
     private ImageBinder<MediaItemMetadata.ArtworkRef> mArtBinder = null;
     private PlaybackViewModel mPlaybackViewModel;
     private ContentFormatView mContentFormatView;
+    private View mSeparatorView;
+    private View mViewSeparatedFromExtraSlot;
 
     private boolean mShowLinearProgressBar;
     private boolean mShowCircularProgressBar;
@@ -89,6 +92,9 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
                     R.layout.minimized_content_format, extraSlot, false);
             extraSlot.addView(mContentFormatView);
         }
+
+        mSeparatorView = findViewById(R.id.minimized_control_bar_subtitle_separator);
+        mViewSeparatedFromExtraSlot = findViewWithTag("view_separated_from_extra_slot");
     }
 
     /** Connects the bar to the {@link PlaybackViewModel}. */
@@ -99,6 +105,9 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
                 null, null, null, null, null, mContentTile, mAppIcon, maxArtSize,
                 mContentFormatView, null);
         mPlaybackViewModel = model;
+
+        mMetadataController.setLogoSeparatorView(mSeparatorView);
+        mMetadataController.setViewSeparatedFromLogo(mViewSeparatedFromExtraSlot);
 
         ControlBarHelper.initProgressBar(getContext(), owner, mPlaybackViewModel,
                 mLinearProgressBar, mShowLinearProgressBar);
