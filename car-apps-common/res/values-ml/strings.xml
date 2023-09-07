@@ -22,4 +22,6 @@ limitations under the License.
     <string name="restricted_while_driving" msgid="2278031053760704437">"ഡ്രൈവ് ചെയ്യുമ്പോൾ ഫീച്ചർ ലഭ്യമല്ല."</string>
     <string name="scroll_bar_page_down_button" msgid="8633547153186948066">"താഴോട്ട് സ്‌ക്രോൾ ചെയ്യുക"</string>
     <string name="scroll_bar_page_up_button" msgid="8306413844913744345">"മുകളിലോട്ട് സ്‌ക്രോൾ ചെയ്യുക"</string>
+    <!-- no translation found for minimized_control_bar_subtitle_separator_text (3156031489488743055) -->
+    <skip />
 </resources>

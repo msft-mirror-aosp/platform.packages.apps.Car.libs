@@ -22,4 +22,6 @@ limitations under the License.
     <string name="restricted_while_driving" msgid="2278031053760704437">"ड्राइव्ह करताना वैशिष्ट्य उपलब्ध नाही."</string>
     <string name="scroll_bar_page_down_button" msgid="8633547153186948066">"खाली स्क्रोल करा"</string>
     <string name="scroll_bar_page_up_button" msgid="8306413844913744345">"वर स्क्रोल करा"</string>
+    <!-- no translation found for minimized_control_bar_subtitle_separator_text (3156031489488743055) -->
+    <skip />
 </resources>
