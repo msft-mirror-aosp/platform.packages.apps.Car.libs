@@ -87,7 +87,7 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
                             viewType == VIEW_TYPE_LIST_ITEM_FULL_TOUCH_INTERCEPTOR);
                 }
                 return new ListItemViewHolder(
-                        inflater.inflate(R.layout.car_ui_list_item, parent, false),
+                        inflater.inflate(R.layout.car_ui_list_item_2, parent, false),
                         viewType == VIEW_TYPE_LIST_ITEM_FULL_TOUCH_INTERCEPTOR);
             case VIEW_TYPE_LIST_HEADER:
                 return new HeaderViewHolder(
@@ -203,6 +203,14 @@ public class CarUiListItemAdapter extends RecyclerView.Adapter<RecyclerView.View
             // layout is provided with all ui elements/touch interceptors, the visibility will be
             // set on the corresponding touch interceptor, which will essentially do nothing which
             // maintains backwards compatibility.
+            // This functionality supports tap targets (SecureView) being directly in the View
+            // hierarchy, as opposed to being tap target Views overlaid on the ui elements of a list
+            // item. This allows the tap target Views to be parents of the list item ui elements in
+            // the View hierarchy. This functionality is tied to the car_ui_list_item_2 layout. RROs
+            // against list items should only rely on this functionality in this layout. Do NOT
+            // insert tap target Views into the View hierarchy with car_ui_list_item, as there is no
+            // guarantee that the version of car-ui-lib that is compiled with an app will support
+            // this, as this functionality was added after car_ui_list_item.
             if (usesFullTouchInterceptor) {
                 requireViewByRefId(itemView, R.id.car_ui_list_item_touch_interceptor)
                         .setVisibility(View.VISIBLE);
