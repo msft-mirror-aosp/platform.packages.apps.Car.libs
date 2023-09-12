@@ -47,10 +47,5 @@
         </attr>
 
         <attr name="logoTint" format="color" />
-
-        <attr name="backgroundTone" format="enum">
-            <enum name="dark" value="0"/>
-            <enum name="light" value="1"/>
-        </attr>
     </declare-styleable>
 </resources>

@@ -28,4 +28,6 @@ limitations under the License.
 
     <string name="scroll_bar_page_down_button">Scroll down</string>
     <string name="scroll_bar_page_up_button">Scroll up</string>
+
+    <string name="minimized_control_bar_subtitle_separator_text">•</string>
 </resources>

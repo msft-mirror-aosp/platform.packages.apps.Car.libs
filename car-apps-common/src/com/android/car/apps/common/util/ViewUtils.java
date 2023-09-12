@@ -177,6 +177,11 @@ public class ViewUtils {
         }
     }
 
+    /** Returns whether the given view is visible. */
+    public static boolean isVisible(@Nullable View view) {
+        return (view != null) && (view.getVisibility() == VISIBLE);
+    }
+
     /** Sets the visibility of the (optional) view to {@link View#VISIBLE} or {@link View#GONE}. */
     public static void setVisible(@Nullable View view, boolean visible) {
         if (view != null) {
