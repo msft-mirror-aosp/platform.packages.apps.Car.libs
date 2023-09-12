@@ -39,9 +39,6 @@ import androidx.annotation.NonNull;
 import androidx.core.util.Supplier;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.car.ui.FocusArea;
-import com.android.car.ui.baselayout.Insets;
-import com.android.car.ui.baselayout.InsetsChangedListener;
 import com.android.car.ui.core.CarUi;
 import com.android.car.ui.paintbooth.appstyledview.AppStyledViewSampleActivity;
 import com.android.car.ui.paintbooth.appstyledview.TransparentActivity;
@@ -74,7 +71,7 @@ import java.util.List;
 /**
  * Paint booth app
  */
-public class MainActivity extends Activity implements InsetsChangedListener {
+public class MainActivity extends Activity {
 
     public static final String STOP_SERVICE = "com.android.car.ui.paintbooth.StopService";
 
@@ -337,17 +334,6 @@ public class MainActivity extends Activity implements InsetsChangedListener {
         switchWidget.setChecked(checked);
         Toast.makeText(this, "All newly loaded plugin compatible components will "
                 + (isPluginEnabled() ? "" : "NOT ") + "use the plugin", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onCarUiInsetsChanged(@NonNull Insets insets) {
-        FocusArea focusArea = requireViewById(R.id.focus_area);
-        focusArea.setBoundsOffset(0, insets.getTop(), 0, insets.getBottom());
-        focusArea.setHighlightPadding(0, insets.getTop(), 0, insets.getBottom());
-        requireViewById(R.id.list)
-                .setPadding(0, insets.getTop(), 0, insets.getBottom());
-        requireViewById(android.R.id.content)
-                .setPadding(insets.getLeft(), 0, insets.getRight(), 0);
     }
 
     private abstract static class ListElement {
