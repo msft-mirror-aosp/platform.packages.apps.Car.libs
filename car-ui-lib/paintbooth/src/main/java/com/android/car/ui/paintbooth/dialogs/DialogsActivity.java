@@ -32,9 +32,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.ui.AlertDialogBuilder;
-import com.android.car.ui.FocusArea;
-import com.android.car.ui.baselayout.Insets;
-import com.android.car.ui.baselayout.InsetsChangedListener;
 import com.android.car.ui.core.CarUi;
 import com.android.car.ui.paintbooth.R;
 import com.android.car.ui.recyclerview.CarUiContentListItem;
@@ -49,7 +46,7 @@ import java.util.List;
 /**
  * Activity that shows different dialogs from the device default theme.
  */
-public class DialogsActivity extends Activity implements InsetsChangedListener {
+public class DialogsActivity extends Activity {
 
     private final List<Pair<Integer, View.OnClickListener>> mButtons = new ArrayList<>();
 
@@ -370,15 +367,4 @@ public class DialogsActivity extends Activity implements InsetsChangedListener {
                     holder.bind(pair.first, pair.second);
                 }
             };
-
-    @Override
-    public void onCarUiInsetsChanged(@NonNull Insets insets) {
-        FocusArea focusArea = requireViewById(R.id.focus_area);
-        focusArea.setBoundsOffset(0, insets.getTop(), 0, insets.getBottom());
-        focusArea.setHighlightPadding(0, insets.getTop(), 0, insets.getBottom());
-        requireViewById(R.id.list)
-                .setPadding(0, insets.getTop(), 0, insets.getBottom());
-        requireViewById(android.R.id.content)
-                .setPadding(insets.getLeft(), 0, insets.getRight(), 0);
-    }
 }

@@ -43,9 +43,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.car.ui.FocusArea;
-import com.android.car.ui.baselayout.Insets;
-import com.android.car.ui.baselayout.InsetsChangedListener;
 import com.android.car.ui.core.CarUi;
 import com.android.car.ui.imewidescreen.CarUiImeSearchListItem;
 import com.android.car.ui.paintbooth.R;
@@ -63,7 +60,7 @@ import java.util.List;
 /**
  * Activity that shows different scenarios for wide screen ime.
  */
-public class WideScreenImeActivity extends AppCompatActivity implements InsetsChangedListener {
+public class WideScreenImeActivity extends AppCompatActivity {
     private static final String TAG = "PaintBooth";
 
     private final List<MenuItem> mMenuItems = new ArrayList<>();
@@ -294,17 +291,6 @@ public class WideScreenImeActivity extends AppCompatActivity implements InsetsCh
                     return mWidescreenItems.get(position).getType();
                 }
             };
-
-    @Override
-    public void onCarUiInsetsChanged(@NonNull Insets insets) {
-        FocusArea focusArea = requireViewById(R.id.focus_area);
-        focusArea.setBoundsOffset(0, insets.getTop(), 0, insets.getBottom());
-        focusArea.setHighlightPadding(0, insets.getTop(), 0, insets.getBottom());
-        requireViewById(R.id.list)
-                .setPadding(0, insets.getTop(), 0, insets.getBottom());
-        requireViewById(android.R.id.content)
-                .setPadding(insets.getLeft(), 0, insets.getRight(), 0);
-    }
 
     private abstract static class ListElement {
 
