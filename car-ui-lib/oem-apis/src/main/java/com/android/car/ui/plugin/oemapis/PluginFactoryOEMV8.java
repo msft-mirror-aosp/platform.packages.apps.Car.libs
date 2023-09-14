@@ -23,10 +23,10 @@ import androidx.annotation.Nullable;
 
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV3;
 import com.android.car.ui.plugin.oemapis.preference.PreferenceOEMV1;
-import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
+import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV2;
 import com.android.car.ui.plugin.oemapis.recyclerview.ListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewAttributesOEMV1;
-import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewOEMV2;
+import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewOEMV3;
 import com.android.car.ui.plugin.oemapis.recyclerview.ViewHolderOEMV1;
 import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV3;
 
@@ -41,10 +41,8 @@ import java.util.List;
  * <p>
  * Multiple of these can be provided via {@link PluginVersionProviderOEMV1} to allow plugins
  * to provide an old implementation for old apps, and a newer implementation for newer apps.
- *
- * @deprecated Use {@link PluginFactoryOEMV8} instead
  */
-public interface PluginFactoryOEMV7 {
+public interface PluginFactoryOEMV8 {
     /**
      * Gives the plugin access to two factories that will create FocusParkingViews and
      * FocusAreas. These views have their implementation in the static car-ui-lib.
@@ -139,7 +137,7 @@ public interface PluginFactoryOEMV7 {
      * @param attrs   An object containing initial attributes for the button.
      */
     @Nullable
-    RecyclerViewOEMV2 createRecyclerView(
+    RecyclerViewOEMV3 createRecyclerView(
             @NonNull Context sourceContext,
             @Nullable RecyclerViewAttributesOEMV1 attrs);
 
@@ -147,6 +145,6 @@ public interface PluginFactoryOEMV7 {
      * Creates an instance of list item adapter
      */
     @Nullable
-    AdapterOEMV1<? extends ViewHolderOEMV1> createListItemAdapter(
+    AdapterOEMV2<? extends ViewHolderOEMV1> createListItemAdapter(
             @NonNull List<ListItemOEMV1> items);
 }

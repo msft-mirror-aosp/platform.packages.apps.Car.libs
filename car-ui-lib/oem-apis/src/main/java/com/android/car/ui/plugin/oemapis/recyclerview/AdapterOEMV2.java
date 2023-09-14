@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 The Android Open Source Project
+ * Copyright (C) 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,14 @@ package com.android.car.ui.plugin.oemapis.recyclerview;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * See {@code androidx.recyclerview.widget.RecyclerView.Adapter}
  *
- * @deprecated Use {@link AdapterOEMV2} instead
- *
  * @param <V> A class that extends ViewHolder that will be used by the adapter.
  */
-public interface AdapterOEMV1<V extends ViewHolderOEMV1> {
+public interface AdapterOEMV2<V extends ViewHolderOEMV1> {
 
     int ALLOW = 0;
     int PREVENT_WHEN_EMPTY = 1;
@@ -53,6 +52,41 @@ public interface AdapterOEMV1<V extends ViewHolderOEMV1> {
     int getItemViewType(int position);
 
     /**
+     * See {@code androidx.recyclerview.widget.RecyclerView.Adapter#notifyDataSetChanged}
+     */
+    void notifyDataSetChanged();
+
+    /**
+     * See {@code androidx.recyclerview.widget.RecyclerView.Adapter#notifyItemRangeChanged(int, int)}
+     */
+    void notifyItemRangeChanged(int positionStart, int itemCount);
+
+    /**
+     * See {@code androidx.recyclerview.widget.RecyclerView.Adapter#notifyItemRangeChanged(int, int, Object)}
+     */
+    void notifyItemRangeChanged(int positionStart, int itemCount, @Nullable Object payload);
+
+    /**
+     * See {@code androidx.recyclerview.widget.RecyclerView.Adapter#notifyItemRangeInserted(int, int)}
+     */
+    void notifyItemRangeInserted(int positionStart, int itemCount);
+
+    /**
+     * See {@code androidx.recyclerview.widget.RecyclerView.Adapter#notifyItemRangeRemoved(int, int)}
+     */
+    void notifyItemRangeRemoved(int positionStart, int itemCount);
+
+    /**
+     * See {@code androidx.recyclerview.widget.RecyclerView.Adapter#notifyItemMoved(int, int)}
+     */
+    void notifyItemMoved(int fromPosition, int toPosition);
+
+    /**
+     * See {@code androidx.recyclerview.widget.RecyclerView.Adapter#setStateRestorationPolicy(StateRestorationPolicy)}
+     */
+    void setStateRestorationPolicy(int strategy);
+
+    /**
      * See {@code androidx.recyclerview.widget.RecyclerView.Adapter#getStateRestorationPolicy()}
      */
     int getStateRestorationPolicyInt();
@@ -60,7 +94,7 @@ public interface AdapterOEMV1<V extends ViewHolderOEMV1> {
     /**
      * See {@code androidx.recyclerview.widget.RecyclerView.Adapter#onAttachedToRecyclerView}
      */
-    void onAttachedToRecyclerView(@NonNull RecyclerViewOEMV1 recyclerView);
+    void onAttachedToRecyclerView(@NonNull RecyclerViewOEMV3 recyclerView);
 
     /**
      * See {@code androidx.recyclerview.widget.RecyclerView.Adapter#bindViewHolder}
@@ -76,7 +110,7 @@ public interface AdapterOEMV1<V extends ViewHolderOEMV1> {
     /**
      * See {@code androidx.recyclerview.widget.RecyclerView.Adapter#onDetachedFromRecyclerView}
      */
-    void onDetachedFromRecyclerView(@NonNull RecyclerViewOEMV1 recyclerView);
+    void onDetachedFromRecyclerView(@NonNull RecyclerViewOEMV3 recyclerView);
 
     /**
      * See {@code androidx.recyclerview.widget.RecyclerView.Adapter#onFailedToRecycleView}
