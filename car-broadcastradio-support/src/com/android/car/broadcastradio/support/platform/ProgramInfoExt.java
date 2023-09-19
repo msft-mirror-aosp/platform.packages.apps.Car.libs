@@ -171,8 +171,14 @@ public class ProgramInfoExt {
 
         MediaMetadata.Builder bld = new MediaMetadata.Builder();
 
-        ProgramSelector selector =
-                ProgramSelectorExt.createAmFmSelector(info.getLogicallyTunedTo().getValue());
+        ProgramSelector selector;
+        ProgramSelector.Identifier logicallyTunedTo = info.getLogicallyTunedTo();
+        if (logicallyTunedTo != null && logicallyTunedTo.getType()
+                == ProgramSelector.IDENTIFIER_TYPE_AMFM_FREQUENCY) {
+            selector = ProgramSelectorExt.createAmFmSelector(logicallyTunedTo.getValue());
+        } else {
+            selector = info.getSelector();
+        }
         String displayTitle = ProgramSelectorExt.getDisplayName(selector, info.getChannel());
         bld.putString(MediaMetadata.METADATA_KEY_DISPLAY_TITLE, displayTitle);
         String subtitle = getProgramName(info, /* flags= */ 0, programNameOrder);

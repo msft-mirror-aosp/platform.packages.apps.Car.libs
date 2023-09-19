@@ -81,6 +81,11 @@ public class ProgramSelectorExt {
     @Retention(RetentionPolicy.SOURCE)
     public @interface NameFlag {}
 
+    /**
+     * Invalid value for a {@link ProgramSelector.Identifier}
+     */
+    public static int INVALID_IDENTIFIER_VALUE = 0;
+
     private static final String URI_SCHEME_BROADCASTRADIO = "broadcastradio";
     private static final String URI_AUTHORITY_PROGRAM = "program";
     private static final String URI_VENDOR_PREFIX = "VENDOR_";
@@ -251,26 +256,57 @@ public class ProgramSelectorExt {
     }
 
     /**
+     * Get frequency from a {@link ProgramSelector}.
+     *
+     * @param selector Program selector
+     * @return frequency of the first {@link ProgramSelector#IDENTIFIER_TYPE_AMFM_FREQUENCY} id in
+     * program selector if it exists, otherwise the AM/FM frequency in
+     * {@link ProgramSelector#IDENTIFIER_TYPE_HD_STATION_ID_EXT} id if it is the primary id,
+     * {@link #INVALID_IDENTIFIER_VALUE} otherwise.
+     */
+    public static int getFrequency(@NonNull ProgramSelector selector) {
+        if (ProgramSelectorExt.hasId(selector, ProgramSelector.IDENTIFIER_TYPE_AMFM_FREQUENCY)) {
+            return (int) selector.getFirstId(ProgramSelector.IDENTIFIER_TYPE_AMFM_FREQUENCY);
+        } else if (selector.getPrimaryId().getType()
+                == ProgramSelector.IDENTIFIER_TYPE_HD_STATION_ID_EXT) {
+            return IdentifierExt.asHdPrimary(selector.getPrimaryId()).getFrequency();
+        }
+        return INVALID_IDENTIFIER_VALUE;
+    }
+
+    /**
      * Returns a channel name that can be displayed to the user.
      *
-     * It's implemented only for radio technologies where the channel is meant
-     * to be presented to the user.
+     * <p>It's implemented only for radio technologies where the channel is meant
+     * to be presented to the user, such as FM/AM and HD radio.
+     *
+     * <p>For HD radio, the display name is prefix with "-HD[NUMBER]" where the number is the
+     * sub channel.
      *
      * @param sel the program selector
-     * @return Channel name or null, if radio technology doesn't present channel names to the user.
+     * @return Channel name or {@code null}, if radio technology doesn't present channel names to
+     * the user.
      */
     public static @Nullable String getDisplayName(@NonNull ProgramSelector sel,
             @NameFlag int flags) {
         boolean noProgramTypeFallback = (flags & NAME_NO_PROGRAM_TYPE_FALLBACK) != 0;
 
         if (isAmFmProgram(sel)) {
-            if (!hasId(sel, ProgramSelector.IDENTIFIER_TYPE_AMFM_FREQUENCY)) {
+            long freq;
+            String hdSuffix = "";
+            if (hasId(sel, ProgramSelector.IDENTIFIER_TYPE_AMFM_FREQUENCY)) {
+                freq = sel.getFirstId(ProgramSelector.IDENTIFIER_TYPE_AMFM_FREQUENCY);
+            } else if (sel.getPrimaryId().getType()
+                    == ProgramSelector.IDENTIFIER_TYPE_HD_STATION_ID_EXT) {
+                IdentifierExt.HdPrimary hdIdExt = IdentifierExt.asHdPrimary(sel.getPrimaryId());
+                freq = hdIdExt.getFrequency();
+                hdSuffix = "-HD" + (hdIdExt.getSubchannel() + 1);
+            } else {
                 if (noProgramTypeFallback) return null;
                 // if there is no frequency assigned, let's assume it's a malformed RDS selector
                 return "FM";
             }
-            long freq = sel.getFirstId(ProgramSelector.IDENTIFIER_TYPE_AMFM_FREQUENCY);
-            return formatAmFmFrequency(freq, flags);
+            return formatAmFmFrequency(freq, flags) + hdSuffix;
         }
 
         if ((flags & NAME_MODULATION_ONLY) != 0) return null;
