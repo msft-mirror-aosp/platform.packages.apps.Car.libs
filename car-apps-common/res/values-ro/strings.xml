@@ -22,6 +22,5 @@ limitations under the License.
     <string name="restricted_while_driving" msgid="2278031053760704437">"Funcția nu este disponibilă când conduceți."</string>
     <string name="scroll_bar_page_down_button" msgid="8633547153186948066">"Derulează în jos"</string>
     <string name="scroll_bar_page_up_button" msgid="8306413844913744345">"Derulează în sus"</string>
-    <!-- no translation found for minimized_control_bar_subtitle_separator_text (3156031489488743055) -->
-    <skip />
+    <string name="minimized_control_bar_subtitle_separator_text" msgid="3156031489488743055">"•"</string>
 </resources>
