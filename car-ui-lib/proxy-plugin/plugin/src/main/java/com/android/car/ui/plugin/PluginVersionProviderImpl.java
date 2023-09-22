@@ -29,6 +29,7 @@ import com.chassis.car.ui.plugin.PluginFactoryImplV2;
 import com.chassis.car.ui.plugin.PluginFactoryImplV5;
 import com.chassis.car.ui.plugin.PluginFactoryImplV6;
 import com.chassis.car.ui.plugin.PluginFactoryImplV7;
+import com.chassis.car.ui.plugin.PluginFactoryImplV8;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -94,9 +95,11 @@ public class PluginVersionProviderImpl implements PluginVersionProviderOEMV1 {
                 return new PluginFactoryImplV5(pluginContext);
             case 6:
                 return new PluginFactoryImplV6(pluginContext);
+            case 7:
+                return new PluginFactoryImplV7(pluginContext);
             // Keep the newest version as default case and add old versions above
             default:
-                return new PluginFactoryImplV7(pluginContext);
+                return new PluginFactoryImplV8(pluginContext);
         }
     }
 
