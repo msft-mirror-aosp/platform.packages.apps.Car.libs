@@ -28,9 +28,12 @@ import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy;
 
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterDataObserverOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV2;
+import com.android.car.ui.plugin.oemapis.recyclerview.ListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewOEMV3;
 import com.android.car.ui.plugin.oemapis.recyclerview.ViewHolderOEMV1;
+import com.android.car.ui.recyclerview.CarUiListItem;
 import com.android.car.ui.recyclerview.CarUiListItemAdapter;
+import com.android.car.ui.utils.CarUiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,12 +46,15 @@ public class CarUiListItemAdapterAdapterProxyV2 implements
 
     private final CarUiListItemAdapter mDelegateAdapter;
     private final Context mPluginContext;
+    private final List<ListItemOEMV1> mItems;
+    private List<CarUiListItem> mStaticItems;
 
 
-    public CarUiListItemAdapterAdapterProxyV2(CarUiListItemAdapter carUiListItemAdapter,
-            Context pluginContext) {
+    public CarUiListItemAdapterAdapterProxyV2(List<ListItemOEMV1> items, Context pluginContext) {
         mPluginContext = pluginContext;
-        mDelegateAdapter = carUiListItemAdapter;
+        mItems = items;
+        mStaticItems = CarUiUtils.convertList(mItems, ListItemUtils::toStaticListItem);
+        mDelegateAdapter = new CarUiListItemAdapter(mStaticItems);
     }
 
     @Override
@@ -68,31 +74,48 @@ public class CarUiListItemAdapterAdapterProxyV2 implements
 
     @Override
     public void notifyDataSetChanged() {
+        mStaticItems.clear();
+        mStaticItems.addAll(
+                CarUiUtils.convertList(mItems, ListItemUtils::toStaticListItem));
         mDelegateAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void notifyItemRangeChanged(int positionStart, int itemCount) {
+        for (int i = positionStart; i <= positionStart + itemCount; i++) {
+            mStaticItems.set(i, ListItemUtils.toStaticListItem(mItems.get(i)));
+        }
         mDelegateAdapter.notifyItemRangeChanged(positionStart, itemCount);
     }
 
     @Override
     public void notifyItemRangeChanged(int positionStart, int itemCount, @Nullable Object payload) {
+        for (int i = positionStart; i <= positionStart + itemCount; i++) {
+            mStaticItems.set(i, ListItemUtils.toStaticListItem(mItems.get(i)));
+        }
         mDelegateAdapter.notifyItemRangeChanged(positionStart, itemCount, payload);
     }
 
     @Override
     public void notifyItemRangeInserted(int positionStart, int itemCount) {
+        for (int i = positionStart; i <= positionStart + itemCount; i++) {
+            mStaticItems.add(i, ListItemUtils.toStaticListItem(mItems.get(i)));
+        }
         mDelegateAdapter.notifyItemRangeInserted(positionStart, itemCount);
     }
 
     @Override
     public void notifyItemRangeRemoved(int positionStart, int itemCount) {
+        for (int i = positionStart; i <= positionStart + itemCount; i++) {
+            mStaticItems.remove(i);
+        }
         mDelegateAdapter.notifyItemRangeRemoved(positionStart, itemCount);
     }
 
     @Override
     public void notifyItemMoved(int fromPosition, int toPosition) {
+        CarUiListItem item = mStaticItems.remove(fromPosition);
+        mStaticItems.add(toPosition, item);
         mDelegateAdapter.notifyItemMoved(fromPosition, toPosition);
     }
 
@@ -119,14 +142,14 @@ public class CarUiListItemAdapterAdapterProxyV2 implements
 
     @Override
     public void onAttachedToRecyclerView(RecyclerViewOEMV3 recyclerViewOEMV3) {
-        //TODO: CarUiListItemAdapterAdapterV2 passes a null here. Is there a better path
+        //TODO: CarUiListItemAdapterAdapterV1 passes a null here. Is there a better path
         // are we wanting clients to call these methods
         mDelegateAdapter.onAttachedToRecyclerView(null);
     }
 
     @Override
     public void onDetachedFromRecyclerView(RecyclerViewOEMV3 recyclerViewOEMV3) {
-        //TODO: CarUiListItemAdapterAdapterV2 passes a null here. Is there a better path
+        //TODO: CarUiListItemAdapterAdapterV1 passes a null here. Is there a better path
         // are we wanting clients to call these methods
         mDelegateAdapter.onDetachedFromRecyclerView(null);
     }

@@ -39,16 +39,12 @@ import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewAttributesOEMV
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewOEMV3;
 import com.android.car.ui.plugin.oemapis.recyclerview.ViewHolderOEMV1;
 import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV3;
-import com.android.car.ui.recyclerview.CarUiListItem;
-import com.android.car.ui.recyclerview.CarUiListItemAdapter;
 import com.android.car.ui.recyclerview.CarUiRecyclerViewImpl;
-import com.android.car.ui.utils.CarUiUtils;
 
 
 import com.chassis.car.ui.plugin.appstyledview.AppStyledViewControllerAdapterProxyV3;
 import com.chassis.car.ui.plugin.preference.PreferenceAdapterProxy;
 import com.chassis.car.ui.plugin.recyclerview.CarUiListItemAdapterAdapterProxyV2;
-import com.chassis.car.ui.plugin.recyclerview.ListItemUtils;
 import com.chassis.car.ui.plugin.recyclerview.RecyclerViewAdapterProxyV3;
 import com.chassis.car.ui.plugin.toolbar.BaseLayoutInstallerProxy;
 
@@ -121,11 +117,7 @@ public class PluginFactoryImplV8 implements PluginFactoryOEMV8 {
     @Override
     public AdapterOEMV2<? extends ViewHolderOEMV1> createListItemAdapter(
             List<ListItemOEMV1> items) {
-        List<? extends CarUiListItem> staticItems = CarUiUtils.convertList(items,
-                ListItemUtils::toStaticListItem);
-        // Build the CarUiListItemAdapter that will be delegated to
-        CarUiListItemAdapter carUiListItemAdapter = new CarUiListItemAdapter(staticItems);
         return new CarUiListItemAdapterAdapterProxyV2(
-                carUiListItemAdapter, mPluginUiContextFactory.getRecentPluginUiContext());
+                items, mPluginUiContextFactory.getRecentPluginUiContext());
     }
 }
