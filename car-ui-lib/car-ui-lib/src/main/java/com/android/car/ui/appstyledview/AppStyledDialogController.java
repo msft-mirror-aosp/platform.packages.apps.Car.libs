@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.os.Build;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.View;
@@ -29,6 +30,7 @@ import android.view.View;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.UiContext;
 import androidx.annotation.VisibleForTesting;
 
 import com.android.car.ui.R;
@@ -130,15 +132,18 @@ public final class AppStyledDialogController {
 
     /**
      * Constructs a controller that can display an app styled view.
-     *
-     * @deprecated Use {@link #AppStyledDialogController(Activity)} instead
      */
-    @Deprecated
-    public AppStyledDialogController(@NonNull Context context) {
+    public AppStyledDialogController(@UiContext Context context) {
         Objects.requireNonNull(context);
 
-        if (context instanceof Activity) {
-            throw new IllegalArgumentException();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (!context.isUiContext()) {
+                throw new IllegalArgumentException();
+            }
+        } else {
+            if (!(context instanceof Activity)) {
+                throw new IllegalArgumentException();
+            }
         }
 
         mAppStyledViewController = PluginFactorySingleton.get(context).createAppStyledView(context);

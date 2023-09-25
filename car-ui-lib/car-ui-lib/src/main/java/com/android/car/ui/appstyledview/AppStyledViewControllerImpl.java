@@ -16,7 +16,6 @@
 
 package com.android.car.ui.appstyledview;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Insets;
@@ -82,10 +81,9 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
         // implementation.
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             Context unwrappedContext = CarUiUtils.unwrapContext(context);
-            Insets systemBarInsets =
-                    ((Activity) unwrappedContext).getWindow().getWindowManager()
-                            .getCurrentWindowMetrics().getWindowInsets().getInsets(
-                                    WindowInsetsCompat.Type.statusBars());
+            Insets systemBarInsets = unwrappedContext.getSystemService(
+                    WindowManager.class).getCurrentWindowMetrics().getWindowInsets().getInsets(
+                    WindowInsetsCompat.Type.statusBars());
 
             return systemBarInsets.top + systemBarInsets.bottom;
         }
@@ -98,10 +96,9 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
         // implementation.
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             Context unwrappedContext = CarUiUtils.unwrapContext(context);
-            Insets systemBarInsets =
-                    ((Activity) unwrappedContext).getWindow().getWindowManager()
-                            .getCurrentWindowMetrics().getWindowInsets().getInsets(
-                                    WindowInsetsCompat.Type.statusBars());
+            Insets systemBarInsets = unwrappedContext.getSystemService(
+                    WindowManager.class).getCurrentWindowMetrics().getWindowInsets().getInsets(
+                    WindowInsetsCompat.Type.statusBars());
 
             return systemBarInsets.left + systemBarInsets.right;
         }
