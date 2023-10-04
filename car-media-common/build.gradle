@@ -68,7 +68,7 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
     implementation "androidx.media:media:1.6.0"
-    implementation files(gradle.ext.lib_car_system_stubs)
+    compileOnly files(gradle.ext.lib_car_system_stubs)
 
     implementation project(":car-apps-common")
 }
