@@ -119,6 +119,11 @@
     <style name="MinimizedControlBarTitle" parent="TextAppearance.Body1"/>
     <style name="MinimizedControlBarSubtitle" parent="TextAppearance.Body3"/>
 
+    <style name="MinimizedControlBarSubtitleSeparator" parent="TextAppearance.Body3">
+        <item name="android:layout_marginHorizontal">4dp</item>
+    </style>
+
+
     <!-- Styles for ControlBar -->
     <style name="ControlBar">
         <item name="android:layout_width">match_parent</item>

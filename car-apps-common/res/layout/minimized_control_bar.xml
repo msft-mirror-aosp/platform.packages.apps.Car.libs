@@ -61,41 +61,58 @@
         app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constrainedWidth="true"
-        app:layout_constraintBottom_toTopOf="@+id/minimized_control_bar_subtitle"
+        app:layout_constraintBottom_toTopOf="@+id/subtitle_group"
         app:layout_constraintStart_toEndOf="@+id/minimized_control_bar_content_tile"
-        app:layout_constraintEnd_toStartOf="@+id/textEndBarrier"/>
+        app:layout_constraintEnd_toStartOf="@+id/minimized_control_buttons_wrapper"/>
 
-    <TextView
-        android:id="@+id/minimized_control_bar_subtitle"
-        style="@style/MinimizedControlBarSubtitle"
-        android:layout_width="wrap_content"
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/subtitle_group"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:singleLine="true"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintTop_toBottomOf="@+id/minimized_control_bar_title"
-        app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/minimized_control_bar_title"
-        app:layout_constraintEnd_toStartOf="@+id/textEndBarrier"/>
+        app:layout_constraintEnd_toStartOf="@+id/minimized_control_buttons_wrapper">
 
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/textEndBarrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="end"
-        app:constraint_referenced_ids="minimized_control_bar_subtitle,minimized_control_bar_title"/>
+        <TextView
+            android:id="@+id/minimized_control_bar_subtitle"
+            android:tag="view_separated_from_extra_slot"
+            style="@style/MinimizedControlBarSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/minimized_control_bar_subtitle_separator"/>
 
-    <FrameLayout
-        android:id="@+id/minimized_control_bar_extra_slot"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/minimized_control_bar_text_padding"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/minimized_control_buttons_wrapper"
-        app:layout_constraintStart_toEndOf="@+id/textEndBarrier"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/minimized_control_bar_subtitle_separator"
+            style="@style/MinimizedControlBarSubtitleSeparator"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/minimized_control_bar_subtitle_separator_text"
+            android:singleLine="true"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/minimized_control_bar_subtitle"
+            app:layout_constraintEnd_toStartOf="@+id/minimized_control_bar_extra_slot"/>
+
+        <FrameLayout
+            android:id="@+id/minimized_control_bar_extra_slot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/minimized_control_bar_text_padding"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/minimized_control_bar_subtitle_separator"
+            app:layout_constraintEnd_toEndOf="parent">
+        </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Using a LinearLayout as a wrapper to be able to define layout constraints between the
     parent (ConstraintLayout with locale based layout) and the child (LinearLayout with LTR

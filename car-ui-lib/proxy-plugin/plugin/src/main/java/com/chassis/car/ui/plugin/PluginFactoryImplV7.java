@@ -86,10 +86,9 @@ public class PluginFactoryImplV7 implements PluginFactoryOEMV7 {
                 pluginContext, contentView, insetsChangedListener, toolbarEnabled, fullscreen);
     }
 
-    // TODO(b/279507809) set to true to enable proxy plugin toolbar
     @Override
     public boolean customizesBaseLayout() {
-        return false;
+        return true;
     }
 
     @Override

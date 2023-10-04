@@ -40,7 +40,12 @@ buildscript {
     gradle.ext.repoRootPath = rootDir.parentFile.parentFile.parentFile.parentFile.parent
     gradle.ext.aaosCertPath = gradle.ext.repoRootPath + "/packages/apps/Car/libs/certs/com_android_car_apps_test.jks"
     gradle.ext.chassisCertPath = gradle.ext.repoRootPath + "/vendor/auto/embedded/prebuilts/car-ui-lib/chassis_upload_key.jks"
-    gradle.ext.platformCertPath = gradle.ext.repoRootPath + "/vendor/google/certs/devkeys/platform.keystore"
+    def googleCertPath = gradle.ext.repoRootPath + "/vendor/google/certs/devkeys/platform.keystore"
+    if (file(googleCertPath).exists()) {
+        gradle.ext.platformCertPath = googleCertPath
+    } else {
+        gradle.ext.platformCertPath = gradle.ext.repoRootPath + "/packages/apps/Car/libs/certs/platform.keystore"
+    }
     gradle.ext.soongBash = gradle.ext.repoRootPath + "/build/soong/soong_ui.bash"
     gradle.ext.platformSdkVersion = "33" // Change this to the most recent android API level.
     if (file(gradle.ext.soongBash).exists()) {

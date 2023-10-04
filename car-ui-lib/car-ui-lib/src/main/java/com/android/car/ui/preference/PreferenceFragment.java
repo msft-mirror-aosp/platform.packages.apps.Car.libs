@@ -55,6 +55,7 @@ import com.android.car.ui.toolbar.Toolbar;
 import com.android.car.ui.toolbar.ToolbarController;
 import com.android.car.ui.utils.CarUiUtils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,7 +115,7 @@ public abstract class PreferenceFragment extends PreferenceFragmentCompat implem
 
     /**
      * Sets up what the toolbar should display when on this PreferenceFragment.
-     *
+     * <p>
      * This can be overridden in subclasses to customize the toolbar. By default it puts a back
      * button on the toolbar, and sets its title to the {@link PreferenceScreen PreferenceScreen's}
      * title.
@@ -135,12 +136,12 @@ public abstract class PreferenceFragment extends PreferenceFragmentCompat implem
     /**
      * Gets the toolbar for the given fragment. The fragment can be either this PreferenceFragment,
      * or one of the fragments that are created from it such as {@link ListPreferenceFragment}.
-     *
+     * <p>
      * This can be overridden by subclasses to have the fragments use a different toolbar.
      *
-     * @see #getPreferenceInsets(Fragment)
      * @param fragment The fragment to get a toolbar for. Either this fragment, or one of the
      *                 fragments that it launches.
+     * @see #getPreferenceInsets(Fragment)
      */
     @Nullable
     protected ToolbarController getPreferenceToolbar(@NonNull Fragment fragment) {
@@ -151,12 +152,12 @@ public abstract class PreferenceFragment extends PreferenceFragmentCompat implem
      * Gets the {@link Insets} for the given fragment. The fragment can be either this
      * PreferenceFragment, or one of the fragments that are created from it such as
      * {@link ListPreferenceFragment}.
-     *
+     * <p>
      * This can be overridden by subclasses to have the fragments use different insets.
      *
+     * @param fragment The fragment to get insets for. Either this fragment, or one of the fragments
+     *                 that it launches.
      * @see #getPreferenceToolbar(Fragment)
-     * @param fragment The fragment to get insets for. Either this fragment, or one of the
-     *                 fragments that it launches.
      */
     @Nullable
     protected Insets getPreferenceInsets(@NonNull Fragment fragment) {
@@ -187,8 +188,8 @@ public abstract class PreferenceFragment extends PreferenceFragmentCompat implem
      * this method to display custom dialogs or to handle dialogs for custom preference classes.
      *
      * <p>Note: this is borrowed as-is from androidx.preference.PreferenceFragmentCompat with
-     * updates to launch Car UI library {@link DialogFragment} instead of the ones in the
-     * support library.
+     * updates to launch Car UI library {@link DialogFragment} instead of the ones in the support
+     * library.
      *
      * @param preference The {@link Preference} object requesting the dialog
      */
@@ -258,8 +259,8 @@ public abstract class PreferenceFragment extends PreferenceFragmentCompat implem
     }
 
     /**
-     * Sets up toolbar for {@link ListPreferenceFragment}
-     * and {@link MultiSelectListPreferenceFragment}
+     * Sets up toolbar for {@link ListPreferenceFragment} and
+     * {@link MultiSelectListPreferenceFragment}
      */
     protected void setupChildFragmentToolbar(@NonNull Preference preference) {
         ToolbarController toolbar = null;
@@ -369,12 +370,12 @@ public abstract class PreferenceFragment extends PreferenceFragmentCompat implem
 
     /**
      * In order to change the layout for {@link PreferenceFragment}, make sure the correct layout is
-     * passed to PreferenceFragment.CarUi theme.
-     * Override ht method in order to inflate {@link CarUiRecyclerView}
+     * passed to PreferenceFragment.CarUi theme. Override ht method in order to inflate
+     * {@link CarUiRecyclerView}
      */
     @NonNull
     public CarUiRecyclerView onCreateCarUiRecyclerView(LayoutInflater inflater, ViewGroup parent,
-                                                       Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         return requireViewByRefId(parent, R.id.recycler_view);
     }
 
@@ -450,27 +451,66 @@ public abstract class PreferenceFragment extends PreferenceFragmentCompat implem
         // When not in touch mode, focus on the previously focused and selected item, if any.
         if (mCarUiRecyclerView != null) {
             mCarUiRecyclerView.addOnChildAttachStateChangeListener(
-                        new RecyclerView.OnChildAttachStateChangeListener() {
-                            @Override
-                            public void onChildViewAttachedToWindow(View view) {
-                                // The RecyclerView in onCreateRecyclerView() might not be the real
-                                // RecyclerView in the view tree. However, when an item is attached
-                                // to window, its parent (a RecyclerView) must be the real
-                                // RecyclerView in the view tree, so update mRecyclerView here.
-                                if (mRecyclerView == null) {
-                                    mRecyclerView = view.getParent();
-                                }
-                                int position = mCarUiRecyclerView.getChildLayoutPosition(view);
-                                if (position == mLastFocusedAndSelectedPrefPosition) {
-                                    view.requestFocus();
-                                }
+                    new RecyclerView.OnChildAttachStateChangeListener() {
+                        @Override
+                        public void onChildViewAttachedToWindow(View view) {
+                            // The RecyclerView in onCreateRecyclerView() might not be the real
+                            // RecyclerView in the view tree. However, when an item is attached
+                            // to window, its parent (a RecyclerView) must be the real
+                            // RecyclerView in the view tree, so update mRecyclerView here.
+                            if (mRecyclerView == null) {
+                                mRecyclerView = view.getParent();
                             }
-                            @Override
-                            public void onChildViewDetachedFromWindow(View view) {
+                            int position = mCarUiRecyclerView.getChildLayoutPosition(view);
+                            if (position == mLastFocusedAndSelectedPrefPosition) {
+                                view.requestFocus();
                             }
-                });
+                        }
+
+                        @Override
+                        public void onChildViewDetachedFromWindow(View view) {
+                        }
+                    });
         }
         return recyclerView;
+    }
+
+    private static boolean getPreferenceDividerAllowedAbove(Preference preference) {
+        try {
+            Field field = Preference.class.getDeclaredField("mAllowDividerAbove");
+            field.setAccessible(true);
+            return (boolean) field.get(preference);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            return false;
+        }
+    }
+
+    private static void setPreferenceDividerAllowedAbove(Preference preference, boolean allowed) {
+        try {
+            Field field = Preference.class.getDeclaredField("mAllowDividerAbove");
+            field.setAccessible(true);
+            field.set(preference, allowed);
+        } catch (NoSuchFieldException | IllegalAccessException ignored) {
+        }
+    }
+
+    private static boolean getPreferenceDividerAllowedBelow(Preference preference) {
+        try {
+            Field field = Preference.class.getDeclaredField("mAllowDividerBelow");
+            field.setAccessible(true);
+            return (boolean) field.get(preference);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            return false;
+        }
+    }
+
+    private static void setPreferenceDividerAllowedBelow(Preference preference, boolean allowed) {
+        try {
+            Field field = Preference.class.getDeclaredField("mAllowDividerBelow");
+            field.setAccessible(true);
+            field.set(preference, allowed);
+        } catch (NoSuchFieldException | IllegalAccessException ignored) {
+        }
     }
 
     /**
@@ -500,6 +540,8 @@ public abstract class PreferenceFragment extends PreferenceFragmentCompat implem
         to.setVisible(from.isVisible());
         to.setLayoutResource(from.getLayoutResource());
         to.setCopyingEnabled(from.isCopyingEnabled());
+        setPreferenceDividerAllowedBelow(to, getPreferenceDividerAllowedBelow(from));
+        setPreferenceDividerAllowedAbove(to, getPreferenceDividerAllowedAbove(from));
 
         if (!(to instanceof UxRestrictablePreference)) {
             to.setShouldDisableView(from.getShouldDisableView());

@@ -19,11 +19,6 @@ package com.android.car.ui.paintbooth.caruirecyclerview;
 import android.app.Activity;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-
-import com.android.car.ui.FocusArea;
-import com.android.car.ui.baselayout.Insets;
-import com.android.car.ui.baselayout.InsetsChangedListener;
 import com.android.car.ui.core.CarUi;
 import com.android.car.ui.paintbooth.R;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
@@ -32,9 +27,10 @@ import com.android.car.ui.toolbar.ToolbarController;
 
 import java.util.ArrayList;
 
-/** Activity that shows GridCarUiRecyclerView example with sample data. */
-public class GridCarUiRecyclerViewActivity extends Activity implements
-        InsetsChangedListener {
+/**
+ * Activity that shows GridCarUiRecyclerView example with sample data.
+ */
+public class GridCarUiRecyclerViewActivity extends Activity {
     private final ArrayList<String> mData = new ArrayList<>();
     private final int mDataToGenerate = 200;
 
@@ -58,16 +54,5 @@ public class GridCarUiRecyclerViewActivity extends Activity implements
             mData.add("data" + i);
         }
         return mData;
-    }
-
-    @Override
-    public void onCarUiInsetsChanged(@NonNull Insets insets) {
-        FocusArea focusArea = requireViewById(R.id.focus_area);
-        focusArea.setBoundsOffset(0, insets.getTop(), 0, insets.getBottom());
-        focusArea.setHighlightPadding(0, insets.getTop(), 0, insets.getBottom());
-        requireViewById(R.id.list)
-                .setPadding(0, insets.getTop(), 0, insets.getBottom());
-        requireViewById(android.R.id.content)
-                .setPadding(insets.getLeft(), 0, insets.getRight(), 0);
     }
 }

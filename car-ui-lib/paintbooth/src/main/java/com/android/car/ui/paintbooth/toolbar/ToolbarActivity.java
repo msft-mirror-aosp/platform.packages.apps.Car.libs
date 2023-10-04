@@ -33,9 +33,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.ui.AlertDialogBuilder;
-import com.android.car.ui.FocusArea;
-import com.android.car.ui.baselayout.Insets;
-import com.android.car.ui.baselayout.InsetsChangedListener;
 import com.android.car.ui.core.CarUi;
 import com.android.car.ui.paintbooth.R;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
@@ -52,7 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ToolbarActivity extends AppCompatActivity implements InsetsChangedListener {
+public class ToolbarActivity extends AppCompatActivity {
 
     private final List<MenuItem> mMenuItems = new ArrayList<>();
     private final List<Pair<CharSequence, View.OnClickListener>> mButtons = new ArrayList<>();
@@ -67,7 +64,7 @@ public class ToolbarActivity extends AppCompatActivity implements InsetsChangedL
         toolbar.setTitle(getTitle());
         toolbar.setNavButtonMode(NavButtonMode.BACK);
         toolbar.setLogo(R.drawable.ic_launcher);
-        boolean[] isSearching = new boolean[] { false };
+        boolean[] isSearching = new boolean[]{false};
         toolbar.registerBackListener(
                 () -> {
                     if (toolbar.getState() == Toolbar.State.SEARCH
@@ -221,8 +218,8 @@ public class ToolbarActivity extends AppCompatActivity implements InsetsChangedL
                     .setOnClickListener(
                             i ->
                                     Toast.makeText(this,
-                                            "Checked? " + i.isChecked(),
-                                            Toast.LENGTH_SHORT)
+                                                    "Checked? " + i.isChecked(),
+                                                    Toast.LENGTH_SHORT)
                                             .show())
                     .build());
             toolbar.setMenuItems(mMenuItems);
@@ -325,8 +322,8 @@ public class ToolbarActivity extends AppCompatActivity implements InsetsChangedL
                     .setTitle("Foo " + overflowCounter.value)
                     .setOnClickListener(
                             i -> Toast.makeText(this,
-                                    i.isChecked() ? "Checked" : "Unchecked",
-                                    Toast.LENGTH_SHORT)
+                                            i.isChecked() ? "Checked" : "Unchecked",
+                                            Toast.LENGTH_SHORT)
                                     .show())
                     .setDisplayBehavior(MenuItem.DisplayBehavior.NEVER)
                     .setCheckable()
@@ -376,17 +373,6 @@ public class ToolbarActivity extends AppCompatActivity implements InsetsChangedL
 
         CarUiRecyclerView prv = requireViewById(R.id.list);
         prv.setAdapter(mAdapter);
-    }
-
-    @Override
-    public void onCarUiInsetsChanged(@NonNull Insets insets) {
-        FocusArea focusArea = requireViewById(R.id.focus_area);
-        focusArea.setBoundsOffset(0, insets.getTop(), 0, insets.getBottom());
-        focusArea.setHighlightPadding(0, insets.getTop(), 0, insets.getBottom());
-        requireViewById(R.id.list)
-                .setPadding(0, insets.getTop(), 0, insets.getBottom());
-        requireViewById(android.R.id.content)
-                .setPadding(insets.getLeft(), 0, insets.getRight(), 0);
     }
 
     public void xmlMenuItemClicked(MenuItem item) {
