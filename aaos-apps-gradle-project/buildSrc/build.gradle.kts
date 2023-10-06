@@ -22,7 +22,9 @@ repositories {
 }
 
 val androidGradlePluginVersion: String by project
+val kotlinGradlePluginVersion: String by project
 
 dependencies {
     implementation("com.android.tools.build:gradle:$androidGradlePluginVersion")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinGradlePluginVersion")
 }
