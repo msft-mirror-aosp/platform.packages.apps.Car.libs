@@ -24,6 +24,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.FrameLayout;
@@ -81,11 +82,13 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
         // implementation.
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             Context unwrappedContext = CarUiUtils.unwrapContext(context);
-            Insets systemBarInsets = unwrappedContext.getSystemService(
-                    WindowManager.class).getCurrentWindowMetrics().getWindowInsets().getInsets(
-                    WindowInsetsCompat.Type.statusBars());
+            WindowInsets windowInsets =
+                    unwrappedContext.getSystemService(
+                            WindowManager.class).getCurrentWindowMetrics().getWindowInsets();
+            Insets systemBarInsets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars());
+            Insets imeInsets = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
 
-            return systemBarInsets.top + systemBarInsets.bottom;
+            return systemBarInsets.top + systemBarInsets.bottom + imeInsets.top + imeInsets.bottom;
         }
 
         return (float) (displayMetrics.heightPixels * (1 - VISIBLE_SCREEN_PERCENTAGE));
