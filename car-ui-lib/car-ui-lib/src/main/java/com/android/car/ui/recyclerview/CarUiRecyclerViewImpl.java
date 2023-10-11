@@ -27,6 +27,7 @@ import android.car.drivingstate.CarUxRestrictions;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build.VERSION_CODES;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.InputDevice;
@@ -177,7 +178,7 @@ public final class CarUiRecyclerViewImpl extends FrameLayout
     /**
      * Initialize the state of the recyclerview
      *
-     * @param attrs AttributeSet that came via xml layout files
+     * @param attrs  AttributeSet that came via xml layout files
      * @param attrs2 RecyclerViewAttributesOEMV1 that are only available through the plugin system
      */
     private void init(Context context,
@@ -194,7 +195,7 @@ public final class CarUiRecyclerViewImpl extends FrameLayout
         @LayoutRes int layout = R.layout.car_ui_recycler_view_no_scrollbar;
 
         mSize = (attrs2 != null) ? attrs2.getSize() :
-            a.getInt(R.styleable.CarUiRecyclerView_carUiSize, SIZE_LARGE);
+                a.getInt(R.styleable.CarUiRecyclerView_carUiSize, SIZE_LARGE);
         if (mScrollBarEnabled) {
             switch (mSize) {
                 case SIZE_SMALL:
@@ -265,33 +266,33 @@ public final class CarUiRecyclerViewImpl extends FrameLayout
 
         boolean rotaryScrollEnabled = (attrs2 != null) ? attrs2.isRotaryScrollEnabled() :
                 a.getBoolean(
-                    R.styleable.CarUiRecyclerView_rotaryScrollEnabled, /* defValue=*/ false);
+                        R.styleable.CarUiRecyclerView_rotaryScrollEnabled, /* defValue=*/ false);
         int orientation = (attrs2 != null) ? attrs2.getLayoutStyle().getOrientation() :
                 a.getInt(R.styleable.CarUiRecyclerView_android_orientation,
-                    LinearLayout.VERTICAL);
+                        LinearLayout.VERTICAL);
         initRotaryScroll(mRecyclerView, rotaryScrollEnabled, orientation);
 
         mScrollBarPaddingTop = context.getResources()
-            .getDimensionPixelSize(R.dimen.car_ui_scrollbar_padding_top);
+                .getDimensionPixelSize(R.dimen.car_ui_scrollbar_padding_top);
         mScrollBarPaddingBottom = context.getResources()
-            .getDimensionPixelSize(R.dimen.car_ui_scrollbar_padding_bottom);
+                .getDimensionPixelSize(R.dimen.car_ui_scrollbar_padding_bottom);
 
         @CarUiRecyclerViewLayout int carUiRecyclerViewLayout = (attrs2 != null)
                 ? attrs2.getLayoutStyle().getLayoutType() :
                 a.getInt(R.styleable.CarUiRecyclerView_layoutStyle, CarUiRecyclerViewLayout.LINEAR);
         mNumOfColumns = (attrs2 != null) ? attrs2.getLayoutStyle().getSpanCount() :
-            a.getInt(R.styleable.CarUiRecyclerView_numOfColumns, /* defValue= */ 2);
+                a.getInt(R.styleable.CarUiRecyclerView_numOfColumns, /* defValue= */ 2);
         mEnableDividers = attrs2 == null && a.getBoolean(
-            R.styleable.CarUiRecyclerView_enableDivider, /* defValue= */ false);
+                R.styleable.CarUiRecyclerView_enableDivider, /* defValue= */ false);
 
         mDividerItemDecorationLinear = new LinearDividerItemDecoration(
-            ContextCompat.getDrawable(context, R.drawable.car_ui_recyclerview_divider));
+                ContextCompat.getDrawable(context, R.drawable.car_ui_recyclerview_divider));
 
         mDividerItemDecorationGrid =
-            new GridDividerItemDecoration(
-                ContextCompat.getDrawable(context, R.drawable.car_ui_divider),
-                ContextCompat.getDrawable(context, R.drawable.car_ui_divider),
-                mNumOfColumns);
+                new GridDividerItemDecoration(
+                        ContextCompat.getDrawable(context, R.drawable.car_ui_divider),
+                        ContextCompat.getDrawable(context, R.drawable.car_ui_divider),
+                        mNumOfColumns);
 
         mIsInitialized = true;
 
@@ -691,8 +692,16 @@ public final class CarUiRecyclerViewImpl extends FrameLayout
     @Override
     public void requestLayout() {
         super.requestLayout();
+
         if (mIsInitialized) {
+            Parcelable recyclerViewState = null;
+            if (mRecyclerView.getLayoutManager() != null) {
+                recyclerViewState = mRecyclerView.getLayoutManager().onSaveInstanceState();
+            }
             mRecyclerView.requestLayout();
+            if (mRecyclerView.getLayoutManager() != null && recyclerViewState != null) {
+                mRecyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+            }
         }
         if (mScrollBar != null) {
             mScrollBar.requestLayout();
