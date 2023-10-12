@@ -62,9 +62,20 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
         super.onCreate(savedInstanceState);
         setContentView(mController.getAppStyledView(mContent));
 
+        Window window = getWindow();
+        if (window == null) {
+            return;
+        }
+
         WindowManager.LayoutParams params = getWindow().getAttributes();
-        getWindow().setAttributes(mController.getDialogWindowLayoutParam(params));
-        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        window.setAttributes(mController.getDialogWindowLayoutParam(params));
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        window.getDecorView().getRootView().setOnApplyWindowInsetsListener(
+                (v, insets) -> {
+                    WindowManager.LayoutParams dialogParams = window.getAttributes();
+                    window.setAttributes(mController.getDialogWindowLayoutParam(dialogParams));
+                    return insets;
+                });
     }
 
     @Override
