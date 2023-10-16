@@ -47,7 +47,7 @@ import com.android.car.ui.utils.CarUiUtils;
 
 import com.chassis.car.ui.plugin.appstyledview.AppStyledViewControllerAdapterProxyV3;
 import com.chassis.car.ui.plugin.preference.PreferenceAdapterProxy;
-import com.chassis.car.ui.plugin.recyclerview.CarListItemAdapterAdapterProxy;
+import com.chassis.car.ui.plugin.recyclerview.CarUiListItemAdapterAdapterProxyV1;
 import com.chassis.car.ui.plugin.recyclerview.ListItemUtils;
 import com.chassis.car.ui.plugin.recyclerview.RecyclerViewAdapterProxyV2;
 import com.chassis.car.ui.plugin.toolbar.BaseLayoutInstallerProxy;
@@ -55,10 +55,8 @@ import com.chassis.car.ui.plugin.toolbar.BaseLayoutInstallerProxy;
 import java.util.List;
 
 /**
- * An implementation of the plugin factory that delegates back to the car-ui-lib implementation.
- * The main benefit of this is so that customizations can be applied to the car-ui-lib via a RRO
- * without the need to target each app specifically. Note: it only applies to the components that
- * come through the plugin system.
+ * See {@code PluginFactoryImplV8}. This class is for backwards compatibility with apps that use
+ * an older version of car-ui-lib.
  */
 public class PluginFactoryImplV7 implements PluginFactoryOEMV7 {
     private final PluginUiContextFactory mPluginUiContextFactory;
@@ -125,7 +123,7 @@ public class PluginFactoryImplV7 implements PluginFactoryOEMV7 {
                 ListItemUtils::toStaticListItem);
         // Build the CarUiListItemAdapter that will be delegated to
         CarUiListItemAdapter carUiListItemAdapter = new CarUiListItemAdapter(staticItems);
-        return new CarListItemAdapterAdapterProxy(
+        return new CarUiListItemAdapterAdapterProxyV1(
                 carUiListItemAdapter, mPluginUiContextFactory.getRecentPluginUiContext());
     }
 }

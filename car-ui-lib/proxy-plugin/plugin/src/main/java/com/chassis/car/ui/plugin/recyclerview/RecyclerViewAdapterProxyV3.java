@@ -29,12 +29,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.OnChildAttachStateChangeListener;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
-import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
+import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV2;
 import com.android.car.ui.plugin.oemapis.recyclerview.LayoutStyleOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.OnChildAttachStateChangeListenerOEMV1;
-import com.android.car.ui.plugin.oemapis.recyclerview.OnScrollListenerOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewAttributesOEMV1;
-import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewOEMV1;
+import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewOEMV3;
 import com.android.car.ui.plugin.oemapis.recyclerview.ViewHolderOEMV1;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.recyclerview.CarUiRecyclerViewImpl;
@@ -43,38 +42,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * See {@code RecyclerViewAdapterProxyV3}. This class is for backwards compatibility with apps that
- * use an older version of car-ui-lib.
+ *  Adapts a {@link RecyclerViewAdapterV3} into a {@link RecyclerViewOEMV3}.
  */
-public class RecyclerViewAdapterProxyV1 implements RecyclerViewOEMV1 {
+public class RecyclerViewAdapterProxyV3 implements RecyclerViewOEMV3 {
     private Context mPluginContext;
     private CarUiRecyclerViewImpl mRecyclerView;
 
-    public RecyclerViewAdapterProxyV1(Context pluginContext, CarUiRecyclerViewImpl recyclerView,
-            RecyclerViewAttributesOEMV1 recyclerViewAttributesOEMV1) {
+    public RecyclerViewAdapterProxyV3(Context pluginContext, CarUiRecyclerViewImpl recyclerView,
+                                      RecyclerViewAttributesOEMV1 recyclerViewAttributesOEMV1) {
         mPluginContext = pluginContext;
         mRecyclerView = recyclerView;
         setLayoutStyle(recyclerViewAttributesOEMV1.getLayoutStyle());
     }
 
     @NonNull
-    private final List<OnScrollListenerOEMV1> mScrollListeners = new ArrayList<>();
+    private final List<OnScrollListenerOEMV3> mScrollListeners = new ArrayList<>();
 
     @NonNull
     private final CarUiRecyclerView.OnScrollListener mOnScrollListener =
             new CarUiRecyclerView.OnScrollListener() {
                 @Override
                 public void onScrolled(@NonNull CarUiRecyclerView recyclerView, int dx, int dy) {
-                    for (OnScrollListenerOEMV1 listener : mScrollListeners) {
-                        listener.onScrolled(RecyclerViewAdapterProxyV1.this, dx, dy);
+                    for (OnScrollListenerOEMV3 listener : mScrollListeners) {
+                        listener.onScrolled(RecyclerViewAdapterProxyV3.this, dx, dy);
                     }
                 }
 
                 @Override
                 public void onScrollStateChanged(@NonNull CarUiRecyclerView recyclerView,
-                        int newState) {
-                    for (OnScrollListenerOEMV1 listener : mScrollListeners) {
-                        listener.onScrollStateChanged(RecyclerViewAdapterProxyV1.this,
+                                                 int newState) {
+                    for (OnScrollListenerOEMV3 listener : mScrollListeners) {
+                        listener.onScrollStateChanged(RecyclerViewAdapterProxyV3.this,
                                 toInternalScrollState(newState));
                     }
                 }
@@ -105,13 +103,13 @@ public class RecyclerViewAdapterProxyV1 implements RecyclerViewOEMV1 {
 
     private static int toInternalScrollState(int state) {
         /* default to RecyclerView.SCROLL_STATE_IDLE */
-        int internalState = RecyclerViewOEMV1.SCROLL_STATE_IDLE;
+        int internalState = RecyclerViewOEMV3.SCROLL_STATE_IDLE;
         switch (state) {
             case RecyclerView.SCROLL_STATE_DRAGGING:
-                internalState = RecyclerViewOEMV1.SCROLL_STATE_DRAGGING;
+                internalState = RecyclerViewOEMV3.SCROLL_STATE_DRAGGING;
                 break;
             case RecyclerView.SCROLL_STATE_SETTLING:
-                internalState = RecyclerViewOEMV1.SCROLL_STATE_SETTLING;
+                internalState = RecyclerViewOEMV3.SCROLL_STATE_SETTLING;
                 break;
         }
         return internalState;
@@ -119,25 +117,25 @@ public class RecyclerViewAdapterProxyV1 implements RecyclerViewOEMV1 {
 
 
     @Override
-    public <V extends ViewHolderOEMV1> void setAdapter(AdapterOEMV1<V> adapterOEMV1) {
-        if (adapterOEMV1 == null) {
+    public <V extends ViewHolderOEMV1> void setAdapter(AdapterOEMV2<V> adapterOEMV2) {
+        if (adapterOEMV2 == null) {
             mRecyclerView.setAdapter(null);
         } else {
-            mRecyclerView.setAdapter(new RVAdapterWrapper(adapterOEMV1));
+            mRecyclerView.setAdapter(new RVAdapterWrapper(adapterOEMV2));
         }
     }
 
     @Override
-    public void addOnScrollListener(@NonNull OnScrollListenerOEMV1 onScrollListenerOEMV1) {
+    public void addOnScrollListener(@NonNull OnScrollListenerOEMV3 onScrollListenerOEMV3) {
         if (mScrollListeners.isEmpty()) {
             mRecyclerView.addOnScrollListener(mOnScrollListener);
         }
-        mScrollListeners.add(onScrollListenerOEMV1);
+        mScrollListeners.add(onScrollListenerOEMV3);
     }
 
     @Override
-    public void removeOnScrollListener(@NonNull OnScrollListenerOEMV1 onScrollListenerOEMV1) {
-        mScrollListeners.remove(onScrollListenerOEMV1);
+    public void removeOnScrollListener(@NonNull OnScrollListenerOEMV3 onScrollListenerOEMV3) {
+        mScrollListeners.remove(onScrollListenerOEMV3);
         if (mScrollListeners.isEmpty()) {
             mRecyclerView.removeOnScrollListener(mOnScrollListener);
         }
@@ -383,6 +381,21 @@ public class RecyclerViewAdapterProxyV1 implements RecyclerViewOEMV1 {
     @Override
     public View findViewByPosition(int i) {
         return mRecyclerView.findViewByPosition(i);
+    }
+
+    @Override
+    public boolean isComputingLayout() {
+        return !mRecyclerView.isLayoutCompleted();
+    }
+
+    @Override
+    public void addOnLayoutCompleteListener(@Nullable Runnable runnable) {
+        mRecyclerView.addOnLayoutCompleteListener(runnable);
+    }
+
+    @Override
+    public void removeOnLayoutCompleteListener(@Nullable Runnable runnable) {
+        mRecyclerView.removeOnLayoutCompleteListener(runnable);
     }
 
     @Override

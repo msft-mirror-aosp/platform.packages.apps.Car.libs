@@ -35,16 +35,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Adapts a {@link CarUiListItemAdapter} into a {@link AdapterOEMV1}
+ * See {@code CarUiListItemAdapterAdapterProxyV2}. This class is for backwards compatibility with
+ * apps that use an older version of car-ui-lib.
  */
-public class CarListItemAdapterAdapterProxy implements
-        AdapterOEMV1<CarListItemAdapterAdapterProxy.ViewHolderWrapper> {
+public class CarUiListItemAdapterAdapterProxyV1 implements
+        AdapterOEMV1<CarUiListItemAdapterAdapterProxyV1.ViewHolderWrapper> {
 
     private final CarUiListItemAdapter mDelegateAdapter;
     private final Context mPluginContext;
 
 
-    public CarListItemAdapterAdapterProxy(CarUiListItemAdapter carUiListItemAdapter,
+    public CarUiListItemAdapterAdapterProxyV1(CarUiListItemAdapter carUiListItemAdapter,
             Context pluginContext) {
         mPluginContext = pluginContext;
         mDelegateAdapter = carUiListItemAdapter;

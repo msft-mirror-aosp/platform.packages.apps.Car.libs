@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 The Android Open Source Project
+ * Copyright (C) 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,20 @@ import androidx.annotation.Nullable;
 
 /**
  * {@code androidx.recyclerview.widget.RecyclerView}
- *
- * @deprecated Use {@link RecyclerViewOEMV3} instead
  */
-@Deprecated
-public interface RecyclerViewOEMV1 {
+public interface RecyclerViewOEMV3 {
+
+    /** See {@code androidx.recyclerview.widget.RecyclerView.OnScrollListener} */
+    interface OnScrollListenerOEMV3 {
+        /**
+         * See
+         * {@code androidx.recyclerview.widget.RecyclerView.OnScrollListener#onScrollStateChanged}
+         */
+        void onScrollStateChanged(@NonNull RecyclerViewOEMV3 recyclerView, int newState);
+
+        /** See {@code androidx.recyclerview.widget.RecyclerView.OnScrollListener#onScrolled} */
+        void onScrolled(@NonNull RecyclerViewOEMV3 recyclerView, int dx, int dy);
+    }
 
     /**
      * The RecyclerView is not currently scrolling.
@@ -51,13 +60,13 @@ public interface RecyclerViewOEMV1 {
     int SCROLL_STATE_SETTLING = 2;
 
     /** {@code RecyclerView#setAdapter(Adapter)} */
-    <V extends ViewHolderOEMV1> void setAdapter(@Nullable AdapterOEMV1<V> adapter);
+    <V extends ViewHolderOEMV1> void setAdapter(@Nullable AdapterOEMV2<V> adapter);
 
     /** {@code RecyclerView#addOnScrollListener} */
-    void addOnScrollListener(@NonNull OnScrollListenerOEMV1 listener);
+    void addOnScrollListener(@NonNull OnScrollListenerOEMV3 listener);
 
     /** {@code RecyclerView#removeOnScrollListener} */
-    void removeOnScrollListener(@NonNull OnScrollListenerOEMV1 listener);
+    void removeOnScrollListener(@NonNull OnScrollListenerOEMV3 listener);
 
     /** {@code RecyclerView#clearOnScrollListeners()} */
     void clearOnScrollListeners();
@@ -202,4 +211,17 @@ public interface RecyclerViewOEMV1 {
     /** {@code LayoutManager#findViewByPosition} */
     @Nullable
     View findViewByPosition(int position);
+
+    /** {code RecyclerView#isComputingLayout()} */
+    boolean isComputingLayout();
+
+    /**
+     * Adds a listener to be called when the view's layout is completed.
+     */
+    void addOnLayoutCompleteListener(@Nullable Runnable runnable);
+
+    /**
+     * Removes a listener to be called when the view's layout is completed.
+     */
+    void removeOnLayoutCompleteListener(@Nullable Runnable runnable);
 }
