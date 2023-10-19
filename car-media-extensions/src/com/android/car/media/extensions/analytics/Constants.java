@@ -48,7 +48,7 @@ public class Constants {
      * @see Constants#ANALYTICS_SHARE_OEM_DIAGNOSTICS
      */
     public static final String ANALYTICS_ROOT_KEY_BROADCAST_COMPONENT_NAME =
-            "androidx.car.app.mediaextension.broadcastcomponentname";
+            "androidx.car.app.mediaextension.analytics.broadcastcomponentname";
 
     /**
      * Passkey used to verify analytics broadcast is sent from an approved host. Handled by
@@ -111,8 +111,8 @@ public class Constants {
      *
      * <p>Type: String - String value that indicates analytics event action.
      */
-    public static final String ANALYTICS_INTENT_ACTION =
-            "androidx.car.app.media.mediaextensions.analytics.action";
+    public static final String ACTION_ANALYTICS =
+            "androidx.car.app.mediaextensions.analytics.action.ANALYTICS";
 
     /** @Hide */
     public static final String ANALYTICS_EVENT_BUNDLE_ARRAY_KEY =
