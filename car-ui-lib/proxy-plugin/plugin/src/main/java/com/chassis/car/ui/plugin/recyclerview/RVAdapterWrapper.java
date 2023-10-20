@@ -209,7 +209,7 @@ public final class RVAdapterWrapper extends Adapter<RVAdapterWrapper.ViewHolderW
 
             @Override
             public int getItemViewType(int position) {
-                return getItemViewType(position);
+                return adapter.getItemViewType(position);
             }
 
             @Override
