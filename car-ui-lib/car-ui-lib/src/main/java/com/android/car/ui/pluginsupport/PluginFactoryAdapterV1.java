@@ -53,6 +53,7 @@ import java.util.function.Function;
  * PluginFactory}, to provide a version-agnostic way of interfacing with the OEM's
  * PluginFactory.
  */
+@SuppressWarnings("AndroidJdkLibsChecker")
 public final class PluginFactoryAdapterV1 implements PluginFactory {
     @NonNull
     private final PluginFactoryOEMV1 mOem;
