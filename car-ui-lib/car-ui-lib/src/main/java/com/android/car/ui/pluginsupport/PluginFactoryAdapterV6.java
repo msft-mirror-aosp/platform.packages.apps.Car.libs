@@ -41,6 +41,9 @@ import com.android.car.ui.appstyledview.AppStyledViewControllerImpl;
 import com.android.car.ui.baselayout.Insets;
 import com.android.car.ui.baselayout.InsetsChangedListener;
 import com.android.car.ui.plugin.oemapis.Consumer;
+import com.android.car.ui.plugin.oemapis.FocusAreaOEMV1;
+import com.android.car.ui.plugin.oemapis.FocusParkingViewOEMV1;
+import com.android.car.ui.plugin.oemapis.Function;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV6;
 import com.android.car.ui.plugin.oemapis.TextOEMV1;
@@ -86,8 +89,21 @@ public final class PluginFactoryAdapterV6 implements PluginFactory {
     public PluginFactoryAdapterV6(@NonNull PluginFactoryOEMV6 oem) {
         mOem = oem;
         mOem.setRotaryFactories(
-                c -> new FocusParkingViewAdapterV1(new FocusParkingView(c)),
-                c -> new FocusAreaAdapterV1(new FocusArea(c)));
+                // TODO (b/304841988) Provide full Function definitions instead of a lambda as a
+                //  workaround to avoid r8 stripping this code during optimization, which prevents a
+                //  crash when an app relies on this callback
+                new Function<Context, FocusParkingViewOEMV1>() {
+                    @Override
+                    public FocusParkingViewOEMV1 apply(Context context) {
+                        return new FocusParkingViewAdapterV1(new FocusParkingView(context));
+                    }
+                },
+                new Function<Context, FocusAreaOEMV1>() {
+                    @Override
+                    public FocusAreaOEMV1 apply(Context context) {
+                        return new FocusAreaAdapterV1(new FocusArea(context));
+                    }
+                });
     }
 
     @Nullable
@@ -107,8 +123,17 @@ public final class PluginFactoryAdapterV6 implements PluginFactory {
         ToolbarControllerOEMV2 toolbar = mOem.installBaseLayoutAround(
                 context,
                 contentView,
-                insetsChangedListener == null ? null
-                        : insets -> insetsChangedListener.onCarUiInsetsChanged(adaptInsets(insets)),
+                // TODO (b/304841988) Provide full Consumer definition instead of a lambda as a
+                //  workaround to avoid r8 stripping this code during optimization, which prevents a
+                //  crash when an app relies on this callback
+                new Consumer<InsetsOEMV1>() {
+                    @Override
+                    public void accept(@NonNull InsetsOEMV1 insets) {
+                        if (insetsChangedListener != null) {
+                            insetsChangedListener.onCarUiInsetsChanged(adaptInsets(insets));
+                        }
+                    }
+                },
                 toolbarEnabled, fullscreen);
 
         if (toolbar != null) {
