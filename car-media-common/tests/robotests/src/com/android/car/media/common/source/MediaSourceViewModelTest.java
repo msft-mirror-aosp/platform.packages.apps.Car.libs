@@ -30,10 +30,12 @@ import android.app.Application;
 import android.car.Car;
 import android.car.media.CarMediaManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.support.v4.media.MediaBrowserCompat;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.test.core.app.ApplicationProvider;
 
 import com.android.car.apps.common.testutils.CaptureObserver;
 import com.android.car.apps.common.testutils.InstantTaskExecutorRule;
@@ -75,9 +77,11 @@ public class MediaSourceViewModelTest {
 
     private MediaSource mRequestedSource;
     private MediaSource mMediaSource;
+    private Context mContext;
 
     @Before
     public void setUp() {
+        mContext = ApplicationProvider.getApplicationContext();
         mRequestedSource = null;
         mMediaSource = null;
     }
@@ -136,7 +140,8 @@ public class MediaSourceViewModelTest {
         initializeViewModel();
 
         mViewModel.getBrowserCallback().onBrowserConnectionChanged(
-                new BrowsingState(mMediaSource, mMediaBrowser, ConnectionStatus.CONNECTED));
+                new BrowsingState(mContext, mMediaSource, mMediaBrowser,
+                        ConnectionStatus.CONNECTED));
         mViewModel.getBrowsingState().observe(mLifecycleOwner, observer);
 
         BrowsingState browsingState = observer.getObservedValue();
@@ -153,7 +158,8 @@ public class MediaSourceViewModelTest {
         initializeViewModel();
 
         mViewModel.getBrowserCallback().onBrowserConnectionChanged(
-                new BrowsingState(mMediaSource, mMediaBrowser, ConnectionStatus.REJECTED));
+                new BrowsingState(mContext, mMediaSource, mMediaBrowser,
+                        ConnectionStatus.REJECTED));
         mViewModel.getBrowsingState().observe(mLifecycleOwner, observer);
 
         BrowsingState browsingState = observer.getObservedValue();

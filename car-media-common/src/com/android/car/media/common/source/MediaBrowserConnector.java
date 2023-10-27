@@ -32,6 +32,8 @@ import androidx.core.util.Preconditions;
 import androidx.media.utils.MediaConstants;
 
 import com.android.car.media.common.R;
+import com.android.car.media.common.analytics.AnalyticsHelper;
+import com.android.car.media.extensions.analytics.host.IAnalyticsManager;
 
 import java.util.Objects;
 
@@ -89,16 +91,39 @@ public class MediaBrowserConnector {
      * {@link ConnectionStatus}.
      */
     public static class BrowsingState {
+        @NonNull final Context mContext;
         @NonNull public final MediaSource mMediaSource;
         @NonNull public final MediaBrowserCompat mBrowser;
         @NonNull public final ConnectionStatus mConnectionStatus;
+        @NonNull final Bundle mRootExtras = new Bundle();
+        @NonNull IAnalyticsManager mAnalyticsManager;
 
         @VisibleForTesting
-        public BrowsingState(@NonNull MediaSource mediaSource, @NonNull MediaBrowserCompat browser,
-                @NonNull ConnectionStatus status) {
+        public BrowsingState(Context context, @NonNull MediaSource mediaSource,
+                @NonNull MediaBrowserCompat browser, @NonNull ConnectionStatus status) {
+            mContext = context;
             mMediaSource = Preconditions.checkNotNull(mediaSource, "source can't be null");
             mBrowser = Preconditions.checkNotNull(browser, "browser can't be null");
             mConnectionStatus = Preconditions.checkNotNull(status, "status can't be null");
+            if (browser.isConnected() && browser.getExtras() != null) {
+                mRootExtras.putAll(browser.getExtras());
+            }
+            mAnalyticsManager = AnalyticsHelper.makeAnalyticsManager(mContext, mMediaSource,
+                    mRootExtras);
+        }
+
+        /** Updates rootextras */
+        public void updateRootExtras(@NonNull Bundle rootExtras) {
+            mRootExtras.clear();
+            mRootExtras.putAll(rootExtras);
+            mAnalyticsManager.sendQueue();
+            mAnalyticsManager = AnalyticsHelper.makeAnalyticsManager(mContext, mMediaSource,
+                    mRootExtras);
+        }
+
+        @NonNull
+        public IAnalyticsManager getAnalyticsManager() {
+            return mAnalyticsManager;
         }
 
         @Override
@@ -209,7 +234,8 @@ public class MediaBrowserConnector {
             Log.e(TAG, "sendNewState mBrowser is null!");
             return;
         }
-        mCallback.onBrowserConnectionChanged(new BrowsingState(mMediaSource, mBrowser, cnx));
+        mCallback.onBrowserConnectionChanged(
+                new BrowsingState(mContext, mMediaSource, mBrowser, cnx));
     }
 
     /**

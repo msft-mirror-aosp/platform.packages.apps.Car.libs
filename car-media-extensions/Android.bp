@@ -1,0 +1,66 @@
+
+//
+// Copyright (C) 2023 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Unbundled target (should stay that way).
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+media_extensions_common_static_libs = [
+    "androidx.annotation_annotation",
+    "junit",
+]
+
+android_library {
+    name: "car-media-extensions-source",
+    srcs: ["src/**/*.java"],
+    resource_dirs: ["res"],
+    min_sdk_version: "30",
+    target_sdk_version: "31",
+    sdk_version: "system_current",
+    optimize: {
+        enabled: false,
+    },
+    libs: [
+       "androidx.annotation_annotation",
+   ],
+    static_libs: media_extensions_common_static_libs
+}
+
+java_genrule {
+    name: "car-media-extensions-aar",
+    srcs: [
+        ":car-media-extensions-source{.aar}",
+        "res/**/*",
+    ],
+    out: ["car-media-extensions.aar"],
+    tools: [
+        "make_slim_aar",
+    ],
+    cmd: "dir=packages/apps/Car/libs/car-media-extensions && " +
+        "$(location make_slim_aar) --classes-allowlist com/android/car/media/extensions $(out) " +
+        "$(location :car-media-extensions-source{.aar}) $$dir/res",
+    dist: {
+        targets: ["car-media-extensions-aar",]
+    },
+}
+
+android_library_import {
+    name: "car-media-extensions-prebuilt",
+    aars: [":car-media-extensions-aar"],
+    sdk_version: "current",
+    static_libs: media_extensions_common_static_libs,
+}

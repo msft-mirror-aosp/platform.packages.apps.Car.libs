@@ -26,6 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.robolectric.RuntimeEnvironment.application;
 
+import android.content.Context;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -35,6 +36,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
+import androidx.test.core.app.ApplicationProvider;
 
 import com.android.car.apps.common.testutils.CaptureObserver;
 import com.android.car.apps.common.testutils.InstantTaskExecutorRule;
@@ -91,13 +93,16 @@ public class PlaybackViewModelTest {
     private MutableLiveData<BrowsingState> mBrowsingStateLD;
 
     private Map<MediaBrowserCompat, MediaControllerCompat> mBrowserToController = new HashMap<>();
+    private Context mContext;
 
     @Before
     public void setUp() {
+        mContext = ApplicationProvider.getApplicationContext();
         mBrowserToController.put(mMediaBrowser, mMediaController);
         doNothing().when(mMediaController).registerCallback(mCapturedCallback.capture());
         mBrowsingStateLD = dataOf(
-                new BrowsingState(mMediaSource, mMediaBrowser, ConnectionStatus.CONNECTED));
+                new BrowsingState(mContext, mMediaSource, mMediaBrowser,
+                        ConnectionStatus.CONNECTED));
         mPlaybackViewModel = new PlaybackViewModel(application, mBrowsingStateLD,
                 browser -> mBrowserToController.get(browser));
     }
@@ -238,7 +243,8 @@ public class PlaybackViewModelTest {
         });
 
         mBrowsingStateLD.setValue(
-                new BrowsingState(mMediaSource, newMediaBrowser, ConnectionStatus.CONNECTED));
+                new BrowsingState(mContext, mMediaSource, newMediaBrowser,
+                        ConnectionStatus.CONNECTED));
         deliverValuesToCallbacks(newCallbackCaptor, newMetadata, newPlaybackState);
     }
 

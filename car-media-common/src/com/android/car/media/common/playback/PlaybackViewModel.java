@@ -381,6 +381,11 @@ public class PlaybackViewModel extends AndroidViewModel {
                 mPlaybackStateWrapper.setValue(null);
             }
         }
+
+        @Override
+        public void onExtrasChanged(Bundle extras) {
+            mBrowsingState.updateRootExtras(extras);
+        }
     }
 
     /** Convenient extension of {@link PlaybackStateCompat}. */
