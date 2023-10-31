@@ -34,6 +34,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -43,9 +44,11 @@ import java.util.Objects;
 public class MediaSourceViewModel extends AndroidViewModel {
     private static final String TAG = "MediaSourceViewModel";
 
+
     private static MediaSourceViewModel[] sInstances = new MediaSourceViewModel[2];
     private final Car mCar;
     private CarMediaManager mCarMediaManager;
+
 
     // Primary media source.
     private final MutableLiveData<MediaSource> mPrimaryMediaSource = dataOf(null);
@@ -55,6 +58,9 @@ public class MediaSourceViewModel extends AndroidViewModel {
 
     private final Handler mHandler;
     private final CarMediaManager.MediaSourceChangedListener mMediaSourceListener;
+
+    private final MediaSourceUtil mMediaSourceUtil;
+
 
     /**
      * Factory for creating dependencies. Can be swapped out for testing.
@@ -124,6 +130,7 @@ public class MediaSourceViewModel extends AndroidViewModel {
         mMode = mode;
         mInputFactory = inputFactory;
         mCar = inputFactory.getCarApi();
+        mMediaSourceUtil = new MediaSourceUtil(application.getApplicationContext());
 
         mBrowserConnector = inputFactory.createMediaBrowserConnector(application, mBrowserCallback);
 
@@ -134,10 +141,10 @@ public class MediaSourceViewModel extends AndroidViewModel {
         try {
             mCarMediaManager = mInputFactory.getCarMediaManager(mCar);
             mCarMediaManager.addMediaSourceListener(mMediaSourceListener, mode);
-            MediaSource src = mInputFactory.getMediaSource(mCarMediaManager.getMediaSource(mode));
-            if (Log.isLoggable(TAG, Log.INFO)) {
-                Log.i(TAG, "Initializing with " + src);
-            }
+
+            MediaSource src = getInitialMediaSource(mode);
+            Log.i(TAG, "Initializing " + (mode == 0 ? "playback" : "browse")
+                    + " mode with " + src);
             updateModelState(src);
         } catch (CarNotConnectedException e) {
             Log.e(TAG, "Car not connected", e);
@@ -185,9 +192,22 @@ public class MediaSourceViewModel extends AndroidViewModel {
 
     private void updateModelState(MediaSource newMediaSource) {
         MediaSource oldMediaSource = mPrimaryMediaSource.getValue();
-
+        if (Log.isLoggable(TAG, Log.DEBUG)) {
+            Log.d(TAG, "updateModelState from " + oldMediaSource + " to " + newMediaSource);
+        }
         if (Objects.equals(oldMediaSource, newMediaSource)) {
             return;
+        }
+
+        // Skip non Audio apps
+        if (newMediaSource != null) {
+            ComponentName mbsName = newMediaSource.getBrowseServiceComponentName();
+            if (!mMediaSourceUtil.isAudioMediaSource(mbsName)) {
+                Log.i(TAG, "Skipping update from " + oldMediaSource
+                        + " for non audio app mbs:" + mbsName);
+                return;
+            }
+            Log.i(TAG, "Updating from " + oldMediaSource + " to audio app mbs:" + mbsName);
         }
 
         // Broadcast the new source
@@ -198,4 +218,23 @@ public class MediaSourceViewModel extends AndroidViewModel {
             mBrowserConnector.connectTo(newMediaSource);
         }
     }
+
+    /**
+     * Iterate over past sources and find the first valid media source
+     */
+    private MediaSource getInitialMediaSource(int mode) {
+        List<ComponentName> lastMediaSources = mCarMediaManager.getLastMediaSources(mode);
+        if (Log.isLoggable(TAG, Log.DEBUG)) {
+            Log.d(TAG, "Found media sources history for "
+                    + (mode == 0 ? "playback" : "browse") + ":" + lastMediaSources);
+        }
+        ComponentName initialMediaSource = lastMediaSources.stream()
+                .filter(Objects::nonNull)
+                .filter(mMediaSourceUtil::isAudioMediaSource)
+                .findFirst()
+                .orElse(null);
+        return mInputFactory.getMediaSource(initialMediaSource);
+    }
+
+
 }
