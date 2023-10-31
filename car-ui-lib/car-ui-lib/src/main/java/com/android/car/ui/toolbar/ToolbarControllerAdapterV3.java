@@ -26,8 +26,10 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.IdRes;
@@ -97,10 +99,26 @@ public final class ToolbarControllerAdapterV3 implements ToolbarController {
         ImeSearchInterfaceOEMV2 imeSearchInterface = mOemToolbar.getImeSearchInterface();
         mSupportsImeSearch = imeSearchInterface != null;
         if (imeSearchInterface != null) {
+            // TODO (b/304841988) Provide full Consumer definition instead of a lambda as a
+            //  workaround to avoid r8 stripping this code during optimization, which prevents a
+            //  crash when an app relies on this callback
             imeSearchInterface.setOnPrivateImeCommandListener(
-                    (action, data) -> mSearchWidescreenController.getOnPrivateImeCommandListener()
-                            .accept(action, data));
-            imeSearchInterface.setSearchTextViewConsumer(mSearchWidescreenController::setTextView);
+                    new com.android.car.ui.plugin.oemapis.BiConsumer<String, Bundle>() {
+                        @Override
+                        public void accept(String action, Bundle data) {
+                            mSearchWidescreenController.getOnPrivateImeCommandListener()
+                                    .accept(action, data);
+                        }
+                    }
+            );
+            imeSearchInterface.setSearchTextViewConsumer(
+                    new com.android.car.ui.plugin.oemapis.Consumer<TextView>() {
+                        @Override
+                        public void accept(TextView textView) {
+                            mSearchWidescreenController.setTextView(textView);
+                        }
+                    }
+            );
         }
 
         oemToolbar.setBackListener(() -> {
@@ -116,14 +134,22 @@ public final class ToolbarControllerAdapterV3 implements ToolbarController {
             }
         });
 
-        oemToolbar.setSearchListener(query -> {
-            for (OnSearchListener listener : mDeprecatedSearchListeners) {
-                listener.onSearch(query);
-            }
-            for (Consumer<String> listener : mSearchListeners) {
-                listener.accept(query);
-            }
-        });
+        // TODO (b/304841988) Provide full Consumer definition instead of a lambda as a
+        //  workaround to avoid r8 stripping this code during optimization, which prevents a
+        //  crash when an app relies on this callback
+        oemToolbar.setSearchListener(
+                new com.android.car.ui.plugin.oemapis.Consumer<String>() {
+                    @Override
+                    public void accept(String query) {
+                        for (OnSearchListener listener : mDeprecatedSearchListeners) {
+                            listener.onSearch(query);
+                        }
+                        for (Consumer<String> listener : mSearchListeners) {
+                            listener.accept(query);
+                        }
+                    }
+                }
+        );
         oemToolbar.setSearchCompletedListener(() -> {
             for (OnSearchCompletedListener listener : mDeprecatedSearchCompletedListeners) {
                 listener.onSearchCompleted();
