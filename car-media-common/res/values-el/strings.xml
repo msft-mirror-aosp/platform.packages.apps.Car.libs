@@ -21,8 +21,8 @@
     <string name="metadata_default_title" msgid="5902775732281325081">"Χωρίς τίτλο"</string>
     <string name="default_error_message" msgid="4044331619453864482">"Παρουσιάστηκε κάποιο πρόβλημα. Δοκιμάστε αργότερα."</string>
     <string name="error_code_app_error" msgid="3608680401453743688">"Δεν είναι δυνατή η εκτέλεση του αιτήματος αυτήν τη στιγμή."</string>
-    <string name="error_code_not_supported" msgid="8004310657548193089">"Δεν είναι δυνατή η εκτέλεση του αιτήματος από αυτήν την εφαρμογή."</string>
-    <string name="error_code_authentication_expired" msgid="1727285213286610186">"Συνδεθείτε, για να χρησιμοποιήσετε αυτήν την εφαρμογή."</string>
+    <string name="error_code_not_supported" msgid="8004310657548193089">"Δεν είναι δυνατή η εκτέλεση του αιτήματος από αυτή την εφαρμογή."</string>
+    <string name="error_code_authentication_expired" msgid="1727285213286610186">"Συνδεθείτε, για να χρησιμοποιήσετε αυτή την εφαρμογή."</string>
     <string name="error_code_premium_account_required" msgid="2328664287270814966">"Απαιτείται premium πρόσβαση."</string>
     <string name="error_code_concurrent_stream_limit" msgid="493048763425570552">"Ακρόαση πάρα πολλών συσκευών"</string>
     <string name="error_code_parental_control_restricted" msgid="325145513462419399">"Αυτό το περιεχόμενο είναι αποκλεισμένο."</string>

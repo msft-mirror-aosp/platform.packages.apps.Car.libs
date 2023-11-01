@@ -72,43 +72,6 @@ public abstract class CarVoiceInteractionSession extends VoiceInteractionSession
      */
     public static final String KEY_CONVERSATION = "KEY_CONVERSATION";
 
-    /** Indicates to assistant that no action was specified. */
-    public static final String VOICE_ACTION_NO_ACTION = "VOICE_ACTION_NO_ACTION";
-
-    /**
-     * Indicates to assistant that a read action is being requested for a given payload. A {@link
-     * StatusBarNotification} object will be provided in the payload
-     */
-    public static final String VOICE_ACTION_READ_NOTIFICATION = "VOICE_ACTION_READ_NOTIFICATION";
-
-    /**
-     * Indicates to assistant that a reply action is being requested for a given payload. A {@link
-     * StatusBarNotification} object will be provided in the payload
-     */
-    public static final String VOICE_ACTION_REPLY_NOTIFICATION = "VOICE_ACTION_REPLY_NOTIFICATION";
-
-    /**
-     * Indicates to assistant that a read conversation action is being requested. A {@link
-     * Conversation} object will be provided in the payload.
-     */
-    public static final String VOICE_ACTION_READ_CONVERSATION = "VOICE_ACTION_READ_CONVERSATION";
-
-    /**
-     * Indicates to assistant that a reply conversation action is being requested. A {@link
-     * Conversation} object will be provided in the payload.
-     */
-    public static final String VOICE_ACTION_REPLY_CONVERSATION = "VOICE_ACTION_REPLY_CONVERSATION";
-
-    /**
-     * Indicates to digital assistant that it should capture a SMS message from the user,
-     * potentially finding which contact to send the message to and which device to send the message
-     * from (only if the application does not send the digital assistant this information in the
-     * bundle). Once the digital assistant has gathered the information from the user, it should
-     * send back the PendingIntent (provided in the bundle) with the information so the application
-     * can actually send the SMS.
-     */
-    public static final String VOICE_ACTION_SEND_SMS = "VOICE_ACTION_SEND_SMS";
-
     /* Recipient's phone number. If this and the recipient name are not provided,
      * by the application, digital assistant must do contact disambiguation
      * and add the phone number to the pending intent
@@ -147,6 +110,53 @@ public abstract class CarVoiceInteractionSession extends VoiceInteractionSession
      * PendingIntent and may not re-add it to the PendingIntent).
      */
     public static final String KEY_SEND_PENDING_INTENT = "KEY_SEND_PENDING INTENT";
+
+    /**
+     * The key used for the {@link android.content.ComponentName} of the target.
+     */
+    public static final String KEY_TARGET_COMPONENT = "KEY_TARGET_COMPONENT";
+
+    /** Indicates to assistant that no action was specified. */
+    public static final String VOICE_ACTION_NO_ACTION = "VOICE_ACTION_NO_ACTION";
+
+    /**
+     * Indicates to assistant that a read action is being requested for a given payload. A {@link
+     * StatusBarNotification} object will be provided in the payload
+     */
+    public static final String VOICE_ACTION_READ_NOTIFICATION = "VOICE_ACTION_READ_NOTIFICATION";
+
+    /**
+     * Indicates to assistant that a reply action is being requested for a given payload. A {@link
+     * StatusBarNotification} object will be provided in the payload
+     */
+    public static final String VOICE_ACTION_REPLY_NOTIFICATION = "VOICE_ACTION_REPLY_NOTIFICATION";
+
+    /**
+     * Indicates to assistant that a read conversation action is being requested. A {@link
+     * Conversation} object will be provided in the payload.
+     */
+    public static final String VOICE_ACTION_READ_CONVERSATION = "VOICE_ACTION_READ_CONVERSATION";
+
+    /**
+     * Indicates to assistant that a reply conversation action is being requested. A {@link
+     * Conversation} object will be provided in the payload.
+     */
+    public static final String VOICE_ACTION_REPLY_CONVERSATION = "VOICE_ACTION_REPLY_CONVERSATION";
+
+    /**
+     * Indicates to assistant that a compose message action is being requested.
+     */
+    public static final String VOICE_ACTION_COMPOSE_MESSAGE = "VOICE_ACTION_COMPOSE_MESSAGE";
+
+    /**
+     * Indicates to digital assistant that it should capture a SMS message from the user,
+     * potentially finding which contact to send the message to and which device to send the message
+     * from (only if the application does not send the digital assistant this information in the
+     * bundle). Once the digital assistant has gathered the information from the user, it should
+     * send back the PendingIntent (provided in the bundle) with the information so the application
+     * can actually send the SMS.
+     */
+    public static final String VOICE_ACTION_SEND_SMS = "VOICE_ACTION_SEND_SMS";
 
     /**
      * Indicates to assistant that it should resolve the exception in the given payload (found in

@@ -51,6 +51,7 @@ import com.android.car.ui.testing.matchers.ViewMatchers;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -188,6 +189,7 @@ public class ToolbarMenuItemsTest {
 
         runWithActivityAndToolbar((activity, toolbar) -> menuItem[0].setIcon(0));
 
+        waitForViewWithText("Test!");
         onView(withText("Test!")).check(matches(isDisplayed()));
     }
 
@@ -216,6 +218,7 @@ public class ToolbarMenuItemsTest {
         assertThat(menuItem[0].isChecked()).isTrue();
     }
 
+    @Ignore("b/296913206")
     @Test
     public void menuItems_overflowText_shouldWork() {
         MenuItem.OnClickListener callback = mock(MenuItem.OnClickListener.class);
@@ -293,6 +296,7 @@ public class ToolbarMenuItemsTest {
         onView(isRoot()).perform(waitForView(withContentDescription("Overflow")));
         onView(withContentDescription("Overflow")).perform(click());
 
+        waitForViewWithText("Test title!");
         onView(withText("Test title!")).perform(click());
 
         verify(callback).onClick(menuItem[0]);
@@ -460,6 +464,7 @@ public class ToolbarMenuItemsTest {
 
         runWithActivityAndToolbar((activity, toolbar) -> menuItem[0].setOnClickListener(callback2));
 
+        waitForViewWithText("Button!");
         onView(withText("Button!")).perform(click());
         verify(callback1, times(1)).onClick(menuItem[0]);
         verify(callback2, times(1)).onClick(menuItem[0]);

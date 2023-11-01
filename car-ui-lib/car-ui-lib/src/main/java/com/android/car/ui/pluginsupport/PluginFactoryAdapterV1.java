@@ -32,6 +32,8 @@ import com.android.car.ui.appstyledview.AppStyledViewControllerAdapterV1;
 import com.android.car.ui.appstyledview.AppStyledViewControllerImpl;
 import com.android.car.ui.baselayout.Insets;
 import com.android.car.ui.baselayout.InsetsChangedListener;
+import com.android.car.ui.plugin.oemapis.FocusAreaOEMV1;
+import com.android.car.ui.plugin.oemapis.FocusParkingViewOEMV1;
 import com.android.car.ui.plugin.oemapis.InsetsOEMV1;
 import com.android.car.ui.plugin.oemapis.PluginFactoryOEMV1;
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV1;
@@ -43,6 +45,8 @@ import com.android.car.ui.toolbar.ToolbarControllerAdapterV1;
 import com.android.car.ui.widget.CarUiTextView;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * This class is a wrapper around {@link PluginFactoryOEMV1} that implements {@link
@@ -59,8 +63,21 @@ public final class PluginFactoryAdapterV1 implements PluginFactory {
         mOem = oem;
 
         mOem.setRotaryFactories(
-                c -> new FocusParkingViewAdapterV1(new FocusParkingView(c)),
-                c -> new FocusAreaAdapterV1(new FocusArea(c)));
+                // TODO (b/304841988) Provide full Function definitions instead of a lambda as a
+                //  workaround to avoid r8 stripping this code during optimization, which prevents a
+                //  crash when an app relies on this callback
+                new Function<Context, FocusParkingViewOEMV1>() {
+                    @Override
+                    public FocusParkingViewOEMV1 apply(Context context) {
+                        return new FocusParkingViewAdapterV1(new FocusParkingView(context));
+                    }
+                },
+                new Function<Context, FocusAreaOEMV1>() {
+                    @Override
+                    public FocusAreaOEMV1 apply(Context context) {
+                        return new FocusAreaAdapterV1(new FocusArea(context));
+                    }
+                });
     }
 
     @Nullable
@@ -80,8 +97,17 @@ public final class PluginFactoryAdapterV1 implements PluginFactory {
         ToolbarControllerOEMV1 toolbar = mOem.installBaseLayoutAround(
                 context,
                 contentView,
-                insetsChangedListener == null ? null
-                        : insets -> insetsChangedListener.onCarUiInsetsChanged(adaptInsets(insets)),
+                // TODO (b/304841988) Provide full Consumer definition instead of a lambda as a
+                //  workaround to avoid r8 stripping this code during optimization, which prevents a
+                //  crash when an app relies on this callback
+                new Consumer<InsetsOEMV1>() {
+                    @Override
+                    public void accept(@NonNull InsetsOEMV1 insets) {
+                        if (insetsChangedListener != null) {
+                            insetsChangedListener.onCarUiInsetsChanged(adaptInsets(insets));
+                        }
+                    }
+                },
                 toolbarEnabled, fullscreen);
 
         if (toolbar != null) {

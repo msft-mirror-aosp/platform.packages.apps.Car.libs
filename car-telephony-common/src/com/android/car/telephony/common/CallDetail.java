@@ -31,7 +31,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.Arrays;
-import java.util.function.Predicate;
 
 /**
  * Represents details of {@link Call.Details}.
@@ -202,6 +201,12 @@ public class CallDetail {
     @Nullable
     public PhoneAccountHandle getPhoneAccountHandle() {
         return mPhoneAccountHandle;
+    }
+
+    /** Returns the id of the {@link PhoneAccountHandle} for this call. */
+    @Nullable
+    public String getPhoneAccountName() {
+        return mPhoneAccountHandle == null ? null : mPhoneAccountHandle.getId();
     }
 
     /** Returns if the call is a bluetooth call. */

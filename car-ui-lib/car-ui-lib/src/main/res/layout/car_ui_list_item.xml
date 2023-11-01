@@ -15,6 +15,13 @@
   ~ limitations under the License.
   -->
 
+<!-- When customizing list items with RROs using ViewStubs on the tap targets, car_ui_list_item_2
+    layout should be used. The car_ui_list_item_2 layout is the only list item layout which is
+    guaranteed to accommodate ViewStubs which will be inflated to contain all the relevant ui
+    elements of a car ui list item. The car_ui_list_item layout should be customized without relying
+    on ViewStubs as there is no guarantee that the version of car-ui-lib that is compiled with an
+    app will inflate the ViewStubs before referencing the underlying ui elements as this
+    functionality was added after car_ui_list_item. -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"

@@ -16,14 +16,21 @@
 
 package com.android.car.ui.paintbooth;
 
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+import static android.content.pm.PackageManager.MATCH_DISABLED_COMPONENTS;
+import static android.content.pm.PackageManager.MATCH_SYSTEM_ONLY;
+
 import static com.android.car.ui.paintbooth.PaintBoothApplication.SHARED_PREFERENCES_FILE;
 import static com.android.car.ui.paintbooth.PaintBoothApplication.SHARED_PREFERENCES_PLUGIN_DENYLIST;
 
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ProviderInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,9 +46,6 @@ import androidx.annotation.NonNull;
 import androidx.core.util.Supplier;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.car.ui.FocusArea;
-import com.android.car.ui.baselayout.Insets;
-import com.android.car.ui.baselayout.InsetsChangedListener;
 import com.android.car.ui.core.CarUi;
 import com.android.car.ui.paintbooth.appstyledview.AppStyledViewSampleActivity;
 import com.android.car.ui.paintbooth.appstyledview.TransparentActivity;
@@ -60,9 +64,7 @@ import com.android.car.ui.paintbooth.toolbar.ToolbarActivity;
 import com.android.car.ui.paintbooth.widescreenime.WideScreenImeActivity;
 import com.android.car.ui.paintbooth.widescreenime.WideScreenTestView;
 import com.android.car.ui.paintbooth.widgets.WidgetActivity;
-import com.android.car.ui.pluginsupport.PluginFactory;
 import com.android.car.ui.pluginsupport.PluginFactorySingleton;
-import com.android.car.ui.pluginsupport.PluginFactoryStub;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.toolbar.ToolbarController;
 
@@ -74,7 +76,7 @@ import java.util.List;
 /**
  * Paint booth app
  */
-public class MainActivity extends Activity implements InsetsChangedListener {
+public class MainActivity extends Activity {
 
     public static final String STOP_SERVICE = "com.android.car.ui.paintbooth.StopService";
 
@@ -86,7 +88,8 @@ public class MainActivity extends Activity implements InsetsChangedListener {
             new ServiceElement("Simulate Screen Bounds", VisibleBoundsSimulator.class),
             new SwitchElement("Add PaintBooth to plugin deny-list", this::isInPluginDenyList,
                     this::onPluginSwitchChanged),
-            new SwitchElement("Set plugin enabled state", this::isPluginEnabled,
+            new SwitchElement("Set plugin enabled state",
+                    () -> PluginFactorySingleton.isPluginEnabled(this),
                     this::onPluginEnabledStateChanged),
             new ActivityElement("Token samples", TokenActivity.class),
             new ActivityElement("Theme samples", TextSamples.class),
@@ -313,17 +316,12 @@ public class MainActivity extends Activity implements InsetsChangedListener {
         Toast.makeText(this, "Relaunch PaintBooth to see effects", Toast.LENGTH_SHORT).show();
     }
 
-    private boolean isPluginEnabled() {
-        PluginFactory factory = PluginFactorySingleton.get(this);
-        if (factory instanceof PluginFactoryStub) {
-            return false;
-        }
-        return true; // factory instanceof PluginFactoryAdapterV#
-    }
-
-    private void onPluginEnabledStateChanged(CompoundButton switchWidget, boolean checked) {
-        PluginFactorySingleton.setPluginEnabledForTesting(true);
-        if (!isPluginEnabled()) {
+    private void onPluginEnabledStateChanged(CompoundButton switchWidget, boolean enabled) {
+        String authority = this.getString(
+                R.string.car_ui_plugin_package_provider_authority_name);
+        ProviderInfo providerInfo = this.getPackageManager().resolveContentProvider(authority,
+                MATCH_DISABLED_COMPONENTS | MATCH_SYSTEM_ONLY);
+        if (providerInfo == null) {
             switchWidget.setText("Try to enable plugin");
             switchWidget.setEnabled(false);
             switchWidget.setChecked(false);
@@ -331,23 +329,20 @@ public class MainActivity extends Activity implements InsetsChangedListener {
                     Toast.LENGTH_SHORT).show();
             return;
         }
-        PluginFactorySingleton.setPluginEnabledForTesting(checked);
-        switchWidget.setEnabled(true);
-        switchWidget.setText("Set plugin enabled state");
-        switchWidget.setChecked(checked);
-        Toast.makeText(this, "All newly loaded plugin compatible components will "
-                + (isPluginEnabled() ? "" : "NOT ") + "use the plugin", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onCarUiInsetsChanged(@NonNull Insets insets) {
-        FocusArea focusArea = requireViewById(R.id.focus_area);
-        focusArea.setBoundsOffset(0, insets.getTop(), 0, insets.getBottom());
-        focusArea.setHighlightPadding(0, insets.getTop(), 0, insets.getBottom());
-        requireViewById(R.id.list)
-                .setPadding(0, insets.getTop(), 0, insets.getBottom());
-        requireViewById(android.R.id.content)
-                .setPadding(insets.getLeft(), 0, insets.getRight(), 0);
+        ComponentName componentName = new ComponentName(providerInfo.packageName,
+                providerInfo.name);
+        int state = enabled ? COMPONENT_ENABLED_STATE_ENABLED : COMPONENT_ENABLED_STATE_DISABLED;
+        this.getPackageManager().setComponentEnabledSetting(componentName,
+                state, 0 /* no optional flags */);
+        // PaintBooth will force quit when disabling the plugin (enabled = false), so these values
+        // will be reset when PaintBooth is relaunched
+        if (enabled) {
+            switchWidget.setText("Set plugin enabled state");
+            switchWidget.setEnabled(true);
+            switchWidget.setChecked(true);
+            // TODO(b/288332302) Restart paintbooth automatically for convenience
+            Toast.makeText(this, "Relaunch PaintBooth to see effects", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private abstract static class ListElement {
