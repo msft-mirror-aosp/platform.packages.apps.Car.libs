@@ -15,9 +15,9 @@
  */
 package com.android.car.media.extensions.analytics.host;
 
+import static com.android.car.media.extensions.analytics.Constants.ACTION_ANALYTICS;
 import static com.android.car.media.extensions.analytics.Constants.ANALYTICS_BUNDLE_KEY_PASSKEY;
 import static com.android.car.media.extensions.analytics.Constants.ANALYTICS_EVENT_BUNDLE_ARRAY_KEY;
-import static com.android.car.media.extensions.analytics.Constants.ANALYTICS_INTENT_ACTION;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -123,7 +123,7 @@ public class AnalyticsManager implements IAnalyticsManager {
     }
 
     private void sendBatch(@NonNull Queue<Bundle> eventQueue) {
-        Intent eventIntent = new Intent(ANALYTICS_INTENT_ACTION);
+        Intent eventIntent = new Intent(ACTION_ANALYTICS);
         eventIntent.setComponent(ComponentName.unflattenFromString(mReceiverComponent));
 
         Bundle eventBatchBundle = createBatch(new ArrayList<>(eventQueue));

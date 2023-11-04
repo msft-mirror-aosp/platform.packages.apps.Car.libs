@@ -23,6 +23,7 @@ import static com.android.car.media.extensions.analytics.Constants.ANALYTICS_EVE
 import static com.android.car.media.extensions.analytics.Constants.ANALYTICS_EVENT_VIEW_CHANGE;
 import static com.android.car.media.extensions.analytics.Constants.ANALYTICS_EVENT_VISIBLE_ITEMS;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -54,6 +55,7 @@ public class AnalyticsParser {
      *
      * @Hide
      */
+    @SuppressLint("ExecutorRegistration")
     @SuppressWarnings("deprecation")
     public static void parseAnalyticsIntent(@NonNull Intent intent,
             @NonNull AnalyticsCallback analyticsCallback) {
@@ -85,6 +87,7 @@ public class AnalyticsParser {
      *
      * @Hide
      */
+    @SuppressLint("ExecutorRegistration")
     public static void parseAnalyticsBundle(@NonNull Bundle analyticsBundle,
             @NonNull AnalyticsCallback analyticsCallback) {
         String eventName = analyticsBundle.getString(ANALYTICS_EVENT_DATA_KEY_EVENT_NAME, "");

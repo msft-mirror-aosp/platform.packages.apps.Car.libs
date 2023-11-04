@@ -18,6 +18,7 @@ package com.android.car.media.extensions.analytics.client;
 
 import static com.android.car.media.extensions.analytics.Constants.ANALYTICS_BUNDLE_KEY_PASSKEY;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -49,7 +50,7 @@ public abstract class AnalyticsBroadcastReceiver extends BroadcastReceiver {
     /**
      * Abstract BroadcastReceiver used to receive analytic events.
      * <p>
-     *     Extend and add to manifest with {@link Constants#ANALYTICS_INTENT_ACTION}.
+     *     Extend and add to manifest with {@link Constants#ACTION_ANALYTICS}.
      * </p>
      * <p>
      *     Add analytics opt-in and sessionId to rootHints with
@@ -58,6 +59,7 @@ public abstract class AnalyticsBroadcastReceiver extends BroadcastReceiver {
      * </p>
      * @param analyticsCallback Callback for {@link AnalyticsEvent AnalyticEvents}.
      */
+    @SuppressLint("ExecutorRegistration")
     public AnalyticsBroadcastReceiver(@NonNull AnalyticsCallback analyticsCallback) {
         super();
         this.mAnalyticsCallback = analyticsCallback;
