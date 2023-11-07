@@ -46,6 +46,6 @@ android_test {
         "car-apps-common-prebuilt",
         "platform-test-annotations",
         "mockito-target-inline-minus-junit4",
-        "truth-prebuilt",
+        "truth",
     ],
 }

@@ -129,7 +129,7 @@ android_test {
         "car-ui-lib-source",
         "platform-test-annotations",
         "mockito-target-inline-minus-junit4",
-        "truth-prebuilt",
+        "truth",
     ],
     jni_libs: [
         // For mockito extended

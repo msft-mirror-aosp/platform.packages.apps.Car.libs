@@ -93,7 +93,7 @@ android_test {
         "hamcrest-library",
         "mockito-target-inline-minus-junit4",
         "platform-test-annotations",
-        "truth-prebuilt",
+        "truth",
     ],
     test_suites: ["automotive-general-tests"],
 
