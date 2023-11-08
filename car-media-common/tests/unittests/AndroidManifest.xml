@@ -15,6 +15,16 @@
     limitations under the License.
 -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.android.car.media.common.robotests">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.android.car.media.common.unittests">
+
+    <application android:testOnly="false"
+                 android:debuggable="true">
+        <uses-library android:name="android.test.runner" />
+    </application>
+
+    <instrumentation android:name="androidx.test.runner.AndroidJUnitRunner"
+                     android:targetPackage="com.android.car.media.common.unittests"
+                     android:label="Car media common Unit Tests" />
 </manifest>

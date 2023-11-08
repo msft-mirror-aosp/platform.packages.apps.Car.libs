@@ -1,4 +1,5 @@
-// Copyright (C) 2020 The Android Open Source Project
+//
+// Copyright (C) 2023 The Android Open Source Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,12 +19,12 @@ package {
 }
 
 //############################################################
-// Car Media Extensions unit test target, run with:
-// mmma -j64 packages/apps/Car/libs/car-media-extensions
-// atest car-media-extensions-unit-tests
+// car-media-common unit test target, run with:
+// mmma -j64 packages/apps/Car/libs/car-media-common
+// atest car-media-common-unit-tests
 //############################################################
 android_test {
-    name: "car-media-extensions-unit-tests",
+    name: "car-media-common-unit-tests",
 
     certificate: ":com-android-car-apps-test",
 
@@ -35,7 +36,6 @@ android_test {
     ],
 
     privileged: true,
-
     min_sdk_version: "30",
     target_sdk_version: "31",
     sdk_version: "system_current",
@@ -52,7 +52,16 @@ android_test {
         "androidx.test.espresso.core",
         "androidx.test.espresso.contrib",
         "androidx.test.espresso.intents",
+        "androidx.lifecycle_lifecycle-extensions",
+        "androidx.test.espresso.core",
+        "androidx.test.espresso.contrib",
         "hamcrest-library",
+        "androidx.arch.core_core-runtime",
+        "androidx.arch.core_core-common",
+        "androidx.mediarouter_mediarouter",
+        "android.car-system-stubs",
+        "car-apps-common-prebuilt",
+        "car-media-common-prebuilt",
         "car-media-extensions-prebuilt",
         "mockito-target-extended-minus-junit4",
         "platform-test-annotations",

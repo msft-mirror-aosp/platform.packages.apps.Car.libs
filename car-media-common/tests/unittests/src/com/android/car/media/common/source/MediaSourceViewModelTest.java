@@ -24,18 +24,19 @@ import static com.android.car.media.common.MediaTestUtils.newFakeMediaSource;
 import static com.google.common.truth.Truth.assertThat;
 
 import static org.mockito.Mockito.when;
-import static org.robolectric.RuntimeEnvironment.application;
 
 import android.app.Application;
 import android.car.Car;
 import android.car.media.CarMediaManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Looper;
 import android.support.v4.media.MediaBrowserCompat;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.android.car.apps.common.testutils.CaptureObserver;
 import com.android.car.apps.common.testutils.InstantTaskExecutorRule;
@@ -50,10 +51,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.robolectric.RobolectricTestRunner;
 
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(AndroidJUnit4.class)
 public class MediaSourceViewModelTest {
 
     private static final String TAG = "MediaSourceVMTest";
@@ -87,39 +87,49 @@ public class MediaSourceViewModelTest {
     }
 
     private void initializeViewModel() {
+        Application application = ApplicationProvider.getApplicationContext();
+        if (Looper.myLooper() == null) {
+            Looper.prepare();  // Needed when running with atest.
+        }
         mViewModel = new MediaSourceViewModel(application, MEDIA_SOURCE_MODE_PLAYBACK,
                 new MediaSourceViewModel.InputFactory() {
-            @Override
-            public MediaBrowserConnector createMediaBrowserConnector(
-                    @NonNull Application application,
-                    @NonNull MediaBrowserConnector.Callback connectedBrowserCallback) {
-                return new MediaBrowserConnector(application, connectedBrowserCallback) {
                     @Override
-                    protected MediaBrowserCompat createMediaBrowser(MediaSource mediaSource,
-                            MediaBrowserCompat.ConnectionCallback callback) {
-                        mRequestedSource = mediaSource;
-                        MediaBrowserCompat bro = super.createMediaBrowser(mediaSource, callback);
-                        Log.i(TAG, "createMediaBrowser: " + idHash(bro) + " for: " + mediaSource);
-                        return bro;
+                    public MediaBrowserConnector createMediaBrowserConnector(
+                            @NonNull Application application,
+                            @NonNull MediaBrowserConnector.Callback connectedBrowserCallback) {
+                        return new MediaBrowserConnector(application, connectedBrowserCallback) {
+                            @Override
+                            protected MediaBrowserCompat createMediaBrowser(MediaSource src,
+                                    MediaBrowserCompat.ConnectionCallback callback) {
+                                mRequestedSource = src;
+                                MediaBrowserCompat bro = super.createMediaBrowser(src,
+                                        callback);
+                                Log.i(TAG, "createMediaBrowser: " + idHash(bro) + " for: " + src);
+                                return bro;
+                            }
+                        };
                     }
-                };
-            }
 
-            @Override
-            public Car getCarApi() {
-                return mCar;
-            }
+                    @Override
+                    public Car getCarApi() {
+                        return mCar;
+                    }
 
-            @Override
-            public CarMediaManager getCarMediaManager(Car carApi) {
-                return mCarMediaManager;
-            }
+                    @Override
+                    public CarMediaManager getCarMediaManager(Car carApi) {
+                        return mCarMediaManager;
+                    }
 
-            @Override
-            public MediaSource getMediaSource(ComponentName componentName) {
-                return mMediaSource;
-            }
-        });
+                    @Override
+                    public MediaSource getMediaSource(ComponentName componentName) {
+                        return mMediaSource;
+                    }
+
+                    @Override
+                    public boolean isAudioMediaSource(ComponentName componentName) {
+                        return true;
+                    }
+                });
     }
 
     @Test
@@ -137,6 +147,7 @@ public class MediaSourceViewModelTest {
         CaptureObserver<BrowsingState> observer = new CaptureObserver<>();
         mMediaSource = newFakeMediaSource("test", "test");
         when(mMediaBrowser.isConnected()).thenReturn(true);
+
         initializeViewModel();
 
         mViewModel.getBrowserCallback().onBrowserConnectionChanged(

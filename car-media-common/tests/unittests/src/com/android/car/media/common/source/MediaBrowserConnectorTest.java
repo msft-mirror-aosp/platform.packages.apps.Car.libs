@@ -24,11 +24,13 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static org.robolectric.RuntimeEnvironment.application;
 
+import android.content.Context;
 import android.support.v4.media.MediaBrowserCompat;
 
 import androidx.annotation.NonNull;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.android.car.apps.common.testutils.InstantTaskExecutorRule;
 import com.android.car.apps.common.testutils.TestLifecycleOwner;
@@ -44,13 +46,12 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.robolectric.RobolectricTestRunner;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(AndroidJUnit4.class)
 public class MediaBrowserConnectorTest {
 
     @Rule
@@ -86,7 +87,8 @@ public class MediaBrowserConnectorTest {
         doNothing().when(mConnectedBrowserCallback).onBrowserConnectionChanged(
                 mBrowsingStateCaptor.capture());
 
-        mBrowserConnector = new MediaBrowserConnector(application, mConnectedBrowserCallback) {
+        Context context = ApplicationProvider.getApplicationContext();
+        mBrowserConnector = new MediaBrowserConnector(context, mConnectedBrowserCallback) {
             @Override
             protected MediaBrowserCompat createMediaBrowser(@NonNull MediaSource mediaSource,
                     @NonNull MediaBrowserCompat.ConnectionCallback callback) {

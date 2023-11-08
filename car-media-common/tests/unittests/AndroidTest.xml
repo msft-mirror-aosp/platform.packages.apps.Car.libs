@@ -14,13 +14,13 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<configuration description="Runs Car Media Extensions Unit Tests.">
+<configuration description="Runs Car Media Commmon Unit Tests.">
     <option name="test-suite-tag" value="apct" />
     <option name="test-suite-tag" value="apct-instrumentation" />
 
     <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
         <option name="cleanup-apks" value="true" />
-        <option name="test-file-name" value="car-media-extensions-unit-tests.apk" />
+        <option name="test-file-name" value="car-media-common-unit-tests.apk" />
     </target_preparer>
 
     <!--Disable device animation and clear app data before test running. -->
@@ -31,7 +31,7 @@
     </target_preparer>
 
     <test class="com.android.tradefed.testtype.AndroidJUnitTest" >
-        <option name="package" value="com.android.car.media.extensions.tests" />
+        <option name="package" value="com.android.car.media.common.unittests" />
         <option name="runner" value="androidx.test.runner.AndroidJUnitRunner" />
     </test>
 </configuration>

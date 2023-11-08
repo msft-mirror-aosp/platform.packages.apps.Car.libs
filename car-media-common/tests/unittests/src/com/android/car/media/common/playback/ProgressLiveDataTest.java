@@ -18,11 +18,16 @@ package com.android.car.media.common.playback;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
+import android.os.Handler;
 import android.support.v4.media.session.PlaybackStateCompat;
 
 import androidx.lifecycle.Lifecycle;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.android.car.apps.common.testutils.CaptureObserver;
 import com.android.car.apps.common.testutils.InstantTaskExecutorRule;
@@ -35,12 +40,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.shadows.ShadowLooper;
+import org.mockito.stubbing.Answer;
 
-import java.util.concurrent.TimeUnit;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(AndroidJUnit4.class)
 public class ProgressLiveDataTest {
     private static final long START_TIME = 500L;
     private static final long START_PROGRESS = 1000L;
@@ -54,6 +57,9 @@ public class ProgressLiveDataTest {
     @Rule
     public final TestLifecycleOwner mLifecycleOwner = new TestLifecycleOwner();
 
+    @Mock Handler mHandler;
+    private Runnable mRunnable;
+
     @Mock
     private PlaybackStateCompat mPlaybackState;
     private long mLastPositionUpdateTime;
@@ -63,7 +69,6 @@ public class ProgressLiveDataTest {
 
     @Before
     public void setUp() {
-        ShadowLooper.pauseMainLooper();
         mCurrentElapsedTime = START_TIME;
         mLastPositionUpdateTime = START_TIME;
         when(mPlaybackState.getLastPositionUpdateTime()).thenAnswer(
@@ -71,8 +76,17 @@ public class ProgressLiveDataTest {
         when(mPlaybackState.getPosition()).thenReturn(START_PROGRESS);
         when(mPlaybackState.getPlaybackSpeed()).thenReturn(1F);
         when(mPlaybackState.getState()).thenReturn(PlaybackStateCompat.STATE_PLAYING);
+        when(mHandler.postDelayed(any(), anyLong())).thenAnswer((Answer<Boolean>) invocation -> {
+            mRunnable = invocation.getArgument(0);
+            return true;
+        });
+        doAnswer((Answer<Void>) invocation -> {
+            mRunnable = null;
+            return null;
+        }).when(mHandler).removeCallbacksAndMessages(any());
+
         mProgressLiveData = new ProgressLiveData(mPlaybackState, MAX_PROGRESS,
-                this::getCurrentElapsedTime);
+                this::getCurrentElapsedTime, mHandler);
     }
 
     private long getCurrentElapsedTime() {
@@ -81,7 +95,10 @@ public class ProgressLiveDataTest {
 
     private void advanceElapsedTime(long time) {
         mCurrentElapsedTime += time;
-        ShadowLooper.idleMainLooper(time, TimeUnit.MILLISECONDS);
+        if (mRunnable != null) {
+            mRunnable.run();
+            mRunnable = null;
+        }
     }
 
     @Test

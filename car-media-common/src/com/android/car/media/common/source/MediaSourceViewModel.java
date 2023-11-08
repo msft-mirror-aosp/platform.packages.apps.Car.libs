@@ -59,8 +59,6 @@ public class MediaSourceViewModel extends AndroidViewModel {
     private final Handler mHandler;
     private final CarMediaManager.MediaSourceChangedListener mMediaSourceListener;
 
-    private final MediaSourceUtil mMediaSourceUtil;
-
 
     /**
      * Factory for creating dependencies. Can be swapped out for testing.
@@ -75,6 +73,8 @@ public class MediaSourceViewModel extends AndroidViewModel {
         CarMediaManager getCarMediaManager(Car carApi) throws CarNotConnectedException;
 
         MediaSource getMediaSource(ComponentName componentName);
+
+        boolean isAudioMediaSource(ComponentName componentName);
     }
 
     /** Returns the MediaSourceViewModel singleton tied to the application. */
@@ -92,6 +92,9 @@ public class MediaSourceViewModel extends AndroidViewModel {
      */
     private MediaSourceViewModel(@NonNull Application application, int mode) {
         this(application, mode, new InputFactory() {
+            private final MediaSourceUtil mMediaSourceUtil =
+                    new MediaSourceUtil(application.getApplicationContext());
+
             @Override
             public MediaBrowserConnector createMediaBrowserConnector(
                     @NonNull Application application,
@@ -114,6 +117,11 @@ public class MediaSourceViewModel extends AndroidViewModel {
                 return componentName == null ? null : MediaSource.create(application,
                         componentName);
             }
+
+            @Override
+            public boolean isAudioMediaSource(ComponentName componentName) {
+                return mMediaSourceUtil.isAudioMediaSource(componentName);
+            }
         });
     }
 
@@ -130,7 +138,6 @@ public class MediaSourceViewModel extends AndroidViewModel {
         mMode = mode;
         mInputFactory = inputFactory;
         mCar = inputFactory.getCarApi();
-        mMediaSourceUtil = new MediaSourceUtil(application.getApplicationContext());
 
         mBrowserConnector = inputFactory.createMediaBrowserConnector(application, mBrowserCallback);
 
@@ -202,7 +209,7 @@ public class MediaSourceViewModel extends AndroidViewModel {
         // Skip non Audio apps
         if (newMediaSource != null) {
             ComponentName mbsName = newMediaSource.getBrowseServiceComponentName();
-            if (!mMediaSourceUtil.isAudioMediaSource(mbsName)) {
+            if (!mInputFactory.isAudioMediaSource(mbsName)) {
                 Log.i(TAG, "Skipping update from " + oldMediaSource
                         + " for non audio app mbs:" + mbsName);
                 return;
@@ -230,7 +237,7 @@ public class MediaSourceViewModel extends AndroidViewModel {
         }
         ComponentName initialMediaSource = lastMediaSources.stream()
                 .filter(Objects::nonNull)
-                .filter(mMediaSourceUtil::isAudioMediaSource)
+                .filter(mInputFactory::isAudioMediaSource)
                 .findFirst()
                 .orElse(null);
         return mInputFactory.getMediaSource(initialMediaSource);

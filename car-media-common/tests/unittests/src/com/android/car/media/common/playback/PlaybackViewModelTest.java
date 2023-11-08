@@ -24,8 +24,8 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.robolectric.RuntimeEnvironment.application;
 
+import android.app.Application;
 import android.content.Context;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
@@ -37,6 +37,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.android.car.apps.common.testutils.CaptureObserver;
 import com.android.car.apps.common.testutils.InstantTaskExecutorRule;
@@ -55,7 +56,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.robolectric.RobolectricTestRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -63,7 +63,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(AndroidJUnit4.class)
 public class PlaybackViewModelTest {
 
     @Rule
@@ -103,6 +103,7 @@ public class PlaybackViewModelTest {
         mBrowsingStateLD = dataOf(
                 new BrowsingState(mContext, mMediaSource, mMediaBrowser,
                         ConnectionStatus.CONNECTED));
+        Application application = ApplicationProvider.getApplicationContext();
         mPlaybackViewModel = new PlaybackViewModel(application, mBrowsingStateLD,
                 browser -> mBrowserToController.get(browser));
     }
