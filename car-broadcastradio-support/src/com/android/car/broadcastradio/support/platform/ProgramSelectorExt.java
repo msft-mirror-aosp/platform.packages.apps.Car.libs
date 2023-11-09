@@ -29,6 +29,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -595,6 +596,58 @@ public class ProgramSelectorExt {
             public int getSCIdS() {
                 return (int) ((mValue >>> (32 + 8)) & 0xF);
             }
+        }
+    }
+
+    public static class ProgramSelectorComparator implements Comparator<ProgramSelector> {
+        @Override
+        public int compare(ProgramSelector selector1, ProgramSelector selector2) {
+            int type1 = selector1.getPrimaryId().getType();
+            int type2 = selector2.getPrimaryId().getType();
+            int frequency1 = getFrequency(selector1);
+            int frequency2 = getFrequency(selector2);
+            if (isAmFmProgram(selector1) && isAmFmProgram(selector2)) {
+                if (frequency1 != frequency2) {
+                    return frequency1 > frequency2 ? 1 : -1;
+                }
+                int subchannel1 = selector1.getPrimaryId().getType()
+                        == ProgramSelector.IDENTIFIER_TYPE_HD_STATION_ID_EXT
+                        ? IdentifierExt.asHdPrimary(selector1.getPrimaryId()).getSubchannel() : 0;
+                int subchannel2 = selector2.getPrimaryId().getType()
+                        == ProgramSelector.IDENTIFIER_TYPE_HD_STATION_ID_EXT
+                        ? IdentifierExt.asHdPrimary(selector2.getPrimaryId()).getSubchannel() : 0;
+                if (subchannel1 != subchannel2) {
+                    return subchannel1 > subchannel2 ? 1 : -1;
+                }
+                return selector1.getPrimaryId().getType() - selector2.getPrimaryId().getType();
+            } else if (type1 == ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT
+                    && type2 == ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT) {
+                if (frequency1 != frequency2) {
+                    return frequency1 > frequency2 ? 1 : -1;
+                }
+                IdentifierExt.DabPrimary dabPrimary1 = IdentifierExt.asDabPrimary(
+                        selector1.getPrimaryId());
+                IdentifierExt.DabPrimary dabPrimary2 = IdentifierExt.asDabPrimary(
+                        selector2.getPrimaryId());
+                int ecc1 = dabPrimary1.getEcc();
+                int ecc2 = dabPrimary2.getEcc();
+                if (ecc1 != ecc2) {
+                    return ecc1 > ecc2 ? 1 : -1;
+                }
+                int sId1 = dabPrimary1.getSId();
+                int sId2 = dabPrimary2.getSId();
+                if (sId1 != sId2) {
+                    return sId1 > sId2 ? 1 : -1;
+                }
+                int sCIds1 = dabPrimary1.getSCIdS();
+                int sCIds2 = dabPrimary2.getSCIdS();
+                if (sCIds1 != sCIds2) {
+                    return sCIds1 > sCIds2 ? 1 : -1;
+                }
+                return getDabEnsemble(selector1) > getDabEnsemble(selector2) ? 1 : -1;
+            }
+            return type1 > type2 || (type1 == type2 && selector1.getPrimaryId().getValue()
+                    > selector2.getPrimaryId().getValue()) ? 1 : -1;
         }
     }
 }

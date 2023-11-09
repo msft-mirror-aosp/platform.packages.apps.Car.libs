@@ -30,6 +30,7 @@ import android.util.Log;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Comparator;
 import java.util.Objects;
 
 /**
@@ -261,5 +262,13 @@ public class ProgramInfoExt {
             return imageResolver.resolve(albumArtId);
         }
         return null;
+    }
+    public static class ProgramInfoComparator implements Comparator<RadioManager.ProgramInfo> {
+        @Override
+        public int compare(RadioManager.ProgramInfo info1, RadioManager.ProgramInfo info2) {
+            Comparator<ProgramSelector> selectorComparator =
+                    new ProgramSelectorExt.ProgramSelectorComparator();
+            return selectorComparator.compare(info1.getSelector(), info2.getSelector());
+        }
     }
 }
