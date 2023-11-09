@@ -270,8 +270,32 @@ public class ProgramSelectorExt {
         } else if (selector.getPrimaryId().getType()
                 == ProgramSelector.IDENTIFIER_TYPE_HD_STATION_ID_EXT) {
             return IdentifierExt.asHdPrimary(selector.getPrimaryId()).getFrequency();
+        } else if (selector.getPrimaryId().getType()
+                == ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT
+                || selector.getPrimaryId().getType()
+                == ProgramSelector.IDENTIFIER_TYPE_DAB_SID_EXT) {
+            try {
+                return (int) selector.getFirstId(ProgramSelector.IDENTIFIER_TYPE_DAB_FREQUENCY);
+            } catch (IllegalArgumentException e) {
+                return INVALID_IDENTIFIER_VALUE;
+            }
         }
         return INVALID_IDENTIFIER_VALUE;
+    }
+
+    /**
+     * Get ensemble value from a DAB-type {@link ProgramSelector}.
+     *
+     * @param selector Program selector
+     * @return Value of the first {@link ProgramSelector#IDENTIFIER_TYPE_DAB_ENSEMBLE} identifier,
+     * 0 otherwise
+     */
+    public static int getDabEnsemble(@NonNull ProgramSelector selector) {
+        try {
+            return (int) selector.getFirstId(ProgramSelector.IDENTIFIER_TYPE_DAB_ENSEMBLE);
+        } catch (IllegalArgumentException e) {
+            return INVALID_IDENTIFIER_VALUE;
+        }
     }
 
     /**
@@ -321,7 +345,8 @@ public class ProgramSelectorExt {
         switch (sel.getPrimaryId().getType()) {
             case ProgramSelector.IDENTIFIER_TYPE_SXM_SERVICE_ID:
                 return "SXM";
-            case ProgramSelector.IDENTIFIER_TYPE_DAB_SIDECC:
+            case ProgramSelector.IDENTIFIER_TYPE_DAB_SID_EXT:
+            case ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT:
                 return "DAB";
             case ProgramSelector.IDENTIFIER_TYPE_DRMO_SERVICE_ID:
                 return "DRMO";
@@ -478,10 +503,10 @@ public class ProgramSelectorExt {
      */
     public static class IdentifierExt {
         /**
-         * Decode {@link ProgramSelector#IDENTIFIER_TYPE_HD_STATION_ID_EXT} value.
+         * Decoder of {@link ProgramSelector#IDENTIFIER_TYPE_HD_STATION_ID_EXT} value.
          *
-         * @param id identifier to decode
-         * @return value decoder
+         * When pushed to the framework, it will be non-static class referring
+         * to the original value.
          */
         public static @Nullable HdPrimary asHdPrimary(@NonNull Identifier id) {
             if (id.getType() == ProgramSelector.IDENTIFIER_TYPE_HD_STATION_ID_EXT) {
@@ -516,6 +541,59 @@ public class ProgramSelectorExt {
 
             public int getFrequency() {
                 return (int) ((mValue >>> (32 + 4)) & 0x3FFFF);
+            }
+        }
+
+        /**
+         * Decoder of {@link ProgramSelector#IDENTIFIER_TYPE_DAB_DMB_SID_EXT} value.
+         *
+         * <p>When pushed to the framework, it will be non-static class referring
+         * to the original value.
+         * @param id Identifier to be decoded
+         * @return {@link DabPrimary} object if the identifier is DAB-type, {@code null} otherwise
+         */
+        public static @Nullable DabPrimary asDabPrimary(@NonNull Identifier id) {
+            if (id.getType() == ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT) {
+                return new DabPrimary(id.getValue());
+            }
+            return null;
+        }
+
+        /**
+         * Decoder of {@link ProgramSelector#IDENTIFIER_TYPE_DAB_DMB_SID_EXT} value.
+         *
+         * <p>When pushed to the framework, it will be non-static class referring
+         * to the original value.
+         */
+        public static class DabPrimary {
+            private final long mValue;
+
+            private DabPrimary(long value) {
+                mValue = value;
+            }
+
+            /**
+             * Get Service Identifier (SId).
+             * @return SId value
+             */
+            public int getSId() {
+                return (int) (mValue & 0xFFFFFFFF);
+            }
+
+            /**
+             * Get Extended Country Code (ECC)
+             * @return Extended Country Code
+             */
+            public int getEcc() {
+                return (int) ((mValue >>> 32) & 0xFF);
+            }
+
+            /**
+             * Get SCIdS (Service Component Identifier within the Service) value
+             * @return SCIdS value
+             */
+            public int getSCIdS() {
+                return (int) ((mValue >>> (32 + 8)) & 0xF);
             }
         }
     }
