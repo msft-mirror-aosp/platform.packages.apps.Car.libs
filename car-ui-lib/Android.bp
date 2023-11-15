@@ -156,6 +156,8 @@ java_genrule {
     name: "car-ui-lib-aar",
     srcs: [
         ":car-ui-lib-source{.aar}",
+        "car-ui-lib/proguard-rules-platform.pro",
+        "car-ui-lib/proguard-rules.pro",
         "car-ui-lib/src/main/res/**/*",
         "car-ui-lib/src/main/res-overlayable/**/*",
         "car-ui-lib/src/main/res-private/**/*",
