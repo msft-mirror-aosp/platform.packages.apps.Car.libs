@@ -86,7 +86,7 @@ public class CallDetailLiveData extends LiveData<CallDetail> {
     }
 
     private void setTelecomCallDetail(@Nullable Call telecomCall) {
-        setValue(telecomCall != null ? CallDetail.fromTelecomCallDetail(telecomCall.getDetails())
+        setValue(telecomCall != null ? CallDetail.fromTelecomCall(telecomCall)
                 : null);
     }
 }
