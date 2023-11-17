@@ -18,6 +18,7 @@ package com.android.car.media.common.source;
 
 import static com.android.car.apps.common.util.CarAppsDebugUtils.idHash;
 import static com.android.car.media.common.MediaConstants.BROWSE_CUSTOM_ACTIONS_ACTION_LIMIT;
+import static com.android.car.media.common.MediaConstants.KEY_ROOT_HINT_MEDIA_SESSION_API;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -46,6 +47,8 @@ import java.util.Objects;
 public class MediaBrowserConnector {
 
     private static final String TAG = "MediaBrowserConnector";
+
+    private static final Bundle sExtraRootHints = new Bundle();
 
     /**
      * Represents the state of the connection to the media browser service given to
@@ -154,6 +157,11 @@ public class MediaBrowserConnector {
 
     @Nullable private MediaSource mMediaSource;
     @Nullable private MediaBrowserCompat mBrowser;
+
+    /** Appends some root hints that will be sent to the MediaBrowserCompat. */
+    public static void addRootHints(@NonNull Bundle rootHints) {
+        sExtraRootHints.putAll(rootHints);
+    }
 
     /**
      * Create a new MediaBrowserConnector.
@@ -283,10 +291,12 @@ public class MediaBrowserConnector {
     protected MediaBrowserCompat createMediaBrowser(@NonNull MediaSource mediaSource,
             @NonNull MediaBrowserCompat.ConnectionCallback callback) {
         Bundle rootHints = new Bundle();
+        rootHints.putInt(KEY_ROOT_HINT_MEDIA_SESSION_API, 1);
         rootHints.putInt(MediaConstants.BROWSER_ROOT_HINTS_KEY_MEDIA_ART_SIZE_PIXELS,
                 mMaxBitmapSizePx);
         rootHints.putInt(BROWSE_CUSTOM_ACTIONS_ACTION_LIMIT,
                 mContext.getResources().getInteger(R.integer.max_custom_actions));
+        rootHints.putAll(sExtraRootHints);
         ComponentName browseService = mediaSource.getBrowseServiceComponentName();
         return new MediaBrowserCompat(mContext, browseService, callback, rootHints);
     }

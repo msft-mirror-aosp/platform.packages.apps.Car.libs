@@ -155,9 +155,17 @@ public class MediaItemsRepository {
         return state.getAnalyticsManager();
     }
 
+    /** Returns the root id. Must be called after the source is connected. */
+    public String getRootId() {
+        return getCache().mRootId;
+    }
+
     /**
      * Convenience wrapper for root media items. The live data is the same instance for all
      * media sources.
+     * Note: this call doesn't fetch the items. Something else must call
+     * {@link #getMediaChildren(String, Bundle)} with the result of {@link #getRootId()} once the
+     * browsing state is connected.
      */
     public MediaItemsLiveData getRootMediaItems() {
         return mRootMediaItems;
@@ -178,8 +186,8 @@ public class MediaItemsRepository {
         return mCustomBrowseActions;
     }
 
-    /** Returns the children of the given node. */
-    public MediaItemsLiveData getMediaChildren(String nodeId) {
+    /** Returns the children of the given node. Initiates a MediaBrowserCompat query. */
+    public MediaItemsLiveData getMediaChildren(String nodeId, @NonNull Bundle options) {
         PerMediaSourceCache cache = getCache();
         MediaChildren items = cache.mChildrenByNodeId.get(nodeId);
         if (items == null) {
@@ -189,7 +197,7 @@ public class MediaItemsRepository {
 
         // Always refresh the subscription (to work around bugs in media apps).
         mBrowsingState.mBrowser.unsubscribe(nodeId);
-        mBrowsingState.mBrowser.subscribe(nodeId, mBrowseCallback);
+        mBrowsingState.mBrowser.subscribe(nodeId, options, mBrowseCallback);
 
         return items.mLiveData;
     }
@@ -206,13 +214,13 @@ public class MediaItemsRepository {
     }
 
     /** Sets the search query. Results will be given through {@link #getSearchMediaItems}. */
-    public void setSearchQuery(String query) {
+    public void setSearchQuery(String query, @NonNull Bundle options) {
         mSearchQuery = query;
         if (TextUtils.isEmpty(mSearchQuery)) {
             clearSearchResults();
         } else {
             mSearchMediaItems.setLoading();
-            mBrowsingState.mBrowser.search(mSearchQuery, null, mSearchCallback);
+            mBrowsingState.mBrowser.search(mSearchQuery, options, mSearchCallback);
         }
     }
 
@@ -236,9 +244,7 @@ public class MediaItemsRepository {
                 mRootMediaItems.setLoading();
                 break;
             case CONNECTED:
-                String rootId = mBrowsingState.mBrowser.getRoot();
-                getCache().mRootId = rootId;
-                getMediaChildren(rootId);
+                getCache().mRootId = mBrowsingState.mBrowser.getRoot();
                 mCustomBrowseActions.postValue(parseBrowseActions(mBrowsingState));
                 break;
             case DISCONNECTING:
