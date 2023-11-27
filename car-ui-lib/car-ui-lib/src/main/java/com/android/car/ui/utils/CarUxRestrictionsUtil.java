@@ -19,7 +19,6 @@ import static android.car.drivingstate.CarUxRestrictions.UX_RESTRICTIONS_LIMIT_S
 
 import android.car.Car;
 import android.car.drivingstate.CarUxRestrictions;
-import android.car.drivingstate.CarUxRestrictions.CarUxRestrictionsInfo;
 import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.Context;
 import android.os.Build;
@@ -147,8 +146,7 @@ public class CarUxRestrictionsUtil {
      * Returns whether any of the given flags are blocked by the specified restrictions. If null is
      * given, the method returns true for safety.
      */
-    public static boolean isRestricted(
-            @CarUxRestrictionsInfo int restrictionFlags, @Nullable CarUxRestrictions uxr) {
+    public static boolean isRestricted(int restrictionFlags, @Nullable CarUxRestrictions uxr) {
         return (uxr == null) || ((uxr.getActiveRestrictions() & restrictionFlags) != 0);
     }
 

@@ -58,7 +58,6 @@ public class MenuItem {
     private final boolean mShowIconAndTitle;
     private final boolean mIsTinted;
     private final boolean mIsPrimary;
-    @CarUxRestrictions.CarUxRestrictionsInfo
 
     private int mId;
     private CarUxRestrictions mCurrentRestrictions;
@@ -225,14 +224,13 @@ public class MenuItem {
     }
 
     /** Sets the UxRestrictions of this MenuItem. */
-    public void setUxRestrictions(@CarUxRestrictions.CarUxRestrictionsInfo int uxRestrictions) {
+    public void setUxRestrictions(int uxRestrictions) {
         if (mUxRestrictions != uxRestrictions) {
             mUxRestrictions = uxRestrictions;
             update();
         }
     }
 
-    @CarUxRestrictions.CarUxRestrictionsInfo
     public int getUxRestrictions() {
         return mUxRestrictions;
     }
@@ -346,7 +344,6 @@ public class MenuItem {
         private boolean mIsSearch = false;
         private boolean mIsSettings = false;
         private boolean mIsPrimary = false;
-        @CarUxRestrictions.CarUxRestrictionsInfo
         private int mUxRestrictions = CarUxRestrictions.UX_RESTRICTIONS_BASELINE;
 
         public Builder(@NonNull Context c) {
@@ -531,11 +528,9 @@ public class MenuItem {
         }
 
         /**
-         * Sets under what {@link android.car.drivingstate.CarUxRestrictions.CarUxRestrictionsInfo}
-         * the MenuItem should be restricted.
+         * Sets the UxRestrictions on this MenuItem.
          */
-        public Builder setUxRestrictions(
-                @CarUxRestrictions.CarUxRestrictionsInfo int restrictions) {
+        public Builder setUxRestrictions(int restrictions) {
             mUxRestrictions = restrictions;
             return this;
         }
