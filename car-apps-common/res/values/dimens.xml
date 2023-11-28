@@ -78,4 +78,18 @@
     <dimen name="hero_button_height">@dimen/touch_target_size</dimen>
     <dimen name="hero_button_corner_radius">38dp</dimen>
 
+    <!-- Car seekbar -->
+    <!-- This height should equal to
+    (car_rotary_highlight_ring_radius + car_rotary_highlight_ring_thickness) * 2
+    in order to make the ring fit perfectly. -->
+    <dimen name="car_seekbar_slider_height">76dp</dimen>
+    <dimen name="car_seekbar_slider_radius">38dp</dimen>
+    <dimen name="car_seekbar_background_height">8dp</dimen>
+    <dimen name="car_seekbar_background_radius">5dp</dimen>
+    <dimen name="car_seekbar_padding">1dp</dimen>
+    <dimen name="car_seekbar_icon_size">56dp</dimen>
+    <dimen name="car_seekbar_icon_padding">20dp</dimen>
+    <dimen name="car_rotary_highlight_ring_radius">30dp</dimen>
+    <dimen name="car_rotary_highlight_ring_thickness">8dp</dimen>
+
 </resources>
