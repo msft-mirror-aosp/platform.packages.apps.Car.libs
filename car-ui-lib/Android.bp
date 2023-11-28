@@ -105,6 +105,8 @@ android_library {
 java_genrule {
     name: "car-ui-lib-no-overlayable-aar",
     srcs: [
+        "car-ui-lib/proguard-rules-platform.pro",
+        "car-ui-lib/proguard-rules.pro",
         ":car-ui-lib-source-no-overlayable{.aar}",
         "car-ui-lib/src/main/res/**/*",
         "car-ui-lib/src/main/res-private/**/*",
