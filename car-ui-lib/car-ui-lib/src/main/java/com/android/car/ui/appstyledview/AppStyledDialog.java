@@ -24,15 +24,23 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
+
+import com.android.car.ui.utils.CarUiUtils;
+
+import java.util.List;
 
 /**
  * App styled dialog used to display a view that cannot be customized via OEM. Dialog will inflate a
@@ -42,14 +50,17 @@ import androidx.core.view.WindowInsetsControllerCompat;
  * Apps should not use this directly. Apps should use {@link AppStyledDialogController}.
  */
 class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListener {
+    private static final int IME_OVERLAP_DP = 32;
+
     private final AppStyledViewController mController;
     private Runnable mOnDismissListener;
     private View mContent;
+    private View mAppStyledView;
     private final Context mContext;
 
     AppStyledDialog(@NonNull Activity context, @NonNull AppStyledViewController controller) {
         super(context);
-        // super.getContext() returns a ContextThemeWrapper which is not an Activity which we need 
+        // super.getContext() returns a ContextThemeWrapper which is not an Activity which we need
         // in order to get call getWindow()
         mContext = context;
         mController = controller;
@@ -60,21 +71,116 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(mController.getAppStyledView(mContent));
+        Window window = getWindow();
+        if (window == null) {
+            return;
+        }
+
+        window.setAttributes(mController.getDialogWindowLayoutParam(getWindow().getAttributes()));
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        configureImeInsetFit();
+    }
+
+    private void configureImeInsetFit() {
+        // Required inset API is unsupported. Fallback to default IME behavior.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            return;
+        }
 
         Window window = getWindow();
         if (window == null) {
             return;
         }
 
-        WindowManager.LayoutParams params = getWindow().getAttributes();
-        window.setAttributes(mController.getDialogWindowLayoutParam(params));
-        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        window.getDecorView().getRootView().setOnApplyWindowInsetsListener(
-                (v, insets) -> {
-                    WindowManager.LayoutParams dialogParams = window.getAttributes();
-                    window.setAttributes(mController.getDialogWindowLayoutParam(dialogParams));
-                    return insets;
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        ViewCompat.setWindowInsetsAnimationCallback(window.getDecorView().getRootView(),
+                new WindowInsetsAnimationCompat.Callback(
+                        WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP) {
+
+                    int mEndHeight;
+                    WindowManager.LayoutParams mAnimationLayoutParams;
+                    WindowManager.LayoutParams mStartLayoutParams;
+                    int mAppStyledViewBottomPadding;
+                    boolean mIsImeShown;
+                    final int mImeOverlapPx =
+                            (int) CarUiUtils.dpToPixel(mContext.getResources(), IME_OVERLAP_DP);
+
+                    @Override
+                    public void onPrepare(@NonNull WindowInsetsAnimationCompat animation) {
+                        mAnimationLayoutParams = new WindowManager.LayoutParams();
+                        mStartLayoutParams = mController.getDialogWindowLayoutParam(
+                                window.getAttributes());
+                        mAnimationLayoutParams.copyFrom(mStartLayoutParams);
+
+                        int[] location = new int[2];
+                        window.getDecorView().getRootView().getLocationOnScreen(location);
+                        int x = location[0];
+                        int y = location[1];
+
+                        mAppStyledViewBottomPadding = mAppStyledView.getPaddingBottom();
+
+                        mAnimationLayoutParams.gravity = Gravity.TOP | Gravity.LEFT;
+                        mAnimationLayoutParams.setFitInsetsTypes(0);
+                        mAnimationLayoutParams.x = x;
+                        mAnimationLayoutParams.y = y;
+                        window.setAttributes(mAnimationLayoutParams);
+                    }
+
+                    @NonNull
+                    @Override
+                    public WindowInsetsAnimationCompat.BoundsCompat onStart(
+                            @NonNull WindowInsetsAnimationCompat animation,
+                            @NonNull WindowInsetsAnimationCompat.BoundsCompat bounds) {
+                        WindowInsetsCompat insets = ViewCompat.getRootWindowInsets(
+                                window.getDecorView().getRootView());
+                        int imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
+                        mIsImeShown = imeHeight > 0;
+                        int imeOverlap = mIsImeShown ? imeHeight - mImeOverlapPx : 0;
+                        mEndHeight = mController.getDialogWindowLayoutParam(
+                                window.getAttributes()).height - imeOverlap;
+
+                        return bounds;
+                    }
+
+                    @Override
+                    public void onEnd(@NonNull WindowInsetsAnimationCompat animation) {
+                        mStartLayoutParams.height = mEndHeight;
+                        window.setAttributes(mStartLayoutParams);
+                        super.onEnd(animation);
+                    }
+
+                    @NonNull
+                    @Override
+                    public WindowInsetsCompat onProgress(@NonNull WindowInsetsCompat insets,
+                            @NonNull List<WindowInsetsAnimationCompat> runningAnimations) {
+                        // Find an IME animation.
+                        WindowInsetsAnimationCompat imeAnimation = null;
+                        for (WindowInsetsAnimationCompat animation : runningAnimations) {
+                            if ((animation.getTypeMask() & WindowInsetsCompat.Type.ime()) != 0) {
+                                imeAnimation = animation;
+                                break;
+                            }
+                        }
+                        if (imeAnimation != null) {
+                            // Offset the view based on the interpolated fraction of the IME
+                            // animation.
+                            int mStartHeight = mStartLayoutParams.height;
+                            mAnimationLayoutParams.height =
+                                    (int) (mStartHeight - ((mStartHeight - mEndHeight)
+                                            * imeAnimation.getInterpolatedFraction()));
+                            window.setAttributes(mAnimationLayoutParams);
+                            float imeOffset = mIsImeShown ? mImeOverlapPx
+                                    * imeAnimation.getInterpolatedFraction()
+                                    : -mImeOverlapPx * imeAnimation.getInterpolatedFraction();
+                            mAppStyledView.setPadding(mAppStyledView.getPaddingLeft(),
+                                    mAppStyledView.getPaddingTop(),
+                                    mAppStyledView.getPaddingRight(),
+                                    (int) (mAppStyledViewBottomPadding + imeOffset));
+                        }
+
+                        return insets;
+                    }
                 });
     }
 
@@ -84,7 +190,6 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
             mOnDismissListener.run();
         }
     }
-
 
     @Override
     public void onAttachedToWindow() {
@@ -99,12 +204,10 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
      */
     private void copySystemUiVisibility() {
         getWindow().getDecorView().setSystemUiVisibility(
-                ((Activity) mContext).getWindow().getDecorView().getSystemUiVisibility()
-        );
+                ((Activity) mContext).getWindow().getDecorView().getSystemUiVisibility());
         getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(
                 i -> getWindow().getDecorView().setSystemUiVisibility(
-                        ((Activity) mContext).getWindow().getDecorView().getSystemUiVisibility()
-                ));
+                        ((Activity) mContext).getWindow().getDecorView().getSystemUiVisibility()));
     }
 
     /**
@@ -131,8 +234,7 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
         if (activitySystemBarBehavior != 0) {
             // Configure the behavior of the hidden system bars to match requesting activity
             dialogWindowInsetsController.setSystemBarsBehavior(
-                    activityWindowInsetsController.getSystemBarsBehavior()
-            );
+                    activityWindowInsetsController.getSystemBarsBehavior());
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -150,11 +252,25 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
         }
     }
 
-    void setContent(View contentView) {
-        mContent = contentView;
-        if (isShowing()) {
-            setContentView(mController.getAppStyledView(mContent));
+    @Override
+    public void show() {
+        if (getWindow() != null) {
+            getWindow().setAttributes(
+                    mController.getDialogWindowLayoutParam(getWindow().getAttributes()));
         }
+        super.show();
+        mContent.clearFocus();
+    }
+
+    void setContent(View contentView) {
+        if (contentView.getParent() != null) {
+            ((ViewGroup) contentView.getParent()).removeView(contentView);
+        }
+
+        mContent = contentView;
+        mAppStyledView = mController.getAppStyledView(mContent);
+        configureImeInsetFit();
+        setContentView(mAppStyledView);
     }
 
     View getContent() {

@@ -77,31 +77,30 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
         updateNavIconClickListener();
     }
 
-    private float getVerticalInset(Context context, DisplayMetrics displayMetrics) {
+    private float getVerticalInset(DisplayMetrics displayMetrics) {
         // Inset API not supported before Android R. Fallback to previous 90 percent of display size
         // implementation.
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            Context unwrappedContext = CarUiUtils.unwrapContext(context);
+            Context unwrappedContext = CarUiUtils.unwrapContext(mContext);
             WindowInsets windowInsets =
                     unwrappedContext.getSystemService(
                             WindowManager.class).getCurrentWindowMetrics().getWindowInsets();
-            Insets systemBarInsets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars());
-            Insets imeInsets = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
+            Insets systemBarInsets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
 
-            return systemBarInsets.top + systemBarInsets.bottom + imeInsets.top + imeInsets.bottom;
+            return systemBarInsets.top + systemBarInsets.bottom;
         }
 
         return (float) (displayMetrics.heightPixels * (1 - VISIBLE_SCREEN_PERCENTAGE));
     }
 
-    private float getHorizontalInset(Context context, DisplayMetrics displayMetrics) {
+    private float getHorizontalInset(DisplayMetrics displayMetrics) {
         // Inset API not supported before Android R. Fallback to previous 90 percent of display size
         // implementation.
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            Context unwrappedContext = CarUiUtils.unwrapContext(context);
+            Context unwrappedContext = CarUiUtils.unwrapContext(mContext);
             Insets systemBarInsets = unwrappedContext.getSystemService(
                     WindowManager.class).getCurrentWindowMetrics().getWindowInsets().getInsets(
-                    WindowInsetsCompat.Type.statusBars());
+                    WindowInsetsCompat.Type.systemBars());
 
             return systemBarInsets.left + systemBarInsets.right;
         }
@@ -113,27 +112,30 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
     public LayoutParams getDialogWindowLayoutParam(LayoutParams params) {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         WindowManager wm = mContext.getSystemService(WindowManager.class);
-        wm.getDefaultDisplay().getMetrics(displayMetrics);
+        wm.getDefaultDisplay().getRealMetrics(displayMetrics);
 
         int maxWidth = mContext.getResources().getDimensionPixelSize(
                 R.dimen.car_ui_app_styled_dialog_width_max);
         int maxHeight = mContext.getResources().getDimensionPixelSize(
                 R.dimen.car_ui_app_styled_dialog_height_max);
 
-        int displayWidth = (int) (displayMetrics.widthPixels - getHorizontalInset(mContext,
-                displayMetrics));
-        int displayHeight = (int) ((int) displayMetrics.heightPixels - getVerticalInset(mContext,
-                displayMetrics));
+        int displayWidth = displayMetrics.widthPixels;
+        int displayHeight = displayMetrics.heightPixels;
+
+        int horizontalInset = (int) getHorizontalInset(displayMetrics);
+        int verticalInset = (int) getVerticalInset(displayMetrics);
+
+        mWidth = displayWidth;
+        mHeight = displayHeight;
 
         int configuredWidth = mContext.getResources().getDimensionPixelSize(
                 R.dimen.car_ui_app_styled_dialog_width);
-        mWidth = configuredWidth != 0 ? configuredWidth : Math.min(displayWidth, maxWidth);
         int configuredHeight = mContext.getResources().getDimensionPixelSize(
                 R.dimen.car_ui_app_styled_dialog_height);
-        mHeight = configuredHeight != 0 ? configuredHeight : Math.min(displayHeight, maxHeight);
 
-        params.width = mWidth;
-        params.height = mHeight;
+        mWidth = configuredWidth != 0 ? configuredWidth : Math.min(mWidth, maxWidth);
+        mHeight = configuredHeight != 0 ? configuredHeight : Math.min(mHeight, maxHeight);
+
         params.dimAmount = CarUiUtils.getFloat(mContext.getResources(),
                 R.dimen.car_ui_app_styled_dialog_dim_amount);
 
@@ -167,26 +169,29 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
             return params;
         }
 
+        int minPaddingPx = (int) CarUiUtils.dpToPixel(mContext.getResources(),
+                DIALOG_MIN_PADDING);
+
+        if (mWidth + horizontalInset >= displayWidth - (minPaddingPx * 2)) {
+            mWidth = displayWidth - horizontalInset - (minPaddingPx * 2);
+        }
+
+        if (mHeight + verticalInset >= displayHeight - (minPaddingPx * 2)) {
+            mHeight = displayHeight - verticalInset - (minPaddingPx * 2);
+        }
+
+        params.width = mWidth;
+        params.height = mHeight;
+
+        int startMarginThresholdPx = (int) CarUiUtils.dpToPixel(mContext.getResources(),
+                DIALOG_START_MARGIN_THRESHOLD);
         if (mContext.getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE) {
             int startMargin = (displayWidth - mWidth) / 2;
-            int topMargin = (displayHeight - mHeight) / 2;
-            int startMarginThresholdPx = (int) CarUiUtils.dpToPixel(mContext.getResources(),
-                    DIALOG_START_MARGIN_THRESHOLD);
-            int minPaddingPx = (int) CarUiUtils.dpToPixel(mContext.getResources(),
-                    DIALOG_MIN_PADDING);
-
             if (startMargin >= startMarginThresholdPx) {
-                params.gravity = Gravity.START;
-                params.horizontalMargin = (float) startMarginThresholdPx / displayWidth;
-            }
-
-            if (startMargin == 0) {
-                params.width = mWidth - minPaddingPx;
-            }
-
-            if (topMargin == 0) {
-                params.height = mHeight - minPaddingPx;
+                params.gravity = Gravity.TOP | Gravity.START;
+                params.x = startMarginThresholdPx;
+                params.y = (displayHeight - mHeight) / 2;
             }
         }
 
