@@ -23,7 +23,23 @@ limitations under the License.-->
 
       <item type="drawable" name="ic_overflow_button"/>
 
+      <item type="id" name="minimized_control_bar_layout"/>
+      <item type="id" name="metadata_background"/>
+      <item type="id" name="minimized_control_bar_content_tile"/>
+      <item type="id" name="minimized_control_bar_app_icon"/>
+      <item type="id" name="minimized_control_bar_title"/>
+      <item type="id" name="subtitle_group"/>
+      <item type="id" name="minimized_control_bar_subtitle"/>
+      <item type="id" name="minimized_control_bar_subtitle_separator"/>
+      <item type="id" name="minimized_control_bar_extra_slot"/>
+      <item type="id" name="minimized_control_buttons_wrapper"/>
+      <item type="id" name="minimized_control_bar_left_slot"/>
+      <item type="id" name="minimized_control_bar_main_slot"/>
+      <item type="id" name="minimized_control_bar_right_slot"/>
+
       <item type="integer" name="control_bar_columns"/>
+
+      <item type="layout" name="minimized_control_bar"/>
 
       <item type="style" name="Widget.ActionButton.PlayPause"/>
       <item type="style" name="MinimizedControlBar"/>
