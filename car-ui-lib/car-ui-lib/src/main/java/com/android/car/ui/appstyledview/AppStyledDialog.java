@@ -31,12 +31,24 @@ import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowManager;
 
+import androidx.activity.OnBackPressedDispatcher;
+import androidx.activity.OnBackPressedDispatcherOwner;
+import androidx.activity.ViewTreeOnBackPressedDispatcherOwner;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LifecycleRegistry;
+import androidx.lifecycle.ViewTreeLifecycleOwner;
+import androidx.savedstate.SavedStateRegistry;
+import androidx.savedstate.SavedStateRegistryController;
+import androidx.savedstate.SavedStateRegistryOwner;
+import androidx.savedstate.ViewTreeSavedStateRegistryOwner;
 
 import com.android.car.ui.utils.CarUiUtils;
 
@@ -49,28 +61,45 @@ import java.util.List;
  * <p>
  * Apps should not use this directly. Apps should use {@link AppStyledDialogController}.
  */
-class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListener {
-    private static final int IME_OVERLAP_DP = 32;
 
+class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListener, LifecycleOwner,
+        SavedStateRegistryOwner, OnBackPressedDispatcherOwner {
+
+    private static final int IME_OVERLAP_DP = 32;
     private final AppStyledViewController mController;
     private Runnable mOnDismissListener;
     private View mContent;
     private View mAppStyledView;
     private final Context mContext;
+    private final LifecycleRegistry mLifecycleRegistry;
+    private final SavedStateRegistryController mSavedStateRegistryController;
+    private final OnBackPressedDispatcher mOnBackPressedDispatcher;
 
     AppStyledDialog(@NonNull Activity context, @NonNull AppStyledViewController controller) {
         super(context);
-        // super.getContext() returns a ContextThemeWrapper which is not an Activity which we need
-        // in order to get call getWindow()
+        mLifecycleRegistry = new LifecycleRegistry(this);
+        mSavedStateRegistryController = SavedStateRegistryController.create(this);
+        mOnBackPressedDispatcher = new OnBackPressedDispatcher(super::onBackPressed);
+        // super.getContext() returns a ContextThemeWrapper which is not an Activity which we
+        // need in order to get call getWindow()
         mContext = context;
         mController = controller;
         setOnDismissListener(this);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
     }
 
+    @NonNull
+    @Override
+    public Bundle onSaveInstanceState() {
+        Bundle bundle = super.onSaveInstanceState();
+        mSavedStateRegistryController.performSave(bundle);
+        return bundle;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mSavedStateRegistryController.performRestore(savedInstanceState);
         Window window = getWindow();
         if (window == null) {
             return;
@@ -79,6 +108,8 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
         window.setAttributes(mController.getDialogWindowLayoutParam(getWindow().getAttributes()));
         window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         configureImeInsetFit();
+
+        mLifecycleRegistry.setCurrentState(Lifecycle.State.CREATED);
     }
 
     private void configureImeInsetFit() {
@@ -185,6 +216,19 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
     }
 
     @Override
+    protected void onStart() {
+        mLifecycleRegistry.setCurrentState(Lifecycle.State.STARTED);
+        mLifecycleRegistry.setCurrentState(Lifecycle.State.RESUMED);
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        mLifecycleRegistry.setCurrentState(Lifecycle.State.DESTROYED);
+        super.onStop();
+    }
+
+    @Override
     public void onDismiss(DialogInterface dialog) {
         if (mOnDismissListener != null) {
             mOnDismissListener.run();
@@ -273,6 +317,30 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
         setContentView(mAppStyledView);
     }
 
+    @Override
+    public void setContentView(@NonNull View view) {
+        initViewTreeOwners();
+        super.setContentView(view);
+    }
+
+    @Override
+    public void setContentView(int layoutResID) {
+        initViewTreeOwners();
+        super.setContentView(layoutResID);
+    }
+
+    @Override
+    public void setContentView(@NonNull View view, @Nullable ViewGroup.LayoutParams params) {
+        initViewTreeOwners();
+        super.setContentView(view, params);
+    }
+
+    @Override
+    public void addContentView(@NonNull View view, @Nullable ViewGroup.LayoutParams params) {
+        initViewTreeOwners();
+        super.addContentView(view, params);
+    }
+
     View getContent() {
         return mContent;
     }
@@ -281,7 +349,41 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
         mOnDismissListener = listener;
     }
 
+    @Nullable
     WindowManager.LayoutParams getWindowLayoutParams() {
+        if (getWindow() == null) {
+            return null;
+        }
+
         return getWindow().getAttributes();
+    }
+
+    @NonNull
+    @Override
+    public Lifecycle getLifecycle() {
+        return mLifecycleRegistry;
+    }
+
+    private void initViewTreeOwners() {
+        Window window = getWindow();
+        if (window == null) {
+            return;
+        }
+
+        ViewTreeLifecycleOwner.set(window.getDecorView(), this);
+        ViewTreeSavedStateRegistryOwner.set(window.getDecorView(), this);
+        ViewTreeOnBackPressedDispatcherOwner.set(window.getDecorView(), this);
+    }
+
+    @NonNull
+    @Override
+    public SavedStateRegistry getSavedStateRegistry() {
+        return mSavedStateRegistryController.getSavedStateRegistry();
+    }
+
+    @NonNull
+    @Override
+    public OnBackPressedDispatcher getOnBackPressedDispatcher() {
+        return mOnBackPressedDispatcher;
     }
 }
