@@ -319,13 +319,13 @@ public class ProgramSelectorExt {
         if (isAmFmProgram(sel)) {
             long freq;
             String hdSuffix = "";
-            if (hasId(sel, ProgramSelector.IDENTIFIER_TYPE_AMFM_FREQUENCY)) {
-                freq = sel.getFirstId(ProgramSelector.IDENTIFIER_TYPE_AMFM_FREQUENCY);
-            } else if (sel.getPrimaryId().getType()
+            if (sel.getPrimaryId().getType()
                     == ProgramSelector.IDENTIFIER_TYPE_HD_STATION_ID_EXT) {
                 IdentifierExt.HdPrimary hdIdExt = IdentifierExt.asHdPrimary(sel.getPrimaryId());
                 freq = hdIdExt.getFrequency();
                 hdSuffix = "-HD" + (hdIdExt.getSubchannel() + 1);
+            } else if (hasId(sel, ProgramSelector.IDENTIFIER_TYPE_AMFM_FREQUENCY)) {
+                freq = sel.getFirstId(ProgramSelector.IDENTIFIER_TYPE_AMFM_FREQUENCY);
             } else {
                 if (noProgramTypeFallback) return null;
                 // if there is no frequency assigned, let's assume it's a malformed RDS selector
