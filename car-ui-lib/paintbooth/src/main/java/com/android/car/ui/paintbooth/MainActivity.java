@@ -322,7 +322,7 @@ public class MainActivity extends Activity {
         ProviderInfo providerInfo = this.getPackageManager().resolveContentProvider(authority,
                 MATCH_DISABLED_COMPONENTS | MATCH_SYSTEM_ONLY);
         if (providerInfo == null) {
-            switchWidget.setText("Try to enable plugin");
+            switchWidget.setText(R.string.try_enable_plugin);
             switchWidget.setEnabled(false);
             switchWidget.setChecked(false);
             Toast.makeText(this, "Plugin is disabled or does not exist",
@@ -337,7 +337,7 @@ public class MainActivity extends Activity {
         // PaintBooth will force quit when disabling the plugin (enabled = false), so these values
         // will be reset when PaintBooth is relaunched
         if (enabled) {
-            switchWidget.setText("Set plugin enabled state");
+            switchWidget.setText(R.string.set_plugin_enabled_state);
             switchWidget.setEnabled(true);
             switchWidget.setChecked(true);
             // TODO(b/288332302) Restart paintbooth automatically for convenience

@@ -16,6 +16,7 @@
 
 package com.android.car.ui.appstyledview;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -107,6 +108,7 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
                             (int) CarUiUtils.dpToPixel(mContext.getResources(), IME_OVERLAP_DP);
 
                     @Override
+                    @SuppressLint({"NewApi", "RtlHardcoded"})
                     public void onPrepare(@NonNull WindowInsetsAnimationCompat animation) {
                         mAnimationLayoutParams = new WindowManager.LayoutParams();
                         mStartLayoutParams = mController.getDialogWindowLayoutParam(
