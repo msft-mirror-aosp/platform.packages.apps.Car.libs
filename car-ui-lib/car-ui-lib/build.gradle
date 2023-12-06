@@ -18,6 +18,7 @@
 
 plugins {
     id 'com.android.library'
+    id 'com.android.car.unbundled.conventions.local-publish'
 }
 
 android {
