@@ -246,14 +246,8 @@ public class MediaBrowserConnector {
                 new BrowsingState(mContext, mMediaSource, mBrowser, cnx));
     }
 
-    /**
-     * Creates and connects a new {@link MediaBrowserCompat} if the given {@link MediaSource}
-     * isn't null. If needed, the previous browser is disconnected.
-     * @param mediaSource the media source to connect to.
-     * @see MediaBrowserCompat#MediaBrowserCompat(Context, ComponentName,
-     * MediaBrowserCompat.ConnectionCallback, android.os.Bundle)
-     */
-    public void connectTo(@Nullable MediaSource mediaSource) {
+    /** Disconnect from the {@link MediaBrowserCompat} if it was connected. */
+    public void maybeDisconnect() {
         if (mBrowser != null && mBrowser.isConnected()) {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "Disconnecting: " + getSourcePackage()
@@ -262,6 +256,17 @@ public class MediaBrowserConnector {
             sendNewState(ConnectionStatus.DISCONNECTING);
             mBrowser.disconnect();
         }
+    }
+
+    /**
+     * Creates and connects a new {@link MediaBrowserCompat} if the given {@link MediaSource}
+     * isn't null. If needed, the previous browser is disconnected.
+     * @param mediaSource the media source to connect to.
+     * @see MediaBrowserCompat#MediaBrowserCompat(Context, ComponentName,
+     * MediaBrowserCompat.ConnectionCallback, android.os.Bundle)
+     */
+    public void connectTo(@Nullable MediaSource mediaSource) {
+        maybeDisconnect();
 
         mMediaSource = mediaSource;
         if (mMediaSource != null) {

@@ -16,9 +16,6 @@
 
 package com.android.car.media.common;
 
-import static android.car.media.CarMediaManager.MEDIA_SOURCE_MODE_PLAYBACK;
-
-import android.app.Application;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Size;
@@ -106,7 +103,7 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
 
     /** Connects the bar to the {@link PlaybackViewModel}. */
     public void setModel(@NonNull PlaybackViewModel model, @NonNull LifecycleOwner owner,
-            @NonNull Size maxArtSize) {
+            @NonNull MediaItemsRepository repository, @NonNull Size maxArtSize) {
         mMediaButtonController.setModel(model, owner);
         mMetadataController = new MetadataController(owner, model, null, mTitle, mSubtitle, null,
                 null, null, null, null, null, mContentTile, mAppIcon, maxArtSize,
@@ -116,9 +113,8 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
             if (mediaItemMetadata != null && getVisibility() == VISIBLE) {
                 ArrayList<String> items = new ArrayList<>();
                 items.add(mediaItemMetadata.getId());
-                MediaItemsRepository.get((Application) getContext().getApplicationContext(),
-                        MEDIA_SOURCE_MODE_PLAYBACK).getAnalyticsManager().sendVisibleItemsEvents(
-                        null, AnalyticsEvent.MINI_PLAYBACK, AnalyticsEvent.SHOW,
+                repository.getAnalyticsManager().sendVisibleItemsEvents(
+                        "", AnalyticsEvent.MINI_PLAYBACK, AnalyticsEvent.SHOW,
                         AnalyticsEvent.NONE, items);
             }
         });
