@@ -102,6 +102,13 @@ public class MediaItemMetadata {
         this(item.getDescription(), null, item.isBrowsable(), item.isPlayable(), null);
     }
 
+    /** Creates a MediaItemMetadata where only the media id is set. */
+    public static MediaItemMetadata createEmptyRootData(String rootId) {
+        MediaDescriptionCompat.Builder bb = new MediaDescriptionCompat.Builder();
+        bb.setMediaId(rootId);
+        return new MediaItemMetadata(bb.build(), null, true, false, null);
+    }
+
     @VisibleForTesting
     public MediaItemMetadata(@NonNull MediaDescriptionCompat description, @Nullable Long queueId,
                              boolean isBrowsable, boolean isPlayable,

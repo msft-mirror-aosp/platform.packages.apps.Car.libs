@@ -25,11 +25,11 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.car.app.mediaextensions.analytics.Constants;
+import androidx.car.app.mediaextensions.analytics.host.AnalyticsManager;
+import androidx.car.app.mediaextensions.analytics.host.IAnalyticsManager;
 
 import com.android.car.media.common.source.MediaSource;
-import com.android.car.media.extensions.analytics.Constants;
-import com.android.car.media.extensions.analytics.host.AnalyticsManager;
-import com.android.car.media.extensions.analytics.host.IAnalyticsManager;
 
 /**
  * Analytics related helper methods.

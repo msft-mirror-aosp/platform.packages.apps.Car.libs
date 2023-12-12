@@ -16,6 +16,10 @@
 
 package com.android.car.media.common;
 
+import static androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent.VIEW_ACTION_MODE_NONE;
+import static androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent.VIEW_ACTION_SHOW;
+import static androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent.VIEW_COMPONENT_MINI_PLAYBACK;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Size;
@@ -25,6 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.android.car.apps.common.BackgroundImageView;
@@ -32,7 +37,6 @@ import com.android.car.apps.common.MinimizedControlBar;
 import com.android.car.apps.common.imaging.ImageBinder;
 import com.android.car.media.common.browse.MediaItemsRepository;
 import com.android.car.media.common.playback.PlaybackViewModel;
-import com.android.car.media.extensions.analytics.event.AnalyticsEvent;
 
 import java.util.ArrayList;
 
@@ -40,6 +44,7 @@ import java.util.ArrayList;
  * This is a CarControlBar used for displaying Media content, including metadata for the currently
  * playing song and basic controls.
  */
+@OptIn(markerClass = androidx.car.app.annotations2.ExperimentalCarApi.class)
 public class MinimizedPlaybackControlBar extends MinimizedControlBar {
 
     private static final String TAG = "Media.ControlBar";
@@ -114,8 +119,8 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
                 ArrayList<String> items = new ArrayList<>();
                 items.add(mediaItemMetadata.getId());
                 repository.getAnalyticsManager().sendVisibleItemsEvents(
-                        "", AnalyticsEvent.MINI_PLAYBACK, AnalyticsEvent.SHOW,
-                        AnalyticsEvent.NONE, items);
+                        "", VIEW_COMPONENT_MINI_PLAYBACK, VIEW_ACTION_SHOW, VIEW_ACTION_MODE_NONE,
+                        items);
             }
         });
 
