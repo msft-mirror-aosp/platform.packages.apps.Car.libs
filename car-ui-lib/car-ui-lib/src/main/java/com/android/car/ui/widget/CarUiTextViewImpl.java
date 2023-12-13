@@ -163,7 +163,7 @@ public final class CarUiTextViewImpl extends CarUiTextView {
 
             // Account for word wrapping by removing partial words at end of line by moving index
             // back to last whitespace character
-            if (!isTruncationComplete && !Character.isWhitespace(text.charAt(index))) {
+            if (!isTruncationComplete && !Character.isWhitespace(text.charAt(index)) && index > 0) {
                 int offset = 0;
                 while (!Character.isWhitespace(text.charAt(index - offset - 1))) {
                     offset++;
