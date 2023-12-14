@@ -52,4 +52,7 @@
          whichever comes first.-->
     <integer name="analytics_send_batch_size">50</integer>
 
+    <!--  Default logoSize for ContentFormatView (1 is large) -->
+    <integer name="default_logoSize">1</integer>
+
 </resources>
