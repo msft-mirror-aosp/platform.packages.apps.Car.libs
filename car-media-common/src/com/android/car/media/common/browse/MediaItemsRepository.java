@@ -38,6 +38,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.car.app.mediaextensions.analytics.host.IAnalyticsManager;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -48,7 +49,6 @@ import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
 import com.android.car.media.common.source.MediaModels;
 import com.android.car.media.common.source.MediaSource;
 import com.android.car.media.common.source.MediaSourceViewModel;
-import com.android.car.media.extensions.analytics.host.IAnalyticsManager;
 
 import java.util.Collections;
 import java.util.HashMap;

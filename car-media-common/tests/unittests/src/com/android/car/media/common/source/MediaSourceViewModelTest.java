@@ -53,7 +53,7 @@ public class MediaSourceViewModelTest {
 
     private static final String TAG = "MediaSourceVMTest";
 
-    private final MutableLiveData<MediaSource> mMediaSourceLiveData = dataOf(null);
+    private MutableLiveData<MediaSource> mMediaSourceLiveData = null;
 
     @Rule
     public final MockitoRule mMockitoRule = MockitoJUnit.rule();
@@ -74,6 +74,7 @@ public class MediaSourceViewModelTest {
     @Before
     public void setUp() {
         mContext = ApplicationProvider.getApplicationContext();
+        mMediaSourceLiveData = dataOf(null);
         mRequestedSource = null;
         mMediaSource = null;
     }
