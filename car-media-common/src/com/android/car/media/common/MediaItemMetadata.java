@@ -106,6 +106,7 @@ public class MediaItemMetadata {
     public static MediaItemMetadata createEmptyRootData(String rootId) {
         MediaDescriptionCompat.Builder bb = new MediaDescriptionCompat.Builder();
         bb.setMediaId(rootId);
+        bb.setTitle("Root");
         return new MediaItemMetadata(bb.build(), null, true, false, null);
     }
 

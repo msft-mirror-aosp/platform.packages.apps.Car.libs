@@ -50,6 +50,7 @@ import com.android.car.media.common.source.MediaModels;
 import com.android.car.media.common.source.MediaSource;
 import com.android.car.media.common.source.MediaSourceViewModel;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -228,7 +229,7 @@ public class MediaItemsRepository {
     }
 
     private void clearSearchResults() {
-        mSearchMediaItems.clear();
+        mSearchMediaItems.onDataLoaded(null, new ArrayList<>());
     }
 
     private MediaSource getMediaSource() {
