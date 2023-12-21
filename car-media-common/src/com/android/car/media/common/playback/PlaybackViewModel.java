@@ -161,14 +161,14 @@ public class PlaybackViewModel {
     }
 
     public PlaybackViewModel(Context context, LiveData<BrowsingState> browsingState) {
-        this(context, browsingState, createFactory(context));
+        this(context, browsingState, createFactory(context.getApplicationContext()));
     }
 
     @VisibleForTesting
     public PlaybackViewModel(@NonNull Context context, LiveData<BrowsingState> browsingState,
             InputFactory factory) {
-        mInputFactory =  factory;
-        mColorsFactory = new MediaSourceColors.Factory(context);
+        mInputFactory = factory;
+        mColorsFactory = new MediaSourceColors.Factory(context.getApplicationContext());
         browsingState.observeForever(this::onBrowsingStateChanged);
     }
 
