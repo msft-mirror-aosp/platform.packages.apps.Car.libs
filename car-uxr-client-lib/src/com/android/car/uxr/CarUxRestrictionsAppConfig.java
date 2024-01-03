@@ -59,6 +59,14 @@ public class CarUxRestrictionsAppConfig {
         return sInstance;
     }
 
+    /** Returns the content limit regardless of the restriction state. */
+    @Nullable
+    public static Integer getContentLimit(Context context, @XmlRes int xmlRes, @IdRes int resId) {
+        CarUxRestrictionsAppConfig uxr = CarUxRestrictionsAppConfig.getInstance(context, xmlRes);
+        ListConfig cfg = uxr.getMapping().get(resId);
+        return (cfg != null) ? cfg.getContentLimit() : null;
+    }
+
     /**
      * Returns a {@link Map} of Resource Ids as ints to {@link ListConfig} objects.
      */

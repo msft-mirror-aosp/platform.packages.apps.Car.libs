@@ -38,7 +38,12 @@ android {
 
     testOptions {
         unitTests {
-            includeAndroidResources = true
+            /* Enabling this causes build failures.
+            * While we normally want to include Android Resources in unit tests,
+            * we don't have support for shared library resources yet. (b/292279181)
+            * Either way, this library has no unit tests right now.
+            */
+            // includeAndroidResources = true
         }
         animationsDisabled = true
     }
@@ -60,8 +65,7 @@ dependencies {
 // Disable the ':oem-token-lib:verifyReleaseResources' task as references from the shared library
 // dependency are not recognized. Rely on resource verification at the binary level. Android Gradle
 // plugin support for shared library dependencies tracked at b/292279181.
-tasks.withType(VerifyLibraryResourcesTask).configureEach({ task ->
-    task.enabled = false
+tasks.withType(VerifyLibraryResourcesTask).configureEach({ task -> task.enabled = false
 })
 
 android.aaptOptions.additionalParameters "-I", "${projectDir}/../shared-lib/prebuilt/token-shared-lib.apk"

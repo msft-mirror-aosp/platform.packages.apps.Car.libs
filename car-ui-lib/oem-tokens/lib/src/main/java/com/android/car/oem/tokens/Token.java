@@ -27,6 +27,7 @@ import android.view.ContextThemeWrapper;
 import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.Px;
 import androidx.annotation.StyleRes;
 import androidx.annotation.VisibleForTesting;
@@ -62,6 +63,7 @@ public class Token {
     /**
      * Return the package name for the OEM design token shared library installed on device.
      */
+    @Nullable
     public static String getTokenSharedLibPackageName(@NonNull PackageManager packageManager) {
         if (sTestingOverrideEnabled) {
             return TEST_TOKEN_SHARED_LIBRARY_NAME;

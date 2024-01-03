@@ -16,6 +16,7 @@
 
 package com.android.car.media.common;
 
+
 /**
  * Holds constants used when dealing with MediaBrowserServices that support the
  * content style API for media.
@@ -69,4 +70,27 @@ public final class MediaConstants {
             "androidx.car.app.mediaextensions.KEY_CONTENT_FORMAT_TINTABLE_LARGE_ICON_URI";
     public static final String KEY_CONTENT_FORMAT_TINTABLE_SMALL_ICON_URI =
             "androidx.car.app.mediaextensions.KEY_CONTENT_FORMAT_TINTABLE_SMALL_ICON_URI";
+
+    // TODO(b/222362032): Replace with androidx reference.
+    public static final String KEY_ROOT_HINT_MEDIA_SESSION_API =
+            "androidx.car.app.mediaextensions.KEY_ROOT_HINT_MEDIA_SESSION_API";
+    public static final String KEY_ROOT_HINT_MAX_QUEUE_ITEMS_WHILE_RESTRICTED =
+            "androidx.car.app.mediaextensions.KEY_ROOT_HINT_MAX_QUEUE_ITEMS_WHILE_RESTRICTED";
+
+    public static final String KEY_HINT_HOST_PACKAGE_NAME =
+            "androidx.car.app.mediaextensions.KEY_HINT_HOST_PACKAGE_NAME";
+    public static final String KEY_HINT_VIEW_WIDTH_PIXELS =
+            "androidx.car.app.mediaextensions.KEY_HINT_VIEW_WIDTH_PIXELS";
+    public static final String KEY_HINT_VIEW_HEIGHT_PIXELS =
+            "androidx.car.app.mediaextensions.KEY_HINT_VIEW_HEIGHT_PIXELS";
+    public static final String KEY_HINT_VIEW_MAX_ITEMS_WHILE_RESTRICTED =
+            "androidx.car.app.mediaextensions.KEY_HINT_VIEW_MAX_ITEMS_WHILE_RESTRICTED";
+    public static final String KEY_HINT_VIEW_MAX_LIST_ITEMS_COUNT_PER_ROW =
+            "androidx.car.app.mediaextensions.KEY_HINT_VIEW_MAX_LIST_ITEMS_COUNT_PER_ROW";
+    public static final String KEY_HINT_VIEW_MAX_GRID_ITEMS_COUNT_PER_ROW =
+            "androidx.car.app.mediaextensions.KEY_HINT_VIEW_MAX_GRID_ITEMS_COUNT_PER_ROW";
+    public static final String KEY_HINT_VIEW_MAX_CATEGORY_LIST_ITEMS_COUNT_PER_ROW =
+            "androidx.car.app.mediaextensions.KEY_HINT_VIEW_MAX_CATEGORY_LIST_ITEMS_COUNT_PER_ROW";
+    public static final String KEY_HINT_VIEW_MAX_CATEGORY_GRID_ITEMS_COUNT_PER_ROW =
+            "androidx.car.app.mediaextensions.KEY_HINT_VIEW_MAX_CATEGORY_GRID_ITEMS_COUNT_PER_ROW";
 }

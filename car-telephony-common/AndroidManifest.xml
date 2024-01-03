@@ -19,4 +19,5 @@
           package="com.android.car.telephony">
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

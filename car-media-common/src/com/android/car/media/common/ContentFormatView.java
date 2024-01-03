@@ -24,7 +24,6 @@ import static com.android.car.media.common.R.styleable.ContentFormatView_logoTin
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.text.TextUtils;
@@ -33,7 +32,6 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.util.Preconditions;
 
 /**
  * Renders one of the content format logos defined in the {@link MediaItemMetadata}'s extras.
@@ -64,14 +62,11 @@ public class ContentFormatView extends ImageView {
 
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, ContentFormatView,
                 defStyleAttr, 0);
-        try {
-            mLogoTint = a.getColor(ContentFormatView_logoTint, Color.RED);
-            mLogoSize = a.getInteger(ContentFormatView_logoSize, -1);
-
-            Preconditions.checkArgument(mLogoSize != -1, "Invalid logo size");
-        } finally {
-            a.recycle();
-        }
+        mLogoTint = a.getColor(ContentFormatView_logoTint,
+            context.getResources().getColor(R.color.default_logoTint, null));
+        mLogoSize = a.getInteger(ContentFormatView_logoSize,
+            context.getResources().getInteger(R.integer.default_logoSize));
+        a.recycle();
     }
 
     @Override

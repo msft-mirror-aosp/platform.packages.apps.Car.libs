@@ -54,20 +54,22 @@ class ProgressLiveData extends LiveData<PlaybackProgress> {
 
     private final PlaybackStateCompat mPlaybackState;
     private final long mMaxProgress;
-    private final Handler mTimerHandler = new Handler(Looper.getMainLooper());
+    private final Handler mTimerHandler;
     private final Supplier<Long> mElapsedRealtime;
 
     ProgressLiveData(@NonNull PlaybackStateCompat playbackState, long maxProgress) {
-        this(playbackState, maxProgress, SystemClock::elapsedRealtime);
+        this(playbackState, maxProgress, SystemClock::elapsedRealtime,
+                new Handler(Looper.getMainLooper()));
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    @VisibleForTesting()
     ProgressLiveData(
             @NonNull PlaybackStateCompat playbackState, long maxProgress,
-            Supplier<Long> elapsedRealtime) {
+            Supplier<Long> elapsedRealtime, Handler timerHandler) {
         mPlaybackState = playbackState;
         mMaxProgress = maxProgress;
         mElapsedRealtime = elapsedRealtime;
+        mTimerHandler = timerHandler;
     }
 
     private void updateProgress() {

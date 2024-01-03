@@ -51,11 +51,39 @@ public class CallDetail {
     private static final String EXTRA_PARTICIPANT_COUNT = "android.telecom.extra.PARTICIPANT_COUNT";
 
     /**
-     * Extra that should correspond to a {@link Uri} value in the {@link
-     * Call.Details#getExtras()} if a VOIP call provides it. The value should be a
-     * resource/content provider URI to be displayed in the in-call view.
+     * Extra that should correspond to a {@link Uri} value in the {@link Call.Details#getExtras()}
+     * if a VOIP call provides it. The value can be a resource/content provider URI or a web
+     * image to be displayed in the in-call view.
      */
     private static final String EXTRA_CALL_IMAGE_URI = "android.telecom.extra.CALL_IMAGE_URI";
+
+    /**
+     * Extra that should correspond to a `boolean` value in the {@link Call.Details#getExtras()}
+     * if a VOIP call provides it. If the value is true then we will use the local microphone
+     * call silence for our mute button toggling rather than the default of global microphone
+     * call silence.
+     */
+    private static final String EXTRA_TELECOM_USE_LOCAL_CALL_SILENCE_CAPABILITY =
+            "android.telecom.extra.USE_LOCAL_CALL_SILENCE_CAPABILITY";
+
+    /**
+     * Extra with a boolean value that indicates the current call microphone silence state. This is
+     * only relevant for apps that declare the
+     * {@link #EXTRA_TELECOM_USE_LOCAL_CALL_SILENCE_CAPABILITY}.
+     */
+    private static final String EXTRA_LOCAL_CALL_SILENCE_STATE = "android.telecom.extra"
+            + ".LOCAL_CALL_SILENCE_STATE";
+
+    /**
+     * Event sent to request a change to the call silence state. Will be packaged with the
+     * {@link #EXTRA_LOCAL_CALL_SILENCE_STATE} and a boolean value.
+     *
+     * <p>This does not guarantee that the silence state will change, that is determined by the VOIP
+     * app hosting the call.
+     */
+    private static final String EVENT_LOCAL_CALL_SILENCE_STATE_CHANGED =
+            "android.telecom.event.LOCAL_CALL_SILENCE_STATE_CHANGED";
+
     private static final String EXTRA_SCO_STATE = "com.android.bluetooth.hfpclient.SCO_STATE";
     private static final String[] HFP_CLIENT_CONNECTION_SERVICE_CLASS_NAMES = new String[]{
             /* S= */"com.android.bluetooth.hfpclient.connserv.HfpClientConnectionService",
@@ -66,6 +94,8 @@ public class CallDetail {
     public static final int STATE_AUDIO_CONNECTING = 1;
     public static final int STATE_AUDIO_CONNECTED = 2;
 
+    private Call mCall = null;
+    @Nullable
     private final Call.Details mCallDetails;
     private final String mNumber;
     private final CharSequence mDisconnectCause;
@@ -73,6 +103,7 @@ public class CallDetail {
     private final long mConnectTimeMillis;
     private final boolean mIsConference;
     private final PhoneAccountHandle mPhoneAccountHandle;
+    private final String mCallingAppPackageName;
     private final int mScoState;
     private final String mCallerDisplayName;
     private final boolean mIsSelfManaged;
@@ -81,32 +112,63 @@ public class CallDetail {
     private final Uri mCallerImageUri;
     // The VoIP app can set the component name of the activity that hosts its own in call view.
     private final ComponentName mInCallViewComponentName;
+    private final boolean mHasLocalSilenceCapability;
+    private final boolean mLocalSilenceState;
 
-    private CallDetail(@Nullable Call.Details callDetails) {
-        mCallDetails = callDetails;
-        mNumber = getNumber(callDetails);
-        mDisconnectCause = getDisconnectCause(callDetails);
-        mGatewayInfoOriginalAddress = getGatewayInfoOriginalAddress(callDetails);
-        mConnectTimeMillis = getConnectTimeMillis(callDetails);
-        mIsConference = isConferenceCall(callDetails);
-        mPhoneAccountHandle = getPhoneAccountHandle(callDetails);
-        mScoState = getIntegerExtra(callDetails, EXTRA_SCO_STATE);
-        mCallerDisplayName = getCallerDisplayName(callDetails);
-        mIsSelfManaged = isSelfManagedCall(callDetails);
-        mParticipantCount = getIntegerExtra(callDetails, EXTRA_PARTICIPANT_COUNT);
-        mCallerImageUri = getParcelable(callDetails, EXTRA_CALL_IMAGE_URI);
-        mCurrentSpeaker = getStringExtra(callDetails, EXTRA_CURRENT_SPEAKER);
-        mInCallViewComponentName = getParcelable(callDetails, Intent.EXTRA_COMPONENT_NAME);
+    private CallDetail(@NonNull Call call) {
+        this(call.getDetails());
+        mCall = call;
     }
 
-    /** Returns if the call supports the given capability. */
+    /**
+     * @deprecated It is now deprecated and will be removed in a following change. When remove
+     * it, make Call object final and NonNull.
+     */
+    @Deprecated
+    private CallDetail(@Nullable Call.Details callDetails) {
+        mCallDetails = callDetails;
+        mNumber = getNumber(mCallDetails);
+        mDisconnectCause = getDisconnectCause(mCallDetails);
+        mGatewayInfoOriginalAddress = getGatewayInfoOriginalAddress(mCallDetails);
+        mConnectTimeMillis = getConnectTimeMillis(mCallDetails);
+        mIsConference = isConferenceCall(mCallDetails);
+        mPhoneAccountHandle = getPhoneAccountHandle(mCallDetails);
+        mCallingAppPackageName =
+                (mPhoneAccountHandle == null || mPhoneAccountHandle.getComponentName() == null)
+                        ? null : mPhoneAccountHandle.getComponentName().getPackageName();
+        mScoState = getIntegerExtra(mCallDetails, EXTRA_SCO_STATE);
+        mCallerDisplayName = getCallerDisplayName(mCallDetails);
+        mIsSelfManaged = isSelfManagedCall(mCallDetails);
+        mParticipantCount = getIntegerExtra(mCallDetails, EXTRA_PARTICIPANT_COUNT);
+        mCallerImageUri = getParcelable(mCallDetails, EXTRA_CALL_IMAGE_URI);
+        mCurrentSpeaker = getStringExtra(mCallDetails, EXTRA_CURRENT_SPEAKER);
+        mInCallViewComponentName = getParcelable(mCallDetails, Intent.EXTRA_COMPONENT_NAME);
+        mHasLocalSilenceCapability = getBooleanExtra(mCallDetails,
+                EXTRA_TELECOM_USE_LOCAL_CALL_SILENCE_CAPABILITY);
+        mLocalSilenceState = mHasLocalSilenceCapability ? getBooleanExtra(mCallDetails,
+                EXTRA_LOCAL_CALL_SILENCE_STATE) : false;
+    }
+
+    /**
+     * Returns if the call supports the given capability.
+     */
     public boolean can(int capability) {
         return mCallDetails != null && mCallDetails.can(capability);
     }
 
     /**
-     * Creates an instance of {@link CallDetail} from a {@link Call.Details}.
+     * Creates an instance of {@link CallDetail} from a {@link Call}.
      */
+    public static CallDetail fromTelecomCall(@NonNull Call call) {
+        return new CallDetail(call);
+    }
+
+    /**
+     * Creates an instance of {@link CallDetail} from a {@link Call.Details}.
+     *
+     * @deprecated It is now deprecated and will be removed in a following change.
+     */
+    @Deprecated
     public static CallDetail fromTelecomCallDetail(@Nullable Call.Details callDetail) {
         return new CallDetail(callDetail);
     }
@@ -149,7 +211,9 @@ public class CallDetail {
         return mIsConference;
     }
 
-    /** Returns if the call is a self managed call. */
+    /**
+     * Returns if the call is a self managed call.
+     */
     public boolean isSelfManaged() {
         return mIsSelfManaged;
     }
@@ -192,27 +256,73 @@ public class CallDetail {
         return mParticipantCount;
     }
 
-    /** Returns the component name for activity that hosts the VoIP in call view. */
+    /**
+     * Returns the component name for activity that hosts the VoIP in call view.
+     */
     public ComponentName getInCallViewComponentName() {
         return mInCallViewComponentName;
     }
 
-    /** Returns the {@link PhoneAccountHandle} for this call. */
+    /**
+     * Returns the {@link PhoneAccountHandle} for this call.
+     */
     @Nullable
     public PhoneAccountHandle getPhoneAccountHandle() {
         return mPhoneAccountHandle;
     }
 
-    /** Returns the id of the {@link PhoneAccountHandle} for this call. */
+    /**
+     * Returns the package name of the calling app for this call.
+     */
+    @Nullable
+    public String getCallingAppPackageName() {
+        return mCallingAppPackageName;
+    }
+
+    /**
+     * Returns the id of the {@link PhoneAccountHandle} for this call.
+     */
     @Nullable
     public String getPhoneAccountName() {
         return mPhoneAccountHandle == null ? null : mPhoneAccountHandle.getId();
     }
 
-    /** Returns if the call is a bluetooth call. */
+    /**
+     * Returns if the call is a bluetooth call.
+     */
     public boolean isBluetoothCall() {
         return Arrays.stream(HFP_CLIENT_CONNECTION_SERVICE_CLASS_NAMES).anyMatch(
                 s -> s.equals(mPhoneAccountHandle.getComponentName().getClassName()));
+    }
+
+    /**
+     * Returns the local silence state if the app declares the call has the capability of local
+     * silence.
+     */
+    public boolean getLocalSilenceState() {
+        return mLocalSilenceState;
+    }
+
+    /**
+     * Set the local silence state if the app declares the capability. See
+     * {@link #EVENT_LOCAL_CALL_SILENCE_STATE_CHANGED}.
+     *
+     * @return True if the app declares the local silence capability.
+     */
+    public boolean setLocalSilenceState(boolean localSilenceState) {
+        if (mHasLocalSilenceCapability) {
+            Bundle bundle = new Bundle();
+            bundle.putBoolean(EXTRA_LOCAL_CALL_SILENCE_STATE, localSilenceState);
+            sendCallEvent(EVENT_LOCAL_CALL_SILENCE_STATE_CHANGED, bundle);
+            return true;
+        }
+        return false;
+    }
+
+    private void sendCallEvent(String event, Bundle extras) {
+        if (mCall != null) {
+            mCall.sendCallEvent(event, extras);
+        }
     }
 
     private static String getNumber(Call.Details callDetail) {
@@ -281,6 +391,16 @@ public class CallDetail {
             }
         }
         return null;
+    }
+
+    private static boolean getBooleanExtra(Call.Details callDetail, String key) {
+        if (callDetail != null) {
+            Bundle extras = callDetail.getExtras();
+            if (extras != null) {
+                return extras.getBoolean(key, false);
+            }
+        }
+        return false;
     }
 
     private static int getIntegerExtra(Call.Details callDetail, String key) {

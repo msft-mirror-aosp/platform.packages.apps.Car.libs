@@ -59,7 +59,7 @@ dependencies {
     implementation project(':car-ui-lib')
     implementation project(':car-apps-common')
 
-    implementation files(gradle.ext.lib_car_system_stubs)
+    compileOnly files(gradle.ext.lib_car_system_stubs)
 
     androidTestImplementation 'com.google.truth:truth:1.1.3'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

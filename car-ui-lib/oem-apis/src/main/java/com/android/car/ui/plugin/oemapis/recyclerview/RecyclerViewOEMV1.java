@@ -23,7 +23,7 @@ import androidx.annotation.Nullable;
 /**
  * {@code androidx.recyclerview.widget.RecyclerView}
  *
- * @deprecated Use {@link RecyclerViewOEMV2} instead
+ * @deprecated Use {@link RecyclerViewOEMV3} instead
  */
 @Deprecated
 public interface RecyclerViewOEMV1 {

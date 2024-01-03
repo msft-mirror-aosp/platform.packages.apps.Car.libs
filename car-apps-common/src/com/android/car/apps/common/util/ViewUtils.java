@@ -23,6 +23,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -31,6 +32,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -296,5 +299,21 @@ public class ViewUtils {
             }
             container.setVisibility(INVISIBLE);
         }
+    }
+
+    /**
+     * Check if view is partiall or completely hidden by keyboard.
+     * Only checks on y axis, not x axis, it's possible wide screen there is a false positive.
+     */
+    public static boolean isViewOccludedByKeyboard(View view) {
+        WindowInsetsCompat insets = ViewCompat.getRootWindowInsets(view);
+        boolean imeVisible = insets != null && insets.isVisible(WindowInsetsCompat.Type.ime());
+        if (!imeVisible) return false;
+
+        int imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
+        Rect viewRect = new Rect();
+        view.getGlobalVisibleRect(viewRect);
+
+        return viewRect.bottom > imeHeight;
     }
 }
