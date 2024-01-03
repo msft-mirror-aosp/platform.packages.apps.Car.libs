@@ -25,6 +25,8 @@ import com.google.common.truth.Expect;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Comparator;
+
 public final class ProgramSelectorExtTest {
 
     private static final long AM_FREQUENCY_VALUE = 700;
@@ -44,9 +46,7 @@ public final class ProgramSelectorExtTest {
                     (HD_FREQUENCY_VALUE << 36) | ((long) HD_SUBCHANNEL_VALUE << 32)
                             | HD_STATION_ID_VALUE);
     private static final ProgramSelector.Identifier DAB_DMB_SID_EXT_IDENTIFIER =
-            new ProgramSelector.Identifier(ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT,
-                    ((long) DAB_SCIDS_VALUE << 40) | ((long) DAB_ECC_VALUE << 32)
-                            | DAB_SID_VALUE);
+            createDabSidExtId(DAB_SID_VALUE, DAB_ECC_VALUE, DAB_SCIDS_VALUE);
     private static final ProgramSelector.Identifier DAB_ENSEMBLE_IDENTIFIER =
             new ProgramSelector.Identifier(ProgramSelector.IDENTIFIER_TYPE_DAB_ENSEMBLE,
                     DAB_ENSEMBLE_VALUE);
@@ -63,6 +63,8 @@ public final class ProgramSelectorExtTest {
             ProgramSelector.PROGRAM_TYPE_DAB, DAB_DMB_SID_EXT_IDENTIFIER,
             new ProgramSelector.Identifier[]{DAB_FREQUENCY_IDENTIFIER, DAB_ENSEMBLE_IDENTIFIER},
             /* vendorIds= */ null);
+    private static final Comparator<ProgramSelector> SELECTOR_COMPARATOR =
+            new ProgramSelectorExt.ProgramSelectorComparator();
 
     @Rule
     public final Expect mExpect = Expect.create();
@@ -238,5 +240,117 @@ public final class ProgramSelectorExtTest {
         mExpect.withMessage("SCIdS of DAB primary identifier extension")
                 .that(ProgramSelectorExt.IdentifierExt.asDabPrimary(DAB_DMB_SID_EXT_IDENTIFIER)
                         .getSCIdS()).isEqualTo(DAB_SCIDS_VALUE);
+    }
+
+    @Test
+    public void compare_withTwoFmSelectorsForProgramSelectorComparator() {
+        ProgramSelector fmSel2 = ProgramSelectorExt.createAmFmSelector(FM_FREQUENCY_VALUE + 200);
+
+        mExpect.withMessage("Comparison between two FM selectors")
+                .that(SELECTOR_COMPARATOR.compare(FM_SELECTOR, fmSel2)).isEqualTo(-1);
+    }
+
+    @Test
+    public void compare_withFmAndHdSelectors() {
+        mExpect.withMessage("Comparison between FM and HD selectors")
+                .that(SELECTOR_COMPARATOR.compare(FM_SELECTOR, HD_SELECTOR)).isEqualTo(-1);
+    }
+
+    @Test
+    public void compare_withHdSelectorsWithDifferentFrequncies() {
+        ProgramSelector.Identifier hdId = new ProgramSelector.Identifier(
+                ProgramSelector.IDENTIFIER_TYPE_HD_STATION_ID_EXT,
+                ((HD_FREQUENCY_VALUE + 200) << 36) | HD_STATION_ID_VALUE);
+        ProgramSelector hdSel = new ProgramSelector(ProgramSelector.PROGRAM_TYPE_FM_HD, hdId,
+                new ProgramSelector.Identifier[]{}, /* vendorIds= */ null);
+
+        mExpect.withMessage("Comparison between HD selectors with different frequencies")
+                .that(SELECTOR_COMPARATOR.compare(hdSel, HD_SELECTOR)).isEqualTo(1);
+    }
+
+    @Test
+    public void compare_withHdSelectorsWithDifferentSubchannels() {
+        ProgramSelector.Identifier hdId2 = new ProgramSelector.Identifier(
+                ProgramSelector.IDENTIFIER_TYPE_HD_STATION_ID_EXT,
+                (HD_FREQUENCY_VALUE << 36) | HD_STATION_ID_VALUE);
+        ProgramSelector hdSel2 = new ProgramSelector(ProgramSelector.PROGRAM_TYPE_FM_HD, hdId2,
+                new ProgramSelector.Identifier[]{}, /* vendorIds= */ null);
+
+        mExpect.withMessage("Comparison between HD selectors with different subchannels")
+                .that(SELECTOR_COMPARATOR.compare(hdSel2, HD_SELECTOR)).isEqualTo(-1);
+    }
+
+    @Test
+    public void compare_withDabSelectorsWithDifferentFrequencies() {
+        ProgramSelector.Identifier dabFrequencyId2 = new ProgramSelector.Identifier(
+                ProgramSelector.IDENTIFIER_TYPE_DAB_FREQUENCY, 174_928);
+        ProgramSelector.Identifier dabEnsembleId2 = new ProgramSelector.Identifier(
+                ProgramSelector.IDENTIFIER_TYPE_DAB_ENSEMBLE, DAB_ENSEMBLE_VALUE + 1);
+        ProgramSelector dabSel2 = new ProgramSelector(ProgramSelector.PROGRAM_TYPE_DAB,
+                DAB_DMB_SID_EXT_IDENTIFIER,
+                new ProgramSelector.Identifier[]{dabFrequencyId2, dabEnsembleId2},
+                /* vendorIds= */ null);
+
+        mExpect.withMessage("Comparison between DAB selectors with different frequencies")
+                .that(SELECTOR_COMPARATOR.compare(dabSel2, DAB_SELECTOR)).isEqualTo(-1);
+    }
+
+    @Test
+    public void compare_withDabSelectorsWithDifferentEccs() {
+        ProgramSelector.Identifier dabExtId2 = createDabSidExtId(DAB_SID_VALUE - 1,
+                DAB_ECC_VALUE + 1, DAB_SCIDS_VALUE + 1);
+        ProgramSelector dabSel2 = new ProgramSelector(ProgramSelector.PROGRAM_TYPE_DAB,
+                dabExtId2, new ProgramSelector.Identifier[]{DAB_FREQUENCY_IDENTIFIER,
+                        DAB_ENSEMBLE_IDENTIFIER}, /* vendorIds= */ null);
+
+        mExpect.withMessage("Comparison between DAB selectors with different ECC values")
+                .that(SELECTOR_COMPARATOR.compare(dabSel2, DAB_SELECTOR)).isEqualTo(1);
+    }
+
+    @Test
+    public void compare_withDabSelectorsWithDifferentSIds() {
+        ProgramSelector.Identifier dabExtId2 = createDabSidExtId(DAB_SID_VALUE - 1,
+                DAB_ECC_VALUE, DAB_SCIDS_VALUE + 1);
+        ProgramSelector dabSel2 = new ProgramSelector(ProgramSelector.PROGRAM_TYPE_DAB,
+                dabExtId2, new ProgramSelector.Identifier[]{DAB_FREQUENCY_IDENTIFIER,
+                        DAB_ENSEMBLE_IDENTIFIER}, /* vendorIds= */ null);
+
+        mExpect.withMessage("Comparison between DAB selectors with different SId values")
+                .that(SELECTOR_COMPARATOR.compare(dabSel2, DAB_SELECTOR)).isEqualTo(-1);
+    }
+
+    @Test
+    public void compare_withDabSelectorsWithDifferentSCIds() {
+        ProgramSelector.Identifier dabExtId2 = createDabSidExtId(DAB_SID_VALUE,
+                DAB_ECC_VALUE, DAB_SCIDS_VALUE + 1);
+        ProgramSelector dabSel2 = new ProgramSelector(ProgramSelector.PROGRAM_TYPE_DAB,
+                dabExtId2, new ProgramSelector.Identifier[]{DAB_FREQUENCY_IDENTIFIER,
+                        DAB_ENSEMBLE_IDENTIFIER}, /* vendorIds= */ null);
+
+        mExpect.withMessage("Comparison between DAB selectors with different SCId values")
+                .that(SELECTOR_COMPARATOR.compare(dabSel2, DAB_SELECTOR)).isEqualTo(1);
+    }
+
+    @Test
+    public void compare_withDabSelectorsWithDifferentEnsembles() {
+        ProgramSelector.Identifier dabEnsembleId2 = new ProgramSelector.Identifier(
+                ProgramSelector.IDENTIFIER_TYPE_DAB_ENSEMBLE, DAB_ENSEMBLE_VALUE + 1);
+        ProgramSelector dabSel2 = new ProgramSelector(ProgramSelector.PROGRAM_TYPE_DAB,
+                DAB_DMB_SID_EXT_IDENTIFIER, new ProgramSelector.Identifier[]{
+                        DAB_FREQUENCY_IDENTIFIER, dabEnsembleId2}, /* vendorIds= */ null);
+
+        mExpect.withMessage("Comparison between DAB selectors with different ensembles")
+                .that(SELECTOR_COMPARATOR.compare(dabSel2, DAB_SELECTOR)).isEqualTo(1);
+    }
+
+    @Test
+    public void compare_withSelectorsOfDifferentTypes() {
+        mExpect.withMessage("Comparison between HD and DAB selectors with different types")
+                .that(SELECTOR_COMPARATOR.compare(HD_SELECTOR, DAB_SELECTOR)).isEqualTo(-1);
+    }
+
+    private static ProgramSelector.Identifier createDabSidExtId(long sid, int ecc, int sCIdS) {
+        return new ProgramSelector.Identifier(ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT,
+                ((long) sCIdS << 40) | ((long) ecc << 32) | sid);
     }
 }
