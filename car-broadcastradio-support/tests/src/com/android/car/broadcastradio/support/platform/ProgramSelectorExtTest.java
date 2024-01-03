@@ -126,4 +126,110 @@ public final class ProgramSelectorExtTest {
         mExpect.withMessage("Id type beyond selector ids").that(ProgramSelectorExt.hasId(
                 HD_SELECTOR, ProgramSelector.IDENTIFIER_TYPE_AMFM_FREQUENCY)).isFalse();
     }
+
+    @Test
+    public void isAmFmProgram_withAmFmSelector() {
+        mExpect.withMessage("FM selector of AM/FM type program")
+                .that(ProgramSelectorExt.isAmFmProgram(FM_SELECTOR)).isTrue();
+    }
+
+    @Test
+    public void isAmFmProgram_withHdSelector() {
+        mExpect.withMessage("HD selector of AM/FM type program")
+                .that(ProgramSelectorExt.isAmFmProgram(HD_SELECTOR)).isTrue();
+    }
+
+    @Test
+    public void isAmFmProgram_withDabSelector() {
+        mExpect.withMessage("DAB selector of non-AM/FM type program")
+                .that(ProgramSelectorExt.isAmFmProgram(DAB_SELECTOR)).isFalse();
+    }
+
+    @Test
+    public void getFrequency_withAmFmSelector() {
+        mExpect.withMessage("Frequency of FM selector")
+                .that(ProgramSelectorExt.getFrequency(FM_SELECTOR)).isEqualTo(FM_FREQUENCY_VALUE);
+    }
+
+    @Test
+    public void getFrequency_withHdSelector() {
+        mExpect.withMessage("Frequency of HD selector")
+                .that(ProgramSelectorExt.getFrequency(HD_SELECTOR)).isEqualTo(HD_FREQUENCY_VALUE);
+    }
+
+    @Test
+    public void getFrequency_withDabSelector() {
+        mExpect.withMessage("Frequency of DAB selector")
+                .that(ProgramSelectorExt.getFrequency(DAB_SELECTOR)).isEqualTo(DAB_FREQUENCY_VALUE);
+    }
+
+    @Test
+    public void getFrequency_withSelectorWithoutFrequency() {
+        ProgramSelector dabSelectorWithoutFrequency = new ProgramSelector(
+                ProgramSelector.PROGRAM_TYPE_DAB, DAB_DMB_SID_EXT_IDENTIFIER,
+                new ProgramSelector.Identifier[]{DAB_ENSEMBLE_IDENTIFIER}, /* vendorIds= */ null);
+
+        mExpect.withMessage("Frequency of a selector without frequency")
+                .that(ProgramSelectorExt.getFrequency(dabSelectorWithoutFrequency))
+                .isEqualTo(ProgramSelectorExt.INVALID_IDENTIFIER_VALUE);
+    }
+
+    @Test
+    public void getDabEnsemble_withDabSelector() {
+        mExpect.withMessage("Ensemble of DAB selector").that(
+                ProgramSelectorExt.getDabEnsemble(DAB_SELECTOR)).isEqualTo(DAB_ENSEMBLE_VALUE);
+    }
+
+    @Test
+    public void getDabEnsemble_withNonDabSelector() {
+        mExpect.withMessage("Ensemble of FM selector")
+                .that(ProgramSelectorExt.getDabEnsemble(FM_SELECTOR))
+                .isEqualTo(ProgramSelectorExt.INVALID_IDENTIFIER_VALUE);
+    }
+
+    @Test
+    public void asHdPrimary_withNonHdId() {
+        mExpect.withMessage("HD Primary identifier extension for FM id")
+                .that(ProgramSelectorExt.IdentifierExt.asHdPrimary(FM_IDENTIFIER)).isNull();
+    }
+
+    @Test
+    public void getSubchannel_forHdPrimary() {
+        mExpect.withMessage("Sub-channel of HD primary identifier extension")
+                .that(ProgramSelectorExt.IdentifierExt.asHdPrimary(HD_STATION_EXT_IDENTIFIER)
+                        .getSubchannel()).isEqualTo(HD_SUBCHANNEL_VALUE);
+    }
+
+    @Test
+    public void getFrequency_forHdPrimary() {
+        mExpect.withMessage("Frequency of HD primary identifier extension")
+                .that(ProgramSelectorExt.IdentifierExt.asHdPrimary(HD_STATION_EXT_IDENTIFIER)
+                        .getFrequency()).isEqualTo(HD_FREQUENCY_VALUE);
+    }
+
+    @Test
+    public void asDabPrimary_withNonDabId() {
+        mExpect.withMessage("DAB Primary identifier extension for FM id")
+                .that(ProgramSelectorExt.IdentifierExt.asDabPrimary(FM_IDENTIFIER)).isNull();
+    }
+    @Test
+    public void getSId_forDabPrimary() {
+        mExpect.withMessage("Station Id of DAB primary identifier extension")
+                .that(ProgramSelectorExt.IdentifierExt.asDabPrimary(DAB_DMB_SID_EXT_IDENTIFIER)
+                        .getSId()).isEqualTo(DAB_SID_VALUE);
+    }
+
+    @Test
+    public void getEcc_forDabPrimary() {
+        mExpect.withMessage("ECC of DAB primary identifier extension")
+                .that(ProgramSelectorExt.IdentifierExt.asDabPrimary(DAB_DMB_SID_EXT_IDENTIFIER)
+                        .getEcc()).isEqualTo(DAB_ECC_VALUE);
+    }
+
+    @Test
+    public void getSCIdS_forDabPrimary() {
+        mExpect.withMessage("SCIdS of DAB primary identifier extension")
+                .that(ProgramSelectorExt.IdentifierExt.asDabPrimary(DAB_DMB_SID_EXT_IDENTIFIER)
+                        .getSCIdS()).isEqualTo(DAB_SCIDS_VALUE);
+    }
 }
