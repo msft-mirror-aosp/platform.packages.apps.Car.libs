@@ -194,6 +194,13 @@ public final class ProgramSelectorExtTest {
     }
 
     @Test
+    public void getStationId_forHdPrimary() {
+        mExpect.withMessage("Station id of HD primary identifier extension")
+                .that(ProgramSelectorExt.IdentifierExt.asHdPrimary(HD_STATION_EXT_IDENTIFIER)
+                        .getStationId()).isEqualTo(HD_STATION_ID_VALUE);
+    }
+
+    @Test
     public void getSubchannel_forHdPrimary() {
         mExpect.withMessage("Sub-channel of HD primary identifier extension")
                 .that(ProgramSelectorExt.IdentifierExt.asHdPrimary(HD_STATION_EXT_IDENTIFIER)

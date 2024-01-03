@@ -533,7 +533,7 @@ public class ProgramSelectorExt {
             }
 
             public long getStationId() {
-                return mValue & 0xFFFFFFFF;
+                return mValue & 0xFFFFFFFFL;
             }
 
             public int getSubchannel() {
