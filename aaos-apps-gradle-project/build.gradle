@@ -19,7 +19,7 @@
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$androidGradlePluginVersion"
@@ -64,7 +64,7 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     tasks.withType(JavaCompile) {
         // Compile with prebuilt android.jar.
