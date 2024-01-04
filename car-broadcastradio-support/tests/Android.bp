@@ -26,10 +26,16 @@ android_test {
         "car-broadcastradio-support",
         "androidx.test.rules",
         "truth",
+        "mockito-target-extended",
     ],
     libs: ["android.test.base"],
     test_suites: [
         "general-tests",
         "automotive-general-tests",
+    ],
+    // mockito-target-inline dependency
+    jni_libs: [
+        "libdexmakerjvmtiagent",
+        "libstaticjvmtiagent",
     ],
 }
