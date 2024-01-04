@@ -86,7 +86,11 @@ public class MediaBrowserConnector {
          * from {@link #connectTo} just before calling {@link MediaBrowserCompat#disconnect} on the
          * old browser.
          */
-        DISCONNECTING
+        DISCONNECTING,
+        /**
+         * The browser does not exist an no connection can be made
+         */
+        NONEXISTENT
     }
 
     /**
@@ -96,19 +100,19 @@ public class MediaBrowserConnector {
     public static class BrowsingState {
         @NonNull final Context mContext;
         @NonNull public final MediaSource mMediaSource;
-        @NonNull public final MediaBrowserCompat mBrowser;
+        @Nullable public final MediaBrowserCompat mBrowser;
         @NonNull public final ConnectionStatus mConnectionStatus;
         @NonNull final Bundle mRootExtras = new Bundle();
         @NonNull IAnalyticsManager mAnalyticsManager;
 
         @VisibleForTesting
         public BrowsingState(Context context, @NonNull MediaSource mediaSource,
-                @NonNull MediaBrowserCompat browser, @NonNull ConnectionStatus status) {
+                @Nullable MediaBrowserCompat browser, @NonNull ConnectionStatus status) {
             mContext = context;
             mMediaSource = Preconditions.checkNotNull(mediaSource, "source can't be null");
-            mBrowser = Preconditions.checkNotNull(browser, "browser can't be null");
+            mBrowser = browser;
             mConnectionStatus = Preconditions.checkNotNull(status, "status can't be null");
-            if (browser.isConnected() && browser.getExtras() != null) {
+            if (browser != null && browser.isConnected() && browser.getExtras() != null) {
                 mRootExtras.putAll(browser.getExtras());
             }
             mAnalyticsManager = AnalyticsHelper.makeAnalyticsManager(mContext, mMediaSource,
@@ -176,7 +180,9 @@ public class MediaBrowserConnector {
     }
 
     private String getSourcePackage() {
-        if (mMediaSource == null) return null;
+        if (mMediaSource == null || mMediaSource.getBrowseServiceComponentName() == null) {
+            return null;
+        }
         return mMediaSource.getBrowseServiceComponentName().getPackageName();
     }
 
@@ -238,10 +244,6 @@ public class MediaBrowserConnector {
             Log.e(TAG, "sendNewState mMediaSource is null!");
             return;
         }
-        if (mBrowser == null) {
-            Log.e(TAG, "sendNewState mBrowser is null!");
-            return;
-        }
         mCallback.onBrowserConnectionChanged(
                 new BrowsingState(mContext, mMediaSource, mBrowser, cnx));
     }
@@ -269,7 +271,9 @@ public class MediaBrowserConnector {
         maybeDisconnect();
 
         mMediaSource = mediaSource;
-        if (mMediaSource != null) {
+        if (mMediaSource == null) {
+            mBrowser = null;
+        } else if (mMediaSource.getBrowseServiceComponentName() != null) {
             mBrowser = createMediaBrowser(mMediaSource, new BrowserConnectionCallback());
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "Connecting to: " + getSourcePackage()
@@ -287,7 +291,9 @@ public class MediaBrowserConnector {
                 sendNewState(ConnectionStatus.SUSPENDED);
             }
         } else {
+            // No browse service
             mBrowser = null;
+            sendNewState(ConnectionStatus.NONEXISTENT);
         }
     }
 

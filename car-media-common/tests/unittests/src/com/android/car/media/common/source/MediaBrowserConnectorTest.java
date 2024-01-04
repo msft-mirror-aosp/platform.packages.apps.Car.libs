@@ -27,6 +27,7 @@ import static org.mockito.Mockito.verify;
 
 import android.content.Context;
 import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.session.MediaControllerCompat;
 
 import androidx.annotation.NonNull;
 import androidx.test.core.app.ApplicationProvider;
@@ -65,9 +66,12 @@ public class MediaBrowserConnectorTest {
     public MediaBrowserCompat mMediaBrowser1;
     @Mock
     public MediaBrowserCompat mMediaBrowser2;
+    @Mock
+    public MediaControllerCompat mMediaController;
 
     private final MediaSource mMediaSource1 = newFakeMediaSource("mediaService1", "className1");
     private final MediaSource mMediaSource2 = newFakeMediaSource("mediaService2", "className2");
+    private final MediaSource mMediaSource3 = newFakeMediaSource(mMediaController);
 
     private final Map<MediaSource, MediaBrowserCompat> mBrowsers = new HashMap<>(2);
 
@@ -177,12 +181,19 @@ public class MediaBrowserConnectorTest {
         assertThat(mBrowsingStateCaptor.getValue().mBrowser).isEqualTo(mMediaBrowser2);
     }
 
+    @Test
+    public void testConnectionCallback_noBrowseTree_returnsNull() {
+        mBrowserConnector.connectTo(mMediaSource3);
+
+        assertThat(mBrowsingStateCaptor.getValue().mConnectionStatus)
+            .isEqualTo(ConnectionStatus.NONEXISTENT);
+    }
+
     private void setConnectionAction(@NonNull Runnable action) {
         doAnswer(invocation -> {
             action.run();
             return null;
         }).when(mMediaBrowser1).connect();
     }
-
 
 }
