@@ -48,18 +48,21 @@ public class ControlBarHelper {
         boolean useMediaSourceColor =
                 context.getResources().getBoolean(
                         R.bool.use_media_source_color_for_minimized_progress_bar);
-        int defaultColor = context.getResources().getColor(R.color.minimized_progress_bar_highlight,
-                null);
         if (useMediaSourceColor) {
             model.getMediaSourceColors().observe(owner,
                     sourceColors -> {
+                        int defaultColor = context.getResources().getColor(
+                            R.color.media_source_default_color, null);
                         int color = sourceColors != null ? sourceColors.getAccentColor(
                                 defaultColor)
                                 : defaultColor;
                         progressBar.setProgressTintList(ColorStateList.valueOf(color));
                     });
         } else {
-            progressBar.setProgressTintList(ColorStateList.valueOf(defaultColor));
+          progressBar.setProgressTintList(
+              ColorStateList.valueOf(
+                  context.getResources().getColor(
+                      R.color.minimized_progress_bar_highlight, null)));
         }
 
         model.getProgress().observe(owner,
