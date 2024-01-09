@@ -70,6 +70,9 @@ project(':test-rotary-playground').projectDir = new File('../../tests/RotaryPlay
 include ':test-rotary-ime'
 project(':test-rotary-ime').projectDir = new File('../../tests/RotaryIME')
 
+include ':car-calendar-app'
+project(':car-calendar-app').projectDir = new File('../../Calendar')
+
 include ':car-dialer-app'
 project(':car-dialer-app').projectDir = new File('../../Dialer')
 include ':car-dialer-app:testing'
