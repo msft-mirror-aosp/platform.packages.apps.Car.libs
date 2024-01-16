@@ -295,6 +295,7 @@ android_test {
     ],
     required: ["car-ui-lib-proxyplugin"],
     platform_apis: true,
+    min_sdk_version: "28",
     test_suites: ["device-tests"],
 }
 
@@ -331,6 +332,7 @@ android_app {
     ],
 
     platform_apis: true,
+    min_sdk_version: "28",
     certificate: CERTIFICATE,
     privileged: true,
 
