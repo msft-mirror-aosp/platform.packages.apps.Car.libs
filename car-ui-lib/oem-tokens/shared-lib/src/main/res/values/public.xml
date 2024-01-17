@@ -14,6 +14,7 @@
  limitations under the License.
 -->
 <resources>
+    <!-- Color tokens -->
     <public name="colorOemSeed" id="0x00770000" type="attr" />
     <public name="colorPrimary" id="0x00770001" type="attr" />
     <public name="colorOnPrimary" id="0x00770002" type="attr" />
@@ -38,104 +39,126 @@
     <public name="colorSurfaceVariant" id="0x00770015" type="attr" />
     <public name="colorOnSurfaceVariant" id="0x00770016" type="attr" />
     <public name="colorOutline" id="0x00770017" type="attr" />
-    <public name="colorPrimaryPalette100" id="0x00770018" type="attr" />
-    <public name="colorPrimaryPalette99" id="0x00770019" type="attr" />
-    <public name="colorPrimaryPalette95" id="0x0077001A" type="attr" />
-    <public name="colorPrimaryPalette90" id="0x0077001B" type="attr" />
-    <public name="colorPrimaryPalette80" id="0x0077001C" type="attr" />
-    <public name="colorPrimaryPalette70" id="0x0077001D" type="attr" />
-    <public name="colorPrimaryPalette60" id="0x0077001E" type="attr" />
-    <public name="colorPrimaryPalette50" id="0x0077001F" type="attr" />
-    <public name="colorPrimaryPalette40" id="0x00770020" type="attr" />
-    <public name="colorPrimaryPalette30" id="0x00770021" type="attr" />
-    <public name="colorPrimaryPalette20" id="0x00770022" type="attr" />
-    <public name="colorPrimaryPalette10" id="0x00770023" type="attr" />
-    <public name="colorPrimaryPalette0" id="0x00770024" type="attr" />
-    <public name="colorSecondaryPalette100" id="0x00770025" type="attr" />
-    <public name="colorSecondaryPalette99" id="0x00770026" type="attr" />
-    <public name="colorSecondaryPalette95" id="0x00770027" type="attr" />
-    <public name="colorSecondaryPalette90" id="0x00770028" type="attr" />
-    <public name="colorSecondaryPalette80" id="0x00770029" type="attr" />
-    <public name="colorSecondaryPalette70" id="0x0077002A" type="attr" />
-    <public name="colorSecondaryPalette60" id="0x0077002B" type="attr" />
-    <public name="colorSecondaryPalette50" id="0x0077002C" type="attr" />
-    <public name="colorSecondaryPalette40" id="0x0077002D" type="attr" />
-    <public name="colorSecondaryPalette30" id="0x0077002E" type="attr" />
-    <public name="colorSecondaryPalette20" id="0x0077002F" type="attr" />
-    <public name="colorSecondaryPalette10" id="0x00770030" type="attr" />
-    <public name="colorSecondaryPalette0" id="0x00770031" type="attr" />
-    <public name="colorTertiaryPalette100" id="0x00770032" type="attr" />
-    <public name="colorTertiaryPalette99" id="0x00770033" type="attr" />
-    <public name="colorTertiaryPalette95" id="0x00770034" type="attr" />
-    <public name="colorTertiaryPalette90" id="0x00770035" type="attr" />
-    <public name="colorTertiaryPalette80" id="0x00770036" type="attr" />
-    <public name="colorTertiaryPalette70" id="0x00770037" type="attr" />
-    <public name="colorTertiaryPalette60" id="0x00770038" type="attr" />
-    <public name="colorTertiaryPalette50" id="0x00770039" type="attr" />
-    <public name="colorTertiaryPalette40" id="0x0077003A" type="attr" />
-    <public name="colorTertiaryPalette30" id="0x0077003B" type="attr" />
-    <public name="colorTertiaryPalette20" id="0x0077003C" type="attr" />
-    <public name="colorTertiaryPalette10" id="0x0077003D" type="attr" />
-    <public name="colorTertiaryPalette0" id="0x0077003E" type="attr" />
-    <public name="colorErrorPalette100" id="0x0077003F" type="attr" />
-    <public name="colorErrorPalette99" id="0x00770040" type="attr" />
-    <public name="colorErrorPalette95" id="0x00770041" type="attr" />
-    <public name="colorErrorPalette90" id="0x00770042" type="attr" />
-    <public name="colorErrorPalette80" id="0x00770043" type="attr" />
-    <public name="colorErrorPalette70" id="0x00770044" type="attr" />
-    <public name="colorErrorPalette60" id="0x00770045" type="attr" />
-    <public name="colorErrorPalette50" id="0x00770046" type="attr" />
-    <public name="colorErrorPalette40" id="0x00770047" type="attr" />
-    <public name="colorErrorPalette30" id="0x00770048" type="attr" />
-    <public name="colorErrorPalette20" id="0x00770049" type="attr" />
-    <public name="colorErrorPalette10" id="0x0077004A" type="attr" />
-    <public name="colorErrorPalette0" id="0x0077004B" type="attr" />
-    <public name="colorNeutralPalette100" id="0x0077004C" type="attr" />
-    <public name="colorNeutralPalette99" id="0x0077004D" type="attr" />
-    <public name="colorNeutralPalette95" id="0x0077004E" type="attr" />
-    <public name="colorNeutralPalette90" id="0x0077004F" type="attr" />
-    <public name="colorNeutralPalette80" id="0x00770050" type="attr" />
-    <public name="colorNeutralPalette70" id="0x00770051" type="attr" />
-    <public name="colorNeutralPalette60" id="0x00770052" type="attr" />
-    <public name="colorNeutralPalette50" id="0x00770053" type="attr" />
-    <public name="colorNeutralPalette40" id="0x00770054" type="attr" />
-    <public name="colorNeutralPalette30" id="0x00770055" type="attr" />
-    <public name="colorNeutralPalette20" id="0x00770056" type="attr" />
-    <public name="colorNeutralPalette10" id="0x00770057" type="attr" />
-    <public name="colorNeutralPalette0" id="0x00770058" type="attr" />
-    <public name="colorNeutralVariantPalette100" id="0x00770059" type="attr" />
-    <public name="colorNeutralVariantPalette99" id="0x0077005A" type="attr" />
-    <public name="colorNeutralVariantPalette95" id="0x0077005B" type="attr" />
-    <public name="colorNeutralVariantPalette90" id="0x0077005C" type="attr" />
-    <public name="colorNeutralVariantPalette80" id="0x0077005D" type="attr" />
-    <public name="colorNeutralVariantPalette70" id="0x0077005E" type="attr" />
-    <public name="colorNeutralVariantPalette60" id="0x0077005F" type="attr" />
-    <public name="colorNeutralVariantPalette50" id="0x00770060" type="attr" />
-    <public name="colorNeutralVariantPalette40" id="0x00770061" type="attr" />
-    <public name="colorNeutralVariantPalette30" id="0x00770062" type="attr" />
-    <public name="colorNeutralVariantPalette20" id="0x00770063" type="attr" />
-    <public name="colorNeutralVariantPalette10" id="0x00770064" type="attr" />
-    <public name="colorNeutralVariantPalette0" id="0x00770065" type="attr" />
-    <public name="textAppearanceDisplayLarge" id="0x00770066" type="attr" />
-    <public name="textAppearanceDisplayMedium" id="0x00770067" type="attr" />
-    <public name="textAppearanceDisplaySmall" id="0x00770068" type="attr" />
-    <public name="textAppearanceHeadlineLarge" id="0x00770069" type="attr" />
-    <public name="textAppearanceHeadlineMedium" id="0x0077006A" type="attr" />
-    <public name="textAppearanceHeadlineSmall" id="0x0077006B" type="attr" />
-    <public name="textAppearanceTitleLarge" id="0x0077006C" type="attr" />
-    <public name="textAppearanceTitleMedium" id="0x0077006D" type="attr" />
-    <public name="textAppearanceTitleSmall" id="0x0077006E" type="attr" />
-    <public name="textAppearanceLabelLarge" id="0x0077006F" type="attr" />
-    <public name="textAppearanceLabelMedium" id="0x00770070" type="attr" />
-    <public name="textAppearanceLabelSmall" id="0x00770071" type="attr" />
-    <public name="textAppearanceBodyLarge" id="0x00770072" type="attr" />
-    <public name="textAppearanceBodyMedium" id="0x00770073" type="attr" />
-    <public name="textAppearanceBodySmall" id="0x00770074" type="attr" />
-    <public name="shapeCornerNone" id="0x00770075" type="attr" />
-    <public name="shapeCornerExtraSmall" id="0x00770076" type="attr" />
-    <public name="shapeCornerSmall" id="0x00770077" type="attr" />
-    <public name="shapeCornerMedium" id="0x00770078" type="attr" />
-    <public name="shapeCornerLarge" id="0x00770079" type="attr" />
-    <public name="shapeCornerExtraLarge" id="0x0077007A" type="attr" />
-    <public name="shapeCornerFull" id="0x0077007B" type="attr" />
+    <public name="colorPrimaryInverse" id="0x00770018" type="attr" />
+    <public name="colorSurfaceInverse" id="0x00770019" type="attr" />
+    <public name="colorOnSurfaceInverse" id="0x0077001A" type="attr" />
+    <public name="colorScrim" id="0x0077001B" type="attr" />
+    <public name="colorOutlineVariant" id="0x0077001C" type="attr" />
+    <public name="colorSurfaceTint" id="0x0077001D" type="attr" />
+
+    <!-- Primary tonal palette -->
+    <public name="colorPrimaryPalette0" id="0x00771000" type="attr" />
+    <public name="colorPrimaryPalette10" id="0x00771001" type="attr" />
+    <public name="colorPrimaryPalette20" id="0x00771002" type="attr" />
+    <public name="colorPrimaryPalette30" id="0x00771003" type="attr" />
+    <public name="colorPrimaryPalette40" id="0x00771004" type="attr" />
+    <public name="colorPrimaryPalette50" id="0x00771005" type="attr" />
+    <public name="colorPrimaryPalette60" id="0x00771006" type="attr" />
+    <public name="colorPrimaryPalette70" id="0x00771007" type="attr" />
+    <public name="colorPrimaryPalette80" id="0x00771008" type="attr" />
+    <public name="colorPrimaryPalette90" id="0x00771009" type="attr" />
+    <public name="colorPrimaryPalette95" id="0x0077100A" type="attr" />
+    <public name="colorPrimaryPalette99" id="0x0077100B" type="attr" />
+    <public name="colorPrimaryPalette100" id="0x0077100C" type="attr" />
+
+    <!-- Secondary tonal palette -->
+    <public name="colorSecondaryPalette0" id="0x00772000" type="attr" />
+    <public name="colorSecondaryPalette10" id="0x00772001" type="attr" />
+    <public name="colorSecondaryPalette20" id="0x00772002" type="attr" />
+    <public name="colorSecondaryPalette30" id="0x00772003" type="attr" />
+    <public name="colorSecondaryPalette40" id="0x00772004" type="attr" />
+    <public name="colorSecondaryPalette50" id="0x00772005" type="attr" />
+    <public name="colorSecondaryPalette60" id="0x00772006" type="attr" />
+    <public name="colorSecondaryPalette70" id="0x00772007" type="attr" />
+    <public name="colorSecondaryPalette80" id="0x00772008" type="attr" />
+    <public name="colorSecondaryPalette90" id="0x00772009" type="attr" />
+    <public name="colorSecondaryPalette95" id="0x0077200A" type="attr" />
+    <public name="colorSecondaryPalette99" id="0x0077200B" type="attr" />
+    <public name="colorSecondaryPalette100" id="0x0077200C" type="attr" />
+
+    <!-- Tertiary tonal palette -->
+    <public name="colorTertiaryPalette0" id="0x00773000" type="attr" />
+    <public name="colorTertiaryPalette10" id="0x00773001" type="attr" />
+    <public name="colorTertiaryPalette20" id="0x00773002" type="attr" />
+    <public name="colorTertiaryPalette30" id="0x00773003" type="attr" />
+    <public name="colorTertiaryPalette40" id="0x00773004" type="attr" />
+    <public name="colorTertiaryPalette50" id="0x00773005" type="attr" />
+    <public name="colorTertiaryPalette60" id="0x00773006" type="attr" />
+    <public name="colorTertiaryPalette70" id="0x00773007" type="attr" />
+    <public name="colorTertiaryPalette80" id="0x00773008" type="attr" />
+    <public name="colorTertiaryPalette90" id="0x00773009" type="attr" />
+    <public name="colorTertiaryPalette95" id="0x0077300A" type="attr" />
+    <public name="colorTertiaryPalette99" id="0x0077300B" type="attr" />
+    <public name="colorTertiaryPalette100" id="0x0077300C" type="attr" />
+
+    <!-- Error tonal palette -->
+    <public name="colorErrorPalette0" id="0x00774000" type="attr" />
+    <public name="colorErrorPalette10" id="0x00774001" type="attr" />
+    <public name="colorErrorPalette20" id="0x00774002" type="attr" />
+    <public name="colorErrorPalette30" id="0x00774003" type="attr" />
+    <public name="colorErrorPalette40" id="0x00774004" type="attr" />
+    <public name="colorErrorPalette50" id="0x00774005" type="attr" />
+    <public name="colorErrorPalette60" id="0x00774006" type="attr" />
+    <public name="colorErrorPalette70" id="0x00774007" type="attr" />
+    <public name="colorErrorPalette80" id="0x00774008" type="attr" />
+    <public name="colorErrorPalette90" id="0x00774009" type="attr" />
+    <public name="colorErrorPalette95" id="0x0077400A" type="attr" />
+    <public name="colorErrorPalette99" id="0x0077400B" type="attr" />
+    <public name="colorErrorPalette100" id="0x0077400C" type="attr" />
+
+    <!-- Neutral tonal palette -->
+    <public name="colorNeutralPalette0" id="0x00775000" type="attr" />
+    <public name="colorNeutralPalette10" id="0x00775001" type="attr" />
+    <public name="colorNeutralPalette20" id="0x00775002" type="attr" />
+    <public name="colorNeutralPalette30" id="0x00775003" type="attr" />
+    <public name="colorNeutralPalette40" id="0x00775004" type="attr" />
+    <public name="colorNeutralPalette50" id="0x00775005" type="attr" />
+    <public name="colorNeutralPalette60" id="0x00775006" type="attr" />
+    <public name="colorNeutralPalette70" id="0x00775007" type="attr" />
+    <public name="colorNeutralPalette80" id="0x00775008" type="attr" />
+    <public name="colorNeutralPalette90" id="0x00775009" type="attr" />
+    <public name="colorNeutralPalette95" id="0x0077500A" type="attr" />
+    <public name="colorNeutralPalette99" id="0x0077500B" type="attr" />
+    <public name="colorNeutralPalette100" id="0x0077500C" type="attr" />
+
+    <!-- Neutral variant tonal palette -->
+    <public name="colorNeutralVariantPalette0" id="0x00776000" type="attr" />
+    <public name="colorNeutralVariantPalette10" id="0x00776001" type="attr" />
+    <public name="colorNeutralVariantPalette20" id="0x00776002" type="attr" />
+    <public name="colorNeutralVariantPalette30" id="0x00776003" type="attr" />
+    <public name="colorNeutralVariantPalette40" id="0x00776004" type="attr" />
+    <public name="colorNeutralVariantPalette50" id="0x00776005" type="attr" />
+    <public name="colorNeutralVariantPalette60" id="0x00776006" type="attr" />
+    <public name="colorNeutralVariantPalette70" id="0x00776007" type="attr" />
+    <public name="colorNeutralVariantPalette80" id="0x00776008" type="attr" />
+    <public name="colorNeutralVariantPalette90" id="0x00776009" type="attr" />
+    <public name="colorNeutralVariantPalette95" id="0x0077600A" type="attr" />
+    <public name="colorNeutralVariantPalette99" id="0x0077600B" type="attr" />
+    <public name="colorNeutralVariantPalette100" id="0x0077600C" type="attr" />
+
+    <!-- Typeface tokens -->
+    <public name="textAppearanceDisplayLarge" id="0x00777000" type="attr" />
+    <public name="textAppearanceDisplayMedium" id="0x00777001" type="attr" />
+    <public name="textAppearanceDisplaySmall" id="0x00777002" type="attr" />
+    <public name="textAppearanceHeadlineLarge" id="0x00777003" type="attr" />
+    <public name="textAppearanceHeadlineMedium" id="0x00777004" type="attr" />
+    <public name="textAppearanceHeadlineSmall" id="0x00777005" type="attr" />
+    <public name="textAppearanceTitleLarge" id="0x00777006" type="attr" />
+    <public name="textAppearanceTitleMedium" id="0x00777007" type="attr" />
+    <public name="textAppearanceTitleSmall" id="0x00777008" type="attr" />
+    <public name="textAppearanceLabelLarge" id="0x00777009" type="attr" />
+    <public name="textAppearanceLabelMedium" id="0x0077700A" type="attr" />
+    <public name="textAppearanceLabelSmall" id="0x0077700B" type="attr" />
+    <public name="textAppearanceBodyLarge" id="0x0077700C" type="attr" />
+    <public name="textAppearanceBodyMedium" id="0x0077700D" type="attr" />
+    <public name="textAppearanceBodySmall" id="0x0077700E" type="attr" />
+
+    <!-- Shape tokens -->
+    <public name="shapeCornerNone" id="0x00778000" type="attr" />
+    <public name="shapeCornerExtraSmall" id="0x00778001" type="attr" />
+    <public name="shapeCornerSmall" id="0x00778002" type="attr" />
+    <public name="shapeCornerMedium" id="0x00778003" type="attr" />
+    <public name="shapeCornerLarge" id="0x00778004" type="attr" />
+    <public name="shapeCornerExtraLarge" id="0x00778005" type="attr" />
+    <public name="shapeCornerFull" id="0x00778006" type="attr" />
 </resources>
