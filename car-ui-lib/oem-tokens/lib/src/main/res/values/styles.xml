@@ -40,7 +40,13 @@
         <item name="oemColorOnSurface">?attr/oemColorNeutralPalette80</item>
         <item name="oemColorSurfaceVariant">?attr/oemColorNeutralVariantPalette30</item>
         <item name="oemColorOnSurfaceVariant">?attr/oemColorNeutralVariantPalette80</item>
+        <item name="oemColorSurfaceInverse">?attr/oemColorNeutralVariantPalette80</item>
+        <item name="oemColorOnSurfaceInverse">?attr/oemColorNeutralVariantPalette10</item>
+        <item name="oemColorPrimaryInverse">?attr/oemColorPrimaryPalette40</item>
         <item name="oemColorOutline">?attr/oemColorNeutralVariantPalette60</item>
+        <item name="oemColorScrim">?attr/oemColorNeutralPalette80</item>
+        <item name="oemColorOutlineVariant">?attr/oemColorNeutralVariantPalette30</item>
+        <item name="oemColorSurfaceTint">?attr/oemColorPrimaryPalette80</item>
 
         <item name="oemColorPrimaryPalette100">@color/oem_default_color_primary_palette_100</item>
         <item name="oemColorPrimaryPalette99">@color/oem_default_color_primary_palette_99</item>
@@ -175,6 +181,12 @@
         <item name="oemColorSurfaceVariant">?com.android.oem.tokens:attr/colorSurfaceVariant</item>
         <item name="oemColorOnSurfaceVariant">?com.android.oem.tokens:attr/colorOnSurfaceVariant</item>
         <item name="oemColorOutline">?com.android.oem.tokens:attr/colorOutline</item>
+        <item name="oemColorSurfaceInverse">?com.android.oem.tokens:attr/colorSurfaceInverse</item>
+        <item name="oemColorOnSurfaceInverse">?com.android.oem.tokens:attr/colorOnSurfaceInverse</item>
+        <item name="oemColorPrimaryInverse">?com.android.oem.tokens:attr/colorPrimaryInverse</item>
+        <item name="oemColorScrim">?com.android.oem.tokens:attr/colorScrim</item>
+        <item name="oemColorOutlineVariant">?com.android.oem.tokens:attr/colorOutlineVariant</item>
+        <item name="oemColorSurfaceTint">?com.android.oem.tokens:attr/colorSurfaceTint</item>
 
         <item name="oemColorPrimaryPalette100">?com.android.oem.tokens:attr/colorPrimaryPalette100</item>
         <item name="oemColorPrimaryPalette99">?com.android.oem.tokens:attr/colorPrimaryPalette99</item>
@@ -283,6 +295,12 @@
         <item name="com.android.oem.tokens:colorSurfaceVariant">?attr/oemColorNeutralVariantPalette30</item>
         <item name="com.android.oem.tokens:colorOnSurfaceVariant">?attr/oemColorNeutralVariantPalette80</item>
         <item name="com.android.oem.tokens:colorOutline">?attr/oemColorNeutralVariantPalette60</item>
+        <item name="com.android.oem.tokens:colorSurfaceInverse">?attr/oemColorNeutralPalette80</item>
+        <item name="com.android.oem.tokens:colorOnSurfaceInverse">?attr/oemColorNeutralPalette10</item>
+        <item name="com.android.oem.tokens:colorPrimaryInverse">?attr/oemColorPrimaryPalette40</item>
+        <item name="com.android.oem.tokens:colorScrim">?attr/oemColorNeutralPalette80</item>
+        <item name="com.android.oem.tokens:colorOutlineVariant">?attr/oemColorNeutralVariantPalette30</item>
+        <item name="com.android.oem.tokens:colorSurfaceTint">?attr/oemColorPrimaryPalette80</item>
 
         <item name="com.android.oem.tokens:colorPrimaryPalette100">@color/oem_default_color_primary_palette_100</item>
         <item name="com.android.oem.tokens:colorPrimaryPalette99">@color/oem_default_color_primary_palette_99</item>
