@@ -76,13 +76,6 @@ public final class MediaConstants {
             "androidx.car.app.mediaextensions.KEY_ROOT_HINT_MEDIA_SESSION_API";
     public static final String KEY_ROOT_HINT_MAX_QUEUE_ITEMS_WHILE_RESTRICTED =
             "androidx.car.app.mediaextensions.KEY_ROOT_HINT_MAX_QUEUE_ITEMS_WHILE_RESTRICTED";
-
-    public static final String KEY_HINT_HOST_PACKAGE_NAME =
-            "androidx.car.app.mediaextensions.KEY_HINT_HOST_PACKAGE_NAME";
-    public static final String KEY_HINT_VIEW_WIDTH_PIXELS =
-            "androidx.car.app.mediaextensions.KEY_HINT_VIEW_WIDTH_PIXELS";
-    public static final String KEY_HINT_VIEW_HEIGHT_PIXELS =
-            "androidx.car.app.mediaextensions.KEY_HINT_VIEW_HEIGHT_PIXELS";
     public static final String KEY_HINT_VIEW_MAX_ITEMS_WHILE_RESTRICTED =
             "androidx.car.app.mediaextensions.KEY_HINT_VIEW_MAX_ITEMS_WHILE_RESTRICTED";
     public static final String KEY_HINT_VIEW_MAX_LIST_ITEMS_COUNT_PER_ROW =
