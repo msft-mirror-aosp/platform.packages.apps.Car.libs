@@ -45,7 +45,7 @@ import java.util.concurrent.Executor;
  *
  * <p>
  *     Add analytics opt-in and sessionId to rootHints with
- *     {@link RootHintsUtil.RootHintsPopulator}
+ *     {@link RootHintsPopulator}
  */
 @ExperimentalCarApi
 public abstract class AnalyticsBroadcastReceiver extends BroadcastReceiver {
