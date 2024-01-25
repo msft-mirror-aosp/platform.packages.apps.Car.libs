@@ -224,7 +224,7 @@ public final class AppStyledDialogController {
      * Sets a runnable that will be invoked when a dialog is dismissed.
      */
     public void setOnDismissListener(@NonNull Runnable listener) {
-        mDialog.setOnDismissListener(listener);
+        mDialog.setOnDismissListener(dialog -> listener.run());
     }
 
     /**
