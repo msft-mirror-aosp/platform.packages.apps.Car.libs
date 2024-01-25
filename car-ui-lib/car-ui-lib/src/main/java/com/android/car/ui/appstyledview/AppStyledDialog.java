@@ -138,9 +138,18 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
                     final int mImeOverlapPx =
                             (int) CarUiUtils.dpToPixel(mContext.getResources(), IME_OVERLAP_DP);
 
+                    private boolean isImeAnimation(WindowInsetsAnimationCompat animation) {
+                        return (animation.getTypeMask() & WindowInsetsCompat.Type.ime()) != 0;
+
+                    }
+
                     @Override
                     @SuppressLint({"NewApi", "RtlHardcoded"})
                     public void onPrepare(@NonNull WindowInsetsAnimationCompat animation) {
+                        if (!isImeAnimation(animation)) {
+                            return;
+                        }
+
                         mAnimationLayoutParams = new WindowManager.LayoutParams();
                         mStartLayoutParams = mController.getDialogWindowLayoutParam(
                                 window.getAttributes());
@@ -165,6 +174,9 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
                     public WindowInsetsAnimationCompat.BoundsCompat onStart(
                             @NonNull WindowInsetsAnimationCompat animation,
                             @NonNull WindowInsetsAnimationCompat.BoundsCompat bounds) {
+                        if (!isImeAnimation(animation)) {
+                            return bounds;
+                        }
                         WindowInsetsCompat insets = ViewCompat.getRootWindowInsets(
                                 window.getDecorView().getRootView());
                         int imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
@@ -178,8 +190,15 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
 
                     @Override
                     public void onEnd(@NonNull WindowInsetsAnimationCompat animation) {
-                        mStartLayoutParams.height = mEndHeight;
-                        window.setAttributes(mStartLayoutParams);
+                        if (isImeAnimation(animation)) {
+                            mStartLayoutParams.height = mEndHeight;
+                            window.setAttributes(mStartLayoutParams);
+                        } else {
+                            window.setAttributes(
+                                    mController.getDialogWindowLayoutParam(window.getAttributes()));
+                            copyWindowInsets();
+                        }
+
                         super.onEnd(animation);
                     }
 
@@ -190,7 +209,7 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
                         // Find an IME animation.
                         WindowInsetsAnimationCompat imeAnimation = null;
                         for (WindowInsetsAnimationCompat animation : runningAnimations) {
-                            if ((animation.getTypeMask() & WindowInsetsCompat.Type.ime()) != 0) {
+                            if (isImeAnimation(animation)) {
                                 imeAnimation = animation;
                                 break;
                             }
@@ -221,12 +240,22 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
     protected void onStart() {
         mLifecycleRegistry.setCurrentState(Lifecycle.State.STARTED);
         mLifecycleRegistry.setCurrentState(Lifecycle.State.RESUMED);
+
+        if (getWindow() != null) {
+            getWindow().setAttributes(
+                    mController.getDialogWindowLayoutParam(getWindow().getAttributes()));
+        }
         super.onStart();
     }
 
     @Override
     protected void onStop() {
         mLifecycleRegistry.setCurrentState(Lifecycle.State.DESTROYED);
+
+        if (getWindow() != null) {
+            ViewCompat.setWindowInsetsAnimationCallback(getWindow().getDecorView().getRootView(),
+                    null);
+        }
         super.onStop();
     }
 
@@ -249,6 +278,10 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
      * activity is in Immersive mode the dialog will be in Immersive mode too and vice versa.
      */
     private void copySystemUiVisibility() {
+        if (getWindow() == null) {
+            return;
+        }
+
         getWindow().getDecorView().setSystemUiVisibility(
                 ((Activity) mContext).getWindow().getDecorView().getSystemUiVisibility());
         getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(
@@ -261,32 +294,34 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
      * mirror activity state but nav bar requires the following workaround.
      */
     private void copyWindowInsets() {
-        // WindowInsetsController corresponding to activity that requested the dialog
-        WindowInsetsControllerCompat activityWindowInsetsController =
-                ViewCompat.getWindowInsetsController(
-                        ((Activity) mContext).getWindow().getDecorView());
+        Window window = getWindow();
+        if (window == null) {
+            return;
+        }
 
         // WindowInsetsController corresponding to the dialog
         WindowInsetsControllerCompat dialogWindowInsetsController =
-                ViewCompat.getWindowInsetsController(getWindow().getDecorView());
+                WindowCompat.getInsetsController(window, getWindow().getDecorView());
 
-        if (dialogWindowInsetsController == null || activityWindowInsetsController == null) {
-            return;
-        }
+        Activity activity = ((Activity) mContext);
+
+        // WindowInsetsController corresponding to activity that requested the dialog
+        WindowInsetsControllerCompat activityWindowInsetsController =
+                WindowCompat.getInsetsController(activity.getWindow(),
+                        activity.getWindow().getDecorView());
+
 
         int activitySystemBarBehavior = activityWindowInsetsController.getSystemBarsBehavior();
         // Only set system bar behavior when non-default settings are required. Setting default may
         // overwrite flags set by deprecated methods with different defaults.
         if (activitySystemBarBehavior != 0) {
             // Configure the behavior of the hidden system bars to match requesting activity
-            dialogWindowInsetsController.setSystemBarsBehavior(
-                    activityWindowInsetsController.getSystemBarsBehavior());
+            dialogWindowInsetsController.setSystemBarsBehavior(activitySystemBarBehavior);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // Configure nav bar visibility to match requesting activity
-            WindowInsets windowInsets =
-                    ((Activity) mContext).getWindow().getDecorView().getRootWindowInsets();
+            WindowInsets windowInsets = activity.getWindow().getDecorView().getRootWindowInsets();
             if (windowInsets == null) {
                 return;
             }
@@ -300,10 +335,6 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
 
     @Override
     public void show() {
-        if (getWindow() != null) {
-            getWindow().setAttributes(
-                    mController.getDialogWindowLayoutParam(getWindow().getAttributes()));
-        }
         super.show();
         mContent.clearFocus();
     }
