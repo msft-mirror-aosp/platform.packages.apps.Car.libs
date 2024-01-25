@@ -20,7 +20,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -63,12 +62,11 @@ import java.util.List;
  * Apps should not use this directly. Apps should use {@link AppStyledDialogController}.
  */
 
-class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListener, LifecycleOwner,
-        SavedStateRegistryOwner, OnBackPressedDispatcherOwner {
+class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegistryOwner,
+        OnBackPressedDispatcherOwner {
 
     private static final int IME_OVERLAP_DP = 32;
     private final AppStyledViewController mController;
-    private Runnable mOnDismissListener;
     private View mContent;
     private View mAppStyledView;
     private final Context mContext;
@@ -85,7 +83,6 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
         // need in order to get call getWindow()
         mContext = context;
         mController = controller;
-        setOnDismissListener(this);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
     }
 
@@ -260,13 +257,6 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
     }
 
     @Override
-    public void onDismiss(DialogInterface dialog) {
-        if (mOnDismissListener != null) {
-            mOnDismissListener.run();
-        }
-    }
-
-    @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
         copyWindowInsets();
@@ -376,10 +366,6 @@ class AppStyledDialog extends Dialog implements DialogInterface.OnDismissListene
 
     View getContent() {
         return mContent;
-    }
-
-    void setOnDismissListener(Runnable listener) {
-        mOnDismissListener = listener;
     }
 
     @Nullable
