@@ -37,13 +37,13 @@ import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewOEMV2;
 import com.android.car.ui.plugin.oemapis.recyclerview.ViewHolderOEMV1;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.recyclerview.CarUiRecyclerViewImpl;
-import com.android.car.ui.recyclerview.RecyclerViewAdapterV1;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  Adapts a {@link RecyclerViewAdapterV1} into a {@link RecyclerViewOEMV2}.
+ * See {@code RecyclerViewAdapterProxyV3}. This class is for backwards compatibility with apps that
+ * use an older version of car-ui-lib.
  */
 public class RecyclerViewAdapterProxyV2 implements RecyclerViewOEMV2 {
     private Context mPluginContext;

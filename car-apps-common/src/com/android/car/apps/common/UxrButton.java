@@ -48,7 +48,6 @@ public class UxrButton extends TextView {
     private CarUxRestrictions mActiveCarUxRestrictions;
     private View.OnClickListener mOnClickListenerDelegate;
 
-    @CarUxRestrictions.CarUxRestrictionsInfo
     private int mRestrictions;
 
     private final Handler mHandler = new Handler();

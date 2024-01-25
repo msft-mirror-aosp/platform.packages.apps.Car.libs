@@ -42,7 +42,7 @@ import com.android.car.ui.utils.CarUiUtils;
 
 
 import com.chassis.car.ui.plugin.appstyledview.AppStyledViewControllerAdapterProxyV1;
-import com.chassis.car.ui.plugin.recyclerview.CarListItemAdapterAdapterProxy;
+import com.chassis.car.ui.plugin.recyclerview.CarUiListItemAdapterAdapterProxyV1;
 import com.chassis.car.ui.plugin.recyclerview.ListItemUtils;
 import com.chassis.car.ui.plugin.recyclerview.RecyclerViewAdapterProxyV1;
 import com.chassis.car.ui.plugin.toolbar.BaseLayoutInstallerProxy;
@@ -52,7 +52,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * See {@code PluginFactoryImplV7}. This class is for backwards compatibility with apps that use
+ * See {@code PluginFactoryImplV8}. This class is for backwards compatibility with apps that use
  * an older version of car-ui-lib.
  */
 public class PluginFactoryImplV2 implements PluginFactoryOEMV2 {
@@ -114,7 +114,7 @@ public class PluginFactoryImplV2 implements PluginFactoryOEMV2 {
                 ListItemUtils::toStaticListItem);
         // Build the CarUiListItemAdapter that will be delegated to
         CarUiListItemAdapter carUiListItemAdapter = new CarUiListItemAdapter(staticItems);
-        return new CarListItemAdapterAdapterProxy(
+        return new CarUiListItemAdapterAdapterProxyV1(
                 carUiListItemAdapter, mPluginUiContextFactory.getRecentPluginUiContext());
     }
 }

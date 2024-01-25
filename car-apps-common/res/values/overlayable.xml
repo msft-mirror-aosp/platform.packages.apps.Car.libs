@@ -13,6 +13,7 @@ limitations under the License.-->
   <overlayable name="CarAppsCommon">
     <policy type="system|product|signature|vendor">
       <item type="bool" name="enable_control_bar_overflow"/>
+      <item type="bool" name="use_media_source_color_for_minimized_progress_bar"/>
 
       <item type="color" name="action_button_icon_tint" />
 
@@ -22,9 +23,27 @@ limitations under the License.-->
 
       <item type="drawable" name="ic_overflow_button"/>
 
+      <item type="id" name="minimized_control_bar_layout"/>
+      <item type="id" name="metadata_background"/>
+      <item type="id" name="minimized_control_bar_content_tile"/>
+      <item type="id" name="minimized_control_bar_app_icon"/>
+      <item type="id" name="minimized_control_bar_title"/>
+      <item type="id" name="subtitle_group"/>
+      <item type="id" name="minimized_control_bar_subtitle"/>
+      <item type="id" name="minimized_control_bar_subtitle_separator"/>
+      <item type="id" name="minimized_control_bar_extra_slot"/>
+      <item type="id" name="minimized_control_buttons_wrapper"/>
+      <item type="id" name="minimized_control_bar_left_slot"/>
+      <item type="id" name="minimized_control_bar_main_slot"/>
+      <item type="id" name="minimized_control_bar_right_slot"/>
+
       <item type="integer" name="control_bar_columns"/>
 
+      <item type="layout" name="minimized_control_bar"/>
+
       <item type="style" name="Widget.ActionButton.PlayPause"/>
+      <item type="style" name="MinimizedControlBar"/>
+      <item type="style" name="ControlBar"/>
     </policy>
   </overlayable>
 </resources>

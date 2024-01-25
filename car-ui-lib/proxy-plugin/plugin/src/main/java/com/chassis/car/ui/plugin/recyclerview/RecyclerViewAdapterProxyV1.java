@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * See {@code RecyclerViewAdapterProxyV2}. This class is for backwards compatibility with apps that
+ * See {@code RecyclerViewAdapterProxyV3}. This class is for backwards compatibility with apps that
  * use an older version of car-ui-lib.
  */
 public class RecyclerViewAdapterProxyV1 implements RecyclerViewOEMV1 {

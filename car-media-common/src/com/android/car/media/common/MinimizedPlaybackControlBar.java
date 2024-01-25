@@ -16,8 +16,14 @@
 
 package com.android.car.media.common;
 
+import static androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent.VIEW_ACTION_HIDE;
+import static androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent.VIEW_ACTION_MODE_NONE;
+import static androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent.VIEW_ACTION_SHOW;
+import static androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent.VIEW_COMPONENT_MINI_PLAYBACK;
+
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,20 +31,28 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.OptIn;
+import androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.android.car.apps.common.BackgroundImageView;
 import com.android.car.apps.common.MinimizedControlBar;
 import com.android.car.apps.common.imaging.ImageBinder;
+import com.android.car.media.common.browse.MediaItemsRepository;
 import com.android.car.media.common.playback.PlaybackViewModel;
+
+import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * This is a CarControlBar used for displaying Media content, including metadata for the currently
  * playing song and basic controls.
  */
+@OptIn(markerClass = androidx.car.app.annotations2.ExperimentalCarApi.class)
 public class MinimizedPlaybackControlBar extends MinimizedControlBar {
 
-    private static final String TAG = "Media.ControlBar";
+    private static final String TAG = "MiniPlaybackControlBar";
 
     private MediaButtonController mMediaButtonController;
     private MetadataController mMetadataController;
@@ -49,9 +63,12 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
     private ContentFormatView mContentFormatView;
     private View mSeparatorView;
     private View mViewSeparatedFromExtraSlot;
+    private MediaItemsRepository mRepository;
+    private MediaItemMetadata mCurrentItem;
 
     private boolean mShowLinearProgressBar;
     private boolean mShowCircularProgressBar;
+    private boolean mIsActuallyVisible = true;
 
     public MinimizedPlaybackControlBar(Context context) {
         this(context, null);
@@ -64,6 +81,17 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
     public MinimizedPlaybackControlBar(Context context, AttributeSet attrs, int defStyleAttrs) {
         super(context, attrs, defStyleAttrs, R.layout.minimized_playback_control_bar);
         init(context);
+    }
+
+    /**
+     * Tells the view what is actually happening to it, so that it can be considered hidden
+     * right when a hiding animation starts.
+     */
+    public void onActualVisibilityChanged(boolean isVisible) {
+        if (mIsActuallyVisible != isVisible) {
+            mIsActuallyVisible = isVisible;
+            sendVisibleItemsEvent(mCurrentItem, isVisible ? VIEW_ACTION_SHOW : VIEW_ACTION_HIDE);
+        }
     }
 
     private void init(Context context) {
@@ -99,12 +127,21 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
 
     /** Connects the bar to the {@link PlaybackViewModel}. */
     public void setModel(@NonNull PlaybackViewModel model, @NonNull LifecycleOwner owner,
-            @NonNull Size maxArtSize) {
+            @NonNull MediaItemsRepository repository, @NonNull Size maxArtSize) {
         mMediaButtonController.setModel(model, owner);
         mMetadataController = new MetadataController(owner, model, null, mTitle, mSubtitle, null,
                 null, null, null, null, null, mContentTile, mAppIcon, maxArtSize,
                 mContentFormatView, null);
         mPlaybackViewModel = model;
+        mRepository = repository;
+        model.getMetadata().observe(owner, mediaItemMetadata -> {
+            if (getVisibility() == VISIBLE && mIsActuallyVisible
+                    && !Objects.equals(mediaItemMetadata, mCurrentItem)) {
+                sendVisibleItemsEvent(mCurrentItem, VIEW_ACTION_HIDE);
+                sendVisibleItemsEvent(mediaItemMetadata, VIEW_ACTION_SHOW);
+            }
+            mCurrentItem = mediaItemMetadata;
+        });
 
         mMetadataController.setLogoSeparatorView(mSeparatorView);
         mMetadataController.setViewSeparatedFromLogo(mViewSeparatedFromExtraSlot);
@@ -119,5 +156,21 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
                     item -> mArtBinder.setImage(getContext(),
                             item != null ? item.getArtworkKey() : null));
         }
+    }
+
+    private void sendVisibleItemsEvent(@Nullable MediaItemMetadata data,
+            @AnalyticsEvent.ViewAction int viewAction) {
+        if (mRepository == null) {
+            Log.e(TAG, "mRepository is still null !!");
+            return;
+        }
+        if (data == null) {
+            return;
+        }
+
+        ArrayList<String> items = new ArrayList<>();
+        items.add(data.getId());
+        mRepository.getAnalyticsManager().sendVisibleItemsEvents(
+                "", VIEW_COMPONENT_MINI_PLAYBACK, viewAction, VIEW_ACTION_MODE_NONE, items);
     }
 }

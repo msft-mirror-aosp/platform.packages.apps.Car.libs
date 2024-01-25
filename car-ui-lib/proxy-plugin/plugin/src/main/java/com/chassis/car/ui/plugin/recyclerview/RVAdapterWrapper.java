@@ -26,6 +26,8 @@ import androidx.recyclerview.widget.RecyclerView.Adapter;
 
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterDataObserverOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
+import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV2;
+import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewOEMV3;
 import com.android.car.ui.plugin.oemapis.recyclerview.ViewHolderOEMV1;
 
 /**
@@ -34,7 +36,7 @@ import com.android.car.ui.plugin.oemapis.recyclerview.ViewHolderOEMV1;
 public final class RVAdapterWrapper extends Adapter<RVAdapterWrapper.ViewHolderWrapper> {
 
     @NonNull
-    private final AdapterOEMV1 mAdapter;
+    private final AdapterOEMV2 mAdapter;
 
     @NonNull
     private final AdapterDataObserverOEMV1 mAdapterDataObserver = new AdapterDataObserverOEMV1() {
@@ -77,6 +79,10 @@ public final class RVAdapterWrapper extends Adapter<RVAdapterWrapper.ViewHolderW
     };
 
     public RVAdapterWrapper(@NonNull AdapterOEMV1<?> adapter) {
+        this(from(adapter));
+    }
+
+    public RVAdapterWrapper(@NonNull AdapterOEMV2<?> adapter) {
         this.mAdapter = adapter;
         RVAdapterWrapper.super.setHasStableIds(adapter.hasStableIds());
         updateStateRestorationPolicy();
@@ -166,7 +172,7 @@ public final class RVAdapterWrapper extends Adapter<RVAdapterWrapper.ViewHolderW
     public void unregisterAdapterDataObserver(RecyclerView.AdapterDataObserver observer) {
         super.unregisterAdapterDataObserver(observer);
         if (!super.hasObservers()) {
-            mAdapter.registerAdapterDataObserver(mAdapterDataObserver);
+            mAdapter.unregisterAdapterDataObserver(mAdapterDataObserver);
         }
     }
 
@@ -188,10 +194,125 @@ public final class RVAdapterWrapper extends Adapter<RVAdapterWrapper.ViewHolderW
         }
     }
 
-    /**
-     * returns the wrapped {@link AdapterOEMV1}
-     */
-    public AdapterOEMV1<?> getOEMAdapter() {
-        return mAdapter;
+    private static <V extends ViewHolderOEMV1> AdapterOEMV2 from(AdapterOEMV1<V> adapter) {
+        return new AdapterOEMV2<V>() {
+
+            @Override
+            public int getItemCount() {
+                return adapter.getItemCount();
+            }
+
+            @Override
+            public long getItemId(int position) {
+                return adapter.getItemId(position);
+            }
+
+            @Override
+            public int getItemViewType(int position) {
+                return adapter.getItemViewType(position);
+            }
+
+            @Override
+            public void notifyDataSetChanged() {
+                // ignore, not supported.
+            }
+
+            @Override
+            public void notifyItemRangeChanged(int positionStart, int itemCount) {
+                // ignore, not supported.
+            }
+
+            @Override
+            public void notifyItemRangeChanged(int positionStart, int itemCount,
+                    @Nullable Object payload) {
+                // ignore, not supported.
+            }
+
+            @Override
+            public void notifyItemRangeInserted(int positionStart, int itemCount) {
+                // ignore, not supported.
+            }
+
+            @Override
+            public void notifyItemRangeRemoved(int positionStart, int itemCount) {
+                // ignore, not supported.
+            }
+
+            @Override
+            public void notifyItemMoved(int fromPosition, int toPosition) {
+                // ignore, not supported.
+            }
+
+            @Override
+            public void setStateRestorationPolicy(int strategy) {
+                // ignore, not supported.
+            }
+
+            @Override
+            public int getStateRestorationPolicyInt() {
+                return adapter.getStateRestorationPolicyInt();
+            }
+
+            @Override
+            public void onAttachedToRecyclerView(@NonNull RecyclerViewOEMV3 recyclerView) {
+                adapter.onAttachedToRecyclerView(null);
+            }
+
+            @Override
+            public void bindViewHolder(@NonNull V holder, int position) {
+                adapter.bindViewHolder(holder, position);
+            }
+
+            @NonNull
+            @Override
+            public V createViewHolder(@NonNull ViewGroup parent, int viewType) {
+                return adapter.createViewHolder(parent, viewType);
+            }
+
+            @Override
+            public void onDetachedFromRecyclerView(@NonNull RecyclerViewOEMV3 recyclerView) {
+                adapter.onDetachedFromRecyclerView(null);
+            }
+
+            @Override
+            public boolean onFailedToRecycleView(@NonNull V holder) {
+                return adapter.onFailedToRecycleView(holder);
+            }
+
+            @Override
+            public void onViewAttachedToWindow(@NonNull V holder) {
+                adapter.onViewAttachedToWindow(holder);
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(@NonNull V holder) {
+                adapter.onViewDetachedFromWindow(holder);
+            };
+
+            @Override
+            public void onViewRecycled(@NonNull V holder) {
+                adapter.onViewRecycled(holder);
+            }
+
+            @Override
+            public void registerAdapterDataObserver(@NonNull AdapterDataObserverOEMV1 observer) {
+                adapter.registerAdapterDataObserver(observer);
+            }
+
+            @Override
+            public void unregisterAdapterDataObserver(@NonNull AdapterDataObserverOEMV1 observer) {
+                adapter.unregisterAdapterDataObserver(observer);
+            }
+
+            @Override
+            public boolean hasStableIds() {
+                return adapter.hasStableIds();
+            }
+
+            @Override
+            public void setMaxItems(int maxItems) {
+                adapter.setMaxItems(maxItems);
+            }
+        };
     }
 }

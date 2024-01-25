@@ -28,6 +28,7 @@ car_media_common_static_libs = [
     "androidx.lifecycle_lifecycle-common-java8",
     "androidx.lifecycle_lifecycle-extensions",
     "car-apps-common-prebuilt",
+    "car-media-extensions-prebuilt",
 ]
 
 android_library {

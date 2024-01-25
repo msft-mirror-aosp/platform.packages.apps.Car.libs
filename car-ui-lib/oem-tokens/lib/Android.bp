@@ -48,7 +48,7 @@ android_test {
         "androidx.test.espresso.contrib",
         "androidx.test.ext.junit",
         "oem-token-lib-source",
-        "truth-prebuilt",
+        "truth",
     ],
 }
 

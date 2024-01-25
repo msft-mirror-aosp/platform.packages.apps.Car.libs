@@ -22,6 +22,8 @@ import androidx.annotation.NonNull;
 /**
  * See {@code androidx.recyclerview.widget.RecyclerView.Adapter}
  *
+ * @deprecated Use {@link AdapterOEMV2} instead
+ *
  * @param <V> A class that extends ViewHolder that will be used by the adapter.
  */
 public interface AdapterOEMV1<V extends ViewHolderOEMV1> {

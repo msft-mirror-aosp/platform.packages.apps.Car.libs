@@ -21,13 +21,16 @@ import androidx.annotation.NonNull;
 /**
  * Interface for receiving changes to {@link Insets}.
  *
- * <p>This interface can be applied to either activities or fragments. CarUi will automatically call
- * it when the insets change.
+ * <p>This interface can be applied to either activities or fragments. CarUi will automatically
+ * call it when the insets change. To avoid duplicating insets, it is recommended to handle insets
+ * at either the {@code Activity} or {@code Fragment} level but not both.
  *
  * <p>When neither the activity nor any of its fragments implement this interface, the Insets
  * will be applied as padding to the content view.
  */
 public interface InsetsChangedListener {
-    /** Called when the insets change */
+    /**
+     * Called when the insets change
+     */
     void onCarUiInsetsChanged(@NonNull Insets insets);
 }

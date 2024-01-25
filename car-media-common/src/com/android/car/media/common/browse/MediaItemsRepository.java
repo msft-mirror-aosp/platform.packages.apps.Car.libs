@@ -38,7 +38,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
+import androidx.car.app.mediaextensions.analytics.host.IAnalyticsManager;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -46,9 +46,11 @@ import com.android.car.apps.common.util.FutureData;
 import com.android.car.media.common.CustomBrowseAction;
 import com.android.car.media.common.MediaItemMetadata;
 import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
+import com.android.car.media.common.source.MediaModels;
 import com.android.car.media.common.source.MediaSource;
 import com.android.car.media.common.source.MediaSourceViewModel;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -67,7 +69,11 @@ public class MediaItemsRepository {
     /** One instance per MEDIA_SOURCE_MODE. */
     private static MediaItemsRepository[] sInstances = new MediaItemsRepository[2];
 
-    /** Returns the MediaItemsRepository "singleton" tied to the application for the given mode. */
+    /**
+     * @deprecated Apps should maintain their own instance(s) of MediaItemsRepository.
+     * {@link MediaModels} can help simplify this.
+     */
+    @Deprecated
     public static MediaItemsRepository get(@NonNull Application application, int mode) {
         if (sInstances[mode] == null) {
             sInstances[mode] = new MediaItemsRepository(
@@ -127,12 +133,11 @@ public class MediaItemsRepository {
     private final MediaItemsLiveData mSearchMediaItems = new MediaItemsLiveData(/*loading*/ false);
     private final MutableLiveData<Map<String, CustomBrowseAction>> mCustomBrowseActions =
             dataOf(Collections.emptyMap());
-
     private String mSearchQuery;
 
-    @VisibleForTesting
     public MediaItemsRepository(LiveData<BrowsingState> browsingState) {
         browsingState.observeForever(this::onMediaBrowsingStateChanged);
+
     }
 
     /**
@@ -142,9 +147,29 @@ public class MediaItemsRepository {
         return mBrowsingStateLiveData;
     }
 
+    /** returns AnalyticsManager or if no browserState returns stub */
+    @NonNull
+    public IAnalyticsManager getAnalyticsManager() {
+        BrowsingState state = mBrowsingStateLiveData.getValue();
+        if (state == null) {
+            Log.i(TAG, "BrowsingState null #getAnalyticsManager() returning stub");
+            return new IAnalyticsManager() {};
+        }
+
+        return state.getAnalyticsManager();
+    }
+
+    /** Returns the root id. Must be called after the source is connected. */
+    public String getRootId() {
+        return getCache().mRootId;
+    }
+
     /**
      * Convenience wrapper for root media items. The live data is the same instance for all
      * media sources.
+     * Note: this call doesn't fetch the items. Something else must call
+     * {@link #getMediaChildren(String, Bundle)} with the result of {@link #getRootId()} once the
+     * browsing state is connected.
      */
     public MediaItemsLiveData getRootMediaItems() {
         return mRootMediaItems;
@@ -165,8 +190,8 @@ public class MediaItemsRepository {
         return mCustomBrowseActions;
     }
 
-    /** Returns the children of the given node. */
-    public MediaItemsLiveData getMediaChildren(String nodeId) {
+    /** Returns the children of the given node. Initiates a MediaBrowserCompat query. */
+    public MediaItemsLiveData getMediaChildren(String nodeId, @NonNull Bundle options) {
         PerMediaSourceCache cache = getCache();
         MediaChildren items = cache.mChildrenByNodeId.get(nodeId);
         if (items == null) {
@@ -176,7 +201,7 @@ public class MediaItemsRepository {
 
         // Always refresh the subscription (to work around bugs in media apps).
         mBrowsingState.mBrowser.unsubscribe(nodeId);
-        mBrowsingState.mBrowser.subscribe(nodeId, mBrowseCallback);
+        mBrowsingState.mBrowser.subscribe(nodeId, options, mBrowseCallback);
 
         return items.mLiveData;
     }
@@ -193,18 +218,18 @@ public class MediaItemsRepository {
     }
 
     /** Sets the search query. Results will be given through {@link #getSearchMediaItems}. */
-    public void setSearchQuery(String query) {
+    public void setSearchQuery(String query, @NonNull Bundle options) {
         mSearchQuery = query;
         if (TextUtils.isEmpty(mSearchQuery)) {
             clearSearchResults();
         } else {
             mSearchMediaItems.setLoading();
-            mBrowsingState.mBrowser.search(mSearchQuery, null, mSearchCallback);
+            mBrowsingState.mBrowser.search(mSearchQuery, options, mSearchCallback);
         }
     }
 
     private void clearSearchResults() {
-        mSearchMediaItems.clear();
+        mSearchMediaItems.onDataLoaded(null, new ArrayList<>());
     }
 
     private MediaSource getMediaSource() {
@@ -223,9 +248,7 @@ public class MediaItemsRepository {
                 mRootMediaItems.setLoading();
                 break;
             case CONNECTED:
-                String rootId = mBrowsingState.mBrowser.getRoot();
-                getCache().mRootId = rootId;
-                getMediaChildren(rootId);
+                getCache().mRootId = mBrowsingState.mBrowser.getRoot();
                 mCustomBrowseActions.postValue(parseBrowseActions(mBrowsingState));
                 break;
             case DISCONNECTING:

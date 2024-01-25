@@ -136,7 +136,7 @@ public class MediaButtonController {
         boolean useMediaSourceColor =
                 mContext.getResources().getBoolean(R.bool.use_media_source_color_for_fab_spinner);
         if (useMediaSourceColor) {
-            model.getMediaSourceColors().observe(owner, this::updateSpinerColors);
+            model.getMediaSourceColors().observe(owner, this::updateSpinnerColors);
         }
         model.getPlaybackStateWrapper().observe(owner, this::onPlaybackStateChanged);
     }
@@ -247,7 +247,7 @@ public class MediaButtonController {
         return PlayPauseStopImageView.ACTION_DISABLED;
     }
 
-    private void updateSpinerColors(MediaSourceColors colors) {
+    private void updateSpinnerColors(MediaSourceColors colors) {
         int color = getMediaSourceColor(colors);
         mCircularProgressBar.setIndeterminateTintList(ColorStateList.valueOf(color));
     }

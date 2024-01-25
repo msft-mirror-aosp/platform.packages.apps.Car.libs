@@ -26,6 +26,8 @@ include ':oem-token-lib'
 project(':oem-token-lib').projectDir = new File('./oem-tokens/lib')
 include ':oem-demo-rro'
 project(':oem-demo-rro').projectDir = new File('./oem-tokens/rro')
+include ':token-compose-compat'
+project(':token-compose-compat').projectDir = new File('./token-compose-compat')
 
 rootProject.name='Chassis'
 include ':car-rotary-lib'

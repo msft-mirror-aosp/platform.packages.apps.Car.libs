@@ -18,6 +18,7 @@ package com.android.car.media.common.source;
 
 import static com.android.car.apps.common.util.CarAppsDebugUtils.idHash;
 import static com.android.car.media.common.MediaConstants.BROWSE_CUSTOM_ACTIONS_ACTION_LIMIT;
+import static com.android.car.media.common.MediaConstants.KEY_ROOT_HINT_MEDIA_SESSION_API;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -28,10 +29,12 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import androidx.car.app.mediaextensions.analytics.host.IAnalyticsManager;
 import androidx.core.util.Preconditions;
 import androidx.media.utils.MediaConstants;
 
 import com.android.car.media.common.R;
+import com.android.car.media.common.analytics.AnalyticsHelper;
 
 import java.util.Objects;
 
@@ -44,6 +47,8 @@ import java.util.Objects;
 public class MediaBrowserConnector {
 
     private static final String TAG = "MediaBrowserConnector";
+
+    private static final Bundle sExtraRootHints = new Bundle();
 
     /**
      * Represents the state of the connection to the media browser service given to
@@ -89,16 +94,39 @@ public class MediaBrowserConnector {
      * {@link ConnectionStatus}.
      */
     public static class BrowsingState {
+        @NonNull final Context mContext;
         @NonNull public final MediaSource mMediaSource;
         @NonNull public final MediaBrowserCompat mBrowser;
         @NonNull public final ConnectionStatus mConnectionStatus;
+        @NonNull final Bundle mRootExtras = new Bundle();
+        @NonNull IAnalyticsManager mAnalyticsManager;
 
         @VisibleForTesting
-        public BrowsingState(@NonNull MediaSource mediaSource, @NonNull MediaBrowserCompat browser,
-                @NonNull ConnectionStatus status) {
+        public BrowsingState(Context context, @NonNull MediaSource mediaSource,
+                @NonNull MediaBrowserCompat browser, @NonNull ConnectionStatus status) {
+            mContext = context;
             mMediaSource = Preconditions.checkNotNull(mediaSource, "source can't be null");
             mBrowser = Preconditions.checkNotNull(browser, "browser can't be null");
             mConnectionStatus = Preconditions.checkNotNull(status, "status can't be null");
+            if (browser.isConnected() && browser.getExtras() != null) {
+                mRootExtras.putAll(browser.getExtras());
+            }
+            mAnalyticsManager = AnalyticsHelper.makeAnalyticsManager(mContext, mMediaSource,
+                    mRootExtras);
+        }
+
+        /** Updates rootextras */
+        public void updateRootExtras(@NonNull Bundle rootExtras) {
+            mRootExtras.clear();
+            mRootExtras.putAll(rootExtras);
+            mAnalyticsManager.sendQueue();
+            mAnalyticsManager = AnalyticsHelper.makeAnalyticsManager(mContext, mMediaSource,
+                    mRootExtras);
+        }
+
+        @NonNull
+        public IAnalyticsManager getAnalyticsManager() {
+            return mAnalyticsManager;
         }
 
         @Override
@@ -129,6 +157,11 @@ public class MediaBrowserConnector {
 
     @Nullable private MediaSource mMediaSource;
     @Nullable private MediaBrowserCompat mBrowser;
+
+    /** Appends some root hints that will be sent to the MediaBrowserCompat. */
+    public static void addRootHints(@NonNull Bundle rootHints) {
+        sExtraRootHints.putAll(rootHints);
+    }
 
     /**
      * Create a new MediaBrowserConnector.
@@ -209,7 +242,20 @@ public class MediaBrowserConnector {
             Log.e(TAG, "sendNewState mBrowser is null!");
             return;
         }
-        mCallback.onBrowserConnectionChanged(new BrowsingState(mMediaSource, mBrowser, cnx));
+        mCallback.onBrowserConnectionChanged(
+                new BrowsingState(mContext, mMediaSource, mBrowser, cnx));
+    }
+
+    /** Disconnect from the {@link MediaBrowserCompat} if it was connected. */
+    public void maybeDisconnect() {
+        if (mBrowser != null && mBrowser.isConnected()) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, "Disconnecting: " + getSourcePackage()
+                        + " mBrowser: " + idHash(mBrowser));
+            }
+            sendNewState(ConnectionStatus.DISCONNECTING);
+            mBrowser.disconnect();
+        }
     }
 
     /**
@@ -220,14 +266,7 @@ public class MediaBrowserConnector {
      * MediaBrowserCompat.ConnectionCallback, android.os.Bundle)
      */
     public void connectTo(@Nullable MediaSource mediaSource) {
-        if (mBrowser != null && mBrowser.isConnected()) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "Disconnecting: " + getSourcePackage()
-                        + " mBrowser: " + idHash(mBrowser));
-            }
-            sendNewState(ConnectionStatus.DISCONNECTING);
-            mBrowser.disconnect();
-        }
+        maybeDisconnect();
 
         mMediaSource = mediaSource;
         if (mMediaSource != null) {
@@ -257,10 +296,12 @@ public class MediaBrowserConnector {
     protected MediaBrowserCompat createMediaBrowser(@NonNull MediaSource mediaSource,
             @NonNull MediaBrowserCompat.ConnectionCallback callback) {
         Bundle rootHints = new Bundle();
+        rootHints.putInt(KEY_ROOT_HINT_MEDIA_SESSION_API, 1);
         rootHints.putInt(MediaConstants.BROWSER_ROOT_HINTS_KEY_MEDIA_ART_SIZE_PIXELS,
                 mMaxBitmapSizePx);
         rootHints.putInt(BROWSE_CUSTOM_ACTIONS_ACTION_LIMIT,
                 mContext.getResources().getInteger(R.integer.max_custom_actions));
+        rootHints.putAll(sExtraRootHints);
         ComponentName browseService = mediaSource.getBrowseServiceComponentName();
         return new MediaBrowserCompat(mContext, browseService, callback, rootHints);
     }
