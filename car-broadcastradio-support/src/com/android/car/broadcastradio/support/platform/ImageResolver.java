@@ -16,8 +16,9 @@
 
 package com.android.car.broadcastradio.support.platform;
 
-import android.annotation.Nullable;
 import android.graphics.Bitmap;
+
+import androidx.annotation.Nullable;
 
 /**
  * Resolves metadata images.

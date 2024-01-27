@@ -16,13 +16,14 @@
 
 package com.android.car.broadcastradio.support;
 
-import android.annotation.NonNull;
-import android.annotation.Nullable;
 import android.graphics.Bitmap;
 import android.hardware.radio.ProgramSelector;
 import android.hardware.radio.RadioManager.ProgramInfo;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.android.car.broadcastradio.support.platform.ProgramInfoExt;
 

@@ -16,22 +16,23 @@
 
 package com.android.car.broadcastradio.support.media;
 
-import android.annotation.NonNull;
-import android.annotation.Nullable;
-import android.annotation.StringRes;
 import android.graphics.Bitmap;
 import android.hardware.radio.ProgramList;
 import android.hardware.radio.ProgramSelector;
 import android.hardware.radio.RadioManager;
 import android.hardware.radio.RadioManager.BandDescriptor;
 import android.hardware.radio.RadioMetadata;
-import android.media.MediaDescription;
-import android.media.browse.MediaBrowser.MediaItem;
 import android.os.Bundle;
-import android.service.media.MediaBrowserService;
-import android.service.media.MediaBrowserService.BrowserRoot;
-import android.service.media.MediaBrowserService.Result;
+import android.support.v4.media.MediaBrowserCompat.MediaItem;
+import android.support.v4.media.MediaDescriptionCompat;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.media.MediaBrowserServiceCompat;
+import androidx.media.MediaBrowserServiceCompat.BrowserRoot;
+import androidx.media.MediaBrowserServiceCompat.Result;
 
 import com.android.car.broadcastradio.support.Program;
 import com.android.car.broadcastradio.support.R;
@@ -133,7 +134,7 @@ public class BrowseTree {
     private final BrowserRoot mRoot = new BrowserRoot(NODE_ROOT, null);
 
     private final Object mLock = new Object();
-    private final @NonNull MediaBrowserService mBrowserService;
+    private final @NonNull MediaBrowserServiceCompat mBrowserService;
     private final @Nullable ImageResolver mImageResolver;
 
     private List<MediaItem> mRootChildren;
@@ -155,7 +156,7 @@ public class BrowseTree {
     @Nullable Set<Program> mFavorites;
     @Nullable private List<MediaItem> mFavoritesCache;
 
-    public BrowseTree(@NonNull MediaBrowserService browserService,
+    public BrowseTree(@NonNull MediaBrowserServiceCompat browserService,
             @Nullable ImageResolver imageResolver) {
         mBrowserService = Objects.requireNonNull(browserService);
         mImageResolver = imageResolver;
@@ -165,9 +166,10 @@ public class BrowseTree {
         return mRoot;
     }
 
-    private static MediaItem createChild(MediaDescription.Builder descBuilder,
-            String mediaId, String title, ProgramSelector sel, Bitmap icon) {
-        MediaDescription desc = descBuilder
+    private static MediaItem createChild(
+            MediaDescriptionCompat.Builder descBuilder, String mediaId, String title,
+            ProgramSelector sel, Bitmap icon) {
+        MediaDescriptionCompat desc = descBuilder
                 .setMediaId(mediaId)
                 .setMediaUri(ProgramSelectorExt.toUri(sel))
                 .setTitle(title)
@@ -176,13 +178,13 @@ public class BrowseTree {
         return new MediaItem(desc, MediaItem.FLAG_PLAYABLE);
     }
 
-    private static MediaItem createFolder(MediaDescription.Builder descBuilder, String mediaId,
-            String title, boolean isBrowseable, boolean isPlayable, long folderType,
-            Bundle extras) {
+    private static MediaItem createFolder(
+            MediaDescriptionCompat.Builder descBuilder, String mediaId, String title,
+            boolean isBrowseable, boolean isPlayable, long folderType, Bundle extras) {
         if (extras == null) extras = new Bundle();
         extras.putLong(EXTRA_BCRADIO_FOLDER_TYPE, folderType);
 
-        MediaDescription desc = descBuilder
+        MediaDescriptionCompat desc = descBuilder
                 .setMediaId(mediaId).setTitle(title).setExtras(extras).build();
 
         int flags = 0;
@@ -273,7 +275,7 @@ public class BrowseTree {
             if (mProgramListCache != null) return mProgramListCache;
             mProgramListCache = new ArrayList<>();
 
-            MediaDescription.Builder dbld = new MediaDescription.Builder();
+            MediaDescriptionCompat.Builder dbld = new MediaDescriptionCompat.Builder();
 
             for (RadioManager.ProgramInfo program : mProgramListSnapshot) {
                 ProgramSelector sel = program.getSelector();
@@ -330,7 +332,7 @@ public class BrowseTree {
             if (mFavoritesCache != null) return mFavoritesCache;
             mFavoritesCache = new ArrayList<>();
 
-            MediaDescription.Builder dbld = new MediaDescription.Builder();
+            MediaDescriptionCompat.Builder dbld = new MediaDescriptionCompat.Builder();
 
             for (Program fav : mFavorites) {
                 ProgramSelector sel = fav.getSelector();
@@ -348,7 +350,7 @@ public class BrowseTree {
             if (mRootChildren != null) return mRootChildren;
             mRootChildren = new ArrayList<>();
 
-            MediaDescription.Builder dbld = new MediaDescription.Builder();
+            MediaDescriptionCompat.Builder dbld = new MediaDescriptionCompat.Builder();
             if (mProgramList != null) {
                 mRootChildren.add(createFolder(dbld, NODE_PROGRAMS,
                         mBrowserService.getString(R.string.program_list_text),
@@ -409,7 +411,7 @@ public class BrowseTree {
             if (isEmpty()) return null;
             Bundle extras = new Bundle();
             extras.putString(EXTRA_BCRADIO_BAND_NAME_EN, mBandNameEn);
-            return createFolder(new MediaDescription.Builder(), mMediaId,
+            return createFolder(new MediaDescriptionCompat.Builder(), mMediaId,
                     mBrowserService.getString(mBandName), true, true, BCRADIO_FOLDER_TYPE_BAND,
                     extras);
         }
@@ -420,7 +422,7 @@ public class BrowseTree {
                 if (isEmpty()) return null;
                 mChannels = new ArrayList<>();
 
-                MediaDescription.Builder dbld = new MediaDescription.Builder();
+                MediaDescriptionCompat.Builder dbld = new MediaDescriptionCompat.Builder();
 
                 for (BandDescriptor band : mBands) {
                     final int lowerLimit = band.getLowerLimit();

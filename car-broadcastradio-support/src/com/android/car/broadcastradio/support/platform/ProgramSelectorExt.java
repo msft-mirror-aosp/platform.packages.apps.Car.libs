@@ -16,14 +16,15 @@
 
 package com.android.car.broadcastradio.support.platform;
 
-import android.annotation.IntDef;
-import android.annotation.NonNull;
-import android.annotation.Nullable;
 import android.hardware.radio.ProgramSelector;
 import android.hardware.radio.ProgramSelector.Identifier;
 import android.hardware.radio.RadioManager;
 import android.net.Uri;
 import android.util.Log;
+
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -75,7 +76,7 @@ public class ProgramSelectorExt {
      *
      * Upper 16 bits are reserved for {@link ProgramInfoExt#NameFlag}.
      */
-    @IntDef(prefix = { "NAME_" }, flag = true, value = {
+    @IntDef(flag = true, value = {
         NAME_NO_MODULATION,
         NAME_MODULATION_ONLY,
     })
@@ -113,7 +114,7 @@ public class ProgramSelectorExt {
     }
 
     // when pushed to the framework, remove similar code from HAL 2.0 service
-    private static @ProgramSelector.ProgramType int identifierToProgramType(
+    private static int identifierToProgramType(
             @NonNull Identifier primaryId) {
         int idType = primaryId.getType();
         switch (idType) {
@@ -230,8 +231,7 @@ public class ProgramSelectorExt {
      * @param type identifier type to check for
      * @return true, if sel contains any identifier of a given type
      */
-    public static boolean hasId(@NonNull ProgramSelector sel,
-            @ProgramSelector.IdentifierType int type) {
+    public static boolean hasId(@NonNull ProgramSelector sel, int type) {
         try {
             sel.getFirstId(type);
             return true;

@@ -34,4 +34,13 @@ android_library {
     dist: {
         targets: ["dist_files"],
     },
+
+    static_libs: [
+        "androidx.legacy_legacy-support-v4",
+    ],
+
+    libs: ["android.car-system-stubs"],
+    min_sdk_version: "33",
+    target_sdk_version: "33",
+    sdk_version: "system_current",
 }

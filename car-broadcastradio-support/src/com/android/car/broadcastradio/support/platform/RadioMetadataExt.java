@@ -16,8 +16,12 @@
 
 package com.android.car.broadcastradio.support.platform;
 
-import android.annotation.NonNull;
+import static android.hardware.radio.RadioMetadata.METADATA_KEY_ART;
+import static android.hardware.radio.RadioMetadata.METADATA_KEY_ICON;
+
 import android.hardware.radio.RadioMetadata;
+
+import androidx.annotation.NonNull;
 
 /**
  * Proposed extensions to android.hardware.radio.RadioMetadata.
@@ -43,7 +47,7 @@ public class RadioMetadataExt {
      * deprecation here and jump straight to the correct solution.
      */
     public static long getGlobalBitmapId(@NonNull RadioMetadata meta, @NonNull String key) {
-        int localId = meta.getBitmapId(key);
+        int localId = getBitmapId(meta, key);
         if (localId == 0) return 0;
 
         /* When generating global bitmap ID, we want them to remain stable between sessions
@@ -56,5 +60,10 @@ public class RadioMetadataExt {
          * service to permanently match modules to their IDs.
          */
         return ((long) sModuleId << 32) | localId;
+    }
+
+    private static int getBitmapId(@NonNull RadioMetadata meta, @NonNull String key) {
+        if (!METADATA_KEY_ICON.equals(key) && !METADATA_KEY_ART.equals(key)) return 0;
+        return meta.getInt(key);
     }
 }
