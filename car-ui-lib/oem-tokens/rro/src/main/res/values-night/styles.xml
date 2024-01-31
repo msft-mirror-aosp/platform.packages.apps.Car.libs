@@ -15,15 +15,34 @@
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <style name="OemStyle">
-        <item name="com.android.oem.tokens:colorPrimary">@android:color/holo_orange_dark</item>
-        <item name="com.android.oem.tokens:colorOnPrimary">@android:color/holo_orange_dark</item>
-        <item name="com.android.oem.tokens:colorPrimaryContainer">@android:color/holo_orange_dark</item>
-        <item name="com.android.oem.tokens:colorOnPrimaryContainer">@android:color/holo_orange_dark</item>
-        <item name="com.android.oem.tokens:colorSecondary">@android:color/holo_orange_dark</item>
-        <item name="com.android.oem.tokens:colorOnSecondary">@android:color/holo_orange_dark</item>
-        <item name="com.android.oem.tokens:colorSecondaryContainer">@android:color/holo_orange_dark</item>
-        <item name="com.android.oem.tokens:colorOnSecondaryContainer">@android:color/holo_orange_dark</item>
-        <item name="com.android.oem.tokens:colorTertiary">@android:color/holo_orange_dark</item>
-        <item name="com.android.oem.tokens:colorOnTertiary">@android:color/holo_orange_dark</item>
+        <item name="com.android.oem.tokens:colorPrimary">#Df8C93</item>
+        <item name="com.android.oem.tokens:colorOnPrimary">#35040E</item>
+        <item name="com.android.oem.tokens:colorPrimaryContainer">#72333A</item>
+        <item name="com.android.oem.tokens:colorOnPrimaryContainer">#Ffdadb</item>
+        <item name="com.android.oem.tokens:colorSecondary">#C0999C</item>
+        <item name="com.android.oem.tokens:colorOnSecondary">#271113</item>
+        <item name="com.android.oem.tokens:colorSecondaryContainer">#5C3F41</item>
+        <item name="com.android.oem.tokens:colorOnSecondaryContainer">#Ffdadb</item>
+        <item name="com.android.oem.tokens:colorTertiary">#C19D6D</item>
+        <item name="com.android.oem.tokens:colorOnTertiary">#241400</item>
+        <item name="com.android.oem.tokens:colorTertiaryContainer">#5D421B</item>
+        <item name="com.android.oem.tokens:colorOnTertiaryContainer">#Ffddb5</item>
+        <item name="com.android.oem.tokens:colorError">#Ffb4Ab</item>
+        <item name="com.android.oem.tokens:colorOnError">#690005</item>
+        <item name="com.android.oem.tokens:colorErrorContainer">#93000A</item>
+        <item name="com.android.oem.tokens:colorOnErrorContainer">#Ffdad6</item>
+        <item name="com.android.oem.tokens:colorOutline">#9F8C8D</item>
+        <item name="com.android.oem.tokens:colorBackground">#1A1112</item>
+        <item name="com.android.oem.tokens:colorOnBackground">#F0Dedf</item>
+        <item name="com.android.oem.tokens:colorSurface">#1A1112</item>
+        <item name="com.android.oem.tokens:colorOnSurface">#F0Dedf</item>
+        <item name="com.android.oem.tokens:colorSurfaceVariant">#524344</item>
+        <item name="com.android.oem.tokens:colorOnSurfaceVariant">#D7C1C2</item>
+        <item name="com.android.oem.tokens:colorSurfaceInverse">#F0Dedf</item>
+        <item name="com.android.oem.tokens:colorOnSurfaceInverse">#382E2E</item>
+        <item name="com.android.oem.tokens:colorPrimaryInverse">#8F4A51</item>
+        <item name="com.android.oem.tokens:colorSurfaceTint">#Ffb2B8</item>
+        <item name="com.android.oem.tokens:colorOutlineVariant">#524344</item>
+        <item name="com.android.oem.tokens:colorScrim">#000000</item>
     </style>
 </resources>
