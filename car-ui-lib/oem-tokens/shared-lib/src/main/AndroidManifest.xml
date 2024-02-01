@@ -16,7 +16,8 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.android.oem.tokens">
+    package="com.android.oem.tokens"
+    android:versionCode="2">
     <application>
         <library android:name="com.android.oem.tokens" />
     </application>
