@@ -20,6 +20,7 @@ import static com.android.car.ui.utils.CarUiUtils.requireViewByRefId;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Switch;
 
@@ -102,32 +103,47 @@ public class CarUiTwoActionSwitchPreference extends CarUiTwoActionBasePreference
                 R.id.car_ui_secondary_action);
         mSwitchWidget = requireViewByRefId(holder.itemView,
                 R.id.car_ui_secondary_action_concrete);
+        boolean firstActionEnabledViewState = isEnabled() || isUxRestricted()
+                || isClickableWhileDisabled();
+        boolean secondaryActionEnabledViewState = isSecondaryActionEnabled() || isUxRestricted()
+                || isClickableWhileDisabled();
 
         holder.itemView.setFocusable(false);
         holder.itemView.setClickable(false);
         firstActionContainer.setOnClickListener(this::performClickUnrestricted);
-        firstActionContainer.setEnabled(
-                isEnabled() || isUxRestricted() || isClickableWhileDisabled());
-        firstActionContainer.setFocusable(
-                isEnabled() || isUxRestricted() || isClickableWhileDisabled());
+        firstActionContainer.setEnabled(firstActionEnabledViewState);
+        firstActionContainer.setFocusable(firstActionEnabledViewState);
 
         secondActionContainer.setVisibility(mSecondaryActionVisible ? View.VISIBLE : View.GONE);
         mSwitchWidget.setChecked(mSecondaryActionChecked);
 
-        secondaryAction.setEnabled(
-                isSecondaryActionEnabled() || isUxRestricted() || isClickableWhileDisabled());
-        mSwitchWidget.setEnabled(
-                isSecondaryActionEnabled() || isUxRestricted() || isClickableWhileDisabled());
+        secondaryAction.setEnabled(secondaryActionEnabledViewState);
+        mSwitchWidget.setEnabled(secondaryActionEnabledViewState);
         secondaryAction.setOnClickListener(v -> performSecondaryActionClick());
         mSwitchWidget.setOnClickListener(v -> performSecondaryActionClick());
+        // When a switch is enabled, its onTouchEvent listens for drag events so that the switch can
+        // be toggled when the thumb is dragged. When this preference's secondary action is ux
+        // restricted or is disabled and clickable, the thumb shouldn't be draggable. So, intercept
+        // touch events and return true (which eats the event). Return false when the secondary
+        // action is enabled and not ux restricted (which will flow into normal touch behavior).
+        mSwitchWidget.setOnTouchListener((view, event) -> {
+            if ((!isSecondaryActionEnabled() && isClickableWhileDisabled()) || isUxRestricted()) {
+                // When handling touch events, the touch listener is responsible for performing a
+                // click if applicable. Only perform click when click is finished (i.e., ACTION_UP).
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    view.performClick();
+                }
+                return true;
+            }
+            // Don't handle the touch event, fallback to default behavior
+            return false;
+        });
         if (mSwitchWidgetFocusable) {
             secondaryAction.setFocusable(false);
-            mSwitchWidget.setFocusable(
-                    isSecondaryActionEnabled() || isUxRestricted() || isClickableWhileDisabled());
+            mSwitchWidget.setFocusable(secondaryActionEnabledViewState);
         } else {
             mSwitchWidget.setFocusable(false);
-            secondaryAction.setFocusable(
-                    isSecondaryActionEnabled() || isUxRestricted() || isClickableWhileDisabled());
+            secondaryAction.setFocusable(secondaryActionEnabledViewState);
         }
 
         CarUiUtils.makeAllViewsEnabledAndUxRestricted(secondaryAction, isSecondaryActionEnabled(),
