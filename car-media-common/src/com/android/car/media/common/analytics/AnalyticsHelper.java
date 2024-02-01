@@ -18,18 +18,14 @@ package com.android.car.media.common.analytics;
 
 import static com.android.car.media.common.analytics.AnalyticsFlags.ANALYTICS_ENABLED;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.support.v4.media.MediaBrowserCompat;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.car.app.mediaextensions.analytics.Constants;
 import androidx.car.app.mediaextensions.analytics.host.AnalyticsManager;
 import androidx.car.app.mediaextensions.analytics.host.IAnalyticsManager;
-
-import com.android.car.media.common.source.MediaSource;
 
 /**
  * Analytics related helper methods.
@@ -38,58 +34,34 @@ public class AnalyticsHelper {
 
     static IAnalyticsManager sIAnalyticsManagerStub = new IAnalyticsManager() {};
 
+
     /**
      * Builds and returns analytics manager.
      * Returns stub if invalid component name or feature not enabled.
+     *
      * @param context
-     * @param rootExtras
-     * @return
+     * @param browser browser to send analytics
+     * @param rootExtras root extras returned by browser
+     * @return IAnalyticsManager implementation.
      */
     public static IAnalyticsManager makeAnalyticsManager(@NonNull Context context,
-            @NonNull MediaSource mediaSource, @NonNull Bundle rootExtras) {
+            @NonNull MediaBrowserCompat browser, @NonNull Bundle rootExtras) {
         int batchinterval  = context.getResources().getInteger(
                 com.android.car.media.common.R.integer.analytics_send_batch_interval);
         int batchSize = context.getResources().getInteger(
                 com.android.car.media.common.R.integer.analytics_send_batch_size);
-        String passkey = AnalyticsHelper.getPasskey(rootExtras);
-        int sessionId = AnalyticsHelper.getSessionId(rootExtras);
-        ComponentName receiverComponentName = AnalyticsHelper.getAnalyticsComponentName(rootExtras);
-        String sourcePackage = mediaSource.getPackageName();
+        boolean optIn = AnalyticsHelper.getOptIn(rootExtras);
 
         // We return unimplemented stub when analytics not enabled. This way we do not need this
         //  check at every capture point.
-        if (!ANALYTICS_ENABLED || receiverComponentName == null
-                || !receiverComponentName.getPackageName().equals(sourcePackage)) {
-            return sIAnalyticsManagerStub;
+        if (ANALYTICS_ENABLED && optIn) {
+            return new AnalyticsManager(context, browser, batchinterval, batchSize);
         } else {
-            return new AnalyticsManager(context, receiverComponentName.flattenToString(), passkey,
-                    sessionId, batchinterval, batchSize);
+            return sIAnalyticsManagerStub;
         }
     }
 
-    /**
-     * Empty string returned indicates no receiver package or invalid package.
-     */
-    @Nullable
-    private static ComponentName getAnalyticsComponentName(@NonNull Bundle rootExtras) {
-        String receiverComponentName =
-                rootExtras.getString(Constants.ANALYTICS_ROOT_KEY_BROADCAST_COMPONENT_NAME);
-
-        // Check null/empty
-        if (TextUtils.isEmpty(receiverComponentName)) {
-            return null;
-        }
-
-        return ComponentName.unflattenFromString(receiverComponentName);
-    }
-
-    @Nullable
-    private static String getPasskey(@NonNull Bundle rootExtras) {
-        return rootExtras.getString(Constants.ANALYTICS_ROOT_KEY_PASSKEY);
-    }
-
-    @Nullable
-    private static int getSessionId(@NonNull Bundle rootExtras) {
-        return rootExtras.getInt(Constants.ANALYTICS_ROOT_KEY_SESSION_ID);
+    private static boolean getOptIn(Bundle rootExtras) {
+        return rootExtras.getBoolean(Constants.ANALYTICS_ROOT_KEY_OPT_IN, false);
     }
 }

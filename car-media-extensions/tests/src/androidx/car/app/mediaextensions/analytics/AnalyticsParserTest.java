@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package  androidx.car.app.mediaextensions.analytics;
+package androidx.car.app.mediaextensions.analytics;
 
 import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_BROWSE_NODE_CHANGE;
+import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_BUNDLE_ARRAY_KEY;
 import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_DATA_KEY_EVENT_NAME;
 import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_DATA_KEY_HOST_COMPONENT_ID;
 import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_DATA_KEY_ITEM_IDS;
@@ -27,10 +28,11 @@ import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVE
 import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_MEDIA_CLICKED;
 import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_VIEW_CHANGE;
 import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_VISIBLE_ITEMS;
-import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_ROOT_KEY_PASSKEY;
+import static androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent.VIEW_COMPONENT_BROWSE_LIST;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
@@ -45,9 +47,12 @@ import androidx.car.app.mediaextensions.analytics.client.AnalyticsCallback;
 import androidx.car.app.mediaextensions.analytics.client.AnalyticsParser;
 import androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent;
 import androidx.car.app.mediaextensions.analytics.event.BrowseChangeEvent;
+import androidx.car.app.mediaextensions.analytics.event.ErrorEvent;
 import androidx.car.app.mediaextensions.analytics.event.MediaClickedEvent;
 import androidx.car.app.mediaextensions.analytics.event.ViewChangeEvent;
 import androidx.car.app.mediaextensions.analytics.event.VisibleItemsEvent;
+
+import com.google.common.collect.Lists;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -63,21 +68,16 @@ import org.mockito.junit.MockitoRule;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.Executor;
 
 @RunWith(AndroidJUnit4.class)
-public class AnalyticsParserTests {
+public class AnalyticsParserTest {
     @Rule public final MockitoRule mockito = MockitoJUnit.rule();
 
     @Mock
     AnalyticsCallback mAnalyticsCallback;
 
     @Captor ArgumentCaptor<AnalyticsEvent> mEventArgCaptor;
-
-    @Captor ArgumentCaptor<Integer> mErrorArgCaptor;
-
-    private final UUID mPassKey = UUID.randomUUID();
 
     private final Executor mExecutor = Runnable::run;
 
@@ -87,7 +87,51 @@ public class AnalyticsParserTests {
     }
 
     @Test
-    public void parserCallbackTimeComponentTest() {
+    public void isAnalyticsActionTest() {
+        String action = "incorrect";
+        boolean isAnalyticsAction = AnalyticsParser.isAnalyticsAction(action);
+        assertFalse(isAnalyticsAction);
+
+        action = Constants.ACTION_ANALYTICS;
+        isAnalyticsAction = AnalyticsParser.isAnalyticsAction(action);
+        assertTrue(isAnalyticsAction);
+    }
+
+
+    @Test
+    public void parserCallbackAction() throws InterruptedException {
+        Bundle bundle1 = createTestBundle(ANALYTICS_EVENT_MEDIA_CLICKED);
+        String mediaID = "test_media_id_1";
+        bundle1.putString(ANALYTICS_EVENT_DATA_KEY_MEDIA_ID, mediaID);
+
+        Bundle bundle2 = createTestBundle(ANALYTICS_EVENT_VIEW_CHANGE);
+        int viewID = VIEW_COMPONENT_BROWSE_LIST;
+        bundle2.putInt(ANALYTICS_EVENT_DATA_KEY_VIEW_COMPONENT, viewID);
+
+        Bundle list = new Bundle();
+        list.putParcelableArrayList(ANALYTICS_EVENT_BUNDLE_ARRAY_KEY,
+                Lists.newArrayList(bundle1, bundle2));
+
+        AnalyticsParser.parseAnalyticsAction(Constants.ACTION_ANALYTICS, list,
+                mExecutor, mAnalyticsCallback);
+
+        verify(mAnalyticsCallback).onMediaClickedEvent(
+                (MediaClickedEvent) mEventArgCaptor.capture());
+        verify(mAnalyticsCallback).onViewChangeEvent(
+                (ViewChangeEvent) mEventArgCaptor.capture());
+        verifyNoMoreInteractions(mAnalyticsCallback); // Verify onError not called
+
+        List<AnalyticsEvent> events = mEventArgCaptor.getAllValues();
+
+        MediaClickedEvent clickEvent = (MediaClickedEvent) events.get(0);
+        ViewChangeEvent viewEvent = (ViewChangeEvent) events.get(1);
+
+        assertEquals(mediaID, clickEvent.getMediaId());
+        assertEquals(viewID, viewEvent.getViewComponent());
+    }
+
+    @Test
+    public void parserCallbackTimeComponentTest() throws InterruptedException {
         Bundle bundle = createTestBundle(ANALYTICS_EVENT_MEDIA_CLICKED);
         String mediaID = "test_media_id_1";
         bundle.putString(ANALYTICS_EVENT_DATA_KEY_MEDIA_ID, mediaID);
@@ -99,8 +143,8 @@ public class AnalyticsParserTests {
         AnalyticsEvent event = mEventArgCaptor.getValue();
         ComponentName componentName =
                 new ComponentName(
-                        AnalyticsParserTests.class.getPackage().toString(),
-                        AnalyticsParserTests.class.getName());
+                        AnalyticsParserTest.class.getPackage().toString(),
+                        AnalyticsParserTest.class.getName());
         assertEquals(componentName.flattenToString(), event.getComponent());
         assertTrue(event.getTimestampMillis() > 0);
         assertTrue(event.getAnalyticsVersion() > 0);
@@ -160,9 +204,9 @@ public class AnalyticsParserTests {
     @Test
     public void parserCallbackViewEntryTest() {
         Bundle bundle = createTestBundle(ANALYTICS_EVENT_VIEW_CHANGE);
-        int viewComponent = AnalyticsEvent.VIEW_COMPONENT_BROWSE_LIST;
+        int viewComponent = VIEW_COMPONENT_BROWSE_LIST;
         bundle.putInt(ANALYTICS_EVENT_DATA_KEY_VIEW_COMPONENT, viewComponent);
-        bundle.putInt(ANALYTICS_EVENT_DATA_KEY_VIEW_ACTION, AnalyticsEvent.VIEW_ACTION_SHOW);
+        bundle.putInt(ANALYTICS_EVENT_DATA_KEY_VIEW_ACTION, ViewChangeEvent.VIEW_ACTION_SHOW);
         AnalyticsParser.parseAnalyticsBundle(bundle, mExecutor, mAnalyticsCallback);
         verify(mAnalyticsCallback)
                 .onViewChangeEvent((ViewChangeEvent) mEventArgCaptor.capture());
@@ -172,15 +216,15 @@ public class AnalyticsParserTests {
         int eventViewType = event.getViewComponent();
         assertEquals(eventViewType, viewComponent);
         int type = event.getViewAction();
-        assertEquals(type, AnalyticsEvent.VIEW_ACTION_SHOW);
+        assertEquals(type, ViewChangeEvent.VIEW_ACTION_SHOW);
     }
 
     @Test
     public void parserCallbackViewExitTest() {
         Bundle bundle = createTestBundle(ANALYTICS_EVENT_VIEW_CHANGE);
-        int viewComponent = AnalyticsEvent.VIEW_COMPONENT_BROWSE_LIST;
+        int viewComponent = VIEW_COMPONENT_BROWSE_LIST;
         bundle.putInt(ANALYTICS_EVENT_DATA_KEY_VIEW_COMPONENT, viewComponent);
-        bundle.putInt(ANALYTICS_EVENT_DATA_KEY_VIEW_ACTION, AnalyticsEvent.VIEW_ACTION_HIDE);
+        bundle.putInt(ANALYTICS_EVENT_DATA_KEY_VIEW_ACTION, ViewChangeEvent.VIEW_ACTION_HIDE);
         AnalyticsParser.parseAnalyticsBundle(bundle, mExecutor, mAnalyticsCallback);
         verify(mAnalyticsCallback)
                 .onViewChangeEvent((ViewChangeEvent) mEventArgCaptor.capture());
@@ -190,19 +234,93 @@ public class AnalyticsParserTests {
         int eventViewType = event.getViewComponent();
         assertEquals(eventViewType, viewComponent);
         int type = event.getViewAction();
-        assertEquals(type, AnalyticsEvent.VIEW_ACTION_HIDE);
+        assertEquals(type, ViewChangeEvent.VIEW_ACTION_HIDE);
+    }
+
+    @Test
+    public void parserCallbackErrorEmptyBundleTest() {
+        AnalyticsParser.parseAnalyticsBundle(new Bundle(), mExecutor, mAnalyticsCallback);
+        verify(mAnalyticsCallback)
+                .onErrorEvent((ErrorEvent) mEventArgCaptor.capture());
+        verifyNoMoreInteractions(mAnalyticsCallback); // Verify onError not called
+        assertTrue(mEventArgCaptor.getValue() instanceof ErrorEvent);
+        ErrorEvent event = (ErrorEvent) mEventArgCaptor.getValue();
+        int errorCode = event.getErrorCode();
+        assertEquals(errorCode, ErrorEvent.ERROR_CODE_INVALID_EVENT);
+        int type = event.getEventType();
+        assertEquals(type, AnalyticsEvent.EVENT_TYPE_ERROR_EVENT);
+    }
+
+    @Test
+    public void parserCallbackErrorInvalidActionTest() {
+        AnalyticsParser.parseAnalyticsAction("bad_action",
+                createTestBundle(ANALYTICS_EVENT_VIEW_CHANGE),
+                mExecutor, mAnalyticsCallback);
+        verify(mAnalyticsCallback)
+                .onErrorEvent((ErrorEvent) mEventArgCaptor.capture());
+        verifyNoMoreInteractions(mAnalyticsCallback); // Verify onError not called
+        assertTrue(mEventArgCaptor.getValue() instanceof ErrorEvent);
+        ErrorEvent event = (ErrorEvent) mEventArgCaptor.getValue();
+        int errorCode = event.getErrorCode();
+        assertEquals(errorCode, ErrorEvent.ERROR_CODE_INVALID_EVENT);
+        int type = event.getEventType();
+        assertEquals(type, AnalyticsEvent.EVENT_TYPE_ERROR_EVENT);
+    }
+
+    @Test
+    public void parserCallbackErrorInvalidExtrasTest() {
+        AnalyticsParser.parseAnalyticsAction(Constants.ACTION_ANALYTICS,
+                new Bundle(), mExecutor, mAnalyticsCallback);
+        verify(mAnalyticsCallback)
+                .onErrorEvent((ErrorEvent) mEventArgCaptor.capture());
+        verifyNoMoreInteractions(mAnalyticsCallback); // Verify onError not called
+        assertTrue(mEventArgCaptor.getValue() instanceof ErrorEvent);
+        ErrorEvent event = (ErrorEvent) mEventArgCaptor.getValue();
+        int errorCode = event.getErrorCode();
+        assertEquals(errorCode, ErrorEvent.ERROR_CODE_INVALID_EXTRAS);
+        int type = event.getEventType();
+        assertEquals(type, AnalyticsEvent.EVENT_TYPE_ERROR_EVENT);
+    }
+
+    @Test
+    public void parserCallbackErrorInvalidEventNameTest() {
+        Bundle eventBundle = createTestBundle("");
+        AnalyticsParser.parseAnalyticsBundle(eventBundle, mExecutor, mAnalyticsCallback);
+        verify(mAnalyticsCallback)
+                .onErrorEvent((ErrorEvent) mEventArgCaptor.capture());
+        verifyNoMoreInteractions(mAnalyticsCallback); // Verify onError not called
+        assertTrue(mEventArgCaptor.getValue() instanceof ErrorEvent);
+        ErrorEvent event = (ErrorEvent) mEventArgCaptor.getValue();
+        int errorCode = event.getErrorCode();
+        assertEquals(errorCode, ErrorEvent.ERROR_CODE_INVALID_EVENT);
+        int type = event.getEventType();
+        assertEquals(type, AnalyticsEvent.EVENT_TYPE_ERROR_EVENT);
+    }
+
+    @Test
+    public void parserCallbackErrorInvalidBundlesTest() {
+        AnalyticsParser.parseAnalyticsAction(Constants.ACTION_ANALYTICS,
+                createTestBundle(ANALYTICS_EVENT_VIEW_CHANGE), mExecutor, mAnalyticsCallback);
+        verify(mAnalyticsCallback)
+                .onErrorEvent((ErrorEvent) mEventArgCaptor.capture());
+        verifyNoMoreInteractions(mAnalyticsCallback); // Verify onError not called
+        assertTrue(mEventArgCaptor.getValue() instanceof ErrorEvent);
+        ErrorEvent event = (ErrorEvent) mEventArgCaptor.getValue();
+        int errorCode = event.getErrorCode();
+        assertEquals(ErrorEvent.ERROR_CODE_INVALID_BUNDLE, errorCode);
+        int type = event.getEventType();
+        assertEquals(AnalyticsEvent.EVENT_TYPE_ERROR_EVENT, type);
     }
 
     private Bundle createTestBundle(String eventName) {
         Bundle bundle = new Bundle();
-        bundle.putString(ANALYTICS_ROOT_KEY_PASSKEY, mPassKey.toString());
         bundle.putString(ANALYTICS_EVENT_DATA_KEY_EVENT_NAME, eventName);
         bundle.putLong(ANALYTICS_EVENT_DATA_KEY_TIMESTAMP, System.currentTimeMillis());
         bundle.putInt(ANALYTICS_EVENT_DATA_KEY_VERSION, 1);
         ComponentName componentName =
                 new ComponentName(
-                        AnalyticsParserTests.class.getPackage().toString(),
-                        AnalyticsParserTests.class.getName());
+                        AnalyticsParserTest.class.getPackage().toString(),
+                        AnalyticsParserTest.class.getName());
         bundle.putString(
                 ANALYTICS_EVENT_DATA_KEY_HOST_COMPONENT_ID, componentName.flattenToString());
         return bundle;

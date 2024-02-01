@@ -115,7 +115,7 @@ public class MediaBrowserConnector {
             if (browser != null && browser.isConnected() && browser.getExtras() != null) {
                 mRootExtras.putAll(browser.getExtras());
             }
-            mAnalyticsManager = AnalyticsHelper.makeAnalyticsManager(mContext, mMediaSource,
+            mAnalyticsManager = AnalyticsHelper.makeAnalyticsManager(mContext, browser,
                     mRootExtras);
         }
 
@@ -124,7 +124,7 @@ public class MediaBrowserConnector {
             mRootExtras.clear();
             mRootExtras.putAll(rootExtras);
             mAnalyticsManager.sendQueue();
-            mAnalyticsManager = AnalyticsHelper.makeAnalyticsManager(mContext, mMediaSource,
+            mAnalyticsManager = AnalyticsHelper.makeAnalyticsManager(mContext, mBrowser,
                     mRootExtras);
         }
 
@@ -255,6 +255,11 @@ public class MediaBrowserConnector {
                 Log.d(TAG, "Disconnecting: " + getSourcePackage()
                         + " mBrowser: " + idHash(mBrowser));
             }
+
+            // Send queued analytic events before we disconnect.
+            Bundle rootExtras =  mBrowser.getExtras() == null ? new Bundle() : mBrowser.getExtras();
+            AnalyticsHelper.makeAnalyticsManager(mContext, mBrowser, rootExtras).sendQueue();
+
             sendNewState(ConnectionStatus.DISCONNECTING);
             mBrowser.disconnect();
         }
