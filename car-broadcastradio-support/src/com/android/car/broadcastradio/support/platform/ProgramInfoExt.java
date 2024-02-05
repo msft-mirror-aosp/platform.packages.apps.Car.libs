@@ -23,6 +23,7 @@ import android.hardware.radio.RadioManager.ProgramInfo;
 import android.hardware.radio.RadioMetadata;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 
 import androidx.annotation.IntDef;
@@ -51,7 +52,7 @@ public class ProgramInfoExt {
     /**
      * Flags to control how to fetch program name with {@link #getProgramName}.
      *
-     * Lower 16 bits are reserved for {@link ProgramSelectorExt#NameFlag}.
+     * Lower 16 bits are reserved for {@link ProgramSelectorExt.NameFlag}.
      */
     @IntDef(flag = true, value = {
         ProgramSelectorExt.NAME_NO_MODULATION,
@@ -129,7 +130,7 @@ public class ProgramInfoExt {
     }
 
     /**
-     * Proposed reimplementation of {@link RadioManager#ProgramInfo#getMetadata}.
+     * Proposed reimplementation of {@link RadioManager.ProgramInfo#getMetadata}.
      *
      * As opposed to the original implementation, it never returns null.
      */
@@ -143,25 +144,25 @@ public class ProgramInfoExt {
     }
 
     /**
-     * Converts {@link ProgramInfo} to {@link MediaMetadata} for displaying.
+     * Converts {@link ProgramInfo} to {@link MediaMetadataCompat} for displaying.
      *
      * <p>This method is meant to be used for displaying the currently playing station in
-     *  {@link MediaSession}, only a subset of keys populated in {@link ProgramInfo#toMediaMetadata}
+     *  {@link MediaSessionCompat}, only a subset of keys populated in {@link #toMediaMetadata}
      *  will be populated in this method.
      *
      * <ul>
-     * The following keys will be populated in the {@link MediaMetadata}:
-     *  <li>{@link MediaMetadata#METADATA_KEY_DISPLAY_TITLE}</li>
-     *  <li>{@link MediaMetadata#METADATA_KEY_DISPLAY_SUBTITLE}</li>
-     *  <li>{@link MediaMetadata#METADATA_KEY_ALBUM_ART}</li>
-     *  <li>{@link MediaMetadata#METADATA_KEY_USER_RATING}</li>
+     * The following keys will be populated in the {@link MediaMetadataCompat}:
+     *  <li>{@link MediaMetadataCompat#METADATA_KEY_DISPLAY_TITLE}</li>
+     *  <li>{@link MediaMetadataCompat#METADATA_KEY_DISPLAY_SUBTITLE}</li>
+     *  <li>{@link MediaMetadataCompat#METADATA_KEY_ALBUM_ART}</li>
+     *  <li>{@link MediaMetadataCompat#METADATA_KEY_USER_RATING}</li>
      * <ul/>
      *
      * @param info {@link ProgramInfo} to convert
      * @param isFavorite {@code true}, if a given program is a favorite
      * @param imageResolver metadata images resolver/cache
      * @param programNameOrder order of keys to look for program name in {@link ProgramInfo}
-     * @return {@link MediaMetadata} object
+     * @return {@link MediaMetadataCompat} object
      */
     @NonNull
     public static MediaMetadataCompat toMediaDisplayMetadata(@NonNull ProgramInfo info,
@@ -196,25 +197,26 @@ public class ProgramInfoExt {
     }
 
     /**
-     * Converts {@link ProgramInfo} to {@link MediaMetadata}.
+     * Converts {@link ProgramInfo} to {@link MediaMetadataCompat}.
      *
-     * <p>This method is meant to be used for currently playing station in {@link MediaSession}.
+     * <p>This method is meant to be used for currently playing station in
+     * {@link MediaSessionCompat}.
      *
      * <ul>
-     * The following keys will be populated in the {@link MediaMetadata}:
-     *  <li>{@link MediaMetadata#METADATA_KEY_DISPLAY_TITLE}</li>
-     *  <li>{@link MediaMetadata#METADATA_KEY_TITLE}</li>
-     *  <li>{@link MediaMetadata#METADATA_KEY_ARTIST}</li>
-     *  <li>{@link MediaMetadata#METADATA_KEY_ALBUM}</li>
-     *  <li>{@link MediaMetadata#METADATA_KEY_DISPLAY_SUBTITLE}</li>
-     *  <li>{@link MediaMetadata#METADATA_KEY_ALBUM_ART}</li>
-     *  <li>{@link MediaMetadata#METADATA_KEY_USER_RATING}</li>
+     * The following keys will be populated in the {@link MediaMetadataCompat}:
+     *  <li>{@link MediaMetadataCompat#METADATA_KEY_DISPLAY_TITLE}</li>
+     *  <li>{@link MediaMetadataCompat#METADATA_KEY_TITLE}</li>
+     *  <li>{@link MediaMetadataCompat#METADATA_KEY_ARTIST}</li>
+     *  <li>{@link MediaMetadataCompat#METADATA_KEY_ALBUM}</li>
+     *  <li>{@link MediaMetadataCompat#METADATA_KEY_DISPLAY_SUBTITLE}</li>
+     *  <li>{@link MediaMetadataCompat#METADATA_KEY_ALBUM_ART}</li>
+     *  <li>{@link MediaMetadataCompat#METADATA_KEY_USER_RATING}</li>
      * <ul/>
      *
      * @param info {@link ProgramInfo} to convert
      * @param isFavorite {@code true}, if a given program is a favorite
      * @param imageResolver metadata images resolver/cache
-     * @return {@link MediaMetadata} object
+     * @return {@link MediaMetadataCompat} object
      */
     public static @NonNull MediaMetadataCompat toMediaMetadata(@NonNull ProgramInfo info,
             boolean isFavorite, @Nullable ImageResolver imageResolver) {

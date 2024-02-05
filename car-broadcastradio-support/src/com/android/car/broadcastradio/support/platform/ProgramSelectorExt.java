@@ -74,7 +74,7 @@ public class ProgramSelectorExt {
     /**
      * Flags to control how channel values are converted to string with {@link #getDisplayName}.
      *
-     * Upper 16 bits are reserved for {@link ProgramInfoExt#NameFlag}.
+     * Upper 16 bits are reserved for {@link ProgramInfoExt.NameFlag}.
      */
     @IntDef(flag = true, value = {
         NAME_NO_MODULATION,
