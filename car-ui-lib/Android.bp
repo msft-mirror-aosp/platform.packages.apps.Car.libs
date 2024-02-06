@@ -35,6 +35,8 @@ android_library {
     sdk_version: "current",
     min_sdk_version: "28",
     target_sdk_version: "30",
+    // sc-car only supports up to java 8.
+    java_version: "1.8",
 
     manifest: "car-ui-lib/src/main/AndroidManifest-resourceOnly.xml",
     resource_dirs: [
@@ -61,6 +63,8 @@ android_library {
     sdk_version: "current",
     min_sdk_version: "28",
     target_sdk_version: "30",
+    // sc-car only supports up to java 8.
+    java_version: "1.8",
 
     manifest: "car-ui-lib/src/main/AndroidManifest-resourceOnly.xml",
     resource_dirs: [
@@ -82,6 +86,8 @@ android_library {
     sdk_version: "current",
     min_sdk_version: "28",
     target_sdk_version: "30",
+    // sc-car only supports up to java 8.
+    java_version: "1.8",
 
     manifest: "car-ui-lib/src/main/AndroidManifest.xml",
     srcs: ["car-ui-lib/src/main/java/**/*.java"],
@@ -134,6 +140,8 @@ android_library {
     sdk_version: "current",
     min_sdk_version: "28",
     target_sdk_version: "30",
+    // sc-car only supports up to java 8.
+    java_version: "1.8",
 
     manifest: "car-ui-lib/src/main/AndroidManifest.xml",
     srcs: ["car-ui-lib/src/main/java/**/*.java"],
@@ -201,6 +209,8 @@ android_library {
     sdk_version: "current",
     min_sdk_version: "28",
     target_sdk_version: "30",
+    // sc-car only supports up to java 8.
+    java_version: "1.8",
 
     manifest: "car-ui-lib/src/main/AndroidManifest.xml",
     srcs: [
@@ -243,6 +253,8 @@ android_library {
     sdk_version: "current",
     min_sdk_version: "28",
     target_sdk_version: "30",
+    // sc-car only supports up to java 8.
+    java_version: "1.8",
 
     manifest: "car-ui-lib-testing/src/main/AndroidManifest.xml",
     srcs: [
