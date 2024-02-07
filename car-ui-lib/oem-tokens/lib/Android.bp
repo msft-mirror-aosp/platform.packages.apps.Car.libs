@@ -15,9 +15,13 @@
 // MUST be a resource only library
 android_library {
     name: "oem-token-lib-source",
+
     min_sdk_version: "28",
     target_sdk_version: "33",
     sdk_version: "current",
+    // sc-car only supports up to java 8.
+    java_version: "1.8",
+
     manifest: "src/main/AndroidManifest.xml",
     srcs: ["src/main/java/**/*.java"],
     resource_dirs: [
