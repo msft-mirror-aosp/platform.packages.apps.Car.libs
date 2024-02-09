@@ -35,7 +35,6 @@ import com.android.car.ui.AlertDialogBuilder;
 import com.android.car.ui.core.CarUi;
 import com.android.car.ui.paintbooth.R;
 import com.android.car.ui.recyclerview.CarUiContentListItem;
-import com.android.car.ui.recyclerview.CarUiListItemAdapter;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.toolbar.NavButtonMode;
 import com.android.car.ui.toolbar.ToolbarController;
@@ -218,7 +217,7 @@ public class DialogsActivity extends Activity {
         dialog[0] = new AlertDialogBuilder(this)
                 .setTitle("Select one option.")
                 .setSubtitle("Ony one option may be selected at a time")
-                .setAdapter(new CarUiListItemAdapter(data))
+                .setItems(data)
                 .setAllowDismissButton(false)
                 .show();
     }
@@ -256,14 +255,14 @@ public class DialogsActivity extends Activity {
 
         new AlertDialogBuilder(this)
                 .setTitle("Unfocusable items")
-                .setAdapter(new CarUiListItemAdapter(data))
+                .setItems(data)
                 .show();
     }
 
     private void showDialogWithEmptyList() {
         new AlertDialogBuilder(this)
                 .setTitle("Empty list")
-                .setAdapter(new CarUiListItemAdapter(new ArrayList<CarUiContentListItem>()))
+                .setItems(new ArrayList<CarUiContentListItem>())
                 .show();
     }
 
