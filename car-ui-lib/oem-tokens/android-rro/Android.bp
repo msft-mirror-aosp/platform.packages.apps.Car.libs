@@ -12,24 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-android_app {
-    name: "demo-token-rro",
-    resource_dirs: ["src/main/res"],
-    manifest: "src/main/AndroidManifest.xml",
-    sdk_version: "current",
-    aaptflags: [
-        "--no-resource-deduping",
-        "--no-resource-removal"
-    ],
-    libs: [
-       "token-shared-lib",
-    ],
-    enforce_uses_libs:false,
-    static_libs: [
-       "token-customization-base",
-    ],
-    dex_preopt: {
-        enabled: false,
-    },
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
 }
 
+runtime_resource_overlay {
+    name: "token-android-rro",
+    resource_dirs: ["res"],
+    certificate: "platform",
+    manifest: "AndroidManifest.xml",
+    system_ext_specific: true,
+    static_libs: [
+        "token-customization-base"
+    ],
+}
