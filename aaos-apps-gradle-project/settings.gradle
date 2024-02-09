@@ -22,6 +22,9 @@ include ':PaintBooth'
 project(':PaintBooth').projectDir = new File('../car-ui-lib/paintbooth')
 include ':oem-apis'
 project(':oem-apis').projectDir = new File('../car-ui-lib/oem-apis')
+include ':proxy-plugin'
+project(':proxy-plugin').projectDir = new File('../car-ui-lib/proxy-plugin')
+
 include ':car-rotary-lib'
 project(':car-rotary-lib').projectDir = new File('../car-ui-lib/car-rotary-lib')
 include ':car-ui-lib-testing'
