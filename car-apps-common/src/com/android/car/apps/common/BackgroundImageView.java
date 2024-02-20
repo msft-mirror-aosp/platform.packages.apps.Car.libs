@@ -15,11 +15,15 @@
  */
 package com.android.car.apps.common;
 
+import static android.graphics.Shader.TileMode.MIRROR;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.RenderEffect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Size;
 import android.view.View;
@@ -78,6 +82,18 @@ public class BackgroundImageView extends ConstraintLayout {
         setImageAdditionalScale(extraScale);
     }
 
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            int averageDim = (mImageView.getWidth() + mImageView.getHeight()) / 2;
+            float radius = mBitmapBlurPercent * averageDim;
+            RenderEffect blur = RenderEffect.createBlurEffect(radius, radius, MIRROR);
+            mImageView.setRenderEffect(blur);
+        }
+    }
+
     /**
      * @deprecated Use {@link #setBackgroundDrawable} instead, and make sure to only call when the
      * image is actually different! TODO(b/139387273).
@@ -87,8 +103,8 @@ public class BackgroundImageView extends ConstraintLayout {
      */
     @Deprecated
     public void setBackgroundImage(@Nullable Bitmap bitmap, boolean showAnimation) {
-        Drawable drawable = (bitmap != null) ? new BitmapDrawable(bitmap) : null;
-        updateBlur(drawable, showAnimation);
+        Drawable drawable = (bitmap != null) ? new BitmapDrawable(getResources(), bitmap) : null;
+        updateImage(drawable, showAnimation);
     }
 
     /** Sets the drawable that will be displayed blurred by this view. */
@@ -101,18 +117,18 @@ public class BackgroundImageView extends ConstraintLayout {
      * enabled.
      */
     public void setBackgroundDrawable(@Nullable Drawable drawable, boolean showAnimation) {
-        updateBlur(drawable, showAnimation);
+        updateImage(drawable, showAnimation);
     }
 
-    private void updateBlur(@Nullable Drawable drawable, boolean showAnimation) {
+    private void updateImage(@Nullable Drawable drawable, boolean showAnimation) {
         if (drawable == null) {
             mImageView.setImageBitmap(null, false);
             return;
         }
 
-        Bitmap src = BitmapUtils.fromDrawable(drawable, mBitmapTargetSize);
-        Bitmap blurred = ImageUtils.blur(getContext(), src, mBitmapTargetSize, mBitmapBlurPercent);
-        mImageView.setImageBitmap(blurred, showAnimation);
+        Bitmap bmp = BitmapUtils.fromDrawable(drawable, mBitmapTargetSize);
+        mImageView.setImageBitmap(bmp, showAnimation);
+
         invalidate();
         requestLayout();
     }
