@@ -438,7 +438,7 @@
     </style>
 
     <style name="BaseTextAppearance">
-        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:textColor">?oemColorOnBackground</item>
         <item name="android:textColorHighlight">?android:textColorHighlight</item>
         <item name="android:textColorHint">?android:textColorHint</item>
         <item name="android:textColorLink">?android:textColorLink</item>

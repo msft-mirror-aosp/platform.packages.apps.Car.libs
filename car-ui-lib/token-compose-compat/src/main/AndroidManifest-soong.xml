@@ -15,5 +15,5 @@
      limitations under the License.
 -->
 
-<manifest>
+<manifest package="com.android.car.oem.tokens.compose.compat">
 </manifest>

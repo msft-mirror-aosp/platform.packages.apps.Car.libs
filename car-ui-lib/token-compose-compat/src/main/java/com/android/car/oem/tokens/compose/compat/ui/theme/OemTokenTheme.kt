@@ -104,49 +104,64 @@ fun oemColorScheme(oemContext: Context): ColorScheme {
 @Composable
 fun oemTypography(oemContext: Context): Typography {
     val oemTextAppearanceDisplayLarge = Token.getTextAppearance(
-        oemContext, R.attr.oemTextAppearanceDisplayLarge
+        oemContext,
+        R.attr.oemTextAppearanceDisplayLarge
     )
     val oemTextAppearanceDisplayMedium = Token.getTextAppearance(
-        oemContext, R.attr.oemTextAppearanceDisplayMedium
+        oemContext,
+        R.attr.oemTextAppearanceDisplayMedium
     )
     val oemTextAppearanceDisplaySmall = Token.getTextAppearance(
-        oemContext, R.attr.oemTextAppearanceDisplaySmall
+        oemContext,
+        R.attr.oemTextAppearanceDisplaySmall
     )
     val oemTextAppearanceHeadlineLarge = Token.getTextAppearance(
-        oemContext, R.attr.oemTextAppearanceHeadlineLarge
+        oemContext,
+        R.attr.oemTextAppearanceHeadlineLarge
     )
     val oemTextAppearanceHeadlineMedium = Token.getTextAppearance(
-        oemContext, R.attr.oemTextAppearanceHeadlineMedium
+        oemContext,
+        R.attr.oemTextAppearanceHeadlineMedium
     )
     val oemTextAppearanceHeadlineSmall = Token.getTextAppearance(
-        oemContext, R.attr.oemTextAppearanceHeadlineSmall
+        oemContext,
+        R.attr.oemTextAppearanceHeadlineSmall
     )
     val oemTextAppearanceTitleLarge = Token.getTextAppearance(
-        oemContext, R.attr.oemTextAppearanceTitleLarge
+        oemContext,
+        R.attr.oemTextAppearanceTitleLarge
     )
     val oemTextAppearanceTitleMedium = Token.getTextAppearance(
-        oemContext, R.attr.oemTextAppearanceTitleMedium
+        oemContext,
+        R.attr.oemTextAppearanceTitleMedium
     )
     val oemTextAppearanceTitleSmall = Token.getTextAppearance(
-        oemContext, R.attr.oemTextAppearanceTitleSmall
+        oemContext,
+        R.attr.oemTextAppearanceTitleSmall
     )
     val oemTextAppearanceBodyLarge = Token.getTextAppearance(
-        oemContext, R.attr.oemTextAppearanceBodyLarge
+        oemContext,
+        R.attr.oemTextAppearanceBodyLarge
     )
     val oemTextAppearanceBodyMedium = Token.getTextAppearance(
-        oemContext, R.attr.oemTextAppearanceBodyMedium
+        oemContext,
+        R.attr.oemTextAppearanceBodyMedium
     )
     val oemTextAppearanceBodySmall = Token.getTextAppearance(
-        oemContext, R.attr.oemTextAppearanceBodySmall
+        oemContext,
+        R.attr.oemTextAppearanceBodySmall
     )
     val oemTextAppearanceLabelLarge = Token.getTextAppearance(
-        oemContext, R.attr.oemTextAppearanceLabelLarge
+        oemContext,
+        R.attr.oemTextAppearanceLabelLarge
     )
     val oemTextAppearanceLabelMedium = Token.getTextAppearance(
-        oemContext, R.attr.oemTextAppearanceLabelMedium
+        oemContext,
+        R.attr.oemTextAppearanceLabelMedium
     )
     val oemTextAppearanceLabelSmall = Token.getTextAppearance(
-        oemContext, R.attr.oemTextAppearanceLabelSmall
+        oemContext,
+        R.attr.oemTextAppearanceLabelSmall
     )
 
     return Typography(
@@ -169,18 +184,21 @@ fun oemTypography(oemContext: Context): Typography {
 }
 
 fun oemTextStyle(oemContext: Context, textStyle: Int): TextStyle {
+    // keep these sorted by id
     val attrs = intArrayOf(
-        android.R.attr.textSize,
-        android.R.attr.textStyle,
-        android.R.attr.letterSpacing,
-        android.R.attr.lineHeight
+            android.R.attr.textSize, // 16842901
+            android.R.attr.textStyle, // 16842903
+            android.R.attr.textColor, // 16842904
+            android.R.attr.letterSpacing, // 16843958
+            android.R.attr.lineHeight // 16844159
     )
 
     val ta: TypedArray = oemContext.obtainStyledAttributes(textStyle, attrs)
     val textSize = ta.getDimension(0, 0f)
     val textStyleType = ta.getInt(1, 0)
-    val letterSpacing = ta.getFloat(2, 0f)
-    val lineHeight = ta.getDimension(3, 0f)
+    val textColor = ta.getColor(2, 0)
+    val letterSpacing = ta.getFloat(3, 0f)
+    val lineHeight = ta.getDimension(4, 0f)
     var fontStyle = FontStyle.Normal
     var fontWeight = FontWeight.Normal
 
@@ -200,7 +218,8 @@ fun oemTextStyle(oemContext: Context, textStyle: Int): TextStyle {
         letterSpacing = letterSpacing.sp,
         lineHeight = lineHeight.sp,
         fontStyle = fontStyle,
-        fontWeight = fontWeight
+        fontWeight = fontWeight,
+        color = Color(textColor)
     )
 }
 
@@ -210,7 +229,8 @@ fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
 @Composable
 fun oemShapes(oemContext: Context): Shapes {
     val oemShapeCornerExtraSmall = Token.getCornerRadius(
-        oemContext, R.attr.oemShapeCornerExtraSmall
+        oemContext,
+        R.attr.oemShapeCornerExtraSmall
     )
     val oemShapeCornerSmall =
         Token.getCornerRadius(oemContext, R.attr.oemShapeCornerSmall).toInt().pxToDp()
@@ -219,7 +239,8 @@ fun oemShapes(oemContext: Context): Shapes {
     val oemShapeCornerLarge =
         Token.getCornerRadius(oemContext, R.attr.oemShapeCornerLarge).toInt().pxToDp()
     val oemShapeCornerExtraLarge = Token.getCornerRadius(
-        oemContext, R.attr.oemShapeCornerExtraLarge
+        oemContext,
+        R.attr.oemShapeCornerExtraLarge
     ).toInt().pxToDp()
 
     return Shapes(
