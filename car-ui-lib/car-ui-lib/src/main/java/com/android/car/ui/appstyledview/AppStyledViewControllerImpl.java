@@ -110,9 +110,7 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
 
     @Override
     public LayoutParams getDialogWindowLayoutParam(LayoutParams params) {
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        WindowManager wm = mContext.getSystemService(WindowManager.class);
-        wm.getDefaultDisplay().getRealMetrics(displayMetrics);
+        DisplayMetrics displayMetrics = CarUiUtils.getDeviceDisplayMetrics(mContext);
 
         int maxWidth = mContext.getResources().getDimensionPixelSize(
                 R.dimen.car_ui_app_styled_dialog_width_max);

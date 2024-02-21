@@ -24,6 +24,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -176,12 +177,22 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
                         }
                         WindowInsetsCompat insets = ViewCompat.getRootWindowInsets(
                                 window.getDecorView().getRootView());
+                        WindowManager.LayoutParams layoutParams =
+                                mController.getDialogWindowLayoutParam(window.getAttributes());
                         int imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
                         mIsImeShown = imeHeight > 0;
-                        int imeOverlap = mIsImeShown ? imeHeight - mImeOverlapPx : 0;
-                        mEndHeight = mController.getDialogWindowLayoutParam(
-                                window.getAttributes()).height - imeOverlap;
+                        int bottom = layoutParams.y + layoutParams.height;
 
+                        DisplayMetrics displayMetrics =
+                                CarUiUtils.getDeviceDisplayMetrics(mContext);
+
+                        int imeTop = displayMetrics.heightPixels - imeHeight;
+                        int resize = 0;
+                        if (imeTop < bottom) {
+                            resize = bottom - imeTop;
+                        }
+
+                        mEndHeight = layoutParams.height - resize;
                         return bounds;
                     }
 
