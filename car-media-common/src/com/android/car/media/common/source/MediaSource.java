@@ -16,6 +16,7 @@
 
 package com.android.car.media.common.source;
 
+import android.car.Car;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -96,8 +97,19 @@ public class MediaSource {
             @NonNull MediaControllerCompat mediaController) {
         String packageName = mediaController.getPackageName();
         try {
-            CharSequence displayName = extractDisplayName(context, null, packageName);
-            Drawable icon = extractIcon(context, null, packageName);
+            ServiceInfo serviceInfo = null;
+            ComponentName componentName = extractServiceComponentName(mediaController);
+            if (componentName != null) {
+                serviceInfo = getBrowseServiceInfo(context, componentName);
+                String className = serviceInfo != null ? serviceInfo.name : null;
+                if (TextUtils.isEmpty(className)) {
+                    serviceInfo = null;
+                }
+            }
+
+            CharSequence displayName = extractDisplayName(context, serviceInfo, packageName);
+            Drawable icon = extractIcon(context, serviceInfo, packageName);
+
             return new MediaSource(/* componentName= */ null, mediaController, displayName, icon,
                 new IconCropper(context));
         } catch (NameNotFoundException e) {
@@ -176,6 +188,21 @@ public class MediaSource {
                 : context.getPackageManager().getApplicationIcon(packageName);
 
         return BitmapUtils.maybeFlagDrawable(context, appIcon);
+    }
+
+    /**
+     * @return the browse service associated with the media session if provided, null otherwise.
+     */
+    @Nullable
+    private static ComponentName extractServiceComponentName(MediaControllerCompat controller) {
+        if (controller.getExtras() == null || controller.getExtras()
+                .getString(Car.CAR_EXTRA_BROWSE_SERVICE_FOR_SESSION) == null) {
+            return null;
+        }
+        String serviceNameString =
+                controller.getExtras().getString(Car.CAR_EXTRA_BROWSE_SERVICE_FOR_SESSION);
+
+        return new ComponentName(controller.getPackageName(), serviceNameString);
     }
 
     /**
