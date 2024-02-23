@@ -27,8 +27,6 @@
     <!-- Media source's color if not provided -->
     <color name="media_source_default_color">@android:color/background_dark</color>
 
-    <!-- Color used on the minimized progress bar background -->
-    <color name="minimized_progress_bar_background">#464A4D</color>
     <!-- Color used on the minimized progress bar -->
     <color name="minimized_progress_bar_highlight">@color/media_source_default_color</color>
 
@@ -36,7 +34,6 @@
     <color name="fab_spinner_indeterminate_color">@color/media_source_default_color</color>
 
     <!-- Color used on media control buttons -->
-    <color name="media_button_tint">#FFFFFFFF</color>
     <color name="media_button_tint_disabled">#80FFFFFF</color>
 
     <!--  Default color for ContentFormatView  -->

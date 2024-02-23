@@ -5,23 +5,4 @@
     <item type="id" name="skip_next" />
     <item type="id" name="track_list" />
     <item type="id" name="overflow" />
-
-    <!-- Ids for MediaWidgetController -->
-    <item type="id" name="title" />
-    <item type="id" name="album_art" />
-    <item type="id" name="artist" />
-    <item type="id" name="album_title" />
-    <item type="id" name="content_format" />
-    <item type="id" name="current_time" />
-    <item type="id" name="inner_separator" />
-    <item type="id" name="max_time" />
-    <item type="id" name="playback_seek_bar" />
-    <item type="id" name="action_id1"/>
-    <item type="id" name="action_id2"/>
-    <item type="id" name="action_id3"/>
-    <item type="id" name="action_id4"/>
-    <item type="id" name="action_id5"/>
-    <item type="id" name="action_id6"/>
-    <item type="id" name="action_id7"/>
-    <item type="id" name="action_id8"/>
 </resources>

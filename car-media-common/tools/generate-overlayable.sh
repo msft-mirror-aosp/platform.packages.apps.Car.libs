@@ -26,7 +26,7 @@ ANDROID_BUILD_TOP="$(pwd)"
 export ANDROID_BUILD_TOP
 
 python3 $ANDROID_BUILD_TOP/packages/apps/Car/tests/tools/rro/generate-overlayable.py \
-    -n car-media-common \
+    -n CarMediaCommon \
     -r $PROJECT_TOP/res \
-    -e $PROJECT_TOP/res/values/overlayable.xml \
+    -e $PROJECT_TOP/res/values/overlayable.xml $PROJECT_TOP/res/values/excluded-resources.xml $PROJECT_TOP/res/anim/progress_indeterminate_material.xml $PROJECT_TOP/res/anim/progress_indeterminate_rotation_material.xml \
     -o $PROJECT_TOP/res/values/overlayable.xml
