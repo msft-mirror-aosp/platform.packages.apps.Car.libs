@@ -165,6 +165,9 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
             params.y = posY;
 
             return params;
+        } else {
+            params.x = 0;
+            params.y = 0;
         }
 
         int minPaddingPx = (int) CarUiUtils.dpToPixel(mContext.getResources(),
@@ -183,14 +186,16 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
 
         int startMarginThresholdPx = (int) CarUiUtils.dpToPixel(mContext.getResources(),
                 DIALOG_START_MARGIN_THRESHOLD);
-        if (mContext.getResources().getConfiguration().orientation
-                == Configuration.ORIENTATION_LANDSCAPE) {
-            int startMargin = (displayWidth - mWidth) / 2;
-            if (startMargin >= startMarginThresholdPx) {
+        boolean isLandscape = mContext.getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE;
+        int startMargin = (displayWidth - mWidth) / 2;
+
+        if (isLandscape && startMargin >= startMarginThresholdPx) {
                 params.gravity = Gravity.TOP | Gravity.START;
                 params.x = startMarginThresholdPx;
                 params.y = (displayHeight - mHeight) / 2;
-            }
+        } else {
+            params.gravity = Gravity.CENTER;
         }
 
         return params;
