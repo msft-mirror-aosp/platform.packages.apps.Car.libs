@@ -74,6 +74,7 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
     private final LifecycleRegistry mLifecycleRegistry;
     private final SavedStateRegistryController mSavedStateRegistryController;
     private final OnBackPressedDispatcher mOnBackPressedDispatcher;
+    private WindowManager.LayoutParams mBaseLayoutParams;
 
     AppStyledDialog(@NonNull Activity context, @NonNull AppStyledViewController controller) {
         super(context);
@@ -104,11 +105,25 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
             return;
         }
 
-        window.setAttributes(mController.getDialogWindowLayoutParam(getWindow().getAttributes()));
         window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        mBaseLayoutParams = new WindowManager.LayoutParams();
+        mBaseLayoutParams.copyFrom(window.getAttributes());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            mBaseLayoutParams.setFitInsetsTypes(0);
+        }
+        updateAttributes();
         configureImeInsetFit();
 
         mLifecycleRegistry.setCurrentState(Lifecycle.State.CREATED);
+    }
+
+    private void updateAttributes() {
+        Window window = getWindow();
+        if (window == null) {
+            return;
+        }
+
+        window.setAttributes(mController.getDialogWindowLayoutParam(mBaseLayoutParams));
     }
 
     private void configureImeInsetFit() {
@@ -123,14 +138,14 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
         }
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        WindowCompat.setDecorFitsSystemWindows(window, false);
         ViewCompat.setWindowInsetsAnimationCallback(window.getDecorView().getRootView(),
                 new WindowInsetsAnimationCompat.Callback(
                         WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP) {
 
                     int mEndHeight;
+                    int mStartHeight;
                     WindowManager.LayoutParams mAnimationLayoutParams;
-                    WindowManager.LayoutParams mStartLayoutParams;
                     int mAppStyledViewBottomPadding;
                     boolean mIsImeShown;
                     final int mImeOverlapPx =
@@ -138,7 +153,6 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
 
                     private boolean isImeAnimation(WindowInsetsAnimationCompat animation) {
                         return (animation.getTypeMask() & WindowInsetsCompat.Type.ime()) != 0;
-
                     }
 
                     @Override
@@ -149,9 +163,8 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
                         }
 
                         mAnimationLayoutParams = new WindowManager.LayoutParams();
-                        mStartLayoutParams = mController.getDialogWindowLayoutParam(
-                                window.getAttributes());
-                        mAnimationLayoutParams.copyFrom(mStartLayoutParams);
+                        mAnimationLayoutParams.copyFrom(window.getAttributes());
+                        mStartHeight = mAnimationLayoutParams.height;
 
                         int[] location = new int[2];
                         window.getDecorView().getRootView().getLocationOnScreen(location);
@@ -196,20 +209,6 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
                         return bounds;
                     }
 
-                    @Override
-                    public void onEnd(@NonNull WindowInsetsAnimationCompat animation) {
-                        if (isImeAnimation(animation)) {
-                            mStartLayoutParams.height = mEndHeight;
-                            window.setAttributes(mStartLayoutParams);
-                        } else {
-                            window.setAttributes(
-                                    mController.getDialogWindowLayoutParam(window.getAttributes()));
-                            copyWindowInsets();
-                        }
-
-                        super.onEnd(animation);
-                    }
-
                     @NonNull
                     @Override
                     public WindowInsetsCompat onProgress(@NonNull WindowInsetsCompat insets,
@@ -225,7 +224,6 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
                         if (imeAnimation != null) {
                             // Offset the view based on the interpolated fraction of the IME
                             // animation.
-                            int mStartHeight = mStartLayoutParams.height;
                             mAnimationLayoutParams.height =
                                     (int) (mStartHeight - ((mStartHeight - mEndHeight)
                                             * imeAnimation.getInterpolatedFraction()));
@@ -241,6 +239,16 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
 
                         return insets;
                     }
+
+                    @Override
+                    public void onEnd(@NonNull WindowInsetsAnimationCompat animation) {
+                        if (!mIsImeShown) {
+                            updateAttributes();
+                            copyWindowInsets();
+                        }
+
+                        super.onEnd(animation);
+                    }
                 });
     }
 
@@ -249,21 +257,12 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
         mLifecycleRegistry.setCurrentState(Lifecycle.State.STARTED);
         mLifecycleRegistry.setCurrentState(Lifecycle.State.RESUMED);
 
-        if (getWindow() != null) {
-            getWindow().setAttributes(
-                    mController.getDialogWindowLayoutParam(getWindow().getAttributes()));
-        }
         super.onStart();
     }
 
     @Override
     protected void onStop() {
         mLifecycleRegistry.setCurrentState(Lifecycle.State.DESTROYED);
-
-        if (getWindow() != null) {
-            ViewCompat.setWindowInsetsAnimationCallback(getWindow().getDecorView().getRootView(),
-                    null);
-        }
         super.onStop();
     }
 
@@ -272,6 +271,7 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
         super.onAttachedToWindow();
         copyWindowInsets();
         copySystemUiVisibility();
+        updateAttributes();
     }
 
     /**
@@ -327,6 +327,11 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
                 return;
             }
 
+            boolean isStatusBarVisible = windowInsets.isVisible(WindowInsets.Type.statusBars());
+            if (!isStatusBarVisible) {
+                dialogWindowInsetsController.hide(WindowInsetsCompat.Type.statusBars());
+            }
+
             boolean isNavBarVisible = windowInsets.isVisible(WindowInsets.Type.navigationBars());
             if (!isNavBarVisible) {
                 dialogWindowInsetsController.hide(WindowInsetsCompat.Type.navigationBars());
@@ -336,18 +341,26 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
 
     @Override
     public void show() {
+        if (isShowing()) {
+            return;
+        }
+
+        updateContent();
         super.show();
         mContent.clearFocus();
     }
 
     void setContent(View contentView) {
-        if (contentView.getParent() != null) {
-            ((ViewGroup) contentView.getParent()).removeView(contentView);
+        mContent = contentView;
+
+    }
+
+    private void updateContent() {
+        if (mContent.getParent() != null) {
+            ((ViewGroup) mContent.getParent()).removeView(mContent);
         }
 
-        mContent = contentView;
         mAppStyledView = mController.getAppStyledView(mContent);
-        configureImeInsetFit();
         setContentView(mAppStyledView);
     }
 
