@@ -36,11 +36,14 @@ limitations under the License.-->
       <item type="id" name="minimized_control_bar_left_slot"/>
       <item type="id" name="minimized_control_bar_main_slot"/>
       <item type="id" name="minimized_control_bar_right_slot"/>
+      <item type="id" name="rows_container"/>
 
       <item type="integer" name="control_bar_columns"/>
 
+      <item type="layout" name="control_bar"/>
       <item type="layout" name="minimized_control_bar"/>
 
+      <item type="style" name="Widget.ActionButton"/>
       <item type="style" name="Widget.ActionButton.PlayPause"/>
       <item type="style" name="MinimizedControlBar"/>
       <item type="style" name="ControlBar"/>
