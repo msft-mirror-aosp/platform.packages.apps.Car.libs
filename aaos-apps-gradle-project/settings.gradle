@@ -22,6 +22,9 @@ include ':PaintBooth'
 project(':PaintBooth').projectDir = new File('../car-ui-lib/paintbooth')
 include ':oem-apis'
 project(':oem-apis').projectDir = new File('../car-ui-lib/oem-apis')
+include ':proxy-plugin'
+project(':proxy-plugin').projectDir = new File('../car-ui-lib/proxy-plugin')
+
 include ':car-rotary-lib'
 project(':car-rotary-lib').projectDir = new File('../car-ui-lib/car-rotary-lib')
 include ':car-ui-lib-testing'
@@ -30,8 +33,7 @@ include ':oem-token-shared-lib'
 project(':oem-token-shared-lib').projectDir = new File('../car-ui-lib/oem-tokens/shared-lib')
 include ':oem-token-lib'
 project(':oem-token-lib').projectDir = new File('../car-ui-lib/oem-tokens/lib')
-include ':oem-demo-rro'
-project(':oem-demo-rro').projectDir = new File('../car-ui-lib/oem-tokens/rro')
+
 include ':token-compose-compat'
 project(':token-compose-compat').projectDir = new File('../car-ui-lib/token-compose-compat')
 

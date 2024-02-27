@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2022 The Android Open Source Project
+<!-- Copyright (C) 2024 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -19,10 +19,9 @@
     <!-- Primary color palette -->
     <attr name="colorPrimary" format="color" />
     <attr name="colorOnPrimary" format="color" />
+    <attr name="colorPrimaryInverse" format="color" />
     <attr name="colorPrimaryContainer" format="color" />
     <attr name="colorOnPrimaryContainer" format="color" />
-    <!-- TODO: Determine usage of inverse colors. -->
-    <!--  <attr name="colorPrimaryInverse" format="color" />-->
 
     <!-- Secondary color palette -->
     <attr name="colorSecondary" format="color" />
@@ -49,10 +48,12 @@
     <attr name="colorOnSurface" format="color" />
     <attr name="colorSurfaceVariant" format="color" />
     <attr name="colorOnSurfaceVariant" format="color" />
+    <attr name="colorSurfaceInverse" format="color" />
+    <attr name="colorOnSurfaceInverse" format="color" />
+    <attr name="colorSurfaceTint" format="color" />
     <attr name="colorOutline" format="color" />
-    <!-- TODO: Determine usage of inverse colors. -->
-    <!--  <attr name="colorSurfaceInverse" format="color" />-->
-    <!--  <attr name="colorOnSurfaceInverse" format="color" />-->
+    <attr name="colorOutlineVariant" format="color" />
+    <attr name="colorScrim" format="color" />
 
     <!-- Primary tonal palette -->
     <attr name="colorPrimaryPalette100" format="color" />
@@ -114,7 +115,6 @@
     <attr name="colorErrorPalette10" format="color" />
     <attr name="colorErrorPalette0" format="color" />
 
-    <!-- Neutral tonal palette -->
     <attr name="colorNeutralPalette100" format="color" />
     <attr name="colorNeutralPalette99" format="color" />
     <attr name="colorNeutralPalette95" format="color" />

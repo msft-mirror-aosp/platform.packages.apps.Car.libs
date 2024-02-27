@@ -73,8 +73,6 @@ public class PlaybackViewModelTest {
     @Rule
     public final TestLifecycleOwner mLifecycleOwner = new TestLifecycleOwner();
 
-    private final MediaSource mMediaSource = newFakeMediaSource("test", "test");
-
     @Mock
     public MediaBrowserCompat mMediaBrowser;
     @Mock
@@ -87,6 +85,9 @@ public class PlaybackViewModelTest {
     public PlaybackStateCompat mPlaybackState;
     @Captor
     private ArgumentCaptor<MediaControllerCompat.Callback> mCapturedCallback;
+
+    private final MediaSource mMediaSource = newFakeMediaSource("test", "test");
+    private final MediaSource mMediaSource2 = newFakeMediaSource(mMediaController);
 
     private PlaybackViewModel mPlaybackViewModel;
 
@@ -246,6 +247,52 @@ public class PlaybackViewModelTest {
         mBrowsingStateLD.setValue(
                 new BrowsingState(mContext, mMediaSource, newMediaBrowser,
                         ConnectionStatus.CONNECTED));
+        deliverValuesToCallbacks(newCallbackCaptor, newMetadata, newPlaybackState);
+    }
+
+    @Test
+    public void testChangeMediaSource_noBrowseService_consistentController() {
+        when(mMediaController.getMediaController()).thenReturn(mMediaController);
+        deliverValuesToCallbacks(mCapturedCallback, mMediaMetadata, mPlaybackState);
+
+        // Create new MediaBrowser, new MediaController and associated callback captor
+        MediaBrowserCompat newMediaBrowser = mock(MediaBrowserCompat.class);
+        MediaControllerCompat newController = mock(MediaControllerCompat.class);
+        mBrowserToController.put(newMediaBrowser, newController);
+
+        ArgumentCaptor<MediaControllerCompat.Callback> newCallbackCaptor =
+                ArgumentCaptor.forClass(MediaControllerCompat.Callback.class);
+        doNothing().when(newController).registerCallback(newCallbackCaptor.capture());
+
+        // Wire up new data for new MediaController
+        MediaMetadataCompat newMetadata = mock(MediaMetadataCompat.class);
+        PlaybackStateCompat newPlaybackState = mock(PlaybackStateCompat.class);
+
+        // Ensure that all values are coming from the correct MediaController.
+        mPlaybackViewModel.getMetadata().observe(mLifecycleOwner, mediaItemMetadata -> {
+            if (mPlaybackViewModel.getMediaMetadata() == newMetadata) {
+                assertThat(mPlaybackViewModel.getMediaController()).isSameInstanceAs(newController);
+            }
+            if (mPlaybackViewModel.getMediaMetadata() == mMediaMetadata) {
+                assertThat(mPlaybackViewModel.getMediaController())
+                    .isSameInstanceAs(mMediaController);
+            }
+        });
+
+        mPlaybackViewModel.getPlaybackStateWrapper().observe(mLifecycleOwner, state -> {
+            if (state == null) return;
+
+            if (state.getStateCompat() == newPlaybackState) {
+                assertThat(mPlaybackViewModel.getMediaController()).isSameInstanceAs(newController);
+            }
+            if (state.getStateCompat() == mPlaybackState) {
+                assertThat(mPlaybackViewModel.getMediaController())
+                    .isSameInstanceAs(mMediaController);
+            }
+        });
+
+        mBrowsingStateLD.setValue(new BrowsingState(
+                mContext, mMediaSource2, null, ConnectionStatus.NONEXISTENT));
         deliverValuesToCallbacks(newCallbackCaptor, newMetadata, newPlaybackState);
     }
 

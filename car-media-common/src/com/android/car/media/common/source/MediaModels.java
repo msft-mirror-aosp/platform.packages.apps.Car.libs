@@ -57,6 +57,18 @@ public class MediaModels {
         mPlaybackViewModel = new PlaybackViewModel(context, browseState);
     }
 
+    /**
+     * Creates models tied to {@link MediaSessionHelper#getMediaSource}
+     */
+    public MediaModels(Context context) {
+        MediaSessionHelper helper = MediaSessionHelper.getInstance(context);
+        LiveData<MediaSource> srcData = helper.getMediaSource();
+        mMediaSourceViewModel = new MediaSourceViewModel(context, srcData);
+        LiveData<BrowsingState> browseState = mMediaSourceViewModel.getBrowsingState();
+        mMediaItemsRepository = new MediaItemsRepository(browseState);
+        mPlaybackViewModel = new PlaybackViewModel(context, browseState);
+    }
+
     /** Returns the {@link MediaSourceViewModel}. */
     public MediaSourceViewModel getMediaSourceViewModel() {
         return mMediaSourceViewModel;

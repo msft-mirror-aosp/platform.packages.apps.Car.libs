@@ -200,15 +200,17 @@ public class MediaItemsRepository {
         }
 
         // Always refresh the subscription (to work around bugs in media apps).
-        mBrowsingState.mBrowser.unsubscribe(nodeId);
-        mBrowsingState.mBrowser.subscribe(nodeId, options, mBrowseCallback);
+        if (mBrowsingState.mBrowser != null) {
+            mBrowsingState.mBrowser.unsubscribe(nodeId);
+            mBrowsingState.mBrowser.subscribe(nodeId, options, mBrowseCallback);
+        }
 
         return items.mLiveData;
     }
 
     /** Retrieves a specific {@link MediaBrowserCompat.MediaItem} from the connected service. */
     public void getItem(@NonNull final String mediaId, @NonNull final ItemCallback cb) {
-        if (mBrowsingState.mConnectionStatus == CONNECTED) {
+        if (mBrowsingState.mConnectionStatus == CONNECTED && mBrowsingState.mBrowser != null) {
             mBrowsingState.mBrowser.getItem(mediaId, cb);
         } else {
             Log.e(TAG, "getItem called without a connection! "
@@ -222,7 +224,7 @@ public class MediaItemsRepository {
         mSearchQuery = query;
         if (TextUtils.isEmpty(mSearchQuery)) {
             clearSearchResults();
-        } else {
+        } else if (mBrowsingState.mBrowser != null) {
             mSearchMediaItems.setLoading();
             mBrowsingState.mBrowser.search(mSearchQuery, options, mSearchCallback);
         }
@@ -248,7 +250,9 @@ public class MediaItemsRepository {
                 mRootMediaItems.setLoading();
                 break;
             case CONNECTED:
-                getCache().mRootId = mBrowsingState.mBrowser.getRoot();
+            case NONEXISTENT:
+                getCache().mRootId = mBrowsingState.mBrowser == null ? null :
+                        mBrowsingState.mBrowser.getRoot();
                 mCustomBrowseActions.postValue(parseBrowseActions(mBrowsingState));
                 break;
             case DISCONNECTING:
@@ -275,6 +279,10 @@ public class MediaItemsRepository {
 
     /** Does NOT clear the cache. */
     private void unsubscribeNodes() {
+        if (mBrowsingState.mBrowser == null) {
+            return;
+        }
+
         PerMediaSourceCache cache = getCache();
         for (String nodeId : cache.mChildrenByNodeId.keySet()) {
             mBrowsingState.mBrowser.unsubscribe(nodeId);
@@ -364,6 +372,7 @@ public class MediaItemsRepository {
     private Map<String, CustomBrowseAction> parseBrowseActions(BrowsingState browsingState) {
         Map<String, CustomBrowseAction> customBrowseActions = new HashMap<>();
 
+        if (browsingState.mBrowser == null) return customBrowseActions;
         Bundle rootExtras = browsingState.mBrowser.getExtras();
         if (rootExtras == null) return customBrowseActions;
 

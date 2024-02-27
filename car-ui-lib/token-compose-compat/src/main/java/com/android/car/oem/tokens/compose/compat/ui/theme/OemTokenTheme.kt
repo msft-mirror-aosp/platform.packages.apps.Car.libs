@@ -61,6 +61,12 @@ fun oemColorScheme(oemContext: Context): ColorScheme {
     val oemColorSurfaceVariant = Token.getColor(oemContext, R.attr.oemColorSurfaceVariant)
     val oemColorOnSurfaceVariant = Token.getColor(oemContext, R.attr.oemColorOnSurfaceVariant)
     val oemColorOutline = Token.getColor(oemContext, R.attr.oemColorOutline)
+    val oemColorSurfaceInverse = Token.getColor(oemContext, R.attr.oemColorSurfaceInverse)
+    val oemColorOnSurfaceInverse = Token.getColor(oemContext, R.attr.oemColorOnSurfaceInverse)
+    val oemColorPrimaryInverse = Token.getColor(oemContext, R.attr.oemColorPrimaryInverse)
+    val oemColorOutlineVariant = Token.getColor(oemContext, R.attr.oemColorOutlineVariant)
+    val oemColorScrim = Token.getColor(oemContext, R.attr.oemColorScrim)
+    val oemColorSurfaceTint = Token.getColor(oemContext, R.attr.oemColorSurfaceTint)
 
     return ColorScheme(
         primary = Color(oemColorPrimary),
@@ -86,13 +92,12 @@ fun oemColorScheme(oemContext: Context): ColorScheme {
         surfaceVariant = Color(oemColorSurfaceVariant),
         onSurfaceVariant = Color(oemColorOnSurfaceVariant),
         outline = Color(oemColorOutline),
-        // TODO (b/318753781): Update token OEM definitions for consistency
-        inverseSurface = Color(0xFF000080),
-        inverseOnSurface = Color(0xFF000080),
-        inversePrimary = Color(0xFF000080),
-        outlineVariant = Color(0xFF000080),
-        scrim = Color(0xFF000080),
-        surfaceTint = Color(0xFF000080)
+        inverseSurface = Color(oemColorSurfaceInverse),
+        inverseOnSurface = Color(oemColorOnSurfaceInverse),
+        inversePrimary = Color(oemColorPrimaryInverse),
+        outlineVariant = Color(oemColorOutlineVariant),
+        scrim = Color(oemColorScrim),
+        surfaceTint = Color(oemColorSurfaceTint)
     )
 }
 

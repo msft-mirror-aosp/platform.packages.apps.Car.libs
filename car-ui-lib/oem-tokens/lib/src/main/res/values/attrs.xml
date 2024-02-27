@@ -23,6 +23,7 @@
         <attr name="oemColorOnPrimary" format="color" />
         <attr name="oemColorPrimaryContainer" format="color" />
         <attr name="oemColorOnPrimaryContainer" format="color" />
+        <attr name="oemColorPrimaryInverse" format="color" />
 
         <attr name="oemColorSecondary" format="color" />
         <attr name="oemColorOnSecondary" format="color" />
@@ -45,7 +46,12 @@
         <attr name="oemColorOnSurface" format="color" />
         <attr name="oemColorSurfaceVariant" format="color" />
         <attr name="oemColorOnSurfaceVariant" format="color" />
+        <attr name="oemColorSurfaceInverse" format="color" />
+        <attr name="oemColorOnSurfaceInverse" format="color" />
         <attr name="oemColorOutline" format="color" />
+        <attr name="oemColorScrim" format="color" />
+        <attr name="oemColorOutlineVariant" format="color" />
+        <attr name="oemColorSurfaceTint" format="color" />
 
         <attr name="oemColorPrimaryPalette100" format="color" />
         <attr name="oemColorPrimaryPalette99" format="color" />

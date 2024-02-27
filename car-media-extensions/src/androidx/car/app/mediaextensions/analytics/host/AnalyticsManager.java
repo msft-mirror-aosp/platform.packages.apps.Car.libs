@@ -16,24 +16,22 @@
 package androidx.car.app.mediaextensions.analytics.host;
 
 import static androidx.car.app.mediaextensions.analytics.Constants.ACTION_ANALYTICS;
-import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_BUNDLE_KEY_PASSKEY;
 import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_BUNDLE_ARRAY_KEY;
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.media.MediaBrowserCompat;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import androidx.car.app.annotations2.ExperimentalCarApi;
 import androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent;
 import androidx.car.app.mediaextensions.analytics.event.BrowseChangeEvent;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,30 +51,24 @@ public class AnalyticsManager implements IAnalyticsManager {
     /** We don't want to come to close to binder buffer limit, so we limit queue. */
     private final int mEventBufferSize;
     private final AnalyticsEventFactory mAnalyticsFactory;
-    private final String mReceiverComponent;
-    private final Context mContext;
-    private final String mPassKey;
+    private final WeakReference<MediaBrowserCompat> mBrowser;
+    private final String mBrowserComponentString;
 
     /**
      *
      * @param context Context used to send analytics broadcast intent
-     * @param receiverComponent BroadcastReceiver ComponentName flattened to string
-     * @param passKey Same key handed to {@link RootHintsUtil} to auth sent analytics,
-     * {@link androidx.car.app.mediaextensions.analytics.client.AnalyticsBroadcastReceiver#sAuthKey}
-     * @param sessionId Handed to {@link RootHintsUtil} to map sessions for 3P app.
      * @param batchInterval How long to listen for events before sending a batch of events
      * @param batchSize How many events to batch before sending a batch, interval or size,
      *                  whichever happens first.
      */
-    public AnalyticsManager(@NonNull Context context, @NonNull String receiverComponent,
-            @NonNull String passKey, int sessionId, int batchInterval, int batchSize) {
+    public AnalyticsManager(@NonNull Context context, @NonNull MediaBrowserCompat browser,
+            int batchInterval, int batchSize) {
         mHandler = new Handler(Looper.myLooper());
         mBatchInterval = batchInterval;
         mEventBufferSize = batchSize;
-        mReceiverComponent = receiverComponent;
-        mAnalyticsFactory =  new AnalyticsEventFactory(context, sessionId);
-        mContext = context;
-        mPassKey = passKey;
+        mBrowser = new WeakReference<>(browser);
+        mBrowserComponentString = browser.getServiceComponent().flattenToString();
+        mAnalyticsFactory =  new AnalyticsEventFactory(context);
     }
 
     /**
@@ -90,10 +82,10 @@ public class AnalyticsManager implements IAnalyticsManager {
             mHandler.postDelayed(this::sendAllBatches, mBatchInterval);
         }
 
-        Queue<Bundle> queue = sPackageEventQueueMap.get(mReceiverComponent);
+        Queue<Bundle> queue = sPackageEventQueueMap.get(mBrowserComponentString);
         if (queue == null) {
             queue = new ArrayDeque<>(mEventBufferSize);
-            sPackageEventQueueMap.put(mReceiverComponent, queue);
+            sPackageEventQueueMap.put(mBrowserComponentString, queue);
         }
         queue.add(eventBundle);
 
@@ -123,25 +115,25 @@ public class AnalyticsManager implements IAnalyticsManager {
     }
 
     private void sendBatch(@NonNull Queue<Bundle> eventQueue) {
-        Intent eventIntent = new Intent(ACTION_ANALYTICS);
-        eventIntent.setComponent(ComponentName.unflattenFromString(mReceiverComponent));
-
+        //Get the browser service with mMediaAppComponent
+        MediaBrowserCompat browser = mBrowser.get();
+        if (browser == null || !browser.isConnected()){
+            Log.w(TAG, "sendBatch failed, browser null or not connected.");
+            return;
+        }
         Bundle eventBatchBundle = createBatch(new ArrayList<>(eventQueue));
-
-        eventIntent.putExtras(eventBatchBundle);
-        mContext.sendBroadcast(eventIntent);
+        browser.sendCustomAction(ACTION_ANALYTICS, eventBatchBundle, null);
     }
 
     /**
      * Packs an arrayList of AnalyticsEvent into a bundle.
      *
-     * @param eventBundleList
+     * @param eventBundleList list of events each packed into a separate bundle.
      * @return bundle with list of events packed
      */
     private Bundle createBatch(@NonNull ArrayList<Bundle> eventBundleList) {
         Bundle batchBundle = new Bundle();
         batchBundle.putParcelableArrayList(ANALYTICS_EVENT_BUNDLE_ARRAY_KEY, eventBundleList);
-        batchBundle.putString(ANALYTICS_BUNDLE_KEY_PASSKEY, mPassKey);
         return batchBundle;
     }
 

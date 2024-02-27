@@ -59,6 +59,7 @@ cp $OUTPUT_DIR/car-messenger-common/model/outputs/aar/model-release.aar $1/car-m
 cp $OUTPUT_DIR/car-messenger-common/outputs/aar/car-messenger-common-release.aar $1/car-messenger-common.aar
 
 # Tests
+cp $OUTPUT_DIR/car-calendar-app/outputs/apk/androidTest/platform/debug/car-calendar-app-platform-debug-androidTest.apk $1/CarCalendarUnitTests.apk
 cp $OUTPUT_DIR/car-rotary-lib/outputs/apk/androidTest/debug/car-rotary-lib-debug-androidTest.apk $1/CarRotaryLibUnitTests.apk
 cp $OUTPUT_DIR/car-ui-lib/outputs/apk/androidTest/debug/car-ui-lib-debug-androidTest.apk $1/CarUILibUnitTests.apk
 cp $OUTPUT_DIR/car-dialer-app/outputs/apk/emulator/debug/car-dialer-app-emulator-debug.apk $1/CarDialerAppForTesting.apk

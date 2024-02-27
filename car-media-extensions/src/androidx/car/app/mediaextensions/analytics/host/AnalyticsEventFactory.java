@@ -23,7 +23,6 @@ import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVE
 import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_DATA_KEY_ITEM_IDS;
 import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_DATA_KEY_MEDIA_ID;
 import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_DATA_KEY_PARENT_NODE_ID;
-import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_DATA_KEY_SESSION_ID;
 import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_DATA_KEY_TIMESTAMP;
 import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_DATA_KEY_VERSION;
 import static androidx.car.app.mediaextensions.analytics.Constants.ANALYTICS_EVENT_DATA_KEY_VIEW_ACTION;
@@ -40,7 +39,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
-
 import androidx.car.app.annotations2.ExperimentalCarApi;
 import androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent;
 import androidx.car.app.mediaextensions.analytics.event.BrowseChangeEvent;
@@ -58,12 +56,11 @@ class AnalyticsEventFactory {
     @NonNull private final Bundle mBaseBundle;
     @NonNull private Bundle mBundle;
 
-    AnalyticsEventFactory(@NonNull Context context, int sessionId) {
+    AnalyticsEventFactory(@NonNull Context context) {
         mBaseBundle = new Bundle();
         mBundle = new Bundle();
         mBaseBundle.putString(ANALYTICS_EVENT_DATA_KEY_HOST_COMPONENT_ID,
                 context.getApplicationContext().getPackageName());
-        mBaseBundle.putInt(ANALYTICS_EVENT_DATA_KEY_SESSION_ID, sessionId);
     }
     /**
      * Create BrowseChangeEvent

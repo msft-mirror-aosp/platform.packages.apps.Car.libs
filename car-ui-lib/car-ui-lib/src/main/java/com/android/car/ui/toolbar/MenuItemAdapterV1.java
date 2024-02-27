@@ -84,6 +84,7 @@ public class MenuItemAdapterV1 {
                 .setIcon(mClientMenuItem.getIcon())
                 .setEnabled(mClientMenuItem.isEnabled())
                 .setPrimary(mClientMenuItem.isPrimary())
+                .setTinted(mClientMenuItem.isTinted())
                 .setRestricted(mClientMenuItem.isRestricted())
                 .setShowIconAndTitle(mClientMenuItem.isShowingIconAndTitle())
                 .setDisplayBehavior(convertDisplayBehavior(mClientMenuItem.getDisplayBehavior()));

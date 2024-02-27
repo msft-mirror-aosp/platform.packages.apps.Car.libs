@@ -857,7 +857,6 @@ public class CarUiImeWideScreenController {
     private void resetAutomotiveWideScreenViews() {
         mWideScreenDescriptionTitle.setVisibility(View.GONE);
         mContentAreaSurfaceView.setVisibility(View.GONE);
-        mContentAreaSurfaceView.setChildSurfacePackage(null);
         mWideScreenErrorMessage.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.GONE);
         mWideScreenDescription.setVisibility(View.GONE);

@@ -35,9 +35,10 @@ public class ImageUtils {
     private static final float MAX_BLUR = 25f;
 
     /**
-     * Blurs the given image by scaling it down by the given factor and applying the given
-     * blurring radius.
+     * @deprecated Scheduled to stop working with gradle 8... or 9. Replace with the following:
+     * https://developer.android.com/guide/topics/renderscript/migrate#image_blur_on_android_12_into_a_view
      */
+    @Deprecated
     @NonNull
     public static Bitmap blur(Context context, @NonNull Bitmap image, Size bitmapTargetSize,
             float bitmapBlurPercent) {
