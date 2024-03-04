@@ -44,6 +44,7 @@ import java.util.List;
  *
  * @deprecated Use {@link PluginFactoryOEMV8} instead
  */
+@Deprecated
 public interface PluginFactoryOEMV7 {
     /**
      * Gives the plugin access to two factories that will create FocusParkingViews and

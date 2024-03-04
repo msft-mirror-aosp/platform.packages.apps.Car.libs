@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
  *
  * @param <V> A class that extends ViewHolder that will be used by the adapter.
  */
+@Deprecated
 public interface AdapterOEMV1<V extends ViewHolderOEMV1> {
 
     int ALLOW = 0;
