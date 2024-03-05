@@ -20,15 +20,51 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
+import com.android.car.media.common.browse.MediaItemsRepository;
+import com.android.car.media.common.playback.PlaybackViewModel;
+import com.android.car.media.common.source.CarMediaManagerHelper;
+import com.android.car.media.common.source.MediaModels;
+import com.android.car.media.common.source.MediaSourceViewModel;
+
 /** ViewModel used to track state of media widgets that use the {@link MediaWidgetController} */
 public class MediaWidgetViewModel extends AndroidViewModel {
 
+    private MediaModels mModels;
+    private CarMediaManagerHelper mCarMediaManagerHelper;
+    private boolean mNeedsInitialization = true;
     private boolean mQueueVisible = false;
     private boolean mHistoryVisible = false;
     private boolean mOverflowExpanded = false;
 
     public MediaWidgetViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    /** Initialize the MediaWidgetViewModel */
+    public void init(MediaModels models) {
+        mModels = models;
+        mCarMediaManagerHelper = CarMediaManagerHelper.getInstance(getApplication());
+        mNeedsInitialization = false;
+    }
+
+    /**
+     * Returns whether the ViewModel needs to be initialized. The ViewModel may need
+     * re-initialization if a config change occurs or if the system kills the Fragment.
+     */
+    public boolean needsInitialization() {
+        return mNeedsInitialization;
+    }
+
+    public MediaItemsRepository getMediaItemsRepository() {
+        return mModels.getMediaItemsRepository();
+    }
+
+    public PlaybackViewModel getPlaybackViewModel() {
+        return mModels.getPlaybackViewModel();
+    }
+
+    public MediaSourceViewModel getMediaSourceViewModel() {
+        return mModels.getMediaSourceViewModel();
     }
 
     public void setQueueVisible(boolean visible) {
