@@ -174,20 +174,20 @@ public class MediaWidgetController {
         mDescription = mView.findViewById(R.id.album_title);
         mLogo = mView.findViewById(R.id.content_format);
 
-        mAppIcon = null; // can be set to any id
-        mAppName = null; // can be set to any id
+        mAppIcon = mView.findViewById(R.id.media_widget_app_icon);
+        mAppName = mView.findViewById(R.id.media_widget_app_name);
 
         mCurrentTime = mView.findViewById(R.id.current_time);
         mTimeSeparator = mView.findViewById(R.id.inner_separator);
         mMaxTime = mView.findViewById(R.id.max_time);
         mSeekBar = mView.findViewById(R.id.playback_seek_bar);
 
-        mPlayPauseButton = null; // can be set to any id
+        mPlayPauseButton = mView.findViewById(R.id.play_pause_button);
         mActions = ViewUtils.getViewsById(mView, mView.getResources(),
                 R.array.action_slot_ids, null);
-        mQueueButton = null; // can be set to any id
-        mHistoryButton = null; // can be set to any id
-        mActionOverflowButton = null; // can be set to any id
+        mQueueButton = mView.findViewById(R.id.queue_button);
+        mHistoryButton = mView.findViewById(R.id.history_button);
+        mActionOverflowButton = mView.findViewById(R.id.overflow_button);
     }
 
     /**
@@ -440,9 +440,8 @@ public class MediaWidgetController {
             updateActionsWithPlaybackState(mView.getContext(), mActions, playbackState,
                     mDataModel.getPlaybackController().getValue(),
                     mView.getContext().getDrawable(R.drawable.ic_skip_previous),
-                    mView.getContext().getDrawable(R.drawable.ic_skip_next),
-                    true,
-                    null);
+                    mView.getContext().getDrawable(R.drawable.ic_skip_next), null, null,
+                    false, null);
         }
     }
 }
