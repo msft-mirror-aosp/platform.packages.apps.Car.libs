@@ -18,6 +18,10 @@ package {
     default_applicable_licenses: ["Android-Apache-2.0"],
 }
 
+car_broadcastradio_support_static_libs = [
+    "androidx.legacy_legacy-support-v4",
+]
+
 android_library {
     name: "car-broadcastradio-support-source",
 
@@ -35,12 +39,37 @@ android_library {
         targets: ["dist_files"],
     },
 
-    static_libs: [
-        "androidx.legacy_legacy-support-v4",
-    ],
+    static_libs: car_broadcastradio_support_static_libs,
 
     libs: ["android.car-system-stubs"],
     min_sdk_version: "33",
     target_sdk_version: "33",
     sdk_version: "system_current",
 }
+
+java_genrule {
+    name: "car-broadcastradio-support-aar",
+    srcs: [
+        ":car-broadcastradio-support-source{.aar}",
+        "res/**/*",
+    ],
+    out: ["car-broadcastradio-support.aar"],
+    tools: [
+        "make_slim_aar",
+    ],
+    cmd: "dir=packages/apps/Car/libs/car-broadcastradio-support && " +
+        "$(location make_slim_aar) " +
+        "--classes-allowlist com/android/car/broadcastradio/support $(out) " +
+        "$(location :car-broadcastradio-support-source{.aar}) $$dir/res",
+    dist: {
+        targets: ["car-broadcastradio-support-aar",]
+    },
+}
+
+android_library_import {
+    name: "car-broadcastradio-support-prebuilt",
+    aars: [":car-broadcastradio-support-aar"],
+    sdk_version: "current",
+    static_libs: car_broadcastradio_support_static_libs,
+}
+

@@ -22,7 +22,8 @@ android_test {
     name: "CarBroadcastRadioSupportTests",
     srcs: ["src/**/*.java"],
     static_libs: [
-        "car-broadcastradio-support-source",
+        "androidx.legacy_legacy-support-v4",
+        "car-broadcastradio-support-prebuilt",
         "androidx.test.rules",
         "truth",
         "mockito-target-extended",
