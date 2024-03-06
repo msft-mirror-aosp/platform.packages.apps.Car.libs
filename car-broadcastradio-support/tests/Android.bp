@@ -21,7 +21,6 @@ package {
 
 android_test {
     name: "CarBroadcastRadioSupportTests",
-    platform_apis: true,
     srcs: ["src/**/*.java"],
     static_libs: [
         "car-broadcastradio-support",
@@ -39,4 +38,7 @@ android_test {
         "libdexmakerjvmtiagent",
         "libstaticjvmtiagent",
     ],
+
+    min_sdk_version: "33",
+    target_sdk_version: "33",
 }
