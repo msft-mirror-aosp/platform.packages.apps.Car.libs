@@ -286,17 +286,17 @@ public final class AppStyledDialogController {
      * @param themeResId Theme to be set for the returned context
      */
     public Context createContentViewConfigurationContext(Context context, int themeResId) {
-        int width = getContentAreaWidth();
-        if (width == -1) {
-            int widthPx = getAppStyledViewDialogWidth();
-            width = (int) (widthPx / context.getResources().getDisplayMetrics().density);
+        int widthPx = getContentAreaWidth();
+        if (widthPx <= 0) {
+            widthPx = getAppStyledViewDialogWidth();
         }
+        int width = (int) (widthPx / context.getResources().getDisplayMetrics().density);
 
-        int height = getContentAreaHeight();
-        if (height == -1) {
-            int heightPx = getAppStyledViewDialogHeight();
-            height = (int) (heightPx / context.getResources().getDisplayMetrics().density);
+        int heightPx = getContentAreaHeight();
+        if (heightPx <= 0) {
+            heightPx = getAppStyledViewDialogHeight();
         }
+        int height = (int) (heightPx / context.getResources().getDisplayMetrics().density);
 
         Configuration config = context.getResources().getConfiguration();
         config.smallestScreenWidthDp = Math.min(width, height);

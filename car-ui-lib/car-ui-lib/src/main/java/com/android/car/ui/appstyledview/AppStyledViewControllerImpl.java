@@ -203,6 +203,10 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
 
     @Override
     public int getContentAreaWidth() {
+        if (mWidth <= 0) {
+            getDialogWindowLayoutParam(new WindowManager.LayoutParams());
+        }
+
         int orientation = mContext.getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             return mWidth - mContext.getResources().getDimensionPixelSize(
@@ -214,6 +218,10 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
 
     @Override
     public int getContentAreaHeight() {
+        if (mHeight <= 0) {
+            getDialogWindowLayoutParam(new WindowManager.LayoutParams());
+        }
+
         int orientation = mContext.getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             return mHeight;
