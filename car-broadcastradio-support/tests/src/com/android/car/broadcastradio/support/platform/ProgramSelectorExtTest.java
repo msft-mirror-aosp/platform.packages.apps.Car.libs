@@ -94,6 +94,40 @@ public final class ProgramSelectorExtTest {
     }
 
     @Test
+    public void formatAmFmFrequency_withFmFrequency() {
+        mExpect.withMessage("Formatted FM frequency").that(ProgramSelectorExt
+                .formatAmFmFrequency(/* frequencyKhz= */ 97900, /* flags= */ 0))
+                .isEqualTo("97.9 FM");
+    }
+
+    @Test
+    public void formatAmFmFrequency_withAmFrequency() {
+        mExpect.withMessage("Formatted FM frequency").that(ProgramSelectorExt
+                        .formatAmFmFrequency(/* frequencyKhz= */ 680, /* flags= */ 0))
+                .isEqualTo("680 AM");
+    }
+
+    @Test
+    public void formatAmFmFrequency_withInvalidFrequency() {
+        mExpect.withMessage("Formatted invalid frequency").that(ProgramSelectorExt
+                .formatAmFmFrequency(/* frequencyKhz= */ -1, /* flags= */ 0)).isNull();
+    }
+
+    @Test
+    public void formatAmFmFrequency_withModulationOnly() {
+        mExpect.withMessage("Formatted AM frequency with modulation only")
+                .that(ProgramSelectorExt.formatAmFmFrequency(AM_FREQUENCY_VALUE,
+                        ProgramSelectorExt.NAME_MODULATION_ONLY)).isEqualTo("AM");
+    }
+
+    @Test
+    public void formatAmFmFrequency_withoutModulation() {
+        mExpect.withMessage("Formatted FM frequency without modulation")
+                .that(ProgramSelectorExt.formatAmFmFrequency(/* frequencyKhz= */ 97900,
+                        ProgramSelectorExt.NAME_NO_MODULATION)).isEqualTo("97.9");
+    }
+
+    @Test
     public void createAmFmSelector() {
         mExpect.withMessage("FM selector").that(ProgramSelectorExt.createAmFmSelector(
                 FM_FREQUENCY_VALUE)).isEqualTo(FM_SELECTOR);
@@ -187,6 +221,44 @@ public final class ProgramSelectorExtTest {
         mExpect.withMessage("Ensemble of FM selector")
                 .that(ProgramSelectorExt.getDabEnsemble(FM_SELECTOR))
                 .isEqualTo(ProgramSelectorExt.INVALID_IDENTIFIER_VALUE);
+    }
+
+    @Test
+    public void getDisplayName_forAmFmSelector() {
+        mExpect.withMessage("AM/FM selector display name")
+                .that(ProgramSelectorExt.getDisplayName(FM_SELECTOR, /* flags= */ 0))
+                .isEqualTo("88.5 FM");
+    }
+
+    @Test
+    public void getDisplayName_forHdSelector() {
+        mExpect.withMessage("HD selector display name")
+                .that(ProgramSelectorExt.getDisplayName(HD_SELECTOR, /* flags= */ 0))
+                .isEqualTo("97.1 FM-HD2");
+    }
+
+    @Test
+    public void getDisplayName_forRdsSelectorWithoutFrequency() {
+        ProgramSelector.Identifier rdsId = new ProgramSelector.Identifier(
+                ProgramSelector.IDENTIFIER_TYPE_RDS_PI, 15019);
+        ProgramSelector rdsSel = new ProgramSelector(ProgramSelector.PROGRAM_TYPE_FM_HD, rdsId,
+                new ProgramSelector.Identifier[]{}, /* vendorIds= */ null);
+
+        mExpect.withMessage("RDS selector display name")
+                .that(ProgramSelectorExt.getDisplayName(rdsSel, /* flags= */ 0)).isEqualTo("FM");
+    }
+
+    @Test
+    public void getDisplayName_forDabSelector() {
+        mExpect.withMessage("DAB selector display name")
+                .that(ProgramSelectorExt.getDisplayName(DAB_SELECTOR, /* flags= */ 0))
+                .isEqualTo("DAB");
+    }
+
+    @Test
+    public void getDisplayName_forDabSelectorWithModulationOnly() {
+        mExpect.withMessage("DAB selector display name").that(ProgramSelectorExt.getDisplayName(
+                DAB_SELECTOR, ProgramSelectorExt.NAME_MODULATION_ONLY)).isNull();
     }
 
     @Test
