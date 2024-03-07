@@ -29,6 +29,8 @@ car_media_common_static_libs = [
     "androidx.lifecycle_lifecycle-extensions",
     "car-apps-common-prebuilt",
     "car-media-extensions-prebuilt",
+    "car-ui-lib-prebuilt",
+    "car-uxr-client-lib-prebuilt",
 ]
 
 android_library {
