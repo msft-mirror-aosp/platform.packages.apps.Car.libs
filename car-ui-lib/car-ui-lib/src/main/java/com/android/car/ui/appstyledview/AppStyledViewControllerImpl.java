@@ -55,8 +55,6 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
     private Runnable mAppStyledVCloseClickListener;
     @Nullable
     private View mAppStyledView;
-    private int mWidth;
-    private int mHeight;
 
     public AppStyledViewControllerImpl(Context context) {
         mContext = context;
@@ -123,16 +121,16 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
         int horizontalInset = (int) getHorizontalInset(displayMetrics);
         int verticalInset = (int) getVerticalInset(displayMetrics);
 
-        mWidth = displayWidth;
-        mHeight = displayHeight;
+        int width = displayWidth;
+        int height = displayHeight;
 
         int configuredWidth = mContext.getResources().getDimensionPixelSize(
                 R.dimen.car_ui_app_styled_dialog_width);
         int configuredHeight = mContext.getResources().getDimensionPixelSize(
                 R.dimen.car_ui_app_styled_dialog_height);
 
-        mWidth = configuredWidth != 0 ? configuredWidth : Math.min(mWidth, maxWidth);
-        mHeight = configuredHeight != 0 ? configuredHeight : Math.min(mHeight, maxHeight);
+        width = configuredWidth != 0 ? configuredWidth : Math.min(width, maxWidth);
+        height = configuredHeight != 0 ? configuredHeight : Math.min(height, maxHeight);
 
         params.dimAmount = CarUiUtils.getFloat(mContext.getResources(),
                 R.dimen.car_ui_app_styled_dialog_dim_amount);
@@ -173,27 +171,27 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
         int minPaddingPx = (int) CarUiUtils.dpToPixel(mContext.getResources(),
                 DIALOG_MIN_PADDING);
 
-        if (mWidth + horizontalInset >= displayWidth - (minPaddingPx * 2)) {
-            mWidth = displayWidth - horizontalInset - (minPaddingPx * 2);
+        if (width + horizontalInset >= displayWidth - (minPaddingPx * 2)) {
+            width = displayWidth - horizontalInset - (minPaddingPx * 2);
         }
 
-        if (mHeight + verticalInset >= displayHeight - (minPaddingPx * 2)) {
-            mHeight = displayHeight - verticalInset - (minPaddingPx * 2);
+        if (height + verticalInset >= displayHeight - (minPaddingPx * 2)) {
+            height = displayHeight - verticalInset - (minPaddingPx * 2);
         }
 
-        params.width = mWidth;
-        params.height = mHeight;
+        params.width = width;
+        params.height = height;
 
         int startMarginThresholdPx = (int) CarUiUtils.dpToPixel(mContext.getResources(),
                 DIALOG_START_MARGIN_THRESHOLD);
         boolean isLandscape = mContext.getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE;
-        int startMargin = (displayWidth - mWidth) / 2;
+        int startMargin = (displayWidth - horizontalInset - width) / 2;
 
         if (isLandscape && startMargin >= startMarginThresholdPx) {
-                params.gravity = Gravity.TOP | Gravity.START;
-                params.x = startMarginThresholdPx;
-                params.y = (displayHeight - mHeight) / 2;
+            params.gravity = Gravity.TOP | Gravity.START;
+            params.x = startMarginThresholdPx;
+            params.y = (displayHeight - verticalInset - height) / 2;
         } else {
             params.gravity = Gravity.CENTER;
         }
@@ -203,31 +201,27 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
 
     @Override
     public int getContentAreaWidth() {
-        if (mWidth <= 0) {
-            getDialogWindowLayoutParam(new WindowManager.LayoutParams());
-        }
+        int width = getDialogWindowLayoutParam(new LayoutParams()).width;
 
         int orientation = mContext.getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            return mWidth - mContext.getResources().getDimensionPixelSize(
+            return width - mContext.getResources().getDimensionPixelSize(
                     R.dimen.car_ui_toolbar_first_row_height);
         }
 
-        return mWidth;
+        return width;
     }
 
     @Override
     public int getContentAreaHeight() {
-        if (mHeight <= 0) {
-            getDialogWindowLayoutParam(new WindowManager.LayoutParams());
-        }
+        int height = getDialogWindowLayoutParam(new LayoutParams()).height;
 
         int orientation = mContext.getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            return mHeight;
+            return height;
         }
 
-        return mHeight - mContext.getResources().getDimensionPixelSize(
+        return height - mContext.getResources().getDimensionPixelSize(
                 R.dimen.car_ui_toolbar_first_row_height);
     }
 
