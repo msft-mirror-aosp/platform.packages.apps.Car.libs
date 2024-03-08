@@ -17,6 +17,7 @@
 package com.android.car.media.common.ui;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;
@@ -112,16 +113,24 @@ public final class MediaWidgetControllerUtilities {
         }
     }
 
+    // TODO (b/328617319): Add unit tests for this function
     /**
-     * Update non-null buttons in actions with skipPrev, skipNext, and custom actions. If
-     * hideExtraButtons is true, any unfilled actions in the list will be set to GONE. If
+     * Update non-null buttons in actions list with skipPrev, skipNext, and custom actions. If
      * defaultButtonDrawable is non-null, any any unfilled actions in the list are assigned this
-     * Drawable and set to VISIBLE
+     * Drawable and set to VISIBLE, if defaultButtonDrawable is null, any unfilled actions in the
+     * list will be set to GONE. If the skipPrevDrawable, skipPrevBackgroundDrawable,
+     * skipNextDrawable, or skipNextBackgroundDrawable are non-null, they will be used for the
+     * skipPrev/skipNext button's setImageDrawable and setBackground respectively. If
+     * reserveSkipSlots is true, the first two non-null buttons in actions list will not be filled
+     * in with non-skipPrev/skipNext custom actions, regardless if skipPrev/skipNext actions are
+     * used by the media app.
      */
     public static void updateActionsWithPlaybackState(Context context, List<ImageButton> actions,
             PlaybackStateWrapper playbackState, @Nullable PlaybackController playbackController,
             @Nullable Drawable skipPrevDrawable, @Nullable Drawable skipNextDrawable,
-            boolean hideExtraButtons, @Nullable Drawable defaultButtonDrawable) {
+            @Nullable Drawable skipPrevBackgroundDrawable,
+            @Nullable Drawable skipNextBackgroundDrawable, boolean reserveSkipSlots,
+            @Nullable Drawable defaultButtonDrawable) {
         boolean isSkipPrevEnabled = playbackState.isSkipPreviousEnabled();
         boolean isSkipPrevReserved = playbackState.iSkipPreviousReserved();
         boolean isSkipNextEnabled = playbackState.isSkipNextEnabled();
@@ -129,62 +138,76 @@ public final class MediaWidgetControllerUtilities {
         List<PlaybackViewModel.RawCustomPlaybackAction> customActions = playbackState
                 .getCustomActions();
         List<ImageButton> actionsToFill = new ArrayList<>();
-        for (ImageButton button : actions) {
+        for (int i = 0; i < actions.size(); i++) {
+            ImageButton button = actions.get(i);
             if (button != null) {
                 actionsToFill.add(button);
-                if (defaultButtonDrawable != null) {
+                if (defaultButtonDrawable != null && i != 0 && i != 1) {
                     button.setImageDrawable(defaultButtonDrawable);
+                    ViewUtils.setVisible(button, true);
+                } else {
+                    ViewUtils.setVisible(button, false);
                 }
             }
         }
-        // Fill in buttons with previous and next if enabled or reserved
-        boolean isSkipPrevHandled = false;
+
+        // First handle the skip next button to place it in second button
         boolean isSkipNextHandled = false;
+        if (actionsToFill.size() >= 2) {
+            ImageButton button = actionsToFill.get(1);
+            if ((isSkipNextEnabled || isSkipNextReserved)) {
+                if (skipNextDrawable != null) {
+                    button.setImageDrawable(skipNextDrawable);
+                }
+                if (skipNextBackgroundDrawable != null) {
+                    button.setBackground(skipNextBackgroundDrawable);
+                }
+                ViewUtils.setVisible(button, true);
+                button.setEnabled(isSkipNextEnabled);
+                button.setOnClickListener(v -> {
+                    if (playbackController != null) {
+                        playbackController.skipToNext();
+                    }
+                });
+                isSkipNextHandled = true;
+            }
+        }
+        // Now handle the skip prev button
         int startingSlotForCustomActions = 0;
-        for (ImageButton button : actionsToFill) {
-            if (!isSkipPrevHandled) {
-                if (isSkipPrevEnabled || isSkipPrevReserved) {
-                    if (skipPrevDrawable != null) {
-                        button.setImageDrawable(skipPrevDrawable);
-                    }
-                    ViewUtils.setVisible(button, true);
-                    button.setEnabled(isSkipPrevEnabled);
-                    button.setOnClickListener(v -> {
-                        if (playbackController != null) {
-                            playbackController.skipToPrevious();
-                        }
-                    });
-                    isSkipPrevHandled = true;
-                    startingSlotForCustomActions++;
-                    continue;
+        if (actionsToFill.size() >= 1) {
+            ImageButton button = actionsToFill.get(0);
+            if ((isSkipPrevEnabled || isSkipPrevReserved)) {
+                if (skipPrevDrawable != null) {
+                    button.setImageDrawable(skipPrevDrawable);
                 }
-                isSkipPrevHandled = true;
-            }
-            if (!isSkipNextHandled) {
-                if (isSkipNextEnabled || isSkipNextReserved) {
-                    if (skipNextDrawable != null) {
-                        button.setImageDrawable(skipNextDrawable);
-                    }
-                    ViewUtils.setVisible(button, true);
-                    button.setEnabled(isSkipNextEnabled);
-                    button.setOnClickListener(v -> {
-                        if (playbackController != null) {
-                            playbackController.skipToNext();
-                        }
-                    });
-                    startingSlotForCustomActions++;
+                if (skipPrevBackgroundDrawable != null) {
+                    button.setBackground(skipPrevBackgroundDrawable);
                 }
+                ViewUtils.setVisible(button, true);
+                button.setEnabled(isSkipPrevEnabled);
+                button.setOnClickListener(v -> {
+                    if (playbackController != null) {
+                        playbackController.skipToPrevious();
+                    }
+                });
+                startingSlotForCustomActions++;
             }
-            break;
         }
 
         // Fill in remaining buttons (if any) with custom actions
+        if (reserveSkipSlots) {
+            startingSlotForCustomActions = 2;
+        }
         int i = startingSlotForCustomActions;
         for (PlaybackViewModel.RawCustomPlaybackAction a : customActions) {
+            if (i == 1 && isSkipNextHandled) {
+                i++;
+            }
             if (i < actionsToFill.size()) {
                 CustomPlaybackAction customAction = a.fetchDrawable(context);
                 if (customAction != null) {
                     actionsToFill.get(i).setImageDrawable(customAction.mIcon);
+                    actionsToFill.get(i).setBackgroundColor(Color.TRANSPARENT);
                     ViewUtils.setVisible(actionsToFill.get(i), true);
                     actionsToFill.get(i).setOnClickListener(v -> {
                         if (playbackController != null) {
@@ -196,19 +219,6 @@ public final class MediaWidgetControllerUtilities {
                 i++;
             } else {
                 break;
-            }
-        }
-        // If there are more buttons than actions, hide them
-        if (hideExtraButtons) {
-            for (int j = i; j < actionsToFill.size(); j++) {
-                ViewUtils.setVisible(actionsToFill.get(j), false);
-            }
-        }
-        // If there are more buttons than actions, apply default Drawable
-        if (defaultButtonDrawable != null) {
-            for (int j = i; j < actionsToFill.size(); j++) {
-                actionsToFill.get(j).setImageDrawable(defaultButtonDrawable);
-                ViewUtils.setVisible(actionsToFill.get(j), true);
             }
         }
     }
