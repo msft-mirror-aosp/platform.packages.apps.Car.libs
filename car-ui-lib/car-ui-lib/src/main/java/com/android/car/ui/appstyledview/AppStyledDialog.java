@@ -109,7 +109,12 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
         mBaseLayoutParams = new WindowManager.LayoutParams();
         mBaseLayoutParams.copyFrom(window.getAttributes());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            mBaseLayoutParams.setFitInsetsTypes(0);
+            int types = WindowInsetsCompat.Type.systemBars();
+            if (mBaseLayoutParams.layoutInDisplayCutoutMode
+                    != WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS) {
+                types = types | WindowInsetsCompat.Type.displayCutout();
+            }
+            mBaseLayoutParams.setFitInsetsTypes(types);
         }
         updateAttributes();
         configureImeInsetFit();
@@ -138,7 +143,6 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
         }
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
-        WindowCompat.setDecorFitsSystemWindows(window, false);
         ViewCompat.setWindowInsetsAnimationCallback(window.getDecorView().getRootView(),
                 new WindowInsetsAnimationCompat.Callback(
                         WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP) {
