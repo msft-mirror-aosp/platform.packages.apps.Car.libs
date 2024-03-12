@@ -90,11 +90,26 @@ public class AnalyticsHelper {
             @AnalyticsEvent.ViewComponent int viewComp,
             MediaItemsRepository repo, MediaItemMetadata parentItem, List<String> prevItems,
             List<MediaItemMetadata> items, int currFirst, int currLast, boolean fromScroll) {
+        return sendVisibleItemsInc(viewComp, repo, parentItem != null ? parentItem.getId() : null,
+                prevItems,
+                items.stream().map(MediaItemMetadata::getId).collect(Collectors.toList()),
+                currFirst, currLast, fromScroll);
+    }
+
+    /**
+     * Creates a sends a visible items event for the items that became visible and another event
+     * for the items that became hidden.
+     * @return the currently visible items.
+     */
+    public static List<String> sendVisibleItemsInc(
+            @AnalyticsEvent.ViewComponent int viewComp,
+            MediaItemsRepository repo, String parentItem, List<String> prevItems,
+            List<String> items, int currFirst, int currLast, boolean fromScroll) {
 
         // Handle empty list by hiding previous and returning empty.
         if (items.isEmpty() && !prevItems.isEmpty()) {
             repo.getAnalyticsManager().sendVisibleItemsEvents(
-                    parentItem != null ? parentItem.getId() : null, viewComp, VIEW_ACTION_HIDE,
+                    parentItem, viewComp, VIEW_ACTION_HIDE,
                     fromScroll ? VIEW_ACTION_MODE_SCROLL : VIEW_ACTION_MODE_NONE,
                     new ArrayList<>(prevItems));
             return List.of();
@@ -109,7 +124,7 @@ public class AnalyticsHelper {
 
             if (!prevItems.isEmpty()) {
                 repo.getAnalyticsManager().sendVisibleItemsEvents(
-                        parentItem != null ? parentItem.getId() : null, viewComp, VIEW_ACTION_HIDE,
+                        parentItem, viewComp, VIEW_ACTION_HIDE,
                         fromScroll ? VIEW_ACTION_MODE_SCROLL : VIEW_ACTION_MODE_NONE,
                         new ArrayList<>(prevItems));
             }
@@ -122,11 +137,8 @@ public class AnalyticsHelper {
         int limitedMin = Math.min(currFirst, currLast + 1);
         int limitedMax = Math.max(currFirst, currLast + 1);
 
-        List<String> currItemsSublist = items
-                .subList(limitedMin, Math.min(limitedMax, items.size()))
-                .stream()
-                .map(MediaItemMetadata::getId)
-                .collect(Collectors.toCollection(ArrayList::new));
+        List<String> currItemsSublist = new ArrayList<>(items
+                .subList(limitedMin, Math.min(limitedMax, items.size())));
 
         List<String> delta = new ArrayList<>(prevItems);
         List<String> deltaNew = new ArrayList<>(currItemsSublist);
@@ -135,13 +147,13 @@ public class AnalyticsHelper {
 
         if (!delta.isEmpty()) {
             repo.getAnalyticsManager().sendVisibleItemsEvents(
-                    parentItem != null ? parentItem.getId() : null, viewComp, VIEW_ACTION_HIDE,
+                    parentItem, viewComp, VIEW_ACTION_HIDE,
                     fromScroll ? VIEW_ACTION_MODE_SCROLL : VIEW_ACTION_MODE_NONE,
                     new ArrayList<>(delta));
         }
         if (!deltaNew.isEmpty()) {
             repo.getAnalyticsManager().sendVisibleItemsEvents(
-                    parentItem != null ? parentItem.getId() : null, viewComp, VIEW_ACTION_SHOW,
+                    parentItem, viewComp, VIEW_ACTION_SHOW,
                     fromScroll ? VIEW_ACTION_MODE_SCROLL : VIEW_ACTION_MODE_NONE,
                     new ArrayList<>(deltaNew));
         }
