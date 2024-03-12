@@ -26,8 +26,8 @@ import com.android.car.media.common.source.CarMediaManagerHelper;
 import com.android.car.media.common.source.MediaModels;
 import com.android.car.media.common.source.MediaSourceViewModel;
 
-/** ViewModel used to track state of media widgets that use the {@link MediaWidgetController} */
-public class MediaWidgetViewModel extends AndroidViewModel {
+/** ViewModel used to track state of media widgets that use the {@link PlaybackCardController} */
+public class PlaybackCardViewModel extends AndroidViewModel {
 
     private MediaModels mModels;
     private CarMediaManagerHelper mCarMediaManagerHelper;
@@ -36,11 +36,11 @@ public class MediaWidgetViewModel extends AndroidViewModel {
     private boolean mHistoryVisible = false;
     private boolean mOverflowExpanded = false;
 
-    public MediaWidgetViewModel(@NonNull Application application) {
+    public PlaybackCardViewModel(@NonNull Application application) {
         super(application);
     }
 
-    /** Initialize the MediaWidgetViewModel */
+    /** Initialize the PlaybackCardViewModel */
     public void init(MediaModels models) {
         mModels = models;
         mCarMediaManagerHelper = CarMediaManagerHelper.getInstance(getApplication());

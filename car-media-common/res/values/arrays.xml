@@ -56,7 +56,7 @@
         <item>com.android.car.radio/.service.RadioAppService</item>
     </string-array>
 
-    <!-- This array is for the action slot ids that the MediaWidgetController expects -->
+    <!-- This array is for the action slot ids that the PlaybackCardController expects -->
     <array name="action_slot_ids">
         <item>@id/action_id1</item>
         <item>@id/action_id2</item>

@@ -16,12 +16,12 @@
 
 package com.android.car.media.common.ui;
 
-import static com.android.car.media.common.ui.MediaWidgetControllerUtilities.updateActionsWithPlaybackState;
-import static com.android.car.media.common.ui.MediaWidgetControllerUtilities.updateImageViewDrawableAndVisibility;
-import static com.android.car.media.common.ui.MediaWidgetControllerUtilities.updateMediaLink;
-import static com.android.car.media.common.ui.MediaWidgetControllerUtilities.updatePlayButtonWithPlaybackState;
-import static com.android.car.media.common.ui.MediaWidgetControllerUtilities.updateProgressTimesAndSeparator;
-import static com.android.car.media.common.ui.MediaWidgetControllerUtilities.updateTextViewAndVisibility;
+import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.updateActionsWithPlaybackState;
+import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.updateImageViewDrawableAndVisibility;
+import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.updateMediaLink;
+import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.updatePlayButtonWithPlaybackState;
+import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.updateProgressTimesAndSeparator;
+import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.updateTextViewAndVisibility;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -61,11 +61,11 @@ import java.util.List;
  * queue, and history. It observes a {@link PlaybackViewModel} and updates its information depending
  * on the currently playing media source through the {@link android.media.session.MediaSession} API.
  */
-public class MediaWidgetController {
+public class PlaybackCardController {
 
     protected final ViewGroup mView;
     protected final PlaybackViewModel mDataModel;
-    protected final MediaWidgetViewModel mViewModel;
+    protected final PlaybackCardViewModel mViewModel;
     protected final MediaItemsRepository mItemsRepository;
 
     protected TextView mTitle = null;
@@ -92,7 +92,7 @@ public class MediaWidgetController {
     protected MediaLinkHandler mDescriptionLinker = null;
     private LifecycleOwner mViewLifecycle;
 
-    protected MediaWidgetController(Builder builder) {
+    protected PlaybackCardController(Builder builder) {
         mView = builder.mView;
         mDataModel = builder.mDataModel;
         mViewModel = builder.mViewModel;
@@ -113,22 +113,22 @@ public class MediaWidgetController {
     }
 
     /**
-     * Class used to construct a {@link MediaWidgetController} using {@link PlaybackViewModel},
-     * {@link MediaWidgetViewModel}, {@link MediaItemsRepository}, and {@link ViewGroup}.
+     * Class used to construct a {@link PlaybackCardController} using {@link PlaybackViewModel},
+     * {@link PlaybackCardViewModel}, {@link MediaItemsRepository}, and {@link ViewGroup}.
      */
     public static class Builder {
         private ViewGroup mView;
         private PlaybackViewModel mDataModel;
-        private MediaWidgetViewModel mViewModel;
+        private PlaybackCardViewModel mViewModel;
         private MediaItemsRepository mItemsRepository;
 
         /** Default constructor */
         public Builder() {}
 
-        /** Used to set the {@link PlaybackViewModel}, {@link MediaWidgetViewModel}, and
+        /** Used to set the {@link PlaybackViewModel}, {@link PlaybackCardViewModel}, and
          * {@link MediaItemsRepository}.
          */
-        public Builder setModels(PlaybackViewModel dataModel, MediaWidgetViewModel viewModel,
+        public Builder setModels(PlaybackViewModel dataModel, PlaybackCardViewModel viewModel,
                 MediaItemsRepository itemsRepository) {
             mDataModel = dataModel;
             mViewModel = viewModel;
@@ -142,23 +142,23 @@ public class MediaWidgetController {
             return this;
         }
 
-        /** Creates {@link MediaWidgetController}. Throws a {@link RuntimeException} if
+        /** Creates {@link PlaybackCardController}. Throws a {@link RuntimeException} if
          *  {@link #setViewGroup(ViewGroup)} has not been called or called with null ViewGroup.
          *  Throws a {@link RuntimeException} if
-         *  {@link #setModels(PlaybackViewModel, MediaWidgetViewModel, MediaItemsRepository)} has
+         *  {@link #setModels(PlaybackViewModel, PlaybackCardViewModel, MediaItemsRepository)} has
          *  not been called or was called with a null {@link PlaybackViewModel} or null
-         *  {@link MediaWidgetViewModel}.
+         *  {@link PlaybackCardViewModel}.
          */
-        public MediaWidgetController build() {
+        public PlaybackCardController build() {
             if (mView == null) {
                 throw new IllegalStateException("Must call setViewGroup on Builder with non-null "
                         + "ViewGroup before build");
             }
             if (mDataModel == null || mViewModel == null) {
                 throw new IllegalStateException("Must call setModels on Builder before with "
-                        + "non-null PlaybackViewModel and MediaWidgetViewModel before build");
+                        + "non-null PlaybackViewModel and PlaybackCardViewModel before build");
             }
-            MediaWidgetController mwc = new MediaWidgetController(this);
+            PlaybackCardController mwc = new PlaybackCardController(this);
             mwc.setupController();
             return mwc;
         }
@@ -276,8 +276,8 @@ public class MediaWidgetController {
 
     /**
      * Handles the onClick logic for the mQueueButton by toggling
-     * {@link MediaWidgetViewModel#setQueueVisible(boolean)}. Should also handle showing or hiding
-     * the queue, based on {@link MediaWidgetViewModel#getQueueVisible()}. It is also recommended
+     * {@link PlaybackCardViewModel#setQueueVisible(boolean)}. Should also handle showing or hiding
+     * the queue, based on {@link PlaybackCardViewModel#getQueueVisible()}. It is also recommended
      * to query {@link #getMediaHasQueue()} before deciding to show the queue.
      */
     @CallSuper
@@ -309,8 +309,8 @@ public class MediaWidgetController {
 
     /**
      * Handles the onClick logic for the mHistoryButton by toggling
-     * {@link MediaWidgetViewModel#setHistoryVisible(boolean)}. Should also handle showing or hiding
-     * the history, based on {@link MediaWidgetViewModel#getHistoryVisible()}.
+     * {@link PlaybackCardViewModel#setHistoryVisible(boolean)}. Should also handle showing or hiding
+     * the history, based on {@link PlaybackCardViewModel#getHistoryVisible()}.
      */
     @CallSuper
     protected void handleHistoryButtonClicked(View history) {
@@ -332,8 +332,8 @@ public class MediaWidgetController {
 
     /**
      * Handles the onClick logic for the mActionOverflowButton by toggling
-     * {@link MediaWidgetViewModel#setOverflowExpanded(boolean)}. Should also handle showing or
-     * hiding the overflow actions, based on {@link MediaWidgetViewModel#getOverflowExpanded()}.
+     * {@link PlaybackCardViewModel#setOverflowExpanded(boolean)}. Should also handle showing or
+     * hiding the overflow actions, based on {@link PlaybackCardViewModel#getOverflowExpanded()}.
      */
     @CallSuper
     protected void handleCustomActionsOverflowButtonClicked(View overflow) {

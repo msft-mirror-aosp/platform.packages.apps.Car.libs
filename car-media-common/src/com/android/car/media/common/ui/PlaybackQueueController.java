@@ -19,7 +19,7 @@ package com.android.car.media.common.ui;
 import static androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent.VIEW_COMPONENT_QUEUE_LIST;
 import static androidx.recyclerview.widget.RecyclerView.NO_POSITION;
 
-import static com.android.car.media.common.ui.MediaWidgetControllerUtilities.updateTextViewAndVisibility;
+import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.updateTextViewAndVisibility;
 import static com.android.car.ui.recyclerview.RangeFilter.INVALID_INDEX;
 
 import android.content.Context;

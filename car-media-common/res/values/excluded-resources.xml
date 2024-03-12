@@ -17,7 +17,7 @@
 <!-- Ids that will be excluded from overlayable.xml file using generate-overlayable.sh -->
 
 <resources>
-    <!-- Forward declaration for ids used by MediaWidgetController -->
+    <!-- Forward declaration for ids used by PlaybackCardController -->
     <item type="id" name="title" />
     <item type="id" name="album_art" />
     <item type="id" name="artist" />
