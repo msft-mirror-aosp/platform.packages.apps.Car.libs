@@ -44,6 +44,16 @@
     <item type="id" name="history_button"/>
     <item type="id" name="overflow_button"/>
 
+    <!-- Forward declarations for ids used by PlaybackQueueController -->
+    <item type="id" name="thumbnail_container"/>
+    <item type="id" name="thumbnail"/>
+    <item type="id" name="spacer"/>
+    <item type="id" name="queue_list_item_title"/>
+    <item type="id" name="queue_list_item_subtitle"/>
+    <item type="id" name="separator"/>
+    <item type="id" name="now_playing_icon"/>
+    <item type="id" name="queue_list"/>
+
     <!-- Forward declarations for resources used in other car-media-common Classes -->
     <item type="id" name="error_button" />
     <item type="id" name="error_message" />
