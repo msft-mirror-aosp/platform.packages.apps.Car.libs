@@ -89,8 +89,10 @@ public class BackgroundImageView extends ConstraintLayout {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             int averageDim = (mImageView.getWidth() + mImageView.getHeight()) / 2;
             float radius = mBitmapBlurPercent * averageDim;
-            RenderEffect blur = RenderEffect.createBlurEffect(radius, radius, MIRROR);
-            mImageView.setRenderEffect(blur);
+            if (radius > 0) {
+                RenderEffect blur = RenderEffect.createBlurEffect(radius, radius, MIRROR);
+                mImageView.setRenderEffect(blur);
+            }
         }
     }
 
