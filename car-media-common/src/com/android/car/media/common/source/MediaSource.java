@@ -16,7 +16,10 @@
 
 package com.android.car.media.common.source;
 
+import static android.car.media.CarMediaIntents.EXTRA_MEDIA_COMPONENT;
+
 import android.car.Car;
+import android.car.media.CarMediaIntents;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +30,7 @@ import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.service.media.MediaBrowserService;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.text.TextUtils;
@@ -41,6 +45,7 @@ import com.android.car.apps.common.IconCropper;
 import com.android.car.media.common.R;
 
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,7 +57,9 @@ import java.util.Objects;
  */
 public class MediaSource {
     private static final String TAG = "MediaSource";
+    private static final String ANDROIDX_CAR_APP_LAUNCHABLE = "androidx.car.app.launchable";
 
+    private static List<String> sCustomMediaComponents;
     @Nullable
     private final ComponentName mBrowseService;
     @Nullable
@@ -98,7 +105,7 @@ public class MediaSource {
         String packageName = mediaController.getPackageName();
         try {
             ServiceInfo serviceInfo = null;
-            ComponentName componentName = extractServiceComponentName(mediaController);
+            ComponentName componentName = getMediaControllerMBS(context, mediaController);
             if (componentName != null) {
                 serviceInfo = getBrowseServiceInfo(context, componentName);
                 String className = serviceInfo != null ? serviceInfo.name : null;
@@ -110,8 +117,8 @@ public class MediaSource {
             CharSequence displayName = extractDisplayName(context, serviceInfo, packageName);
             Drawable icon = extractIcon(context, serviceInfo, packageName);
 
-            return new MediaSource(/* componentName= */ null, mediaController, displayName, icon,
-                new IconCropper(context));
+            return new MediaSource(/* componentName= */ componentName, mediaController, displayName,
+                    icon, new IconCropper(context));
         } catch (NameNotFoundException e) {
             Log.w(TAG, "App not found " + packageName);
             return null;
@@ -138,12 +145,11 @@ public class MediaSource {
     @Nullable
     private static ServiceInfo getBrowseServiceInfo(@NonNull Context context,
             @NonNull ComponentName componentName) {
-        PackageManager packageManager = context.getPackageManager();
         Intent intent = new Intent();
         intent.setAction(MediaBrowserService.SERVICE_INTERFACE);
         intent.setPackage(componentName.getPackageName());
-        List<ResolveInfo> resolveInfos = packageManager.queryIntentServices(intent,
-                PackageManager.GET_RESOLVED_FILTER);
+        List<ResolveInfo> resolveInfos =
+                queryIntentServices(context, intent, PackageManager.GET_RESOLVED_FILTER);
         if (resolveInfos == null || resolveInfos.isEmpty()) {
             return null;
         }
@@ -191,10 +197,10 @@ public class MediaSource {
     }
 
     /**
-     * @return the browse service associated with the media session if provided, null otherwise.
+     * @return the browse service defined in the controller's extras if provided, null otherwise.
      */
     @Nullable
-    private static ComponentName extractServiceComponentName(MediaControllerCompat controller) {
+    private static ComponentName getServiceFromExtras(MediaControllerCompat controller) {
         if (controller.getExtras() == null || controller.getExtras()
                 .getString(Car.CAR_EXTRA_BROWSE_SERVICE_FOR_SESSION) == null) {
             return null;
@@ -203,6 +209,29 @@ public class MediaSource {
                 controller.getExtras().getString(Car.CAR_EXTRA_BROWSE_SERVICE_FOR_SESSION);
 
         return new ComponentName(controller.getPackageName(), serviceNameString);
+    }
+
+    /**
+     *  @return the browse service defined in the controller's manifest if provided, null otherwise
+     */
+    @Nullable
+    private static ComponentName getServiceFromManifest(Context context,
+            MediaControllerCompat controller) {
+        String packageName = controller.getPackageName();
+        Intent mediaIntent = new Intent();
+        mediaIntent.setPackage(packageName);
+        mediaIntent.setAction(MediaBrowserService.SERVICE_INTERFACE);
+
+        List<ResolveInfo> mediaServices =
+                queryIntentServices(context, mediaIntent, PackageManager.GET_RESOLVED_FILTER);
+
+        for (ResolveInfo resolveInfo : mediaServices) {
+            if (!TextUtils.isEmpty(resolveInfo.serviceInfo.name)) {
+                return new ComponentName(packageName, resolveInfo.serviceInfo.name);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -268,6 +297,22 @@ public class MediaSource {
         return mMediaController;
     }
 
+    /**
+     *  Returns the intent to open a provided MediaSource, or null if not available
+     */
+    @Nullable
+    public Intent getIntent() {
+        // Only intent to a templated app with mbs
+        if (mBrowseService == null) {
+            return null;
+        }
+
+        Intent intent = new Intent(CarMediaIntents.ACTION_MEDIA_TEMPLATE);
+        intent.putExtra(EXTRA_MEDIA_COMPONENT, mBrowseService.flattenToString());
+
+        return intent;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -319,5 +364,109 @@ public class MediaSource {
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Wrong app-launcher intent: " + uri, e);
         }
+    }
+
+    /**
+     * Checks if the media source is supported i.e. Audio only no video, browsers etc.
+     */
+    public static boolean isAudioMediaSource(Context context, ComponentName mbsComponentName) {
+        if (mbsComponentName == null) {
+            return false;
+        }
+
+        if (sCustomMediaComponents == null) {
+            sCustomMediaComponents = Arrays.asList(
+                    context.getResources().getStringArray(R.array.custom_media_packages));
+        }
+        if (sCustomMediaComponents.contains(mbsComponentName.flattenToString())) {
+            Log.d(TAG, "Custom media component " + mbsComponentName + " is supported");
+            return true;
+        }
+        return isMediaTemplate(context, mbsComponentName);
+    }
+
+    /**
+     * Determines if the given media component is supported through media templates
+     */
+    public static boolean isMediaTemplate(Context context, ComponentName mbsComponentName) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) {
+            Log.d(TAG, "Checking if Component " + mbsComponentName + " is a media template");
+        }
+
+        // check the metadata for opt in info
+        Bundle metaData = getMbsMetadata(context, mbsComponentName);
+
+        if (metaData != null && metaData.containsKey(ANDROIDX_CAR_APP_LAUNCHABLE)) {
+            boolean launchable = metaData.getBoolean(ANDROIDX_CAR_APP_LAUNCHABLE);
+            Log.d(TAG, "MBS for " + mbsComponentName
+                    + " is opted " + (launchable ? "in" : "out"));
+            return launchable;
+        }
+
+        Log.d(TAG, "No opt-in info found for Component " + mbsComponentName);
+
+        // No explicit declaration. For backward compatibility, keep MBS only for audio apps
+        String packageName = mbsComponentName.getPackageName();
+        try {
+            if (isLegacyMediaApp(context, packageName)) {
+                if (Log.isLoggable(TAG, Log.DEBUG)) {
+                    Log.d(TAG, "Including " + mbsComponentName
+                            + " for media template app " + packageName);
+                }
+                return true;
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Package " + packageName + " was not found");
+        }
+        Log.d(TAG, "Skipping MBS for " + mbsComponentName
+                + " belonging to non media template app " + packageName);
+        return false;
+    }
+
+    /**
+     * Finds the Media Browse Service associated with the {@link MediaControllerCompat}
+     */
+    @Nullable
+    private static ComponentName getMediaControllerMBS(Context context,
+            MediaControllerCompat mediaController) {
+        // Media browse service can be either provided from controller extras or defined in the
+        // manifest
+        ComponentName componentName = getServiceFromExtras(mediaController);
+        if (componentName == null) {
+            componentName = getServiceFromManifest(context, mediaController);
+        }
+
+        // Only intent if the app is media templated
+        return isAudioMediaSource(context, componentName) ? componentName : null;
+    }
+
+    /**
+     * Determines if it's a legacy media app that doesn't have a launcher activity
+     */
+    private static boolean isLegacyMediaApp(Context context, String packageName)
+            throws PackageManager.NameNotFoundException {
+        // a media app doesn't have a launcher activity
+        return context.getPackageManager().getLaunchIntentForPackage(packageName) == null;
+    }
+
+    /**
+     * Finds the media browser service for the given mbs component and returns its metadata
+     */
+    private static Bundle getMbsMetadata(Context context, ComponentName mbsComponentName) {
+        Intent mediaIntent = new Intent();
+        mediaIntent.setComponent(mbsComponentName);
+        mediaIntent.setAction(MediaBrowserService.SERVICE_INTERFACE);
+        List<ResolveInfo> mediaServices =
+                queryIntentServices(context, mediaIntent, PackageManager.GET_META_DATA);
+        if (Log.isLoggable(TAG, Log.DEBUG)) {
+            Log.d(TAG, "MBS info found for " + mbsComponentName + " : " + mediaServices);
+        }
+        // This has to be not null, if not NPE is appropriate
+        return mediaServices.get(0).serviceInfo.metaData;
+    }
+
+    private static List<ResolveInfo> queryIntentServices(Context context, Intent intent, int flag) {
+        return context.getPackageManager()
+                .queryIntentServices(intent, flag);
     }
 }

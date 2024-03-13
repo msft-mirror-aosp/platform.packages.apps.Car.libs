@@ -45,6 +45,8 @@ import java.util.List;
 public class MediaSessionHelper extends MediaController.Callback {
 
     private final MutableLiveData<MediaSource> mMediaSource = new MutableLiveData<>();
+    private final MutableLiveData<List<MediaSource>> mActiveMediaSources =
+            new MutableLiveData<>();
     private final MediaSessionManager mMediaSessionManager;
     private final InputFactory mInputFactory;
     private final List<MediaController> mMediaControllersList = new ArrayList<>();
@@ -70,6 +72,8 @@ public class MediaSessionHelper extends MediaController.Callback {
         MediaSessionManager getMediaSessionManager(Context appContext);
 
         MediaSource getMediaSource(MediaController mediaController);
+
+        List<MediaSource> getMediaSources(List<MediaController> mediaControllers);
     }
 
     private static InputFactory createInputFactory(@NonNull Context appContext) {
@@ -91,6 +95,16 @@ public class MediaSessionHelper extends MediaController.Callback {
                         new MediaControllerCompat(appContext, token);
 
                 return MediaSource.create(appContext, newMediaController);
+            }
+
+            @Override
+            public List<MediaSource> getMediaSources(List<MediaController> mediaControllers) {
+                List<MediaSource> mediaSources = new ArrayList<>();
+                for (MediaController mediaController : mediaControllers) {
+                    mediaSources.add(getMediaSource(mediaController));
+                }
+
+                return mediaSources;
             }
         };
     }
@@ -114,28 +128,33 @@ public class MediaSessionHelper extends MediaController.Callback {
         return mMediaSource;
     }
 
+    /** Returns a filtered live data of {@link MediaController} with active playback states. */
+    public LiveData<List<MediaSource>> getActiveMediaSources() {
+        return mActiveMediaSources;
+    }
+
     private void onMediaControllersChange(List<MediaController> controllers) {
         unregisterSessionCallbacks();
 
-        MediaController activeMediaController = getActiveMediaController(controllers);
-        updateMediaSource(activeMediaController);
+        List<MediaController> activeMediaControllers = getActiveMediaControllers(controllers);
+        updateMediaSource(activeMediaControllers);
+        updateActiveMediaControllers(activeMediaControllers);
     }
 
     @Nullable
-    private MediaController getActiveMediaController(List<MediaController> controllers) {
+    private List<MediaController> getActiveMediaControllers(List<MediaController> controllers) {
         if (controllers == null || controllers.isEmpty()) {
             return null;
         }
 
-        MediaController activeMediaController = null;
+        List<MediaController> activeMediaControllers = new ArrayList<>();
         for (MediaController mediaController : controllers) {
             if (mediaController.getPlaybackState() == null) {
                 continue;
             }
 
-            if (activeMediaController == null
-                    && isActive(mediaController.getPlaybackState().getState())) {
-                activeMediaController = mediaController;
+            if (isActive(mediaController.getPlaybackState().getState())) {
+                activeMediaControllers.add(mediaController);
             } else {
                 // Since playback state changes don't trigger an active media session change, we
                 // need to listen to the other media sessions in case another one becomes active.
@@ -144,7 +163,7 @@ public class MediaSessionHelper extends MediaController.Callback {
         }
 
         // If no active sessions, return the most recent media session.
-        return activeMediaController == null ? controllers.get(0) : activeMediaController;
+        return activeMediaControllers;
     }
 
     private void registerForPlaybackChanges(MediaController controller) {
@@ -173,8 +192,17 @@ public class MediaSessionHelper extends MediaController.Callback {
         }
     }
 
-    private void updateMediaSource(MediaController mediaController) {
-        mMediaSource.setValue(mInputFactory.getMediaSource(mediaController));
+    private void updateMediaSource(List<MediaController> mediaControllers) {
+        MediaController primaryMediaController = null;
+
+        if (mediaControllers != null && !mediaControllers.isEmpty()) {
+            primaryMediaController = mediaControllers.get(0);
+        }
+        mMediaSource.setValue(mInputFactory.getMediaSource(primaryMediaController));
+    }
+
+    private void updateActiveMediaControllers(List<MediaController> mediaControllers) {
+        mActiveMediaSources.setValue(mInputFactory.getMediaSources(mediaControllers));
     }
 
     /* Copy of PlaybackState.isActive() which is only available for minsdk >=S  */
