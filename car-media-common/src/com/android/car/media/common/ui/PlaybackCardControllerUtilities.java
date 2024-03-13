@@ -142,10 +142,12 @@ public final class PlaybackCardControllerUtilities {
             ImageButton button = actions.get(i);
             if (button != null) {
                 actionsToFill.add(button);
+                button.setBackground(null);
                 if (defaultButtonDrawable != null && i != 0 && i != 1) {
                     button.setImageDrawable(defaultButtonDrawable);
                     ViewUtils.setVisible(button, true);
                 } else {
+                    button.setImageDrawable(null);
                     ViewUtils.setVisible(button, false);
                 }
             }
