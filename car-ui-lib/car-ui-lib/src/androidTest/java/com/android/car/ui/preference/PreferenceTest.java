@@ -18,6 +18,7 @@ package com.android.car.ui.preference;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.swipeRight;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -1044,24 +1045,21 @@ public class PreferenceTest {
 
     @Test
     public void testTwoActionSwitchPreference_switchWidgetFocusableFalse() {
-        // Create mock activity to test when global switchWidgetFocusable bool is false
-        mActivityRule.getScenario().onActivity(activity -> {
-            Context testableContext = spy(activity);
-            Resources testableResources = spy(activity.getResources());
-            when(testableContext.getResources()).thenReturn(testableResources);
-            // Start by setting global bool to be false (focus should now wrap container)
-            doReturn(false).when(testableResources).getBoolean(
-                    R.bool.car_ui_preference_two_action_switch_widget_focusable);
+        Context testableContext = spy(mActivity);
+        Resources testableResources = spy(mActivity.getResources());
+        when(testableContext.getResources()).thenReturn(testableResources);
+        // Start by setting global bool to be false (focus should now wrap container)
+        doReturn(false).when(testableResources).getBoolean(
+                R.bool.car_ui_preference_two_action_switch_widget_focusable);
 
-            // Create CarUiTwoActionSwitchPreference preference and add it to screen.
-            CarUiTwoActionSwitchPreference preference =
-                    new CarUiTwoActionSwitchPreference(testableContext);
-            preference.setKey("twoaction");
-            preference.setOrder(0);
-            activity.addPreference(preference);
-            // Scroll to preference
-            activity.runOnUiThread(() -> activity.scrollToPreference("twoaction"));
-        });
+        // Create CarUiTwoActionSwitchPreference preference and add it to screen.
+        CarUiTwoActionSwitchPreference preference =
+                new CarUiTwoActionSwitchPreference(testableContext);
+        preference.setKey("twoaction");
+        preference.setOrder(0);
+        mActivity.addPreference(preference);
+        // Scroll to preference
+        mActivity.runOnUiThread(() -> mActivity.scrollToPreference("twoaction"));
         // verify focus wraps container when global bool is false
         onView(withIndex(withId(R.id.car_ui_secondary_action_concrete),
                 0)).check(matches(not(isFocusable())));
@@ -1071,29 +1069,92 @@ public class PreferenceTest {
 
     @Test
     public void testTwoActionSwitchPreference_switchWidgetFocusableTrue() {
-        // Create mock activity to test when global switchWidgetFocusable bool is true
-        mActivityRule.getScenario().onActivity(activity -> {
-            Context testableContext = spy(activity);
-            Resources testableResources = spy(activity.getResources());
-            when(testableContext.getResources()).thenReturn(testableResources);
-            // Start by setting global bool to be true (focus should now wrap switch)
-            doReturn(true).when(testableResources).getBoolean(
-                    R.bool.car_ui_preference_two_action_switch_widget_focusable);
+        Context testableContext = spy(mActivity);
+        Resources testableResources = spy(mActivity.getResources());
+        when(testableContext.getResources()).thenReturn(testableResources);
+        // Start by setting global bool to be true (focus should now wrap switch)
+        doReturn(true).when(testableResources).getBoolean(
+                R.bool.car_ui_preference_two_action_switch_widget_focusable);
 
-            // Create CarUiTwoActionSwitchPreference preference and add it to screen.
-            CarUiTwoActionSwitchPreference preference =
-                    new CarUiTwoActionSwitchPreference(testableContext);
-            preference.setKey("twoaction");
-            preference.setOrder(0);
-            activity.addPreference(preference);
-            // Scroll to preference
-            activity.runOnUiThread(() -> activity.scrollToPreference("twoaction"));
-        });
+        // Create CarUiTwoActionSwitchPreference preference and add it to screen.
+        CarUiTwoActionSwitchPreference preference =
+                new CarUiTwoActionSwitchPreference(testableContext);
+        preference.setKey("twoaction");
+        preference.setOrder(0);
+        mActivity.addPreference(preference);
+        // Scroll to preference
+        mActivity.runOnUiThread(() -> mActivity.scrollToPreference("twoaction"));
         // verify focus wraps switch when global bool is true
         onView(withIndex(withId(R.id.car_ui_secondary_action_concrete),
                 0)).check(matches(isFocusable()));
         onView(withIndex(withId(R.id.car_ui_secondary_action),
                 0)).check(matches(not(isFocusable())));
+    }
+
+    @Test
+    public void testTwoActionSwitchPreference_switchNotToggleableWhenDisabled() {
+        Context testableContext = spy(mActivity);
+        Resources testableResources = spy(mActivity.getResources());
+        when(testableContext.getResources()).thenReturn(testableResources);
+        // Set switch widget to be focusable instead of secondary action
+        doReturn(true).when(testableResources).getBoolean(
+                R.bool.car_ui_preference_two_action_switch_widget_focusable);
+
+        // Create CarUiTwoActionSwitchPreference preference and add it to screen.
+        CarUiTwoActionSwitchPreference preference =
+                new CarUiTwoActionSwitchPreference(testableContext);
+        preference.setKey("twoaction");
+        preference.setOrder(0);
+        mActivity.addPreference(preference);
+        // Scroll to preference
+        mActivity.runOnUiThread(() -> mActivity.scrollToPreference("twoaction"));
+
+        // Set preference to be unchecked and clickable while disabled
+        preference.setSecondaryActionChecked(false);
+        preference.setSecondaryActionEnabled(false);
+        preference.setClickableWhileDisabled(true);
+        preference.setDisabledClickListener(mock(Consumer.class));
+
+        // Ensure switch stays unchecked when clicked
+        onView(withId(R.id.car_ui_secondary_action_concrete)).perform(click());
+        onView(withId(R.id.car_ui_secondary_action_concrete)).check(matches(not(isChecked())));
+
+        // Ensure switch stays unchecked when thumb is dragged
+        onView(withId(R.id.car_ui_secondary_action_concrete)).perform(swipeRight());
+        onView(withId(R.id.car_ui_secondary_action_concrete)).check(matches(not(isChecked())));
+    }
+
+    @Test
+    public void testTwoActionSwitchPreference_switchNotToggleableWhenUxRestricted() {
+        Context testableContext = spy(mActivity);
+        Resources testableResources = spy(mActivity.getResources());
+        when(testableContext.getResources()).thenReturn(testableResources);
+        // Set switch widget to be focusable instead of secondary action
+        doReturn(true).when(testableResources).getBoolean(
+                R.bool.car_ui_preference_two_action_switch_widget_focusable);
+
+        // Create CarUiTwoActionSwitchPreference preference and add it to screen.
+        CarUiTwoActionSwitchPreference preference =
+                new CarUiTwoActionSwitchPreference(testableContext);
+        preference.setKey("twoaction");
+        preference.setOrder(0);
+        mActivity.addPreference(preference);
+        // Scroll to preference
+        mActivity.runOnUiThread(() -> mActivity.scrollToPreference("twoaction"));
+
+        // Set preference to be unchecked and ux restricted
+        preference.setSecondaryActionChecked(false);
+        preference.setUxRestricted(true);
+        assertTrue(preference.isUxRestricted());
+        preference.setOnClickWhileRestrictedListener(mock(Consumer.class));
+
+        // Ensure switch stays unchecked when clicked
+        onView(withId(R.id.car_ui_secondary_action_concrete)).perform(click());
+        onView(withId(R.id.car_ui_secondary_action_concrete)).check(matches(not(isChecked())));
+
+        // Ensure switch stays unchecked when thumb is dragged
+        onView(withId(R.id.car_ui_secondary_action_concrete)).perform(swipeRight());
+        onView(withId(R.id.car_ui_secondary_action_concrete)).check(matches(not(isChecked())));
     }
 
     @Test

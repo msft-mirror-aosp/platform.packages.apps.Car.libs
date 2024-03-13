@@ -22,7 +22,7 @@ import android.view.Window;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
@@ -59,23 +59,28 @@ public class AppStyledViewSampleActivity extends AppCompatActivity {
 
         mAppStyledDialogController.setOnNavIconClickListener(
                 () -> mAppStyledDialogController.dismiss());
-        mAppStyledDialogController.setOnDismissListener(() -> showSystemBars());
 
-        Button btn = findViewById(R.id.show_app_styled_fragment);
+        Button btn = requireViewById(R.id.show_app_styled_fragment);
+        Button btnWithBars = requireViewById(R.id.show_app_styled_fragment_with_system_bars);
+
+        mAppStyledDialogController.setContentView(appStyledTestView);
+        mAppStyledDialogController.setNavIconType(NavIcon.CLOSE);
+
         btn.setOnClickListener(v -> {
-            mAppStyledDialogController.setContentView(appStyledTestView);
-            mAppStyledDialogController.setNavIconType(NavIcon.CLOSE);
+            mAppStyledDialogController.setOnDismissListener(this::showSystemBars);
             hideSystemBars();
+            mAppStyledDialogController.show();
+        });
+
+        btnWithBars.setOnClickListener(v -> {
+            mAppStyledDialogController.setOnDismissListener(null);
             mAppStyledDialogController.show();
         });
     }
 
     private void hideSystemBars() {
         WindowInsetsControllerCompat windowInsetsController =
-                ViewCompat.getWindowInsetsController(getWindow().getDecorView());
-        if (windowInsetsController == null) {
-            return;
-        }
+                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
 
         // Configure the behavior of the hidden system bars
         windowInsetsController.setSystemBarsBehavior(
@@ -88,10 +93,7 @@ public class AppStyledViewSampleActivity extends AppCompatActivity {
 
     private void showSystemBars() {
         WindowInsetsControllerCompat windowInsetsController =
-                ViewCompat.getWindowInsetsController(getWindow().getDecorView());
-        if (windowInsetsController == null) {
-            return;
-        }
+                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
 
         // Show the system bars
         windowInsetsController.show(WindowInsetsCompat.Type.systemBars());

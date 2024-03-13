@@ -288,6 +288,7 @@ public class PlaybackViewModel {
                     case REJECTED:
                     case CONNECTING:
                     case CONNECTED:
+                    case NONEXISTENT:
                         mMediaController.unregisterCallback(this);
                         // Fall through
                     case SUSPENDED:
@@ -299,6 +300,8 @@ public class PlaybackViewModel {
 
             if (mBrowsingState.mConnectionStatus == ConnectionStatus.CONNECTED) {
                 setMediaController(mInputFactory.getControllerForBrowser(mBrowsingState.mBrowser));
+            } else if (mBrowsingState.mConnectionStatus == ConnectionStatus.NONEXISTENT) {
+                setMediaController(mBrowsingState.mMediaSource.getMediaController());
             }
         }
 

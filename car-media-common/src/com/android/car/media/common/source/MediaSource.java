@@ -16,16 +16,19 @@
 
 package com.android.car.media.common.source;
 
+import android.car.Car;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.service.media.MediaBrowserService;
+import android.support.v4.media.session.MediaControllerCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -44,13 +47,16 @@ import java.util.Objects;
 
 /**
  * This represents a source of media content. It provides convenient methods to access media source
- * metadata, such as application name and icon.
+ * metadata, such as application name and icon. Media content can either be derived from a
+ * {@link MediaBrowserService} or a {@link MediaControllerCompat}.
  */
 public class MediaSource {
     private static final String TAG = "MediaSource";
 
-    @NonNull
+    @Nullable
     private final ComponentName mBrowseService;
+    @Nullable
+    private final MediaControllerCompat mMediaController;
     @NonNull
     private final CharSequence mDisplayName;
     @NonNull
@@ -62,33 +68,62 @@ public class MediaSource {
      * Creates a {@link MediaSource} for the given {@link ComponentName}
      */
     @Nullable
-    public static MediaSource create(@NonNull Context context,
-            @NonNull ComponentName componentName) {
-        ServiceInfo serviceInfo = getBrowseServiceInfo(context, componentName);
+    public static MediaSource create(@NonNull Context ctx, @NonNull ComponentName componentName) {
+        ServiceInfo serviceInfo = getBrowseServiceInfo(ctx, componentName);
 
         String className = serviceInfo != null ? serviceInfo.name : null;
         if (TextUtils.isEmpty(className)) {
-            Log.w(TAG,
-                    "No MediaBrowserService found in component " + componentName.flattenToString());
+            Log.w(TAG, "No MediaBrowserService for component " + componentName.flattenToString());
             return null;
         }
 
         try {
             String packageName = componentName.getPackageName();
-            CharSequence displayName = extractDisplayName(context, serviceInfo, packageName);
-            Drawable icon = extractIcon(context, serviceInfo, packageName);
+            CharSequence displayName = extractDisplayName(ctx, serviceInfo, packageName);
+            Drawable icon = extractIcon(ctx, serviceInfo, packageName);
             ComponentName browseService = new ComponentName(packageName, className);
-            return new MediaSource(browseService, displayName, icon, new IconCropper(context));
+            return new MediaSource(browseService, null, displayName, icon, new IconCropper(ctx));
         } catch (PackageManager.NameNotFoundException e) {
             Log.w(TAG, "Component not found " + componentName.flattenToString());
             return null;
         }
     }
 
+    /**
+     * Creates a {@link MediaSource} for the given {@link MediaControllerCompat}
+     */
+    @Nullable
+    public static MediaSource create(@NonNull Context context,
+            @NonNull MediaControllerCompat mediaController) {
+        String packageName = mediaController.getPackageName();
+        try {
+            ServiceInfo serviceInfo = null;
+            ComponentName componentName = extractServiceComponentName(mediaController);
+            if (componentName != null) {
+                serviceInfo = getBrowseServiceInfo(context, componentName);
+                String className = serviceInfo != null ? serviceInfo.name : null;
+                if (TextUtils.isEmpty(className)) {
+                    serviceInfo = null;
+                }
+            }
+
+            CharSequence displayName = extractDisplayName(context, serviceInfo, packageName);
+            Drawable icon = extractIcon(context, serviceInfo, packageName);
+
+            return new MediaSource(/* componentName= */ null, mediaController, displayName, icon,
+                new IconCropper(context));
+        } catch (NameNotFoundException e) {
+            Log.w(TAG, "App not found " + packageName);
+            return null;
+        }
+    }
+
     @VisibleForTesting
-    public MediaSource(@NonNull ComponentName browseService, @NonNull CharSequence displayName,
+    public MediaSource(@Nullable ComponentName browseService,
+            @Nullable MediaControllerCompat mediaController, @NonNull CharSequence displayName,
             @NonNull Drawable icon, @NonNull IconCropper iconCropper) {
         mBrowseService = browseService;
+        mMediaController = mediaController;
         mDisplayName = displayName;
         mIcon = icon;
         mIconCropper = iconCropper;
@@ -156,14 +191,31 @@ public class MediaSource {
     }
 
     /**
+     * @return the browse service associated with the media session if provided, null otherwise.
+     */
+    @Nullable
+    private static ComponentName extractServiceComponentName(MediaControllerCompat controller) {
+        if (controller.getExtras() == null || controller.getExtras()
+                .getString(Car.CAR_EXTRA_BROWSE_SERVICE_FOR_SESSION) == null) {
+            return null;
+        }
+        String serviceNameString =
+                controller.getExtras().getString(Car.CAR_EXTRA_BROWSE_SERVICE_FOR_SESSION);
+
+        return new ComponentName(controller.getPackageName(), serviceNameString);
+    }
+
+    /**
      * @return media source human readable name for display.
      */
     @NonNull
     public CharSequence getDisplayName(Context context) {
-        ServiceInfo serviceInfo = getBrowseServiceInfo(context, mBrowseService);
+        ServiceInfo serviceInfo = null;
+        if (mBrowseService != null) {
+            serviceInfo = getBrowseServiceInfo(context, mBrowseService);
+        }
         try {
-            String packageName = mBrowseService.getPackageName();
-            return extractDisplayName(context, serviceInfo, packageName);
+            return extractDisplayName(context, serviceInfo, getPackageName());
         } catch (PackageManager.NameNotFoundException e) {
             Log.e(TAG, "getDisplayName: " + e);
             return mDisplayName;
@@ -175,13 +227,19 @@ public class MediaSource {
      */
     @NonNull
     public String getPackageName() {
-        return mBrowseService.getPackageName();
+        if (mBrowseService != null) {
+            return mBrowseService.getPackageName();
+        } else if (mMediaController != null) {
+            return mMediaController.getPackageName();
+        }
+        Log.e(TAG, "getPackageName() has null BrowseService and Controller");
+        return ""; // Should never happen
     }
 
     /**
      * @return a {@link ComponentName} referencing this media source's {@link MediaBrowserService}.
      */
-    @NonNull
+    @Nullable
     public ComponentName getBrowseServiceComponentName() {
         return mBrowseService;
     }
@@ -202,23 +260,46 @@ public class MediaSource {
         return mIconCropper.crop(mIcon);
     }
 
+    /**
+     * @return {@link MediaControllerCompat} of this media source
+     */
+    @Nullable
+    public MediaControllerCompat getMediaController() {
+        return mMediaController;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MediaSource that = (MediaSource) o;
-        return Objects.equals(mBrowseService, that.mBrowseService);
+        if (mBrowseService != null) {
+            return Objects.equals(mBrowseService, that.mBrowseService);
+        }
+        return Objects.equals(mMediaController, that.mMediaController);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mBrowseService);
+        if (mBrowseService != null) {
+            return Objects.hash(mBrowseService);
+        } else if (mMediaController != null) {
+            return Objects.hash(mMediaController);
+        }
+        Log.e(TAG, "hashCode() has null BrowseService and Controller");
+        return 0; // Should never happen
     }
 
     @Override
     @NonNull
     public String toString() {
-        return mBrowseService.flattenToString();
+        if (mBrowseService != null) {
+            mBrowseService.flattenToString();
+        } else if (mMediaController != null) {
+            return mMediaController.toString();
+        }
+        Log.e(TAG, "toString() has null BrowseService and Controller");
+        return ""; // Should never happen
     }
 
     /**

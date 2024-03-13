@@ -28,11 +28,13 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Parcel;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import androidx.annotation.DimenRes;
 import androidx.annotation.IdRes;
@@ -474,5 +476,26 @@ public final class CarUiUtils {
         }
 
         return context;
+    }
+
+    /**
+     * Return {@link DisplayMetrics} for the current display if {@link Context} is associated with a
+     * {@link android.view.Display}. If the {@link Context} is not associated with a
+     * {@link android.view.Display}, reference the default {@link android.view.Display}.
+     */
+    public static DisplayMetrics getDeviceDisplayMetrics(@NonNull Context context) {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && context.getDisplay() != null) {
+                context.getDisplay().getRealMetrics(displayMetrics);
+                return displayMetrics;
+            }
+        } catch (UnsupportedOperationException e) {
+            // Fall through to default display implementation
+        }
+
+        WindowManager wm = context.getSystemService(WindowManager.class);
+        wm.getDefaultDisplay().getRealMetrics(displayMetrics);
+        return displayMetrics;
     }
 }

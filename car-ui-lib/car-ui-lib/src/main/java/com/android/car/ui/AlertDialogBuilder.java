@@ -58,7 +58,9 @@ import androidx.core.view.OneShotPreDrawListener;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.car.ui.core.CarUi;
 import com.android.car.ui.recyclerview.CarUiContentListItem;
+import com.android.car.ui.recyclerview.CarUiListItem;
 import com.android.car.ui.recyclerview.CarUiListItemAdapter;
 import com.android.car.ui.recyclerview.CarUiRadioButtonListItem;
 import com.android.car.ui.recyclerview.CarUiRadioButtonListItemAdapter;
@@ -236,8 +238,8 @@ public class AlertDialogBuilder {
      * Set the {@link Drawable} to be used in the title.
      * <p>
      * <strong>Note:</strong> To ensure consistent styling, the drawable
-     * should be inflated or constructed using the alert dialog's themed context obtained via {@link
-     * #getContext()}.
+     * should be inflated or constructed using the alert dialog's themed context obtained via
+     * {@link #getContext()}.
      *
      * @return this Builder object to allow for chaining of calls to set methods
      */
@@ -430,9 +432,21 @@ public class AlertDialogBuilder {
     }
 
     /**
+     * Set a list of items to be displayed in the dialog as the content, you will be notified of the
+     * selected item via the supplied listener.
+     *
+     * @return This Builder object to allow for chaining of calls to set methods
+     */
+    public AlertDialogBuilder setItems(List<? extends CarUiListItem> items) {
+        setCustomList(CarUi.createListItemAdapter(getContext(), items));
+        mHasSingleChoiceBodyButton = true;
+        return this;
+    }
+
+    /**
      * This was not supposed to be in the Chassis API because it allows custom views.
      *
-     * @deprecated Use {@link #setAdapter(CarUiListItemAdapter)} instead.
+     * @deprecated Use {@link #setItems(List)} instead.
      */
     @Deprecated
     public AlertDialogBuilder setAdapter(final ListAdapter adapter,
@@ -446,14 +460,19 @@ public class AlertDialogBuilder {
      * Display all the {@link com.android.car.ui.recyclerview.CarUiListItem CarUiListItems} in a
      * {@link CarUiListItemAdapter}. You should set click listeners on the CarUiListItems as opposed
      * to a callback in this function.
+     *
+     * @deprecated Use {@link #setItems(List)} instead. This method is incompatible with the
+     * Car UI plugin.
      */
+    @Deprecated
     public AlertDialogBuilder setAdapter(final CarUiListItemAdapter adapter) {
         setCustomList(adapter);
         mHasSingleChoiceBodyButton = true;
         return this;
     }
 
-    private void setCustomList(@NonNull CarUiListItemAdapter adapter) {
+    private void setCustomList(
+            @NonNull RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter) {
         View customList = LayoutInflater.from(mContext).inflate(
                 R.layout.car_ui_alert_dialog_list, null);
         RecyclerView list = CarUiUtils.requireViewByRefId(customList, R.id.list);
@@ -744,8 +763,8 @@ public class AlertDialogBuilder {
      * @param textChangedListener textWatcher whose methods are called whenever this TextView's text
      *                            changes {@code null} otherwise.
      * @param inputFilters        list of input filters, {@code null} if no filter is needed
-     * @param inputType           See {@link EditText#setInputType(int)}, except {@link
-     *                            android.text.InputType#TYPE_NULL} will not be set.
+     * @param inputType           See {@link EditText#setInputType(int)}, except
+     *                            {@link android.text.InputType#TYPE_NULL} will not be set.
      * @return this Builder object to allow for chaining of calls to set methods
      */
     public AlertDialogBuilder setEditBox(String prompt, TextWatcher textChangedListener,
@@ -819,9 +838,9 @@ public class AlertDialogBuilder {
     /**
      * By default, the AlertDialogBuilder may add a "Dismiss" button if you don't provide a
      * positive/negative/neutral button. This is so that the dialog is still dismissible using the
-     * rotary controller. If however, you add buttons that can close the dialog via {@link
-     * #setAdapter(CarUiListItemAdapter)} or a similar method, then you may wish to suppress the
-     * addition of the dismiss button, which this method allows for.
+     * rotary controller. If however, you add buttons that can close the dialog via
+     * {@link #setAdapter(CarUiListItemAdapter)} or a similar method, then you may wish to suppress
+     * the addition of the dismiss button, which this method allows for.
      *
      * @param allowDismissButton If true, a "Dismiss" button may be added to the dialog. If false,
      *                           it will never be added.
