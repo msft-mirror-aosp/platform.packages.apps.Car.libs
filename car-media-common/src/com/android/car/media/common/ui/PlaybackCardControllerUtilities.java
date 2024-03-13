@@ -38,8 +38,8 @@ import com.android.car.media.common.playback.PlaybackViewModel.PlaybackStateWrap
 import java.util.ArrayList;
 import java.util.List;
 
-/** Static utility functions used to give base logic to views in {@link MediaWidgetController} */
-public final class MediaWidgetControllerUtilities {
+/** Static utility functions used to give base logic to views in {@link PlaybackCardController} */
+public final class PlaybackCardControllerUtilities {
 
     /**
      * Set text on the non-null TextView if the text is non-empty, or sets the
