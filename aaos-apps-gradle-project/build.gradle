@@ -52,10 +52,6 @@ buildscript {
 }
 
 allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
     tasks.withType(JavaCompile) {
         // Compile with prebuilt android.jar.
         options.compilerArgs.add('-Xbootclasspath/p:' + gradle.ext.lib_system_stubs)

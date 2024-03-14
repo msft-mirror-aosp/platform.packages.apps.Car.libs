@@ -14,7 +14,23 @@
  * limitations under the License.
  */
 
-rootProject.name='AAOS Apps'
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'AAOS Apps'
 
 include ':car-ui-lib'
 project(':car-ui-lib').projectDir = new File('../car-ui-lib/car-ui-lib')
