@@ -32,6 +32,8 @@ import java.util.List;
 
 /**
  *  Util class that houses logic related to media sources
+ *  TODO(b/329521960): remove usages of MediaSourceUtil
+ * @deprecated use {@link MediaSource} instead
  */
 public class MediaSourceUtil {
     private static final String TAG = "MediaSourceUtil";
@@ -55,6 +57,10 @@ public class MediaSourceUtil {
      * Checks if the media source is supported i.e. Audio only no video, browsers etc.
      */
     public boolean isAudioMediaSource(ComponentName mbsComponentName) {
+        if (mbsComponentName == null) {
+            return false;
+        }
+
         if (mCustomMediaComponents.contains(mbsComponentName.flattenToString())) {
             Log.d(TAG, "Custom media component " + mbsComponentName + " is supported");
             return true;
