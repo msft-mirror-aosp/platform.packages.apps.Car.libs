@@ -22,6 +22,7 @@ import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,6 +31,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -44,6 +46,7 @@ import java.util.List;
  */
 public class MediaSessionHelper extends MediaController.Callback {
 
+    private static final String TAG = "MediaSessionHelper";
     private final MutableLiveData<MediaSource> mMediaSource = new MutableLiveData<>();
     private final MutableLiveData<List<MediaSource>> mActiveMediaSources =
             new MutableLiveData<>();
@@ -69,10 +72,13 @@ public class MediaSessionHelper extends MediaController.Callback {
     @VisibleForTesting
     interface InputFactory {
 
+        @Nullable
         MediaSessionManager getMediaSessionManager(Context appContext);
 
+        @Nullable
         MediaSource getMediaSource(MediaController mediaController);
 
+        @NonNull
         List<MediaSource> getMediaSources(List<MediaController> mediaControllers);
     }
 
@@ -80,11 +86,13 @@ public class MediaSessionHelper extends MediaController.Callback {
         return new InputFactory() {
 
             @Override
+            @Nullable
             public MediaSessionManager getMediaSessionManager(Context appContext) {
                 return appContext.getSystemService(MediaSessionManager.class);
             }
 
             @Override
+            @Nullable
             public MediaSource getMediaSource(MediaController mediaController) {
                 if (mediaController == null) {
                     return null;
@@ -98,7 +106,11 @@ public class MediaSessionHelper extends MediaController.Callback {
             }
 
             @Override
+            @NonNull
             public List<MediaSource> getMediaSources(List<MediaController> mediaControllers) {
+                if (mediaControllers == null) {
+                    return Collections.emptyList();
+                }
                 List<MediaSource> mediaSources = new ArrayList<>();
                 for (MediaController mediaController : mediaControllers) {
                     mediaSources.add(getMediaSource(mediaController));
@@ -117,6 +129,10 @@ public class MediaSessionHelper extends MediaController.Callback {
         mInputFactory = inputFactory;
         // Register our listener to be notified of changes in the active media sessions.
         mMediaSessionManager = mInputFactory.getMediaSessionManager(appContext);
+        if (mMediaSessionManager == null) {
+            Log.e(TAG, "MediaSessionManager is null");
+            return;
+        }
         mMediaSessionManager.addOnActiveSessionsChangedListener(mActiveSessionsListener, null);
 
         // Set initial value
