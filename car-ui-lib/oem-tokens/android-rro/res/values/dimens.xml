@@ -18,9 +18,9 @@
 -->
 <!-- Consider other dimension overrides in values-xxx when adding/changing the value here! -->
 <resources>
-    <!-- Focus dimensions -->
-    <dimen name="focus_stroke_width">8dp</dimen>
-    <dimen name="focus_pressed_stroke_width">4dp</dimen>
+    <!-- Rotary focus dimensions -->
+    <dimen name="car_rotary_focus_stroke_width">8dp</dimen>
+    <dimen name="car_rotary_focus_pressed_stroke_width">4dp</dimen>
 
     <!-- Switch dimensions -->
     <dimen name="car_switch_track_height">48dp</dimen>
@@ -34,11 +34,20 @@
     <!-- Switch focus ring padding. -->
     <dimen name="car_switch_track_focus_ring_padding">12dp</dimen>
     <!-- Should be the half of car_switch_track_focus_ring_height. -->
-    <dimen name="car_switch_track_focus_ring_outer_radius">36dp</dimen>
+    <dimen name="car_switch_track_focus_ring_outer_radius">@dimen/shape_corner_large</dimen>
     <!-- Should be the half of car_switch_track_height. -->
-    <dimen name="car_switch_thumb_outer_radius">24dp</dimen>
+    <dimen name="car_switch_thumb_outer_radius">@dimen/shape_corner_medium</dimen>
     <!--  The difference between the track size and the thumb size. -->
     <dimen name="car_switch_thumb_stroke_width">4dp</dimen>
     <!-- car_switch_thumb_size + car_switch_thumb_stroke_width == car_switch_track_height -->
     <dimen name="car_switch_thumb_size">40dp</dimen>
+
+    <!-- Button Dimensions -->
+    <dimen name="car_button_height">88dp</dimen>
+    <dimen name="car_button_min_height">88dp</dimen>
+    <dimen name="car_button_height_small">64dp</dimen>
+    <dimen name="car_button_min_height_small">64dp</dimen>
+    <dimen name="car_button_min_width">158dp</dimen>
+    <dimen name="car_button_radius">@dimen/shape_corner_extra_large</dimen>
+    <dimen name="car_button_small_radius">@dimen/shape_corner_large</dimen>
 </resources>
