@@ -17,10 +17,20 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:$androidGradlePluginVersion"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinGradlePluginVersion"
 
-    gradle.ext.aaosLatestSDK = libs.versions.aaosLatestSDK.get().toInteger()
-    gradle.ext.aaosTargetSDK = libs.versions.aaosTargetSDK.get().toInteger()
-    gradle.ext.platformSdkVersion = libs.versions.aaosPlatformSDKVersion.get()
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+
+    gradle.ext.aaosLatestSDK = 33
+    gradle.ext.aaosTargetSDK = 33
 
     gradle.ext.repoRootPath = rootDir.parentFile.parentFile.parentFile.parentFile.parent
     gradle.ext.lib_car_system_stubs = gradle.ext.repoRootPath + "/prebuilts/sdk/" + gradle.ext.aaosLatestSDK + "/system/android.car-system-stubs.jar"
@@ -34,6 +44,7 @@ buildscript {
         gradle.ext.platformCertPath = gradle.ext.repoRootPath + "/packages/apps/Car/libs/certs/platform.keystore"
     }
     gradle.ext.soongBash = gradle.ext.repoRootPath + "/build/soong/soong_ui.bash"
+    gradle.ext.platformSdkVersion = "33" // Change this to the most recent android API level.
     if (file(gradle.ext.soongBash).exists()) {
         gradle.ext.platformSdkVersion = (gradle.ext.soongBash + " --dumpvar-mode PLATFORM_SDK_VERSION").execute().text.trim()
     }
