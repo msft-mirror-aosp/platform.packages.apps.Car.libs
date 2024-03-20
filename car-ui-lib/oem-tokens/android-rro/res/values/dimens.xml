@@ -50,4 +50,17 @@
     <dimen name="car_button_min_width">158dp</dimen>
     <dimen name="car_button_radius">@dimen/shape_corner_extra_large</dimen>
     <dimen name="car_button_small_radius">@dimen/shape_corner_large</dimen>
+
+    <!-- Checkbox dimensions. -->
+    <!-- 77dp scales the material checkbox to provide a 44dp x 44dp checkbox rectangle. -->
+    <dimen name="car_checkbox_size">77dp</dimen>
+    <!-- The checkbox focus ring size -->
+    <dimen name="car_checkbox_focus_ring_size">66dp</dimen>
+
+    <!-- Radio button dimensions -->
+    <dimen name="car_radio_button_outer_ring_size">45dp</dimen>
+    <dimen name="car_radio_button_outer_ring_stroke_width">4dp</dimen>
+    <dimen name="car_radio_button_inner_circle_size">32dp</dimen>
+    <dimen name="car_radio_button_focus_ring_size">69dp</dimen>
+    <dimen name="car_radio_button_focus_ring_padding">12dp</dimen>
 </resources>
