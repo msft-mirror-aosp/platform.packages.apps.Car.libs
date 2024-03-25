@@ -399,7 +399,7 @@ public class PlaybackViewModel {
     }
 
     /** Convenient extension of {@link PlaybackStateCompat}. */
-    public static final class PlaybackStateWrapper {
+    public static class PlaybackStateWrapper {
         private final MediaSource mMediaSource;
         private final MediaControllerCompat mMediaController;
         @Nullable
