@@ -339,7 +339,7 @@ public class MediaSource {
     @NonNull
     public String toString() {
         if (mBrowseService != null) {
-            mBrowseService.flattenToString();
+            return mBrowseService.flattenToString();
         } else if (mMediaController != null) {
             return mMediaController.toString();
         }
