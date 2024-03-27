@@ -55,6 +55,14 @@ public class CarMediaManagerHelper {
         return sInstance;
     }
 
+    /** Returns a human readable mode. For debugging only. */
+    public static String getMode(int mode) {
+        if (mode < 0 || 1 < mode) {
+            return "invalid";
+        }
+        return MODES[mode];
+    }
+
     /**
      * Factory for creating dependencies. Can be swapped out for testing.
      */

@@ -105,7 +105,7 @@ public class PlaybackViewModelTest {
                 new BrowsingState(mContext, mMediaSource, mMediaBrowser,
                         ConnectionStatus.CONNECTED));
         Application application = ApplicationProvider.getApplicationContext();
-        mPlaybackViewModel = new PlaybackViewModel(application, mBrowsingStateLD,
+        mPlaybackViewModel = new PlaybackViewModel(application, mBrowsingStateLD, "test",
                 browser -> mBrowserToController.get(browser));
     }
 

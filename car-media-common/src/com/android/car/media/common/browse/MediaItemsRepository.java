@@ -27,6 +27,7 @@ import static com.android.car.media.common.source.MediaBrowserConnector.Connecti
 import static java.util.stream.Collectors.toList;
 
 import android.app.Application;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.media.MediaBrowserCompat;
@@ -45,11 +46,13 @@ import androidx.lifecycle.MutableLiveData;
 import com.android.car.apps.common.util.FutureData;
 import com.android.car.media.common.CustomBrowseAction;
 import com.android.car.media.common.MediaItemMetadata;
+import com.android.car.media.common.source.CarMediaManagerHelper;
 import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
 import com.android.car.media.common.source.MediaModels;
 import com.android.car.media.common.source.MediaSource;
 import com.android.car.media.common.source.MediaSourceViewModel;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -76,8 +79,9 @@ public class MediaItemsRepository {
     @Deprecated
     public static MediaItemsRepository get(@NonNull Application application, int mode) {
         if (sInstances[mode] == null) {
-            sInstances[mode] = new MediaItemsRepository(
-                    MediaSourceViewModel.get(application, mode).getBrowsingState());
+            String debugId = "Deprecated-" + CarMediaManagerHelper.getMode(mode) + "-AudioSource";
+            sInstances[mode] = new MediaItemsRepository(application,
+                    MediaSourceViewModel.get(application, mode).getBrowsingState(), debugId);
         }
         return sInstances[mode];
     }
@@ -127,6 +131,8 @@ public class MediaItemsRepository {
     }
 
     private BrowsingState mBrowsingState;
+    private final WeakReference<Context> mContext;
+    private final String mDebugId;
     private final Map<MediaSource, PerMediaSourceCache> mCaches = new HashMap<>();
     private final MutableLiveData<BrowsingState> mBrowsingStateLiveData = dataOf(null);
     private final MediaItemsLiveData mRootMediaItems = new MediaItemsLiveData();
@@ -135,9 +141,11 @@ public class MediaItemsRepository {
             dataOf(Collections.emptyMap());
     private String mSearchQuery;
 
-    public MediaItemsRepository(LiveData<BrowsingState> browsingState) {
+    public MediaItemsRepository(Context context, LiveData<BrowsingState> browsingState,
+            String debugId) {
+        mContext = new WeakReference<>(context);
+        mDebugId = debugId + " ";
         browsingState.observeForever(this::onMediaBrowsingStateChanged);
-
     }
 
     /**
@@ -247,21 +255,37 @@ public class MediaItemsRepository {
         mBrowsingStateLiveData.setValue(mBrowsingState);
         switch (mBrowsingState.mConnectionStatus) {
             case CONNECTING:
+                if (Log.isLoggable(TAG, Log.DEBUG)) {
+                    Log.d(TAG, getLogPrefix() + "connecting");
+                }
                 mRootMediaItems.setLoading();
                 break;
             case CONNECTED:
             case NONEXISTENT:
-                getCache().mRootId = mBrowsingState.mBrowser == null ? null :
-                        mBrowsingState.mBrowser.getRoot();
+                MediaBrowserCompat browser = mBrowsingState.mBrowser;
+                String rootId = browser == null ? null : browser.getRoot();
+                getCache().mRootId = rootId;
+                if (Log.isLoggable(TAG, Log.DEBUG)) {
+                    Log.d(TAG, getLogPrefix() + "connected. Root: " + rootId);
+                }
                 mCustomBrowseActions.postValue(parseBrowseActions(mBrowsingState));
                 break;
             case DISCONNECTING:
+                if (Log.isLoggable(TAG, Log.DEBUG)) {
+                    Log.d(TAG, getLogPrefix() +  "disconnecting");
+                }
                 unsubscribeNodes();
                 clearSearchResults();
                 clearNodes();
                 break;
             case REJECTED:
+                if (Log.isLoggable(TAG, Log.DEBUG)) {
+                    Log.d(TAG, getLogPrefix() + "rejected ");
+                }
             case SUSPENDED:
+                if (Log.isLoggable(TAG, Log.DEBUG)) {
+                    Log.d(TAG, getLogPrefix() + "suspended");
+                }
                 onBrowseData(getCache().mRootId, null);
                 clearSearchResults();
                 clearNodes();
@@ -322,7 +346,10 @@ public class MediaItemsRepository {
         @Override
         public void onChildrenLoaded(@NonNull String parentId,
                 @NonNull List<MediaBrowserCompat.MediaItem> children) {
-
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, getLogPrefix() + "onChildrenLoaded " + children.size()
+                        + " P: " + parentId);
+            }
             onBrowseData(parentId, children.stream()
                     .filter(Objects::nonNull)
                     .map(MediaItemMetadata::new)
@@ -338,6 +365,9 @@ public class MediaItemsRepository {
 
         @Override
         public void onError(@NonNull String parentId) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, getLogPrefix() + "onError  P: " + parentId);
+            }
             onBrowseData(parentId, null);
         }
 
@@ -390,5 +420,18 @@ public class MediaItemsRepository {
             customBrowseActions.put(customBrowseAction.getId(), customBrowseAction);
         }
         return customBrowseActions;
+    }
+
+    private String getLogPrefix() {
+        String result = mDebugId;
+        Context context = mContext.get();
+        if (context == null) {
+            result += "no context ";
+        } else {
+            MediaSource source = getMediaSource();
+            result += (source != null) ? source.getDisplayName(context).toString() : "no source";
+            result += " ";
+        }
+        return result;
     }
 }

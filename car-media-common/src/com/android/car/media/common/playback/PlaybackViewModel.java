@@ -47,6 +47,7 @@ import androidx.media.utils.MediaConstants;
 import com.android.car.media.common.CustomPlaybackAction;
 import com.android.car.media.common.MediaItemMetadata;
 import com.android.car.media.common.R;
+import com.android.car.media.common.source.CarMediaManagerHelper;
 import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
 import com.android.car.media.common.source.MediaBrowserConnector.ConnectionStatus;
 import com.android.car.media.common.source.MediaModels;
@@ -56,6 +57,7 @@ import com.android.car.media.common.source.MediaSourceViewModel;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -88,7 +90,8 @@ public class PlaybackViewModel {
         if (sInstances[mode] == null) {
             MediaSourceViewModel sourceModel = MediaSourceViewModel.get(application, mode);
             LiveData<BrowsingState> browseState = sourceModel.getBrowsingState();
-            sInstances[mode] = new PlaybackViewModel(application, browseState);
+            String debugId = "Deprecated-" + CarMediaManagerHelper.getMode(mode) + "-AudioSource";
+            sInstances[mode] = new PlaybackViewModel(application, browseState, debugId);
         }
         return sInstances[mode];
     }
@@ -154,6 +157,8 @@ public class PlaybackViewModel {
                     state -> state == null ? dataOf(new PlaybackProgress(0L, 0L))
                             : new ProgressLiveData(state.mState, state.getMaxProgress()));
 
+    private final WeakReference<Context> mContext;
+    private final String mDebugId;
     private final InputFactory mInputFactory;
 
     private static InputFactory createFactory(Context context) {
@@ -161,12 +166,19 @@ public class PlaybackViewModel {
     }
 
     public PlaybackViewModel(Context context, LiveData<BrowsingState> browsingState) {
-        this(context, browsingState, createFactory(context.getApplicationContext()));
+        this(context, browsingState, "unspecified");
+    }
+
+    public PlaybackViewModel(Context context, LiveData<BrowsingState> browsingState,
+            String debugId) {
+        this(context, browsingState, debugId, createFactory(context.getApplicationContext()));
     }
 
     @VisibleForTesting
     public PlaybackViewModel(@NonNull Context context, LiveData<BrowsingState> browsingState,
-            InputFactory factory) {
+            String debugId, InputFactory factory) {
+        mContext = new WeakReference<>(context);
+        mDebugId = debugId + " ";
         mInputFactory = factory;
         mColorsFactory = new MediaSourceColors.Factory(context.getApplicationContext());
         browsingState.observeForever(this::onBrowsingStateChanged);
@@ -259,7 +271,17 @@ public class PlaybackViewModel {
         return mMediaControllerCallback.mMediaMetadata;
     }
 
-
+    private String getLogPrefix() {
+        String result = mDebugId;
+        Context context = mContext.get();
+        if (context == null) {
+            return result + "no context";
+        }
+        MediaSource source = mMediaSourceLiveData.getValue();
+        result += (source != null) ? source.getDisplayName(context).toString() : "no source";
+        result += " ";
+        return result;
+    }
 
     private class MediaControllerCallback extends MediaControllerCompat.Callback {
 
@@ -334,7 +356,7 @@ public class PlaybackViewModel {
 
         @Override
         public void onSessionDestroyed() {
-            Log.w(TAG, "onSessionDestroyed");
+            Log.w(TAG, getLogPrefix() + "onSessionDestroyed");
             // Bypass the unregisterCallback as the controller is dead.
             // TODO: consider keeping track of orphaned callbacks in case they are resurrected...
             setMediaController(null);
@@ -347,23 +369,34 @@ public class PlaybackViewModel {
             // MediaMetadata equals EMPTY_MEDIA_METADATA, set mMediaMetadata to null to keep
             // the code simpler everywhere else.
             if ((mmdCompat != null) && EMPTY_MEDIA_METADATA.equals(mmdCompat.getMediaMetadata())) {
+                Log.i(TAG, getLogPrefix() + "onMetadataChanged: empty");
                 mMediaMetadata = null;
             } else {
                 mMediaMetadata = mmdCompat;
             }
             MediaItemMetadata item =
                     (mMediaMetadata != null) ? new MediaItemMetadata(mMediaMetadata) : null;
+            if (item != null && Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, getLogPrefix() + "onMetadataChanged: " + item);
+            }
             mMetadata.setValue(item);
             updatePlaybackStatus();
         }
 
         @Override
         public void onQueueTitleChanged(CharSequence title) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, getLogPrefix() + "onQueueTitleChanged: " + title);
+            }
             mQueueTitle.setValue(title);
         }
 
         @Override
         public void onQueueChanged(@Nullable List<MediaSessionCompat.QueueItem> queue) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                int size = (queue != null) ? queue.size() : -1;
+                Log.d(TAG, getLogPrefix() + "onQueueChanged: " + size);
+            }
             List<MediaItemMetadata> filtered = queue == null ? Collections.emptyList()
                     : queue.stream()
                             .filter(item -> item != null
@@ -378,6 +411,9 @@ public class PlaybackViewModel {
 
         @Override
         public void onPlaybackStateChanged(PlaybackStateCompat playbackState) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, getLogPrefix() + "onPlaybackStateChanged: " + playbackState);
+            }
             mPlaybackState = playbackState;
             updatePlaybackStatus();
         }
@@ -394,6 +430,9 @@ public class PlaybackViewModel {
 
         @Override
         public void onExtrasChanged(Bundle extras) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, getLogPrefix() + "onExtrasChanged: " + extras);
+            }
             mBrowsingState.updateRootExtras(extras);
         }
     }
