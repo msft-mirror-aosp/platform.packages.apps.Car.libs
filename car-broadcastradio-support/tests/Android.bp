@@ -15,7 +15,6 @@
 //
 
 package {
-    default_team: "trendy_team_aaos_framework",
     default_applicable_licenses: ["Android-Apache-2.0"],
 }
 
@@ -23,7 +22,7 @@ android_test {
     name: "CarBroadcastRadioSupportTests",
     srcs: ["src/**/*.java"],
     static_libs: [
-        "car-broadcastradio-support",
+        "car-broadcastradio-support-source",
         "androidx.test.rules",
         "truth",
         "mockito-target-extended",

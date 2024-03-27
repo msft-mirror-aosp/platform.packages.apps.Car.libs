@@ -19,7 +19,7 @@ package {
 }
 
 android_library {
-    name: "car-broadcastradio-support",
+    name: "car-broadcastradio-support-source",
 
     srcs: ["src/**/*.java"],
     aidl: {
