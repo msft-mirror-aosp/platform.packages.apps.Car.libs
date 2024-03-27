@@ -41,7 +41,8 @@ import java.util.List;
  * This class keeps track of three different types of media sessions:
  * 1. The most important media session with an active playback state, tracked by getMediaSource().
  *    In scenarios with multiple media sessions, it prioritizes the most important returned from
- *    MediaSessionManager.
+ *    MediaSessionManager. If there are no active playback states, it returns the most important
+ *    media session that is able to be played.
  * 2. All media sessions with an active playback state, tracked by getActiveMediaSources()
  * 3. All media session active and able to be played, tracked by getPlayableMediaSources()
  * <p>
@@ -51,7 +52,7 @@ import java.util.List;
 public class MediaSessionHelper extends MediaController.Callback {
 
     private static final String TAG = "MediaSessionHelper";
-    private final MutableLiveData<MediaSource> mMediaSource = new MutableLiveData<>();
+    private final MutableLiveData<MediaSource> mPrimaryMediaSource = new MutableLiveData<>();
     private final MutableLiveData<List<MediaSource>> mActiveMediaSources =
             new MutableLiveData<>();
     private final MutableLiveData<List<MediaSource>> mPlayableMediaSources =
@@ -145,9 +146,12 @@ public class MediaSessionHelper extends MediaController.Callback {
         onMediaControllersChange(mMediaSessionManager.getActiveSessions(null));
     }
 
-    /** Returns a filtered live data of {@link MediaSource}. */
+    /**
+     * Returns a filtered live data of {@link MediaSource}. If there is no active media session, it
+     * will return the highest priority playable one.
+     */
     public LiveData<MediaSource> getMediaSource() {
-        return mMediaSource;
+        return mPrimaryMediaSource;
     }
 
     /** Returns a filtered live data of {@link MediaSource} with active playback states. */
@@ -169,6 +173,7 @@ public class MediaSessionHelper extends MediaController.Callback {
         List<MediaController> activeControllers = new ArrayList<>();
         List<MediaController> playableControllers = new ArrayList<>();
         parseMediaControllers(controllers, activeControllers, playableControllers);
+        updatePrimaryMediaSource(activeControllers, playableControllers);
         updateActiveMediaSources(activeControllers);
         updatePlayableMediaSources(playableControllers);
     }
@@ -242,13 +247,20 @@ public class MediaSessionHelper extends MediaController.Callback {
             || (playbackState.getActions() & PlaybackStateCompat.ACTION_PLAY) != 0;
     }
 
-    private void updateActiveMediaSources(List<MediaController> mediaControllers) {
+    private void updatePrimaryMediaSource(List<MediaController> activeMediaControllers,
+            List<MediaController> playableMediaControllers) {
         MediaController primaryMediaController = null;
 
-        if (mediaControllers != null && !mediaControllers.isEmpty()) {
-            primaryMediaController = mediaControllers.get(0);
+        if (activeMediaControllers != null && !activeMediaControllers.isEmpty()) {
+            primaryMediaController = activeMediaControllers.get(0);
+        } else if (playableMediaControllers != null && !playableMediaControllers.isEmpty()) {
+            primaryMediaController = playableMediaControllers.get(0);
         }
-        mMediaSource.setValue(mInputFactory.getMediaSource(primaryMediaController));
+
+        mPrimaryMediaSource.setValue(mInputFactory.getMediaSource(primaryMediaController));
+    }
+
+    private void updateActiveMediaSources(List<MediaController> mediaControllers) {
         mActiveMediaSources.setValue(mInputFactory.getMediaSources(mediaControllers));
     }
 
