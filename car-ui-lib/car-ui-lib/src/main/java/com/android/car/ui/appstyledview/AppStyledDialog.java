@@ -37,6 +37,7 @@ import androidx.activity.OnBackPressedDispatcherOwner;
 import androidx.activity.ViewTreeOnBackPressedDispatcherOwner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
@@ -142,7 +143,6 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
             return;
         }
 
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
         ViewCompat.setWindowInsetsAnimationCallback(window.getDecorView().getRootView(),
                 new WindowInsetsAnimationCompat.Callback(
                         WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP) {
@@ -165,6 +165,9 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
                         if (!isImeAnimation(animation)) {
                             return;
                         }
+
+                        window.setSoftInputMode(
+                                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 
                         mAnimationLayoutParams = new WindowManager.LayoutParams();
                         mAnimationLayoutParams.copyFrom(window.getAttributes());
@@ -194,19 +197,27 @@ class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStateRegist
                         }
                         WindowInsetsCompat insets = ViewCompat.getRootWindowInsets(
                                 window.getDecorView().getRootView());
+                        mIsImeShown = insets.getInsets(WindowInsetsCompat.Type.ime())
+                                != Insets.NONE;
                         WindowManager.LayoutParams layoutParams =
                                 mController.getDialogWindowLayoutParam(window.getAttributes());
-                        int imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
-                        mIsImeShown = imeHeight > 0;
-                        int bottom = layoutParams.y + layoutParams.height;
 
-                        DisplayMetrics displayMetrics =
-                                CarUiUtils.getDeviceDisplayMetrics(mContext);
-
-                        int imeTop = displayMetrics.heightPixels - imeHeight;
                         int resize = 0;
-                        if (imeTop < bottom) {
-                            resize = bottom - imeTop;
+                        if (mIsImeShown) {
+                            // Makes assumption that ime is shown on bottom of screen
+                            int imeHeight = bounds.getUpperBound().bottom;
+
+                            int[] location = new int[2];
+                            window.getDecorView().getRootView().getLocationOnScreen(location);
+                            int bottom = location[1] + layoutParams.height;
+
+                            DisplayMetrics displayMetrics =
+                                    CarUiUtils.getDeviceDisplayMetrics(mContext);
+
+                            int imeTop = displayMetrics.heightPixels - imeHeight;
+                            if (imeTop < bottom) {
+                                resize = bottom - imeTop - mImeOverlapPx;
+                            }
                         }
 
                         mEndHeight = layoutParams.height - resize;
