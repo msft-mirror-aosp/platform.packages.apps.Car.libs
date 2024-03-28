@@ -26,6 +26,7 @@ import android.os.Build;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.View;
+import android.view.WindowManager;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
@@ -104,8 +105,8 @@ public final class AppStyledDialogController {
 
     @NonNull
     private AppStyledViewController mAppStyledViewController;
-    @NonNull
-    private AppStyledDialog mDialog;
+    @Nullable
+    private View mContentView;
 
     /**
      * Constructs a controller that can display an app styled view.
@@ -127,7 +128,6 @@ public final class AppStyledDialogController {
         mAppStyledViewController = PluginFactorySingleton.get(activity).createAppStyledView(
                 activity);
         mAppStyledViewController.setSceneType(sceneType);
-        mDialog = new AppStyledDialog(activity, mAppStyledViewController);
     }
 
     /**
@@ -147,13 +147,11 @@ public final class AppStyledDialogController {
         }
 
         mAppStyledViewController = PluginFactorySingleton.get(context).createAppStyledView(context);
-        mDialog = new AppStyledDialog((Activity) context, mAppStyledViewController);
     }
 
     @VisibleForTesting
     void setAppStyledViewController(AppStyledViewController controller, Activity context) {
         mAppStyledViewController = controller;
-        mDialog = new AppStyledDialog(context, mAppStyledViewController);
     }
 
     /**
@@ -170,7 +168,8 @@ public final class AppStyledDialogController {
                             + ".CarUi or Theme.DeviceDefault");
         }
 
-        mDialog.setContent(contentView);
+        mContentView = contentView;
+        mAppStyledViewController.setContent(contentView);
     }
 
     /**
@@ -178,7 +177,7 @@ public final class AppStyledDialogController {
      */
     @Nullable
     public View getContentView() {
-        return mDialog.getContent();
+        return mContentView;
     }
 
     /**
@@ -202,7 +201,7 @@ public final class AppStyledDialogController {
      * Displays the dialog to the user with the custom view provided by the app.
      */
     public void show() {
-        mDialog.show();
+        mAppStyledViewController.show();
     }
 
     /**
@@ -210,7 +209,7 @@ public final class AppStyledDialogController {
      * thread.
      */
     public void dismiss() {
-        mDialog.dismiss();
+        mAppStyledViewController.dismiss();
     }
 
     /**
@@ -224,28 +223,31 @@ public final class AppStyledDialogController {
      * Sets a runnable that will be invoked when a dialog is dismissed.
      */
     public void setOnDismissListener(@Nullable Runnable listener) {
-        if (listener == null) {
-            mDialog.setOnDismissListener(null);
-            return;
-        }
-
-        mDialog.setOnDismissListener(dialog -> listener.run());
+        mAppStyledViewController.setOnDismissListener(listener);
     }
 
     /**
      * Returns the width of the AppStyledView
      */
     public int getAppStyledViewDialogWidth() {
-        return mAppStyledViewController.getDialogWindowLayoutParam(
-                mDialog.getWindowLayoutParams()).width;
+        WindowManager.LayoutParams params = mAppStyledViewController.getAttributes();
+        if (params != null) {
+            return params.width;
+        }
+
+        return -1;
     }
 
     /**
      * Returns the height of the AppStyledView
      */
     public int getAppStyledViewDialogHeight() {
-        return mAppStyledViewController.getDialogWindowLayoutParam(
-                mDialog.getWindowLayoutParams()).height;
+        WindowManager.LayoutParams params = mAppStyledViewController.getAttributes();
+        if (params != null) {
+            return params.height;
+        }
+
+        return -1;
     }
 
     /**
@@ -308,10 +310,5 @@ public final class AppStyledDialogController {
         theme.applyStyle(themeResId, true);
 
         return new ContextThemeWrapper(configContext, theme);
-    }
-
-    @VisibleForTesting
-    AppStyledDialog getAppStyledDialog() {
-        return mDialog;
     }
 }
