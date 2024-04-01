@@ -53,6 +53,7 @@
     <item type="id" name="separator"/>
     <item type="id" name="now_playing_icon"/>
     <item type="id" name="queue_list"/>
+    <item type="id" name="header_app_icon"/>
 
     <!-- Forward declarations for resources used in other car-media-common Classes -->
     <item type="id" name="error_button" />
