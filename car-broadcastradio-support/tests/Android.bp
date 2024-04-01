@@ -19,7 +19,7 @@ package {
 }
 
 android_test {
-    name: "CarBroadcastRadioSupportTests",
+    name: "CarBroadcastRadioSupportLibTests",
     srcs: ["src/**/*.java"],
     static_libs: [
         "car-broadcastradio-support-source",
