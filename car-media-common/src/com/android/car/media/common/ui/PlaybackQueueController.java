@@ -36,7 +36,7 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -67,7 +67,7 @@ public class PlaybackQueueController {
 
     private static final String TAG = "PlaybackQueueController";
 
-    private final FragmentActivity mActivity;
+    private final LifecycleOwner mLifecycleOwner;
     private final LifeCycleObserverUxrContentLimiter mUxrContentLimiter;
     private final int mUxrConfigurationId;
     private final PlaybackViewModel mPlaybackViewModel;
@@ -455,33 +455,42 @@ public class PlaybackQueueController {
         }
     }
 
+    /**
+     * Construct a PlaybackQueueController. If clients do not have a separate layout for the
+     * queue, where the queue is already inflated within the container, they should pass
+     * {@link Resources.ID_NULL} as the LayoutRes resource. If clients do not require a
+     * UxrContentLimiter, they should pass null for uxrContentLimiter and the int passed for
+     * uxrConfigurationId will be ignored.
+     */
     public PlaybackQueueController(
             ViewGroup container,
             @LayoutRes int resource,
             @LayoutRes int itemResource,
-            FragmentActivity activity,
+            LifecycleOwner lifecycleOwner,
             PlaybackViewModel playbackViewModel,
             MediaItemsRepository itemsRepository,
             @Nullable LifeCycleObserverUxrContentLimiter uxrContentLimiter,
             int uxrConfigurationId) {
-        mActivity = activity;
+        mLifecycleOwner = lifecycleOwner;
         mPlaybackViewModel = playbackViewModel;
         mMediaItemsRepository = itemsRepository;
 
-        LayoutInflater inflater = LayoutInflater.from(container.getContext());
-        View view = inflater.inflate(resource, container, false);
-        container.addView(view);
+        if (resource != Resources.ID_NULL) {
+            LayoutInflater inflater = LayoutInflater.from(container.getContext());
+            View view = inflater.inflate(resource, container, false);
+            container.addView(view);
+        }
         mQueueItemLayout = itemResource;
 
-        Resources res = view.getContext().getResources();
-        mQueue = view.findViewById(R.id.queue_list);
+        Resources res = container.getContext().getResources();
+        mQueue = container.findViewById(R.id.queue_list);
 
         mShowTimeForActiveQueueItem = true;
         mShowIconForActiveQueueItem = false;
         mShowThumbnailForQueueItem = true;
         mShowSubtitleForQueueItem = false;
 
-        mPlaybackViewModel.getPlaybackController().observe(activity,
+        mPlaybackViewModel.getPlaybackController().observe(lifecycleOwner,
                 controller -> mController = controller);
         mUxrConfigurationId = uxrConfigurationId;
         initQueue();
@@ -489,7 +498,7 @@ public class PlaybackQueueController {
         mUxrContentLimiter = uxrContentLimiter;
         if (mUxrContentLimiter != null) {
             mUxrContentLimiter.setAdapter(mQueueAdapter);
-            activity.getLifecycle().addObserver(mUxrContentLimiter);
+            lifecycleOwner.getLifecycle().addObserver(mUxrContentLimiter);
         }
     }
 
@@ -510,7 +519,7 @@ public class PlaybackQueueController {
     }
 
     /** Calls {@link RecyclerView#setVerticalFadingEdgeEnabled(boolean)} */
-    public void setFadingEdgeLengthEnabled(boolean enabled) {
+    public void setVerticalFadingEdgeLengthEnabled(boolean enabled) {
         mQueue.setVerticalFadingEdgeEnabled(enabled);
     }
 
@@ -544,10 +553,9 @@ public class PlaybackQueueController {
     }
 
     private void initQueue() {
-        mQueue.setVerticalFadingEdgeEnabled(true);
         mQueueAdapter = new QueueItemsAdapter();
 
-        mPlaybackViewModel.getPlaybackStateWrapper().observe(getActivity(),
+        mPlaybackViewModel.getPlaybackStateWrapper().observe(getLifecycleOwner(),
                 state -> {
                     Long itemId = (state != null) ? state.getActiveQueueItemId() : null;
                     if (!Objects.equals(mActiveQueueItemId, itemId)) {
@@ -572,10 +580,10 @@ public class PlaybackQueueController {
         mItemAnimator = new DefaultItemAnimator();
         mItemAnimator.setSupportsChangeAnimations(false);
         mQueue.setItemAnimator(mItemAnimator);
-        mPlaybackViewModel.getQueue().observe(getActivity(), this::setQueue);
+        mPlaybackViewModel.getQueue().observe(getLifecycleOwner(), this::setQueue);
 
         mPlaybackViewModel.getProgress().observe(
-                getActivity(),
+                getLifecycleOwner(),
                 playbackProgress -> {
                     mQueueAdapter.setCurrentTime(playbackProgress.getCurrentTimeText().toString());
                     mQueueAdapter.setMaxTime(playbackProgress.getMaxTimeText().toString());
@@ -599,7 +607,7 @@ public class PlaybackQueueController {
         }
     }
 
-    private FragmentActivity getActivity() {
-        return mActivity;
+    private LifecycleOwner getLifecycleOwner() {
+        return mLifecycleOwner;
     }
 }
