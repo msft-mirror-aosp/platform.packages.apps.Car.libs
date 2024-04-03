@@ -16,20 +16,17 @@
 
 package com.android.car.ui.plugin;
 
-import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION;
-
 import android.content.Context;
-import android.content.res.Configuration;
+import android.content.ContextWrapper;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
-import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.UiContext;
 
 import com.chassis.car.ui.plugin.CarUiProxyLayoutInflaterFactory;
 
 import java.lang.ref.WeakReference;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 /**
  * This class maintains plugin ui contexts per app, which are used to inflate views with the plugin.
@@ -39,8 +36,6 @@ public final class PluginUiContextFactory {
     private final Context mPluginContext;
     /** The most recently created/referenced plugin ui context. */
     private WeakReference<Context> mRecentUiContext = null;
-    /** A map from app contexts to their corresponding plugin ui contexts. */
-    private Map<Context, Context> mAppToPluginContextMap = new WeakHashMap<>();
 
     public PluginUiContextFactory(@NonNull Context pluginContext) {
         mPluginContext = pluginContext;
@@ -71,41 +66,32 @@ public final class PluginUiContextFactory {
      *
      * @param sourceContext A ui context, normally an Activity context.
      */
-    @NonNull
-    public Context getPluginUiContext(@NonNull Context sourceContext) {
-        Context uiContext = mAppToPluginContextMap.get(sourceContext);
-
-        if (uiContext == null) {
-            uiContext = mPluginContext;
-            if (!uiContext.isUiContext()) {
-                uiContext = uiContext
-                        .createWindowContext(sourceContext.getDisplay(), TYPE_APPLICATION, null);
+    public Context getPluginUiContext(@UiContext Context sourceContext) {
+        Context pluginContext = new ContextWrapper(sourceContext) {
+            @Override
+            public Resources getResources() {
+                return mPluginContext.getResources();
             }
-        }
 
-        Configuration currentConfiguration = uiContext.getResources().getConfiguration();
-        Configuration newConfiguration = sourceContext.getResources().getConfiguration();
-        if (currentConfiguration.diff(newConfiguration) != 0) {
-            uiContext = uiContext.createConfigurationContext(newConfiguration);
-        }
+            @Override
+            public Object getSystemService(@NonNull String name) {
+                if (LAYOUT_INFLATER_SERVICE.equals(name)) {
+                    return mPluginContext.getSystemService(name);
+                }
 
-        // Only wrap uiContext the first time it's configured
-        if (!(uiContext instanceof PluginContextWrapper)) {
-            uiContext = new PluginContextWrapper(uiContext, sourceContext.getPackageName());
-            ((PluginContextWrapper) uiContext).setWindowManager((WindowManager) sourceContext
-                    .getSystemService(Context.WINDOW_SERVICE));
-        }
+                return super.getSystemService(name);
+            }
+        };
 
         // Add a custom layout inflater that can handle things like CarUiTextView that is in the
         // layout files of the car-ui-lib static implementation
-        LayoutInflater inflater = LayoutInflater.from(uiContext);
+        LayoutInflater inflater = LayoutInflater.from(pluginContext);
         if (inflater.getFactory2() == null) {
             inflater.setFactory2(new CarUiProxyLayoutInflaterFactory());
         }
 
-        mAppToPluginContextMap.put(sourceContext, uiContext);
-        mRecentUiContext = new WeakReference<Context>(uiContext);
+        mRecentUiContext = new WeakReference<>(pluginContext);
 
-        return uiContext;
+        return pluginContext;
     }
 }
