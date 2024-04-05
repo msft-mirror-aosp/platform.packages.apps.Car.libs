@@ -94,3 +94,7 @@ project(':car-broadcastradio-support').projectDir = new File('../car-broadcastra
 
 include ':car-radio-app'
 project(':car-radio-app').projectDir = new File('../../Radio')
+
+include ':car-bugreport-app'
+project(':car-bugreport-app').projectDir = new File('../../BugReport')
+include 'car-bugreport-app'
