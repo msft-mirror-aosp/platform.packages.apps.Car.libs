@@ -29,6 +29,7 @@ import android.os.Bundle;
 import android.support.v4.media.MediaBrowserCompat;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.car.app.mediaextensions.analytics.Constants;
 import androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent;
@@ -61,7 +62,7 @@ public class AnalyticsHelper {
      * @return IAnalyticsManager implementation.
      */
     public static IAnalyticsManager makeAnalyticsManager(@NonNull Context context,
-            @NonNull MediaBrowserCompat browser, @NonNull Bundle rootExtras) {
+            @Nullable MediaBrowserCompat browser, @NonNull Bundle rootExtras) {
         int batchinterval  = context.getResources().getInteger(
                 com.android.car.media.common.R.integer.analytics_send_batch_interval);
         int batchSize = context.getResources().getInteger(
@@ -70,7 +71,7 @@ public class AnalyticsHelper {
 
         // We return unimplemented stub when analytics not enabled. This way we do not need this
         //  check at every capture point.
-        if (ANALYTICS_ENABLED && optIn) {
+        if (ANALYTICS_ENABLED && optIn && browser != null) {
             return new AnalyticsManager(context, browser, batchinterval, batchSize);
         } else {
             return sIAnalyticsManagerStub;
