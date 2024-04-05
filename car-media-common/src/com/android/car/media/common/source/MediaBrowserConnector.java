@@ -139,7 +139,7 @@ public class MediaBrowserConnector {
             if (o == null || getClass() != o.getClass()) return false;
             BrowsingState that = (BrowsingState) o;
             return mMediaSource.equals(that.mMediaSource)
-                    && mBrowser.equals(that.mBrowser)
+                    && Objects.equals(mBrowser, that.mBrowser)
                     && mConnectionStatus == that.mConnectionStatus;
         }
 
