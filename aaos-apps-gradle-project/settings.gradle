@@ -91,3 +91,6 @@ include ':car-messenger-app:testing'
 
 include ':car-broadcastradio-support'
 project(':car-broadcastradio-support').projectDir = new File('../car-broadcastradio-support')
+
+include ':car-radio-app'
+project(':car-radio-app').projectDir = new File('../../Radio')
