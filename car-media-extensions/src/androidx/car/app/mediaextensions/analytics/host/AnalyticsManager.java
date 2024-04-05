@@ -32,27 +32,21 @@ import androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent;
 import androidx.car.app.mediaextensions.analytics.event.BrowseChangeEvent;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
 
 
 /** Creates and sends analytic events. */
 @ExperimentalCarApi
 public class AnalyticsManager implements IAnalyticsManager {
     public static final String TAG = "AnalyticsManager";
-
-    private static final Map<String, Queue<Bundle>> sPackageEventQueueMap = new HashMap<>();
+    private final ArrayList<Bundle> mEventQueue;
     private final Handler mHandler;
     private final long mBatchInterval;
     /** We don't want to come to close to binder buffer limit, so we limit queue. */
     private final int mEventBufferSize;
     private final AnalyticsEventFactory mAnalyticsFactory;
     private final WeakReference<MediaBrowserCompat> mBrowser;
-    private final String mBrowserComponentString;
 
     /**
      *
@@ -66,8 +60,8 @@ public class AnalyticsManager implements IAnalyticsManager {
         mHandler = new Handler(Looper.myLooper());
         mBatchInterval = batchInterval;
         mEventBufferSize = batchSize;
+        mEventQueue = new ArrayList<>(mEventBufferSize);
         mBrowser = new WeakReference<>(browser);
-        mBrowserComponentString = browser.getServiceComponent().flattenToString();
         mAnalyticsFactory =  new AnalyticsEventFactory(context);
     }
 
@@ -78,51 +72,29 @@ public class AnalyticsManager implements IAnalyticsManager {
 
         //We have an event but empty queue, so we set up a window to receive a swarm before
         // sending a batch.
-        if (sPackageEventQueueMap.isEmpty()) {
-            mHandler.postDelayed(this::sendAllBatches, mBatchInterval);
+        if (mEventQueue.isEmpty()) {
+            mHandler.postDelayed(this::sendBatch, mBatchInterval);
         }
 
-        Queue<Bundle> queue = sPackageEventQueueMap.get(mBrowserComponentString);
-        if (queue == null) {
-            queue = new ArrayDeque<>(mEventBufferSize);
-            sPackageEventQueueMap.put(mBrowserComponentString, queue);
-        }
-        queue.add(eventBundle);
+        mEventQueue.add(eventBundle);
 
         //We hit queue limit, send batch now, and cancel runnable
-        if (queue.size() >= mEventBufferSize) {
-            sendAllBatches();
+        if (mEventQueue.size() >= mEventBufferSize) {
+            sendBatch();
             mHandler.removeCallbacksAndMessages(null);
         }
     }
 
-    /**
-     * This will clear out all queues by sending all events to all sources.
-     *
-     * <p>The queue will sit empty and the handler idle until there is an event, then it will wait
-     * mBatchInterval before clearing the queue. If queue is full before mBatchInterval is up,
-     * we clear the queue early.
-     */
-    private void sendAllBatches() {
-        for (String packageKey : sPackageEventQueueMap.keySet()) {
-            if (sPackageEventQueueMap.get(packageKey) != null) {
-                sendBatch(sPackageEventQueueMap.get(packageKey));
-            } else {
-                Log.w(TAG, "Event queue null with package key: " + packageKey);
-            }
-        }
-        sPackageEventQueueMap.clear();
-    }
-
-    private void sendBatch(@NonNull Queue<Bundle> eventQueue) {
+    private void sendBatch() {
         //Get the browser service with mMediaAppComponent
         MediaBrowserCompat browser = mBrowser.get();
         if (browser == null || !browser.isConnected()){
             Log.w(TAG, "sendBatch failed, browser null or not connected.");
             return;
         }
-        Bundle eventBatchBundle = createBatch(new ArrayList<>(eventQueue));
+        Bundle eventBatchBundle = createBatch(mEventQueue);
         browser.sendCustomAction(ACTION_ANALYTICS, eventBatchBundle, null);
+        mEventQueue.clear();
     }
 
     /**
@@ -180,12 +152,12 @@ public class AnalyticsManager implements IAnalyticsManager {
     /** @inheritDoc */
     @Override
     public void clearQueue() {
-        sPackageEventQueueMap.clear();
+        mEventQueue.clear();
     }
 
     /** @inheritDoc */
     @Override
     public void sendQueue() {
-        sendAllBatches();
+        sendBatch();
     }
 }
