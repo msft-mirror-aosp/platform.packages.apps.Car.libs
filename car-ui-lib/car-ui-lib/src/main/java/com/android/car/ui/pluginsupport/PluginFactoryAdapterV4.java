@@ -162,7 +162,7 @@ public final class PluginFactoryAdapterV4 implements PluginFactory {
         AppStyledViewControllerOEMV2 appStyledViewControllerOEMV2 = mOem.createAppStyledView(
                 activityContext);
         return appStyledViewControllerOEMV2 == null ? new AppStyledViewControllerImpl(
-                activityContext) : new AppStyledViewControllerAdapterV2(
+                activityContext) : new AppStyledViewControllerAdapterV2(activityContext,
                 appStyledViewControllerOEMV2);
     }
 

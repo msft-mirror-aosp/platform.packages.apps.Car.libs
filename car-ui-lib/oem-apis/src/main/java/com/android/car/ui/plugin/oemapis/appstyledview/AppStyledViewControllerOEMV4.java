@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The Android Open Source Project
+ * Copyright (C) 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,10 @@ package com.android.car.ui.plugin.oemapis.appstyledview;
 import android.view.View;
 import android.view.WindowManager;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /** The OEM interface for a AppStyledView. */
-public interface AppStyledViewControllerOEMV3 {
+public interface AppStyledViewControllerOEMV4 {
     /**
      * Gets the view to display. This view will contain the content view set in {@link #setContent}.
      *
@@ -46,9 +45,27 @@ public interface AppStyledViewControllerOEMV3 {
     int NAV_ICON_BACK = 1;
     int NAV_ICON_CLOSE = 2;
 
+    /**
+     * An AppStyledView that renders all content in a single modal.
+     */
     int SCENE_TYPE_SINGLE = 0;
+
+    /**
+     * An AppStyledView that renders the initial content for content to be rendered across
+     * multiple modals.
+     */
     int SCENE_TYPE_ENTER = 1;
+
+    /**
+     * An AppStyledView that renders the intermediate content for content to be rendered across
+     * multiple modals.
+     */
     int SCENE_TYPE_INTERMEDIATE = 2;
+
+    /**
+     * An AppStyledView that renders the final content for content to be rendered across
+     * multiple modals.
+     */
     int SCENE_TYPE_EXIT = 3;
 
     /**
@@ -56,13 +73,6 @@ public interface AppStyledViewControllerOEMV3 {
      * {@link #NAV_ICON_BACK} or {@link #NAV_ICON_CLOSE}.
      */
     void setNavIcon(int navIcon);
-
-    /**
-     * Returns the layout params for the AppStyledView dialog
-     */
-    @NonNull
-    WindowManager.LayoutParams getDialogWindowLayoutParam(
-            @NonNull WindowManager.LayoutParams params);
 
     /**
      * Returns the maximum width for content to be rendered in the AppStyledView.
@@ -78,4 +88,24 @@ public interface AppStyledViewControllerOEMV3 {
      * Sets the scene type for the app styled view.
      */
     void setSceneType(int sceneType);
+
+    /**
+     * Display the AppStyledView.
+     */
+    void show();
+
+    /**
+     * Dismiss the AppStyledView.
+     */
+    void dismiss();
+
+    /**
+     * Set a listener to be invoked when the AppStyledView is dismissed.
+     */
+    void setOnDismissListener(Runnable runnable);
+
+    /**
+     * Retrieve the current window attributes associated with this AppStyledView.
+     */
+    WindowManager.LayoutParams getAttributes();
 }

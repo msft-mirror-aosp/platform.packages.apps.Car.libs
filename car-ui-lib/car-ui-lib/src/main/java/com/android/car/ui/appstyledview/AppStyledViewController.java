@@ -22,7 +22,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 import androidx.annotation.IntDef;
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 
 import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
 import com.android.car.ui.appstyledview.AppStyledDialogController.SceneType;
@@ -62,10 +62,8 @@ public interface AppStyledViewController {
 
     /**
      * Creates a app styled view.
-     *
-     * @return the view used for app styled view.
      */
-    View getAppStyledView(@Nullable View contentView);
+    void setContent(@NonNull View content);
 
     /**
      * Sets the nav icon to be used.
@@ -76,11 +74,6 @@ public interface AppStyledViewController {
      * Sets a runnable that will be invoked when a nav icon is clicked.
      */
     void setOnNavIconClickListener(Runnable listener);
-
-    /**
-     * Returns the layout params for the AppStyledView dialog
-     */
-    WindowManager.LayoutParams getDialogWindowLayoutParam(WindowManager.LayoutParams params);
 
     /**
      * Returns the maximum width for content to be rendered in the AppStyledView.
@@ -96,4 +89,24 @@ public interface AppStyledViewController {
      * Sets the {@link AppStyledDialogController.SceneType} for the app styled view.
      */
     void setSceneType(@SceneType int sceneType);
+
+    /**
+     * Display the app styled view.
+     */
+    void show();
+
+    /**
+     * Dismiss the app styled view.
+     */
+    void dismiss();
+
+    /**
+     * Set a listener to be invoked when the app styled view is dismissed.
+     */
+    void setOnDismissListener(Runnable runnable);
+
+    /**
+     * Retrieve the current window attributes associated with this app styled view.
+     */
+    WindowManager.LayoutParams getAttributes();
 }
