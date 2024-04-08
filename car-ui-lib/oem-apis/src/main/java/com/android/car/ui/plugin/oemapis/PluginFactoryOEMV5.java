@@ -41,7 +41,7 @@ import java.util.List;
  * Multiple of these can be provided via {@link PluginVersionProviderOEMV1} to allow plugins
  * to provide an old implementation for old apps, and a newer implementation for newer apps.
  *
- * @deprecated Use {@link PluginFactoryOEMV8} instead
+ * @deprecated Use {@link PluginFactoryOEMV9} instead
  */
 @Deprecated
 public interface PluginFactoryOEMV5 {
