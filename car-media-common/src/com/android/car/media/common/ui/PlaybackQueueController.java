@@ -19,11 +19,13 @@ package com.android.car.media.common.ui;
 import static androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent.VIEW_COMPONENT_QUEUE_LIST;
 import static androidx.recyclerview.widget.RecyclerView.NO_POSITION;
 
+import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.updateImageViewDrawableAndVisibility;
 import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.updateTextViewAndVisibility;
 import static com.android.car.ui.recyclerview.RangeFilter.INVALID_INDEX;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
@@ -37,6 +39,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -73,11 +76,14 @@ public class PlaybackQueueController {
     private final PlaybackViewModel mPlaybackViewModel;
     private final MediaItemsRepository mMediaItemsRepository;
     private QueueItemsAdapter mQueueAdapter;
+    private HeaderAdapter mHeaderAdapter;
     private boolean mIsActuallyVisible = false;
     private List<String> mPrevVisibleItems = new ArrayList<>();
     private final CarUiRecyclerView mQueue;
     @LayoutRes
     private final int mQueueItemLayout;
+    @LayoutRes
+    private final int mHeaderLayout;
     private PlaybackQueueCallback mPlaybackQueueCallback;
     private DefaultItemAnimator mItemAnimator;
 
@@ -278,7 +284,13 @@ public class PlaybackQueueController {
         private void scrollToActiveItemPosition() {
             int position = getActiveItemPosition();
             if (position != UxrPivotFilterImpl.INVALID_POSITION) {
-                mQueue.scrollToPosition(position);
+                // The Header pushes each item in QueueAdapter lower,
+                // so scrolling to one further position offsets this.
+                if (mHeaderLayout != Resources.ID_NULL && position != 0) {
+                    mQueue.scrollToPosition(position + 1);
+                } else {
+                    mQueue.scrollToPosition(position);
+                }
             }
         }
 
@@ -455,6 +467,54 @@ public class PlaybackQueueController {
         }
     }
 
+    private class HeaderAdapter extends RecyclerView.Adapter<HeaderAdapter.HeaderViewHolder> {
+
+        private CharSequence mDescription = "";
+        private Drawable mAppIcon = null;
+
+        /**
+         * ViewHolder for displaying the header
+         */
+        class HeaderViewHolder extends RecyclerView.ViewHolder {
+            private final ImageView mAppIcon = itemView.findViewById(R.id.header_app_icon);
+
+            HeaderViewHolder(@NonNull View itemView) {
+                super(itemView);
+            }
+
+            public void bind() {
+                updateImageViewDrawableAndVisibility(mAppIcon, mHeaderAdapter.getAppIcon());
+            }
+        }
+
+        @Override
+        public HeaderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(mHeaderLayout, parent, false);
+            return new HeaderViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(HeaderViewHolder vh, int position) {
+            vh.bind();
+        }
+
+        /** Since there is only one item in the header return 1 */
+        @Override
+        public int getItemCount() {
+            return 1;
+        }
+
+        public void updateAppIcon(Drawable appIcon) {
+            mAppIcon = appIcon;
+            notifyDataSetChanged();
+        }
+
+        public Drawable getAppIcon() {
+            return mAppIcon;
+        }
+    }
+
     /**
      * Construct a PlaybackQueueController. If clients do not have a separate layout for the
      * queue, where the queue is already inflated within the container, they should pass
@@ -464,8 +524,9 @@ public class PlaybackQueueController {
      */
     public PlaybackQueueController(
             ViewGroup container,
-            @LayoutRes int resource,
-            @LayoutRes int itemResource,
+            @LayoutRes int queueResource,
+            @LayoutRes int queueItemResource,
+            @LayoutRes int headerResource,
             LifecycleOwner lifecycleOwner,
             PlaybackViewModel playbackViewModel,
             MediaItemsRepository itemsRepository,
@@ -475,12 +536,13 @@ public class PlaybackQueueController {
         mPlaybackViewModel = playbackViewModel;
         mMediaItemsRepository = itemsRepository;
 
-        if (resource != Resources.ID_NULL) {
+        if (queueResource != Resources.ID_NULL) {
             LayoutInflater inflater = LayoutInflater.from(container.getContext());
-            View view = inflater.inflate(resource, container, false);
+            View view = inflater.inflate(queueResource, container, false);
             container.addView(view);
         }
-        mQueueItemLayout = itemResource;
+        mQueueItemLayout = queueItemResource;
+        mHeaderLayout = headerResource;
 
         Resources res = container.getContext().getResources();
         mQueue = container.findViewById(R.id.queue_list);
@@ -563,7 +625,12 @@ public class PlaybackQueueController {
                         mQueueAdapter.updateActiveItem(/* listIsNew */ false);
                     }
                 });
-        mQueue.setAdapter(mQueueAdapter);
+        if (mHeaderLayout != Resources.ID_NULL) {
+            mHeaderAdapter = new HeaderAdapter();
+            mQueue.setAdapter(new ConcatAdapter(mHeaderAdapter, mQueueAdapter));
+        } else {
+            mQueue.setAdapter(mQueueAdapter);
+        }
         mQueue.addOnScrollListener(new CarUiRecyclerView.OnScrollListener() {
 
             @Override
@@ -589,6 +656,13 @@ public class PlaybackQueueController {
                     mQueueAdapter.setMaxTime(playbackProgress.getMaxTimeText().toString());
                     mQueueAdapter.setTimeVisible(playbackProgress.hasTime());
                 });
+        mPlaybackViewModel.getMediaSource().observe(
+                getLifecycleOwner(),
+                mediaSource -> {
+                    Drawable icon = (mediaSource != null) ? mediaSource.getIcon() : null;
+                    mHeaderAdapter.updateAppIcon(icon);
+                }
+        );
     }
 
     void setQueue(List<MediaItemMetadata> queueItems) {
