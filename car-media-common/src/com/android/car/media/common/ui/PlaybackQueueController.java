@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.IntDef;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -158,19 +159,13 @@ public class PlaybackQueueController {
 
             boolean active = mActiveQueueItemId != null && Objects.equals(mActiveQueueItemId,
                     item.getQueueId());
-            if (active) {
-                if (mCurrentTime != null) {
-                    mCurrentTime.setText(mQueueAdapter.getCurrentTime());
-                }
-                if (mMaxTime != null) {
-                    mMaxTime.setText(mQueueAdapter.getMaxTime());
-                }
-            }
+
+            setCurrTime(active);
+            setMaxTime(active);
+
             boolean shouldShowTime =
                     mShowTimeForActiveQueueItem && active && mQueueAdapter.getTimeVisible();
-            ViewUtils.setVisible(mCurrentTime, shouldShowTime);
-            ViewUtils.setVisible(mMaxTime, shouldShowTime);
-            ViewUtils.setVisible(mTimeSeparator, shouldShowTime);
+            setTimeVisible(shouldShowTime);
 
             mView.setSelected(active);
 
@@ -181,6 +176,46 @@ public class PlaybackQueueController {
                 updateTextViewAndVisibility(mSubtitle, item.getSubtitle());
             } else {
                 ViewUtils.setVisible(mSubtitle, false);
+            }
+        }
+
+        private void setTimeVisible(boolean shouldShowTime) {
+            ViewUtils.setVisible(mCurrentTime, shouldShowTime);
+            ViewUtils.setVisible(mMaxTime, shouldShowTime);
+            ViewUtils.setVisible(mTimeSeparator, shouldShowTime);
+        }
+
+        private void setMaxTime(boolean isActive) {
+            if (mMaxTime != null && isActive) {
+                mMaxTime.setText(mQueueAdapter.getMaxTime());
+            }
+        }
+
+        private void setCurrTime(boolean isActive) {
+            if (mCurrentTime != null && isActive) {
+                mCurrentTime.setText(mQueueAdapter.getCurrentTime());
+            }
+        }
+
+        void bind(@ItemComponent int itemComponent, MediaItemMetadata mediaItemMetadata) {
+            boolean active = mActiveQueueItemId != null && Objects.equals(mActiveQueueItemId,
+                    mediaItemMetadata.getQueueId());
+
+            switch (itemComponent) {
+                case ItemComponent.ITEM_COMPONENT_CURR_TIME:
+                    setCurrTime(active);
+                    break;
+                case ItemComponent.ITEM_COMPONENT_MAX_TIME:
+                    setMaxTime(active);
+                    break;
+                case ItemComponent.ITEM_COMPONENT_VIS_TIME:
+                    boolean shouldShowTime =
+                            mShowTimeForActiveQueueItem && active && mQueueAdapter.getTimeVisible();
+                    setTimeVisible(shouldShowTime);
+                    break;
+                case ItemComponent.ITEM_COMPONENT_WHOLE:
+                    bind(mediaItemMetadata);
+                    break;
             }
         }
 
@@ -195,6 +230,50 @@ public class PlaybackQueueController {
             if (mShowThumbnailForQueueItem) {
                 Context context = mView.getContext();
                 mThumbnailBinder.maybeCancelLoading(context);
+            }
+        }
+    }
+
+    @IntDef(value = {
+            ItemComponent.ITEM_COMPONENT_WHOLE,
+            ItemComponent.ITEM_COMPONENT_CURR_TIME,
+            ItemComponent.ITEM_COMPONENT_MAX_TIME,
+            ItemComponent.ITEM_COMPONENT_VIS_TIME,
+    })
+    public @interface ItemComponent {
+        int ITEM_COMPONENT_WHOLE = 0;
+        int ITEM_COMPONENT_CURR_TIME = 1;
+        int ITEM_COMPONENT_MAX_TIME = 2;
+        int ITEM_COMPONENT_VIS_TIME = 3;
+    }
+
+    private static class QueueItemAdapterObserver extends RecyclerView.AdapterDataObserver {
+        private final QueueItemsAdapter mAdapter;
+        private final CarUiRecyclerView mRecyclerView;
+
+        QueueItemAdapterObserver(QueueItemsAdapter adapter, CarUiRecyclerView recyclerView) {
+            super();
+            this.mAdapter = adapter;
+            this.mRecyclerView = recyclerView;
+        }
+
+        @Override
+        public void onItemRangeChanged(int positionStart, int itemCount, @Nullable Object payload) {
+            if (positionStart >= 0 && itemCount >= 0) {
+                if (mRecyclerView != null && mAdapter != null) {
+                    RecyclerView.ViewHolder holder = mRecyclerView
+                            .findViewHolderForAdapterPosition(positionStart);
+                    if (holder != null) {
+                        if (payload == null) {
+                            //Default whole bind
+                            mAdapter.onBindViewHolder(holder, positionStart);
+                        } else {
+                            //Partial rebind if we have payload saying what to rebind.
+                            mAdapter.onBindViewHolder(holder, positionStart,
+                                    Collections.singletonList(payload));
+                        }
+                    }
+                }
             }
         }
     }
@@ -215,6 +294,8 @@ public class PlaybackQueueController {
         private Integer mActiveItemIndex;
         private boolean mTimeVisible;
         private Integer mScrollingLimitedMessageResId;
+
+
 
         QueueItemsAdapter() {
             mUxrPivotFilter = UxrPivotFilter.PASS_THROUGH;
@@ -274,10 +355,14 @@ public class PlaybackQueueController {
             return mUxrPivotFilter.indexToPosition(mActiveItemIndex);
         }
 
-        private void invalidateActiveItemPosition() {
+        private void invalidateActiveItemPosition(@ItemComponent int itemComponent) {
             int position = getActiveItemPosition();
             if (position != UxrPivotFilterImpl.INVALID_POSITION) {
-                notifyItemChanged(position);
+                if (itemComponent == ItemComponent.ITEM_COMPONENT_WHOLE) {
+                    notifyItemChanged(position);
+                } else {
+                    notifyItemChanged(position, itemComponent);
+                }
             }
         }
 
@@ -343,7 +428,7 @@ public class PlaybackQueueController {
             }
 
             // Invalidate the previous active item so it gets redrawn as a normal one.
-            invalidateActiveItemPosition();
+            invalidateActiveItemPosition(ItemComponent.ITEM_COMPONENT_WHOLE);
 
             mActiveItemIndex = activeItemPos;
             if (listIsNew) {
@@ -353,27 +438,27 @@ public class PlaybackQueueController {
             }
 
             scrollToActiveItemPosition();
-            invalidateActiveItemPosition();
+            invalidateActiveItemPosition(ItemComponent.ITEM_COMPONENT_WHOLE);
         }
 
         void setCurrentTime(String currentTime) {
             if (!mCurrentTimeText.equals(currentTime)) {
                 mCurrentTimeText = currentTime;
-                invalidateActiveItemPosition();
+                invalidateActiveItemPosition(ItemComponent.ITEM_COMPONENT_CURR_TIME);
             }
         }
 
         void setMaxTime(String maxTime) {
             if (!mMaxTimeText.equals(maxTime)) {
                 mMaxTimeText = maxTime;
-                invalidateActiveItemPosition();
+                invalidateActiveItemPosition(ItemComponent.ITEM_COMPONENT_MAX_TIME);
             }
         }
 
         void setTimeVisible(boolean visible) {
             if (mTimeVisible != visible) {
                 mTimeVisible = visible;
-                invalidateActiveItemPosition();
+                invalidateActiveItemPosition(ItemComponent.ITEM_COMPONENT_VIS_TIME);
             }
         }
 
@@ -430,6 +515,36 @@ public class PlaybackQueueController {
                 holder.bind(mScrollingLimitedMessageResId);
             } else {
                 throw new IllegalArgumentException("unknown holder class " + vh.getClass());
+            }
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position,
+                @NonNull List<Object> payloads) {
+
+            if (payloads.isEmpty() || !(holder instanceof QueueViewHolder)) {
+                onBindViewHolder(holder, position);
+                return;
+            }
+
+            int index = mUxrPivotFilter.positionToIndex(position);
+            QueueViewHolder queueViewHolder = (QueueViewHolder) holder;
+            MediaItemMetadata mediaItemMetadata = mQueueItems.get(index);
+
+            for (Object payload : payloads) {
+                //Payload is nullable in observer, so check if null and default to whole.
+                if (payload == null) payload = ItemComponent.ITEM_COMPONENT_WHOLE;
+                @ItemComponent int itemComponent = (int) payload;
+                switch (itemComponent) {
+                    case ItemComponent.ITEM_COMPONENT_CURR_TIME:
+                    case ItemComponent.ITEM_COMPONENT_MAX_TIME:
+                    case ItemComponent.ITEM_COMPONENT_VIS_TIME:
+                        queueViewHolder.bind(itemComponent, mediaItemMetadata);
+                        break;
+                    case ItemComponent.ITEM_COMPONENT_WHOLE:
+                        onBindViewHolder(holder, position);
+                        break;
+                }
             }
         }
 
@@ -616,6 +731,8 @@ public class PlaybackQueueController {
 
     private void initQueue() {
         mQueueAdapter = new QueueItemsAdapter();
+        mQueueAdapter
+                .registerAdapterDataObserver(new QueueItemAdapterObserver(mQueueAdapter, mQueue));
 
         mPlaybackViewModel.getPlaybackStateWrapper().observe(getLifecycleOwner(),
                 state -> {
