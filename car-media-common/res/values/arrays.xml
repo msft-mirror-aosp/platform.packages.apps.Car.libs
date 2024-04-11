@@ -68,6 +68,7 @@
         <item>@id/action_id8</item>
         <item>@id/action_id9</item>
         <item>@id/action_id10</item>
+        <item>@id/action_id11</item>
     </array>
 
 </resources>
