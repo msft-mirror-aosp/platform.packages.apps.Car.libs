@@ -69,14 +69,15 @@ public class MediaBrowserConnectorTest {
     @Mock
     public MediaControllerCompat mMediaController;
 
-    private final MediaSource mMediaSource1 = newFakeMediaSource("mediaService1", "className1");
-    private final MediaSource mMediaSource2 = newFakeMediaSource("mediaService2", "className2");
-    private final MediaSource mMediaSource3 = newFakeMediaSource(mMediaController);
+    private MediaSource mMediaSource1;
+    private MediaSource mMediaSource2;
+    private MediaSource mMediaSource3;
 
     private final Map<MediaSource, MediaBrowserCompat> mBrowsers = new HashMap<>(2);
 
     private MediaBrowserConnector mBrowserConnector;
     private MediaBrowserCompat.ConnectionCallback mConnectionCallback;
+    private Context mContext;
 
     @Mock
     public MediaBrowserConnector.Callback mConnectedBrowserCallback;
@@ -85,14 +86,19 @@ public class MediaBrowserConnectorTest {
 
     @Before
     public void setUp() {
+        mContext = ApplicationProvider.getApplicationContext();
+        mMediaSource1 = newFakeMediaSource(mContext.getPackageManager(), "mediaService1",
+                "className1");
+        mMediaSource2 = newFakeMediaSource(mContext.getPackageManager(), "mediaService2",
+                "className2");
+        mMediaSource3 = newFakeMediaSource(mContext.getPackageManager(), mMediaController);
         mBrowsers.put(mMediaSource1, mMediaBrowser1);
         mBrowsers.put(mMediaSource2, mMediaBrowser2);
 
         doNothing().when(mConnectedBrowserCallback).onBrowserConnectionChanged(
                 mBrowsingStateCaptor.capture());
 
-        Context context = ApplicationProvider.getApplicationContext();
-        mBrowserConnector = new MediaBrowserConnector(context, mConnectedBrowserCallback) {
+        mBrowserConnector = new MediaBrowserConnector(mContext, mConnectedBrowserCallback) {
             @Override
             protected MediaBrowserCompat createMediaBrowser(@NonNull MediaSource mediaSource,
                     @NonNull MediaBrowserCompat.ConnectionCallback callback) {
