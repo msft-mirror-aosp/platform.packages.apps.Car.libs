@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The Android Open Source Project
+ * Copyright (C) 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,33 +21,28 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV2;
-import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV1;
+import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV4;
+import com.android.car.ui.plugin.oemapis.preference.PreferenceOEMV1;
+import com.android.car.ui.plugin.oemapis.recyclerview.AdapterOEMV2;
 import com.android.car.ui.plugin.oemapis.recyclerview.ListItemOEMV1;
 import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewAttributesOEMV1;
-import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewOEMV1;
+import com.android.car.ui.plugin.oemapis.recyclerview.RecyclerViewOEMV3;
 import com.android.car.ui.plugin.oemapis.recyclerview.ViewHolderOEMV1;
-import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV1;
+import com.android.car.ui.plugin.oemapis.toolbar.ToolbarControllerOEMV3;
 
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * This interface contains methods to create customizable Car UI components.
  * <p>
- * It returns them as their OEM-versioned interfaces (i.e. ToolbarControllerOEMV1) and is versioned
+ * It returns them as their OEM-versioned interfaces (i.e. ToolbarControllerOEMV3) and is versioned
  * itself so that no additional reflection or casting is necessary once the PluginFactory has
  * been created.
  * <p>
  * Multiple of these can be provided via {@link PluginVersionProviderOEMV1} to allow plugins
  * to provide an old implementation for old apps, and a newer implementation for newer apps.
- *
- * @deprecated Use {@link PluginFactoryOEMV9} instead
  */
-@Deprecated
-@SuppressWarnings("AndroidJdkLibsChecker")
-public interface PluginFactoryOEMV3 {
+public interface PluginFactoryOEMV9 {
     /**
      * Gives the plugin access to two factories that will create FocusParkingViews and
      * FocusAreas. These views have their implementation in the static car-ui-lib.
@@ -81,10 +76,10 @@ public interface PluginFactoryOEMV3 {
      * @param fullscreen            Whether or not this base layout / toolbar is taking up the whole
      *                              screen. This can be used to decide whether or not to add
      *                              decorations around the edge of it.
-     * @return A {@link ToolbarControllerOEMV1} or null if {@code toolbarEnabled} was false.
+     * @return A {@link ToolbarControllerOEMV3} or null if {@code toolbarEnabled} was false.
      */
     @Nullable
-    ToolbarControllerOEMV1 installBaseLayoutAround(
+    ToolbarControllerOEMV3 installBaseLayoutAround(
             @NonNull Context sourceContext,
             @NonNull View contentView,
             @Nullable Consumer<InsetsOEMV1> insetsChangedListener,
@@ -100,6 +95,21 @@ public interface PluginFactoryOEMV3 {
     boolean customizesBaseLayout();
 
     /**
+     * Creates a preference.
+     *
+     * @param sourceContext The context that will end up using this component. This context must not
+     *                      be used for inflating views, use the plugin context for that. This
+     *                      is used for two purposes: to add the correct configuration to the plugin
+     *                      context via {@code pluginContext.createConfigurationContext(
+     *                      sourceContext.getResources().getConfiguration()} before inflating views,
+     *                      and to pass to the rotary factories provided via
+     *                      {@link #setRotaryFactories}.
+     * @return A {@link PreferenceOEMV1} or null if not implemented.
+     */
+    @Nullable
+    PreferenceOEMV1 createCarUiPreference(@NonNull Context sourceContext);
+
+    /**
      * Creates a app styled view.
      *
      * @param sourceContext The context that will end up using this component. This context must not
@@ -112,7 +122,7 @@ public interface PluginFactoryOEMV3 {
      * @return the view used for app styled view.
      */
     @Nullable
-    AppStyledViewControllerOEMV2 createAppStyledView(@NonNull Context sourceContext);
+    AppStyledViewControllerOEMV4 createAppStyledView(@NonNull Context sourceContext);
 
     /**
      * Creates an instance of CarUiRecyclerView
@@ -127,7 +137,7 @@ public interface PluginFactoryOEMV3 {
      * @param attrs   An object containing initial attributes for the button.
      */
     @Nullable
-    RecyclerViewOEMV1 createRecyclerView(
+    RecyclerViewOEMV3 createRecyclerView(
             @NonNull Context sourceContext,
             @Nullable RecyclerViewAttributesOEMV1 attrs);
 
@@ -135,6 +145,6 @@ public interface PluginFactoryOEMV3 {
      * Creates an instance of list item adapter
      */
     @Nullable
-    AdapterOEMV1<? extends ViewHolderOEMV1> createListItemAdapter(
+    AdapterOEMV2<? extends ViewHolderOEMV1> createListItemAdapter(
             @NonNull List<ListItemOEMV1> items);
 }
