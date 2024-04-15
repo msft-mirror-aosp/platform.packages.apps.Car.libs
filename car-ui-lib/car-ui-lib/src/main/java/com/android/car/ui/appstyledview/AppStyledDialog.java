@@ -274,13 +274,14 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
 
 
     private void configureImeInsetFit() {
-        // Required inset API is unsupported. Fallback to default IME behavior.
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+        Window window = getWindow();
+        if (window == null) {
             return;
         }
 
-        Window window = getWindow();
-        if (window == null) {
+        // Required inset API is unsupported. Fallback to resize behavior.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
             return;
         }
 
