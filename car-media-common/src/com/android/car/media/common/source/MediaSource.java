@@ -396,7 +396,9 @@ public class MediaSource {
         // check the metadata for opt in info
         Bundle metaData = getMbsMetadata(context, mbsComponentName);
 
-        if (metaData != null && metaData.containsKey(ANDROIDX_CAR_APP_LAUNCHABLE)) {
+        if (metaData == null) {
+            return false;
+        } else if (metaData.containsKey(ANDROIDX_CAR_APP_LAUNCHABLE)) {
             boolean launchable = metaData.getBoolean(ANDROIDX_CAR_APP_LAUNCHABLE);
             Log.d(TAG, "MBS for " + mbsComponentName
                     + " is opted " + (launchable ? "in" : "out"));
@@ -461,7 +463,11 @@ public class MediaSource {
         if (Log.isLoggable(TAG, Log.DEBUG)) {
             Log.d(TAG, "MBS info found for " + mbsComponentName + " : " + mediaServices);
         }
-        // This has to be not null, if not NPE is appropriate
+        if (mediaServices.isEmpty() || mediaServices.get(0) == null
+                || mediaServices.get(0).serviceInfo == null) {
+            return null;
+        }
+
         return mediaServices.get(0).serviceInfo.metaData;
     }
 
