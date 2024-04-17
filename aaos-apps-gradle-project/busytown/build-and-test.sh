@@ -7,8 +7,8 @@ echo "Starting $0 at $(date)"
 . "$SCRIPTS_DIR/envsetup.sh"
 
 # Set default version codes and names, allow overrides from the calling shell
-DEFAULT_VERSION_CODE=33
-DEFAULT_VERSION_NAME=33
+DEFAULT_VERSION_CODE=34
+DEFAULT_VERSION_NAME=34
 
 cd "$GRADLE_PROJ_DIR"
 

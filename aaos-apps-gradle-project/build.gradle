@@ -29,7 +29,7 @@ buildscript {
         // in the individual module build.gradle files
     }
 
-    gradle.ext.aaosLatestSDK = 33
+    gradle.ext.aaosLatestSDK = 34
     gradle.ext.aaosTargetSDK = 33
 
     gradle.ext.repoRootPath = rootDir.parentFile.parentFile.parentFile.parentFile.parent
@@ -44,7 +44,7 @@ buildscript {
         gradle.ext.platformCertPath = gradle.ext.repoRootPath + "/packages/apps/Car/libs/certs/platform.keystore"
     }
     gradle.ext.soongBash = gradle.ext.repoRootPath + "/build/soong/soong_ui.bash"
-    gradle.ext.platformSdkVersion = "33" // Change this to the most recent android API level.
+    gradle.ext.platformSdkVersion = "34" // Change this to the most recent android API level.
     if (file(gradle.ext.soongBash).exists()) {
         gradle.ext.platformSdkVersion = (gradle.ext.soongBash + " --dumpvar-mode PLATFORM_SDK_VERSION").execute().text.trim()
     }
