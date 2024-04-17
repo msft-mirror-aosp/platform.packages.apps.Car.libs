@@ -15,38 +15,8 @@
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="OemTokensBase">
+    <style name="OemTokensParent">
         <item name="oemTokenOverrideEnabled">true</item>
-
-        <item name="oemColorPrimary">?attr/oemColorPrimaryPalette80</item>
-        <item name="oemColorOnPrimary">?attr/oemColorPrimaryPalette20</item>
-        <item name="oemColorPrimaryContainer">?attr/oemColorPrimaryPalette30</item>
-        <item name="oemColorOnPrimaryContainer">?attr/oemColorPrimaryPalette90</item>
-        <item name="oemColorSecondary">?attr/oemColorSecondaryPalette80</item>
-        <item name="oemColorOnSecondary">?attr/oemColorSecondaryPalette20</item>
-        <item name="oemColorSecondaryContainer">?attr/oemColorSecondaryPalette30</item>
-        <item name="oemColorOnSecondaryContainer">?attr/oemColorSecondaryPalette90</item>
-        <item name="oemColorTertiary">?attr/oemColorTertiaryPalette80</item>
-        <item name="oemColorOnTertiary">?attr/oemColorTertiaryPalette20</item>
-        <item name="oemColorTertiaryContainer">?attr/oemColorTertiaryPalette30</item>
-        <item name="oemColorOnTertiaryContainer">?attr/oemColorTertiaryPalette90</item>
-        <item name="oemColorError">?attr/oemColorErrorPalette80</item>
-        <item name="oemColorOnError">?attr/oemColorErrorPalette20</item>
-        <item name="oemColorErrorContainer">?attr/oemColorErrorPalette30</item>
-        <item name="oemColorOnErrorContainer">?attr/oemColorErrorPalette90</item>
-        <item name="oemColorBackground">?attr/oemColorNeutralPalette10</item>
-        <item name="oemColorOnBackground">?attr/oemColorNeutralPalette90</item>
-        <item name="oemColorSurface">?attr/oemColorNeutralPalette10</item>
-        <item name="oemColorOnSurface">?attr/oemColorNeutralPalette80</item>
-        <item name="oemColorSurfaceVariant">?attr/oemColorNeutralVariantPalette30</item>
-        <item name="oemColorOnSurfaceVariant">?attr/oemColorNeutralVariantPalette80</item>
-        <item name="oemColorSurfaceInverse">?attr/oemColorNeutralVariantPalette80</item>
-        <item name="oemColorOnSurfaceInverse">?attr/oemColorNeutralVariantPalette10</item>
-        <item name="oemColorPrimaryInverse">?attr/oemColorPrimaryPalette40</item>
-        <item name="oemColorOutline">?attr/oemColorNeutralVariantPalette60</item>
-        <item name="oemColorScrim">?attr/oemColorNeutralPalette80</item>
-        <item name="oemColorOutlineVariant">?attr/oemColorNeutralVariantPalette30</item>
-        <item name="oemColorSurfaceTint">?attr/oemColorPrimaryPalette80</item>
 
         <item name="oemColorPrimaryPalette100">@color/oem_default_color_primary_palette_100</item>
         <item name="oemColorPrimaryPalette99">@color/oem_default_color_primary_palette_99</item>
@@ -155,6 +125,38 @@
         <item name="oemShapeCornerLarge">48dp</item>
         <item name="oemShapeCornerExtraLarge">48dp</item>
         <item name="oemShapeCornerFull">128dp</item>
+    </style>
+
+    <style name="OemTokensBase" parent="OemTokensParent">
+        <item name="oemColorPrimary">?attr/oemColorPrimaryPalette40</item>
+        <item name="oemColorOnPrimary">?attr/oemColorPrimaryPalette100</item>
+        <item name="oemColorPrimaryContainer">?attr/oemColorPrimaryPalette90</item>
+        <item name="oemColorOnPrimaryContainer">?attr/oemColorPrimaryPalette10</item>
+        <item name="oemColorSecondary">?attr/oemColorSecondaryPalette40</item>
+        <item name="oemColorOnSecondary">?attr/oemColorSecondaryPalette100</item>
+        <item name="oemColorSecondaryContainer">?attr/oemColorSecondaryPalette90</item>
+        <item name="oemColorOnSecondaryContainer">?attr/oemColorSecondaryPalette10</item>
+        <item name="oemColorTertiary">?attr/oemColorTertiaryPalette40</item>
+        <item name="oemColorOnTertiary">?attr/oemColorTertiaryPalette100</item>
+        <item name="oemColorTertiaryContainer">?attr/oemColorTertiaryPalette90</item>
+        <item name="oemColorOnTertiaryContainer">?attr/oemColorTertiaryPalette10</item>
+        <item name="oemColorError">?attr/oemColorErrorPalette40</item>
+        <item name="oemColorOnError">?attr/oemColorErrorPalette100</item>
+        <item name="oemColorErrorContainer">?attr/oemColorErrorPalette90</item>
+        <item name="oemColorOnErrorContainer">?attr/oemColorErrorPalette10</item>
+        <item name="oemColorBackground">?attr/oemColorNeutralPalette99</item>
+        <item name="oemColorOnBackground">?attr/oemColorNeutralPalette10</item>
+        <item name="oemColorSurface">?attr/oemColorNeutralPalette99</item>
+        <item name="oemColorOnSurface">?attr/oemColorNeutralPalette10</item>
+        <item name="oemColorSurfaceVariant">?attr/oemColorNeutralVariantPalette90</item>
+        <item name="oemColorOnSurfaceVariant">?attr/oemColorNeutralVariantPalette30</item>
+        <item name="oemColorSurfaceInverse">?attr/oemColorNeutralVariantPalette10</item>
+        <item name="oemColorOnSurfaceInverse">?attr/oemColorNeutralVariantPalette99</item>
+        <item name="oemColorPrimaryInverse">?attr/oemColorPrimaryPalette80</item>
+        <item name="oemColorOutline">?attr/oemColorNeutralVariantPalette50</item>
+        <item name="oemColorScrim">?attr/oemColorNeutralPalette10</item>
+        <item name="oemColorOutlineVariant">?attr/oemColorNeutralVariantPalette90</item>
+        <item name="oemColorSurfaceTint">?attr/oemColorPrimaryPalette10</item>
     </style>
 
     <style name="OemTokens">
