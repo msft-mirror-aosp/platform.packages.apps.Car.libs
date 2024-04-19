@@ -70,6 +70,8 @@ public class MediaSource {
     private final Drawable mIcon;
     @NonNull
     private final IconCropper mIconCropper;
+    @NonNull
+    private final PackageManager mPackageManager;
 
     /**
      * Creates a {@link MediaSource} for the given {@link ComponentName}
@@ -89,7 +91,8 @@ public class MediaSource {
             CharSequence displayName = extractDisplayName(ctx, serviceInfo, packageName);
             Drawable icon = extractIcon(ctx, serviceInfo, packageName);
             ComponentName browseService = new ComponentName(packageName, className);
-            return new MediaSource(browseService, null, displayName, icon, new IconCropper(ctx));
+            return new MediaSource(browseService, null, displayName, icon, new IconCropper(ctx),
+                    ctx.getPackageManager());
         } catch (PackageManager.NameNotFoundException e) {
             Log.w(TAG, "Component not found " + componentName.flattenToString());
             return null;
@@ -118,7 +121,7 @@ public class MediaSource {
             Drawable icon = extractIcon(context, serviceInfo, packageName);
 
             return new MediaSource(/* componentName= */ componentName, mediaController, displayName,
-                    icon, new IconCropper(context));
+                    icon, new IconCropper(context), context.getPackageManager());
         } catch (NameNotFoundException e) {
             Log.w(TAG, "App not found " + packageName);
             return null;
@@ -128,12 +131,14 @@ public class MediaSource {
     @VisibleForTesting
     public MediaSource(@Nullable ComponentName browseService,
             @Nullable MediaControllerCompat mediaController, @NonNull CharSequence displayName,
-            @NonNull Drawable icon, @NonNull IconCropper iconCropper) {
+            @NonNull Drawable icon, @NonNull IconCropper iconCropper,
+            @NonNull PackageManager packageManager) {
         mBrowseService = browseService;
         mMediaController = mediaController;
         mDisplayName = displayName;
         mIcon = icon;
         mIconCropper = iconCropper;
+        mPackageManager = packageManager;
     }
 
     /**
@@ -304,11 +309,30 @@ public class MediaSource {
     public Intent getIntent() {
         // Only intent to a templated app with mbs
         if (mBrowseService == null) {
-            return null;
+            if (mMediaController == null) {
+                // Should not happen
+                Log.e(TAG, "getIntent() with null BrowseService and MediaController");
+                return null;
+            }
+
+            String packageName = mMediaController.getPackageName();
+            return createMediaSessionIntent(packageName);
         }
 
         Intent intent = new Intent(CarMediaIntents.ACTION_MEDIA_TEMPLATE);
         intent.putExtra(EXTRA_MEDIA_COMPONENT, mBrowseService.flattenToString());
+
+        return intent;
+    }
+
+    @Nullable
+    private Intent createMediaSessionIntent(String packageName) {
+        Intent intent = mPackageManager.getLaunchIntentForPackage(packageName);
+        if (intent == null) {
+            return null;
+        }
+        // FLAG_ACTIVITY_NEW_TASK brings any existing task to foreground
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         return intent;
     }

@@ -86,8 +86,8 @@ public class PlaybackViewModelTest {
     @Captor
     private ArgumentCaptor<MediaControllerCompat.Callback> mCapturedCallback;
 
-    private final MediaSource mMediaSource = newFakeMediaSource("test", "test");
-    private final MediaSource mMediaSource2 = newFakeMediaSource(mMediaController);
+    private MediaSource mMediaSource;
+    private MediaSource mMediaSource2;
 
     private PlaybackViewModel mPlaybackViewModel;
 
@@ -99,6 +99,8 @@ public class PlaybackViewModelTest {
     @Before
     public void setUp() {
         mContext = ApplicationProvider.getApplicationContext();
+        mMediaSource = newFakeMediaSource(mContext.getPackageManager(), "test", "test");
+        mMediaSource2 = newFakeMediaSource(mContext.getPackageManager(), mMediaController);
         mBrowserToController.put(mMediaBrowser, mMediaController);
         doNothing().when(mMediaController).registerCallback(mCapturedCallback.capture());
         mBrowsingStateLD = dataOf(
