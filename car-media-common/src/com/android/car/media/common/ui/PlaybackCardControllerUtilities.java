@@ -102,14 +102,28 @@ public final class PlaybackCardControllerUtilities {
     }
 
     /**
-     * Set enabled and selected state on playButton based on
-     * {@link PlaybackStateWrapper#isLoading()} and {@link PlaybackStateWrapper#isPlaying()}
+     * Set enabled and selected state on playButton based on {@link PlaybackViewModel.Action}
      */
     public static void updatePlayButtonWithPlaybackState(@Nullable View playButton,
             PlaybackStateWrapper playbackState) {
         if (playButton != null) {
-            playButton.setEnabled(!playbackState.isLoading());
-            playButton.setSelected(playbackState.isPlaying());
+            @PlaybackViewModel.Action int action = (playbackState != null)
+                    ? playbackState.getMainAction() : PlaybackViewModel.ACTION_DISABLED;
+            switch (action) {
+                case PlaybackViewModel.ACTION_DISABLED:
+                case PlaybackViewModel.ACTION_STOP:
+                    playButton.setEnabled(false);
+                    playButton.setSelected(false);
+                    break;
+                case PlaybackViewModel.ACTION_PLAY:
+                    playButton.setEnabled(true);
+                    playButton.setSelected(false);
+                    break;
+                case PlaybackViewModel.ACTION_PAUSE:
+                    playButton.setEnabled(true);
+                    playButton.setSelected(true);
+                    break;
+            }
         }
     }
 
