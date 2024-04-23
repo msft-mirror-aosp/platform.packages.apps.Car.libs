@@ -374,7 +374,6 @@ public class PlaybackCardController {
         if (mLogo != null) {
             Uri logoUri = mLogo.prepareToDisplay(metadata);
             mLogoBinder.setImage(mView.getContext(), new UriArtRef(logoUri));
-            ViewUtils.setVisible(mLogo, logoUri != null);
         }
     }
 
