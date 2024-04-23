@@ -248,10 +248,11 @@ public class PlaybackQueueController {
     }
 
     private static class QueueItemAdapterObserver extends RecyclerView.AdapterDataObserver {
-        private final QueueItemsAdapter mAdapter;
+        private final RecyclerView.Adapter<RecyclerView.ViewHolder> mAdapter;
         private final CarUiRecyclerView mRecyclerView;
 
-        QueueItemAdapterObserver(QueueItemsAdapter adapter, CarUiRecyclerView recyclerView) {
+        QueueItemAdapterObserver(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter,
+                CarUiRecyclerView recyclerView) {
             super();
             this.mAdapter = adapter;
             this.mRecyclerView = recyclerView;
@@ -264,13 +265,20 @@ public class PlaybackQueueController {
                     RecyclerView.ViewHolder holder = mRecyclerView
                             .findViewHolderForAdapterPosition(positionStart);
                     if (holder != null) {
-                        if (payload == null) {
-                            //Default whole bind
-                            mAdapter.onBindViewHolder(holder, positionStart);
+                        if (holder instanceof QueueViewHolder) {
+                            if (payload == null) {
+                                //Default whole bind
+                                mAdapter.onBindViewHolder(holder, positionStart);
+                            } else {
+                                //Partial rebind if we have payload saying what to rebind.
+                                mAdapter.onBindViewHolder(holder, positionStart,
+                                        Collections.singletonList(payload));
+                            }
+                        } else if (holder instanceof HeaderAdapter.HeaderViewHolder) {
+                            mAdapter.bindViewHolder(holder, positionStart);
                         } else {
-                            //Partial rebind if we have payload saying what to rebind.
-                            mAdapter.onBindViewHolder(holder, positionStart,
-                                    Collections.singletonList(payload));
+                            throw new IllegalArgumentException("unknown holder class "
+                                    + holder.getClass());
                         }
                     }
                 }
@@ -513,6 +521,9 @@ public class PlaybackQueueController {
             } else if (vh instanceof ScrollingLimitedViewHolder) {
                 ScrollingLimitedViewHolder holder = (ScrollingLimitedViewHolder) vh;
                 holder.bind(mScrollingLimitedMessageResId);
+            } else if (vh instanceof HeaderAdapter.HeaderViewHolder) {
+                HeaderAdapter.HeaderViewHolder holder = (HeaderAdapter.HeaderViewHolder) vh;
+                holder.bind();
             } else {
                 throw new IllegalArgumentException("unknown holder class " + vh.getClass());
             }
@@ -731,8 +742,6 @@ public class PlaybackQueueController {
 
     private void initQueue() {
         mQueueAdapter = new QueueItemsAdapter();
-        mQueueAdapter
-                .registerAdapterDataObserver(new QueueItemAdapterObserver(mQueueAdapter, mQueue));
 
         mPlaybackViewModel.getPlaybackStateWrapper().observe(getLifecycleOwner(),
                 state -> {
@@ -744,8 +753,13 @@ public class PlaybackQueueController {
                 });
         if (mHeaderLayout != Resources.ID_NULL) {
             mHeaderAdapter = new HeaderAdapter();
-            mQueue.setAdapter(new ConcatAdapter(mHeaderAdapter, mQueueAdapter));
+            ConcatAdapter adapter = new ConcatAdapter(mHeaderAdapter, mQueueAdapter);
+            adapter.registerAdapterDataObserver(
+                    new QueueItemAdapterObserver(adapter, mQueue));
+            mQueue.setAdapter(adapter);
         } else {
+            mQueueAdapter.registerAdapterDataObserver(
+                    new QueueItemAdapterObserver(mQueueAdapter, mQueue));
             mQueue.setAdapter(mQueueAdapter);
         }
         mQueue.addOnScrollListener(new CarUiRecyclerView.OnScrollListener() {
@@ -773,13 +787,15 @@ public class PlaybackQueueController {
                     mQueueAdapter.setMaxTime(playbackProgress.getMaxTimeText().toString());
                     mQueueAdapter.setTimeVisible(playbackProgress.hasTime());
                 });
-        mPlaybackViewModel.getMediaSource().observe(
-                getLifecycleOwner(),
-                mediaSource -> {
-                    Drawable icon = (mediaSource != null) ? mediaSource.getIcon() : null;
-                    mHeaderAdapter.updateAppIcon(icon);
-                }
-        );
+        if (mHeaderAdapter != null) {
+            mPlaybackViewModel.getMediaSource().observe(
+                    getLifecycleOwner(),
+                    mediaSource -> {
+                        Drawable icon = (mediaSource != null) ? mediaSource.getIcon() : null;
+                        mHeaderAdapter.updateAppIcon(icon);
+                    }
+            );
+        }
     }
 
     void setQueue(List<MediaItemMetadata> queueItems) {
