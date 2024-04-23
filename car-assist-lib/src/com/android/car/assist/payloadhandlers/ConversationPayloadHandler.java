@@ -56,7 +56,7 @@ public class ConversationPayloadHandler {
     }
 
     /**
-     * Creates a notification from {@link Conversation}
+     * Creates a notification from {@link Conversation}.
      */
     @NonNull
     public static Notification createNotificationFromConversation(
@@ -65,24 +65,43 @@ public class ConversationPayloadHandler {
             @NonNull Conversation conversation,
             @DrawableRes int iconRes,
             @Nullable String group) {
+        return createNotificationFromConversation(
+                context, channelId, conversation, iconRes, group, true);
+    }
+
+    /**
+     * Creates a notification from {@link Conversation}.
+     */
+    @NonNull
+    public static Notification createNotificationFromConversation(
+            @NonNull Context context,
+            @NonNull String channelId,
+            @NonNull Conversation conversation,
+            @DrawableRes int iconRes,
+            @Nullable String group,
+            boolean directReplySupported) {
         MessagingStyle messagingStyle = getMessagingStyle(conversation);
         Action muteAction = getNotificationAction(context, conversation,
                 ActionType.ACTION_TYPE_MUTE);
         Action markAsReadAction = getNotificationAction(context, conversation,
                 ActionType.ACTION_TYPE_MARK_AS_READ);
-        Action replyAction = getNotificationAction(context, conversation,
-                ActionType.ACTION_TYPE_REPLY);
 
-        return new NotificationCompat.Builder(context, channelId)
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(context, channelId);
+        notificationBuilder
                 .setStyle(messagingStyle)
                 .setSmallIcon(iconRes)
-                .setLargeIcon(getBitmap(conversation.getConversationIcon(), context))
-                .addAction(replyAction)
-                .addAction(markAsReadAction)
+                .setLargeIcon(getBitmap(conversation.getConversationIcon(), context));
+        if (directReplySupported) {
+            Action replyAction = getNotificationAction(context, conversation,
+                    ActionType.ACTION_TYPE_REPLY);
+            notificationBuilder.addAction(replyAction);
+        }
+        notificationBuilder.addAction(markAsReadAction)
                 .addAction(muteAction)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                .setGroup(group)
-                .build();
+                .setGroup(group);
+        return notificationBuilder.build();
     }
 
     @Nullable
@@ -102,8 +121,8 @@ public class ConversationPayloadHandler {
                             icon,
                             remoteAction.getTitle(),
                             remoteAction.getActionIntent())
-                            .setShowsUserInterface(false)
-                            .setSemanticAction(getSemanticAction(actionType));
+                        .setShowsUserInterface(false)
+                        .setSemanticAction(getSemanticAction(actionType));
             if (conversationAction.getRemoteInput() != null) {
                 builder.addRemoteInput(toCompat(conversationAction.getRemoteInput()));
             }
@@ -168,9 +187,9 @@ public class ConversationPayloadHandler {
             return null;
         }
         return conversation.getActions().stream()
-                .filter(it -> it.getActionType() == action)
-                .findFirst()
-                .orElse(null);
+            .filter(it -> it.getActionType() == action)
+            .findFirst()
+            .orElse(null);
     }
 
     // Conversation classes use android.app.RemoteInput
@@ -180,8 +199,8 @@ public class ConversationPayloadHandler {
     private static androidx.core.app.RemoteInput toCompat(RemoteInput src) {
         androidx.core.app.RemoteInput.Builder builder =
                 new androidx.core.app.RemoteInput.Builder(src.getResultKey())
-                        .setLabel(src.getLabel())
-                        .addExtras(src.getExtras());
+                    .setLabel(src.getLabel())
+                    .addExtras(src.getExtras());
         return builder.build();
     }
 }
