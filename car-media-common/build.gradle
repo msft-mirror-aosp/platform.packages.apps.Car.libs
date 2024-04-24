@@ -75,6 +75,8 @@ dependencies {
 
     implementation project(":car-apps-common")
     implementation project(":car-media-extensions")
+    implementation project(":car-ui-lib")
+    implementation project(":car-uxr-client-lib")
 
     //Test libs
     testImplementation 'org.hamcrest:hamcrest-library:1.3'

@@ -129,6 +129,10 @@ public final class PluginFactoryStub implements PluginFactory {
             return;
         }
 
+        if (!context.getResources().getBoolean(R.bool.car_ui_omit_display_cut_out_insets)) {
+            return;
+        }
+
         // Unwrap context to account for ContextWrapper
         Context unwrappedContext = CarUiUtils.unwrapContext(context);
         if (!(unwrappedContext instanceof Activity)) {
@@ -136,9 +140,6 @@ public final class PluginFactoryStub implements PluginFactory {
         }
 
         Activity activity = (Activity) unwrappedContext;
-        if (!activity.getResources().getBoolean(R.bool.car_ui_omit_display_cut_out_insets)) {
-            return;
-        }
 
         Window baseLayoutWindow = activity.getWindow();
         WindowManager.LayoutParams lp = baseLayoutWindow.getAttributes();

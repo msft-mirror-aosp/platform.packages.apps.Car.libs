@@ -15,6 +15,7 @@
  */
 package com.android.car.ui.recyclerview;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -129,6 +130,7 @@ public final class RecyclerViewAdapterAdapterV2
         return mAdapter.getItemViewType(position);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void notifyDataSetChanged() {
         mAdapter.notifyDataSetChanged();

@@ -41,8 +41,9 @@ public class MediaModels {
         LiveData<MediaSource> srcData = helper.getAudioSource(mode);
         mMediaSourceViewModel = new MediaSourceViewModel(context, srcData);
         LiveData<BrowsingState> browseState = mMediaSourceViewModel.getBrowsingState();
-        mMediaItemsRepository = new MediaItemsRepository(browseState);
-        mPlaybackViewModel = new PlaybackViewModel(context, browseState);
+        String debugId = CarMediaManagerHelper.getMode(mode) + "-AudioSource";
+        mMediaItemsRepository = new MediaItemsRepository(context, browseState, debugId);
+        mPlaybackViewModel = new PlaybackViewModel(context, browseState, debugId);
     }
 
     /**
@@ -53,8 +54,9 @@ public class MediaModels {
         LiveData<MediaSource> srcLiveData = new LiveData<MediaSource>(constantSource) {};
         mMediaSourceViewModel = new MediaSourceViewModel(context, srcLiveData);
         LiveData<BrowsingState> browseState = mMediaSourceViewModel.getBrowsingState();
-        mMediaItemsRepository = new MediaItemsRepository(browseState);
-        mPlaybackViewModel = new PlaybackViewModel(context, browseState);
+        String debugId = "Constant";
+        mMediaItemsRepository = new MediaItemsRepository(context, browseState, debugId);
+        mPlaybackViewModel = new PlaybackViewModel(context, browseState, debugId);
     }
 
     /**
@@ -65,8 +67,9 @@ public class MediaModels {
         LiveData<MediaSource> srcData = helper.getMediaSource();
         mMediaSourceViewModel = new MediaSourceViewModel(context, srcData);
         LiveData<BrowsingState> browseState = mMediaSourceViewModel.getBrowsingState();
-        mMediaItemsRepository = new MediaItemsRepository(browseState);
-        mPlaybackViewModel = new PlaybackViewModel(context, browseState);
+        String debugId = "ActiveSource";
+        mMediaItemsRepository = new MediaItemsRepository(context, browseState, debugId);
+        mPlaybackViewModel = new PlaybackViewModel(context, browseState, debugId);
     }
 
     /** Returns the {@link MediaSourceViewModel}. */

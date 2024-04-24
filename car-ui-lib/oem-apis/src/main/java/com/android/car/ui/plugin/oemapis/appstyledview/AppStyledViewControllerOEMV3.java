@@ -35,7 +35,7 @@ public interface AppStyledViewControllerOEMV3 {
     /**
      * Sets the content view to be contained within this AppStyledView.
      */
-    void setContent(@NonNull View content);
+    void setContent(@Nullable View content);
 
     /**
      * Sets a {@link Runnable} to be called whenever the close icon is clicked.

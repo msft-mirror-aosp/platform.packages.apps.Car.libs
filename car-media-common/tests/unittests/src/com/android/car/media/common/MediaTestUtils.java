@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 The Android Open Source Project
+ * Copyright (C) 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.android.car.media.common;
 
 import android.content.ComponentName;
+import android.content.pm.PackageManager;
 import android.graphics.Path;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -34,21 +35,25 @@ public class MediaTestUtils {
     }
 
     /** Creates a fake {@link MediaSource} with browse service. */
-    public static MediaSource newFakeMediaSource(@NonNull String pkg, @NonNull String cls) {
-        return newFakeMediaSource(new ComponentName(pkg, cls), null);
+    public static MediaSource newFakeMediaSource(@NonNull PackageManager packageManager,
+            @NonNull String pkg, @NonNull String cls) {
+        return newFakeMediaSource(packageManager, new ComponentName(pkg, cls), null);
     }
 
     /** Creates a fake {@link MediaSource} with media controller. */
-    public static MediaSource newFakeMediaSource(MediaControllerCompat mediaController) {
-        return newFakeMediaSource(null, mediaController);
+    public static MediaSource newFakeMediaSource(
+            @NonNull PackageManager packageManager, MediaControllerCompat mediaController) {
+        return newFakeMediaSource(packageManager, null, mediaController);
     }
 
     /** Creates a fake {@link MediaSource}. */
-    public static MediaSource newFakeMediaSource(@Nullable ComponentName browseService,
+    public static MediaSource newFakeMediaSource(@NonNull PackageManager packageManager,
+            @Nullable ComponentName browseService,
             @Nullable MediaControllerCompat mediaController) {
         String displayName = browseService == null ? "" : browseService.getClassName();
         Drawable icon = new ColorDrawable();
         IconCropper iconCropper = new IconCropper(new Path());
-        return new MediaSource(browseService, mediaController, displayName, icon, iconCropper);
+        return new MediaSource(
+                browseService, mediaController, displayName, icon, iconCropper, packageManager);
     }
 }
