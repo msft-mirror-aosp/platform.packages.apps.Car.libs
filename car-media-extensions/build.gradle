@@ -15,7 +15,11 @@
  * limitations under the License.
  */
 // Library-level build file
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+    id 'com.android.car.unbundled.conventions.local-publish'
+}
+
 android {
     compileSdkVersion gradle.ext.aaosLatestSDK
     defaultConfig {
