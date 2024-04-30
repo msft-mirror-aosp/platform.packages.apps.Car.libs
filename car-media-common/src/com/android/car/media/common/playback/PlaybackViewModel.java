@@ -430,6 +430,8 @@ public class PlaybackViewModel {
 
         @Override
         public void onExtrasChanged(Bundle extras) {
+            if (extras == null) return;
+
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, getLogPrefix() + "onExtrasChanged: " + extras);
             }
