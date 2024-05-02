@@ -1,0 +1,55 @@
+// Copyright (C) 2024 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+android_app {
+    name: "car-app-card-host-sample",
+    min_sdk_version: "31",
+    target_sdk_version: "34",
+    sdk_version: "system_current",
+    privileged: true,
+    certificate: "platform",
+// TODO(338455570): re-enable priv-app permissions for car-apps-dev
+//    required: ["allowed_privapp_com.example.appcard.samplehost"],
+    manifest: "src/main/AndroidManifest.xml",
+    srcs: [
+        "src/main/java/**/*.kt",
+    ],
+    proto: {
+        type: "lite",
+    },
+    resource_dirs: ["src/main/res"],
+    libs: [
+        "token-shared-lib",
+    ],
+    static_libs : [
+        "androidx.activity_activity-compose",
+        "androidx.appcompat_appcompat",
+        "androidx.compose.foundation_foundation",
+        "androidx.compose.material3_material3",
+        "androidx.compose.runtime_runtime",
+        "androidx.compose.runtime_runtime-livedata",
+        "androidx.compose.ui_ui",
+        "androidx.core_core-ktx",
+        "androidx.lifecycle_lifecycle-runtime-compose",
+        "androidx.lifecycle_lifecycle-runtime-ktx",
+        "androidx.legacy_legacy-support-v4",
+        "car-app-card-host-lib-source",
+        "car-app-card-lib-source",
+        "guava",
+        "token-compose-compat",
+        // Kotlin
+        "kotlin-stdlib",
+        "kotlinx-coroutines-android",
+    ],
+}

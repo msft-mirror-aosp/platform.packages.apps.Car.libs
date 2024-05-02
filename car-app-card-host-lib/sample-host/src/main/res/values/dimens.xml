@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2024 The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License
+  -->
+<resources>
+    <dimen name="grid_content_padding">4dp</dimen>
+
+    <!-- Settings -->
+    <dimen name="settings_text_padding">16dp</dimen>
+    <dimen name="settings_surface_padding">16dp</dimen>
+    <dimen name="settings_root_column_padding">16dp</dimen>
+
+    <!-- Image App Card -->
+    <dimen name="card_header_icon_size">22dp</dimen>
+    <dimen name="card_button_icon_size">40dp</dimen>
+    <dimen name="card_width">313dp</dimen>
+    <dimen name="card_height">364dp</dimen>
+    <dimen name="card_elevation">6dp</dimen>
+    <dimen name="card_padding">8dp</dimen>
+    <dimen name="image_padding">16dp</dimen>
+    <dimen name="header_padding">24dp</dimen>
+    <dimen name="progressbar_horizontal_padding">24dp</dimen>
+    <dimen name="progressbar_top_padding">16dp</dimen>
+    <dimen name="progressbar_bottom_padding">20dp</dimen>
+    <dimen name="primary_text_horizontal_padding">24dp</dimen>
+    <dimen name="primary_text_bottom_padding">20dp</dimen>
+    <dimen name="secondary_text_horizontal_padding">24dp</dimen>
+    <dimen name="secondary_text_bottom_padding">24dp</dimen>
+    <dimen name="progress_bar_track_height">2dp</dimen>
+
+    <!-- Button -->
+    <dimen name="button_height">75dp</dimen>
+    <dimen name="button_row_padding">24dp</dimen>
+    <dimen name="button_row_spacing">26dp</dimen>
+    <dimen name="button_content_padding">35dp</dimen>
+</resources>

@@ -98,3 +98,18 @@ project(':car-radio-app').projectDir = new File('../../Radio')
 include ':car-bugreport-app'
 project(':car-bugreport-app').projectDir = new File('../../BugReport')
 include 'car-bugreport-app'
+
+include ':car-app-card-lib'
+project(':car-app-card-lib').projectDir = new File('../car-app-card-lib/app-card')
+
+include ':car-app-card-sample-calendar-app'
+project(':car-app-card-sample-calendar-app').projectDir = new File('../car-app-card-lib/sample-calendar-app')
+
+include ':car-app-card-host-lib'
+project(':car-app-card-host-lib').projectDir = new File('../car-app-card-host-lib/app-card-host')
+
+include ':car-app-card-host-sample-app'
+project(':car-app-card-host-sample-app').projectDir = new File('../car-app-card-host-lib/sample-host')
+
+include ':car-app-card-sample-media-app'
+project(':car-app-card-sample-media-app').projectDir = new File('../car-app-card-lib/sample-media-app')
