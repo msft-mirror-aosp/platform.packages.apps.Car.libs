@@ -412,17 +412,15 @@ public class MediaSource {
     /**
      * Determines if the given media component is supported through media templates
      */
-    public static boolean isMediaTemplate(Context context, ComponentName mbsComponentName) {
+    public static boolean isMediaTemplate(Context context,
+            @NonNull ComponentName mbsComponentName) {
         if (Log.isLoggable(TAG, Log.DEBUG)) {
             Log.d(TAG, "Checking if Component " + mbsComponentName + " is a media template");
         }
 
         // check the metadata for opt in info
         Bundle metaData = getMbsMetadata(context, mbsComponentName);
-
-        if (metaData == null) {
-            return false;
-        } else if (metaData.containsKey(ANDROIDX_CAR_APP_LAUNCHABLE)) {
+        if ((metaData != null) && metaData.containsKey(ANDROIDX_CAR_APP_LAUNCHABLE)) {
             boolean launchable = metaData.getBoolean(ANDROIDX_CAR_APP_LAUNCHABLE);
             Log.d(TAG, "MBS for " + mbsComponentName
                     + " is opted " + (launchable ? "in" : "out"));
