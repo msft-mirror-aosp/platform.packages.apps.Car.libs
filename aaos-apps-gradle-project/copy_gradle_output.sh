@@ -84,3 +84,16 @@ cp $OUTPUT_DIR/car-broadcastradio-support/outputs/apk/androidTest/debug/car-broa
 cp $OUTPUT_DIR/car-bugreport-app/outputs/apk/androidTest/platform/debug/car-bugreport-app-platform-debug-androidTest.apk $1/CarBugReportUnitTests.apk
 cp $OUTPUT_DIR/car-app-card-lib/outputs/apk/androidTest/debug/car-app-card-lib-debug-androidTest.apk $1/CarAppCardLibTests.apk
 cp $OUTPUT_DIR/car-app-card-host-lib/outputs/apk/androidTest/debug/car-app-card-host-lib-debug-androidTest.apk $1/CarAppCardHostLibTests.apk
+
+# JaCoCo
+mkdir $1/jacoco
+mkdir $1/jacoco/car-calendar-app
+mkdir $1/jacoco/car-messenger-app
+mkdir $1/jacoco/car-media-app/
+mkdir $1/jacoco/car-dialer-app
+jar cvfM $1/jacoco/car-calendar-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-calendar-app/intermediates/jacoco_instrumented_classes/platformDebug/out .
+jar cvfM $1/jacoco/car-messenger-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-messenger-app/intermediates/jacoco_instrumented_classes/platformDebug/out .
+jar cvfM $1/jacoco/car-media-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-media-app/intermediates/jacoco_instrumented_classes/platformDebug/out .
+jar cvfM $1/jacoco/car-dialer-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-dialer-app/intermediates/jacoco_instrumented_classes/platformDebug/out .
+jar cvfM $1/jacoco-report-classes-all.zip -C $1/jacoco .
+rm -r $1/jacoco
