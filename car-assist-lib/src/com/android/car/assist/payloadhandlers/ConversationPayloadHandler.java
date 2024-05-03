@@ -66,7 +66,7 @@ public class ConversationPayloadHandler {
             @DrawableRes int iconRes,
             @Nullable String group) {
         return createNotificationFromConversation(
-                context, channelId, conversation, iconRes, group, true);
+                context, channelId, conversation, iconRes, group, true, true);
     }
 
     /**
@@ -79,26 +79,29 @@ public class ConversationPayloadHandler {
             @NonNull Conversation conversation,
             @DrawableRes int iconRes,
             @Nullable String group,
-            boolean directReplySupported) {
+            boolean directReplySupported,
+            boolean muteSupported) {
         MessagingStyle messagingStyle = getMessagingStyle(conversation);
-        Action muteAction = getNotificationAction(context, conversation,
-                ActionType.ACTION_TYPE_MUTE);
-        Action markAsReadAction = getNotificationAction(context, conversation,
-                ActionType.ACTION_TYPE_MARK_AS_READ);
-
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context, channelId);
-        notificationBuilder
-                .setStyle(messagingStyle)
-                .setSmallIcon(iconRes)
-                .setLargeIcon(getBitmap(conversation.getConversationIcon(), context));
+
+        Action markAsReadAction = getNotificationAction(context, conversation,
+                ActionType.ACTION_TYPE_MARK_AS_READ);
         if (directReplySupported) {
             Action replyAction = getNotificationAction(context, conversation,
                     ActionType.ACTION_TYPE_REPLY);
             notificationBuilder.addAction(replyAction);
         }
-        notificationBuilder.addAction(markAsReadAction)
-                .addAction(muteAction)
+        if (muteSupported) {
+            Action muteAction = getNotificationAction(context, conversation,
+                    ActionType.ACTION_TYPE_MUTE);
+            notificationBuilder.addAction(muteAction);
+        }
+        notificationBuilder
+                .setStyle(messagingStyle)
+                .setSmallIcon(iconRes)
+                .setLargeIcon(getBitmap(conversation.getConversationIcon(), context))
+                .addAction(markAsReadAction)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setGroup(group);
         return notificationBuilder.build();
