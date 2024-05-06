@@ -24,6 +24,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -34,6 +35,7 @@ import androidx.core.app.NotificationCompat.Action.SemanticAction;
 import androidx.core.app.NotificationCompat.MessagingStyle;
 import androidx.core.graphics.drawable.IconCompat;
 
+import com.android.car.assist.CarVoiceInteractionSession;
 import com.android.car.messenger.common.Conversation;
 import com.android.car.messenger.common.Conversation.ConversationAction.ActionType;
 
@@ -66,41 +68,63 @@ public class ConversationPayloadHandler {
             @DrawableRes int iconRes,
             @Nullable String group) {
         return createNotificationFromConversation(
-                context, channelId, conversation, iconRes, group, true);
+                context,
+                channelId,
+                conversation,
+                /* summarizedConversation= */ null,
+                iconRes,
+                group,
+                /* directReplySupported= */ true,
+                /* muteSupported= */ true);
     }
 
     /**
-     * Creates a notification from {@link Conversation}.
+     * The notification will be created from a summarizedConversation if passed in.
+     *
+     * @param summarizedConversation A truncated conversation for the purposes of assistant readout.
      */
     @NonNull
     public static Notification createNotificationFromConversation(
             @NonNull Context context,
             @NonNull String channelId,
             @NonNull Conversation conversation,
+            @Nullable Conversation summarizedConversation,
             @DrawableRes int iconRes,
             @Nullable String group,
-            boolean directReplySupported) {
-        MessagingStyle messagingStyle = getMessagingStyle(conversation);
-        Action muteAction = getNotificationAction(context, conversation,
-                ActionType.ACTION_TYPE_MUTE);
-        Action markAsReadAction = getNotificationAction(context, conversation,
-                ActionType.ACTION_TYPE_MARK_AS_READ);
+            boolean directReplySupported,
+            boolean muteSupported) {
+
+        MessagingStyle messagingStyle = summarizedConversation == null
+                ? getMessagingStyle(conversation)
+                : getMessagingStyle(summarizedConversation);
+
+        Bundle extras = new Bundle();
+        extras.putBundle(CarVoiceInteractionSession.KEY_CONVERSATION, conversation.toBundle());
 
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context, channelId);
-        notificationBuilder
-                .setStyle(messagingStyle)
-                .setSmallIcon(iconRes)
-                .setLargeIcon(getBitmap(conversation.getConversationIcon(), context));
+
+        Action markAsReadAction = getNotificationAction(context, conversation,
+                ActionType.ACTION_TYPE_MARK_AS_READ);
         if (directReplySupported) {
             Action replyAction = getNotificationAction(context, conversation,
                     ActionType.ACTION_TYPE_REPLY);
             notificationBuilder.addAction(replyAction);
         }
-        notificationBuilder.addAction(markAsReadAction)
-                .addAction(muteAction)
+        if (muteSupported) {
+            Action muteAction = getNotificationAction(context, conversation,
+                    ActionType.ACTION_TYPE_MUTE);
+            notificationBuilder.addAction(muteAction);
+        }
+
+        notificationBuilder
+                .setStyle(messagingStyle)
+                .setSmallIcon(iconRes)
+                .setLargeIcon(getBitmap(conversation.getConversationIcon(), context))
+                .addAction(markAsReadAction)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                .setGroup(group);
+                .setGroup(group)
+                .addExtras(extras);
         return notificationBuilder.build();
     }
 
