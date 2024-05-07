@@ -192,7 +192,8 @@ public class MediaSessionHelper extends MediaController.Callback {
         }
 
         for (MediaController mediaController : controllers) {
-            if (mediaController.getPlaybackState() == null) {
+            PlaybackState playbackState = mediaController.getPlaybackState();
+            if (playbackState == null) {
                 continue;
             }
 
@@ -200,7 +201,7 @@ public class MediaSessionHelper extends MediaController.Callback {
                 playableControllers.add(mediaController);
             }
 
-            if (isActive(mediaController.getPlaybackState().getState())) {
+            if (isActive(playbackState.getState())) {
                 activeControllers.add(mediaController);
             } else {
                 // Since playback state changes don't trigger an active media session change, we
