@@ -27,17 +27,17 @@
     <item type="id" name="inner_separator" />
     <item type="id" name="max_time" />
     <item type="id" name="playback_seek_bar" />
-    <item type="id" name="action_id1"/>
-    <item type="id" name="action_id2"/>
-    <item type="id" name="action_id3"/>
-    <item type="id" name="action_id4"/>
-    <item type="id" name="action_id5"/>
-    <item type="id" name="action_id6"/>
-    <item type="id" name="action_id7"/>
-    <item type="id" name="action_id8"/>
-    <item type="id" name="action_id9"/>
-    <item type="id" name="action_id10"/>
-    <item type="id" name="action_id11"/>
+    <item type="id" name="playback_action_id1"/>
+    <item type="id" name="playback_action_id2"/>
+    <item type="id" name="playback_action_id3"/>
+    <item type="id" name="playback_action_id4"/>
+    <item type="id" name="playback_action_id5"/>
+    <item type="id" name="playback_action_id6"/>
+    <item type="id" name="playback_action_id7"/>
+    <item type="id" name="playback_action_id8"/>
+    <item type="id" name="playback_action_id9"/>
+    <item type="id" name="playback_action_id10"/>
+    <item type="id" name="playback_action_id11"/>
     <item type="id" name="media_widget_app_icon"/>
     <item type="id" name="media_widget_app_name"/>
     <item type="id" name="play_pause_button"/>
