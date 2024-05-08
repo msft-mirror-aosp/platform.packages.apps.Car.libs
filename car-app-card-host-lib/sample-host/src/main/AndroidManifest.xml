@@ -39,6 +39,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCardSampleApplication"
         android:roundIcon="@drawable/baseline_space_dashboard_24">
+        <uses-library android:name="com.android.oem.tokens" android:required="false"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
