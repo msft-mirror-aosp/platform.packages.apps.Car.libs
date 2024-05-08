@@ -18,11 +18,11 @@ REGENERATE USING packages/apps/Car/tests/tools/rro/generate-overlayable.py
     <policy type="system|product|signature">
       <item type="anim" name="trim_end_interpolator"/>
       <item type="anim" name="trim_start_interpolator"/>
-      <item type="array" name="action_slot_ids"/>
       <item type="array" name="custom_media_packages"/>
       <item type="array" name="placeholder_backgrounds"/>
       <item type="array" name="placeholder_icons"/>
       <item type="array" name="placeholder_images"/>
+      <item type="array" name="playback_action_slot_ids"/>
       <item type="array" name="preferred_media_sources"/>
       <item type="attr" name="align_horizontal"/>
       <item type="attr" name="aspect_ratio"/>

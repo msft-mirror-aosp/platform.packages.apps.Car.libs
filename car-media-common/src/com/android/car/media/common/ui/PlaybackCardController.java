@@ -170,7 +170,8 @@ public class PlaybackCardController {
     private void getViewsFromWidget() {
         mTitle = mView.findViewById(R.id.title);
         mAlbumCover = mView.findViewById(R.id.album_art);
-        mSubtitle = mView.findViewById(R.id.artist);
+        TextView subtitle = mView.findViewById(R.id.subtitle);
+        mSubtitle = subtitle != null ? subtitle : mView.findViewById(R.id.artist);
         mDescription = mView.findViewById(R.id.album_title);
         mLogo = mView.findViewById(R.id.content_format);
 
@@ -184,7 +185,7 @@ public class PlaybackCardController {
 
         mPlayPauseButton = mView.findViewById(R.id.play_pause_button);
         mActions = ViewUtils.getViewsById(mView, mView.getResources(),
-                R.array.action_slot_ids, null);
+                R.array.playback_action_slot_ids, null);
         mQueueButton = mView.findViewById(R.id.queue_button);
         mHistoryButton = mView.findViewById(R.id.history_button);
         mActionOverflowButton = mView.findViewById(R.id.overflow_button);
