@@ -215,6 +215,9 @@ public class PlaybackCardController {
     }
 
     /** Do any necessary set up for the mPlayPauseButton like setting OnClickListener */
+    // TODO (b/339303311): Remove this function once PlaybackCardController children use
+    //  PlaybackCardControllerUtilities#updatePlayButtonWithPlaybackState
+    //  with non-null playbackController
     protected void setUpPlayPauseButton() {
         if (mPlayPauseButton != null) {
             mPlayPauseButton.setOnClickListener(playPauseButton -> {
@@ -435,7 +438,9 @@ public class PlaybackCardController {
     /** Update views with data from the {@link PlaybackStateWrapper} */
     protected void updatePlaybackState(PlaybackStateWrapper playbackState) {
         if (playbackState != null) {
-            updatePlayButtonWithPlaybackState(mPlayPauseButton, playbackState);
+            PlaybackController playbackController =
+                    mDataModel.getPlaybackController().getValue();
+            updatePlayButtonWithPlaybackState(mPlayPauseButton, playbackState, playbackController);
             updateActionsWithPlaybackState(mView.getContext(), mActions, playbackState,
                     mDataModel.getPlaybackController().getValue(),
                     mView.getContext().getDrawable(R.drawable.ic_skip_previous),
