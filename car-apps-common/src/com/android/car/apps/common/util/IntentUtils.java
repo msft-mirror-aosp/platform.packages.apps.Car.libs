@@ -21,9 +21,16 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-/** */
+/** Utility class for methods and constants related to intents */
 public class IntentUtils {
     private static final String TAG = "IntentUtils";
+
+    /**
+     *  Intent extra for specifying BlockingActivity's exit button visibility. Passed value should
+     *  be either View.VISIBLE, View.INVISIBLE or View.GONE.
+     */
+    public static final String EXTRA_MEDIA_BLOCKING_ACTIVITY_EXIT_BUTTON_VISIBILITY =
+            "MEDIA_BLOCKING_ACTIVITY_EXIT_BUTTON_VISIBILITY";
 
     private IntentUtils() {
     }
