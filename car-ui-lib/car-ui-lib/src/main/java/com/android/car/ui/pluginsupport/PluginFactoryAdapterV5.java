@@ -180,7 +180,7 @@ public final class PluginFactoryAdapterV5 implements PluginFactory {
             // fallback to the static implementation.
         }
         return appStyledViewControllerOEMV3 == null ? new AppStyledViewControllerImpl(
-                activityContext) : new AppStyledViewControllerAdapterV3(
+                activityContext) : new AppStyledViewControllerAdapterV3(activityContext,
                     appStyledViewControllerOEMV3);
     }
 

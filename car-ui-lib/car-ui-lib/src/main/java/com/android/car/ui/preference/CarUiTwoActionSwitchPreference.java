@@ -18,6 +18,7 @@ package com.android.car.ui.preference;
 
 import static com.android.car.ui.utils.CarUiUtils.requireViewByRefId;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -92,6 +93,7 @@ public class CarUiTwoActionSwitchPreference extends CarUiTwoActionBasePreference
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onBindViewHolder(PreferenceViewHolder holder) {
         super.onBindViewHolder(holder);

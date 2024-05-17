@@ -56,4 +56,19 @@
         <item>com.android.car.radio/.service.RadioAppService</item>
     </string-array>
 
+    <!-- This array is for the action slot ids that the PlaybackCardController expects -->
+    <array name="action_slot_ids">
+        <item>@id/action_id1</item>
+        <item>@id/action_id2</item>
+        <item>@id/action_id3</item>
+        <item>@id/action_id4</item>
+        <item>@id/action_id5</item>
+        <item>@id/action_id6</item>
+        <item>@id/action_id7</item>
+        <item>@id/action_id8</item>
+        <item>@id/action_id9</item>
+        <item>@id/action_id10</item>
+        <item>@id/action_id11</item>
+    </array>
+
 </resources>

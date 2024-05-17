@@ -110,7 +110,7 @@ public class MediaSourceViewModelTest {
     @Test
     public void testGetMediaController_connectedBrowser() {
         CaptureObserver<BrowsingState> observer = new CaptureObserver<>();
-        mMediaSource = newFakeMediaSource("test", "test");
+        mMediaSource = newFakeMediaSource(mContext.getPackageManager(), "test", "test");
         when(mMediaBrowser.isConnected()).thenReturn(true);
 
         initializeViewModel();
@@ -130,7 +130,7 @@ public class MediaSourceViewModelTest {
     @Test
     public void testGetMediaController_noActiveSession_notConnected() {
         CaptureObserver<BrowsingState> observer = new CaptureObserver<>();
-        mMediaSource = newFakeMediaSource("test", "test");
+        mMediaSource = newFakeMediaSource(mContext.getPackageManager(), "test", "test");
         when(mMediaBrowser.isConnected()).thenReturn(false);
         initializeViewModel();
         mMediaSourceLiveData.setValue(mMediaSource);

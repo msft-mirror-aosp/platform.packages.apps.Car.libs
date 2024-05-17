@@ -73,6 +73,10 @@
             android:background="@drawable/button_background_for_rotary"
             android:text="Button Four" />
 
+      <EditText
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"/>
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

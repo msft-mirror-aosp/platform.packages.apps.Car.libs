@@ -18,9 +18,9 @@
 -->
 <!-- Consider other dimension overrides in values-xxx when adding/changing the value here! -->
 <resources>
-    <!-- Focus dimensions -->
-    <dimen name="focus_stroke_width">8dp</dimen>
-    <dimen name="focus_pressed_stroke_width">4dp</dimen>
+    <!-- Rotary focus dimensions -->
+    <dimen name="car_rotary_focus_stroke_width">8dp</dimen>
+    <dimen name="car_rotary_focus_pressed_stroke_width">4dp</dimen>
 
     <!-- Switch dimensions -->
     <dimen name="car_switch_track_height">48dp</dimen>
@@ -34,11 +34,50 @@
     <!-- Switch focus ring padding. -->
     <dimen name="car_switch_track_focus_ring_padding">12dp</dimen>
     <!-- Should be the half of car_switch_track_focus_ring_height. -->
-    <dimen name="car_switch_track_focus_ring_outer_radius">36dp</dimen>
+    <dimen name="car_switch_track_focus_ring_outer_radius">@dimen/shape_corner_large</dimen>
     <!-- Should be the half of car_switch_track_height. -->
-    <dimen name="car_switch_thumb_outer_radius">24dp</dimen>
+    <dimen name="car_switch_thumb_outer_radius">@dimen/shape_corner_medium</dimen>
     <!--  The difference between the track size and the thumb size. -->
     <dimen name="car_switch_thumb_stroke_width">4dp</dimen>
     <!-- car_switch_thumb_size + car_switch_thumb_stroke_width == car_switch_track_height -->
     <dimen name="car_switch_thumb_size">40dp</dimen>
+
+    <!-- Button Dimensions -->
+    <dimen name="car_button_height">88dp</dimen>
+    <dimen name="car_button_min_height">88dp</dimen>
+    <dimen name="car_button_height_small">64dp</dimen>
+    <dimen name="car_button_min_height_small">64dp</dimen>
+    <dimen name="car_button_min_width">158dp</dimen>
+    <dimen name="car_button_radius">@dimen/shape_corner_extra_large</dimen>
+    <dimen name="car_button_small_radius">@dimen/shape_corner_large</dimen>
+
+    <!-- Checkbox dimensions. -->
+    <!-- 77dp scales the material checkbox to provide a 44dp x 44dp checkbox rectangle. -->
+    <dimen name="car_checkbox_size">77dp</dimen>
+    <!-- The checkbox focus ring size -->
+    <dimen name="car_checkbox_focus_ring_size">66dp</dimen>
+
+    <!-- Radio button dimensions -->
+    <dimen name="car_radio_button_outer_ring_size">45dp</dimen>
+    <dimen name="car_radio_button_outer_ring_stroke_width">4dp</dimen>
+    <dimen name="car_radio_button_inner_circle_size">32dp</dimen>
+    <dimen name="car_radio_button_focus_ring_size">69dp</dimen>
+    <dimen name="car_radio_button_focus_ring_padding">12dp</dimen>
+
+    <!-- SeekBar dimensions. -->
+    <!-- Allows thumb to extend out of the range of the track. -->
+    <!-- For more information see android.widget.SeekBar#attr_android:thumbOffset. -->
+    <dimen name="car_seekbar_thumb_offset">24dp</dimen>
+    <!-- Horizontal padding for the SeekBar.-->
+    <dimen name="car_seekbar_horizontal_padding">24dp</dimen>
+    <!-- The SeekBar track height.-->
+    <dimen name="car_seekbar_track_height">24dp</dimen>
+    <!-- Vertical padding that extends the touch area for the SeekBar. -->
+    <dimen name="car_seekbar_track_vertical_padding">26dp</dimen>
+    <!-- The stroke with of the ring around the SeekBar thumb when selected. -->
+    <dimen name="car_seekbar_thumb_selected_stroke_width">8dp</dimen>
+    <!-- The size of the SeekBar thumb. -->
+    <dimen name="car_seekbar_thumb_size">68dp</dimen>
+    <!-- The radius of the end of the SeekbarTrack. -->
+    <dimen name="car_seekbar_thumb_outer_radius">24dp</dimen>
 </resources>

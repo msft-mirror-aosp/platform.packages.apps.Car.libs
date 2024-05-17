@@ -55,6 +55,14 @@ public class CarMediaManagerHelper {
         return sInstance;
     }
 
+    /** Returns a human readable mode. For debugging only. */
+    public static String getMode(int mode) {
+        if (mode < 0 || 1 < mode) {
+            return "invalid";
+        }
+        return MODES[mode];
+    }
+
     /**
      * Factory for creating dependencies. Can be swapped out for testing.
      */
@@ -105,8 +113,6 @@ public class CarMediaManagerHelper {
 
     private static InputFactory createInputFactory(@NonNull Context appContext) {
         return new InputFactory() {
-            private final MediaSourceUtil mMediaSourceUtil =
-                    new MediaSourceUtil(appContext);
 
             @Override
             public Car getCarApi() {
@@ -125,7 +131,7 @@ public class CarMediaManagerHelper {
 
             @Override
             public boolean isAudioMediaSource(ComponentName componentName) {
-                return mMediaSourceUtil.isAudioMediaSource(componentName);
+                return MediaSource.isAudioMediaSource(appContext, componentName);
             }
         };
     }

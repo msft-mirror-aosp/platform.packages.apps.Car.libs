@@ -250,14 +250,14 @@ public class ViewUtils {
     }
 
     /** Get views from typed array. */
-    public static List<View> getViewsById(@NonNull View root, @NonNull Resources res, int arrayId,
-            @Nullable Filter filter) {
+    public static <T extends View> List<T> getViewsById(@NonNull View root,
+            @NonNull Resources res, int arrayId, @Nullable Filter filter) {
         TypedArray viewIds = res.obtainTypedArray(arrayId);
-        List<View> views = new ArrayList<>(viewIds.length());
+        List<T> views = new ArrayList<>(viewIds.length());
         for (int i = 0; i < viewIds.length(); i++) {
             int viewId = viewIds.getResourceId(i, 0);
             if (viewId != 0) {
-                View view = root.findViewById(viewId);
+                T view = root.findViewById(viewId);
                 if (view != null && (filter == null || filter.isValid(view))) {
                     views.add(view);
                 }

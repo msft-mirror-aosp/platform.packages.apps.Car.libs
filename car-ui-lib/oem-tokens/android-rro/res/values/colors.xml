@@ -15,15 +15,43 @@
   ~ limitations under the License.
   -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Focus colors -->
-    <color name="focus_stroke_color">#94CBFF</color>
-    <color name="focus_fill_color">#3D94CBFF</color>
-    <color name="focus_pressed_stroke_color">#94CBFF</color>
-    <color name="focus_pressed_fill_color">#8A94CBFF</color>
-
+    <!-- Rotary focus colors -->
+    <color name="car_rotary_focus_stroke_color">#94CBFF</color>
+    <color name="car_rotary_focus_fill_color">#3D94CBFF</color>
+    <color name="car_rotary_focus_pressed_stroke_color">#94CBFF</color>
+    <color name="car_rotary_focus_pressed_fill_color">#8A94CBFF</color>
 
     <!-- The Switch track background color when checked. -->
     <color name="car_switch_track_background_checked">@color/color_primary</color>
     <!-- The Switch track background color when unchecked. -->
     <color name="car_switch_track_background_unchecked">@color/color_secondary_container</color>
+
+    <!-- Button colors -->
+    <color name="car_button_background">@color/color_secondary_container</color>
+    <color name="car_button_foreground">@color/color_on_secondary_container</color>
+
+    <color name="car_control_highlight">#99d9e2ff</color>
+
+    <!-- Toggle button colors -->
+    <color name="car_button_toggle_background_checked">@color/color_primary</color>
+    <color name="car_button_toggle_background_unchecked">@color/color_secondary</color>
+    <color name="car_button_toggle_foreground_checked">@color/color_on_primary</color>
+    <color name="car_button_toggle_foreground_unchecked">@color/color_on_secondary</color>
+
+    <!-- The Seekbar track's background color. -->
+    <color name="car_seekbar_track_background">@color/color_surface_variant</color>
+    <!-- The Seekbar track's progress color. -->
+    <color name="car_seekbar_track_progress">@color/color_primary</color>
+    <!-- The Seekbar track's secondary progress color. -->
+    <color name="car_seekbar_track_progress_secondary">@color/color_secondary</color>
+    <!-- Color of the outer ring when the SeekBar is selected. -->
+    <color name="car_seekbar_thumb_selected_stroke_color">@color/car_rotary_focus_stroke_color</color>
+    <!-- Color of the background of the ring when the SeekBar is selected. -->
+    <color name="car_seekbar_thumb_selected_background_color">@color/car_rotary_focus_fill_color</color>
+    <!-- The SeekBar thumb color. -->
+    <color name="car_seekbar_thumb">@color/color_surface_inverse</color>
+    <!-- The SeekBar thumb color when disabled -->
+    <color name="car_seekbar_thumb_disabled">@color/color_neutral_palette_40</color>
+    <!-- The SeekBar thumb shadow color. -->
+    <color name="car_seekbar_thumb_shadow">#8F000000</color>
 </resources>

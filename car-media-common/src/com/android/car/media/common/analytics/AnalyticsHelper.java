@@ -16,6 +16,12 @@
 
 package com.android.car.media.common.analytics;
 
+import static androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent.VIEW_ACTION_HIDE;
+import static androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent.VIEW_ACTION_MODE_NONE;
+import static androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent.VIEW_ACTION_MODE_SCROLL;
+import static androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent.VIEW_ACTION_SHOW;
+import static androidx.recyclerview.widget.RecyclerView.NO_POSITION;
+
 import static com.android.car.media.common.analytics.AnalyticsFlags.ANALYTICS_ENABLED;
 
 import android.content.Context;
@@ -23,13 +29,24 @@ import android.os.Bundle;
 import android.support.v4.media.MediaBrowserCompat;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.OptIn;
 import androidx.car.app.mediaextensions.analytics.Constants;
+import androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent;
 import androidx.car.app.mediaextensions.analytics.host.AnalyticsManager;
 import androidx.car.app.mediaextensions.analytics.host.IAnalyticsManager;
+
+import com.android.car.media.common.MediaItemMetadata;
+import com.android.car.media.common.browse.MediaItemsRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Analytics related helper methods.
  */
+@OptIn(markerClass = androidx.car.app.annotations2.ExperimentalCarApi.class)
 public class AnalyticsHelper {
 
     static IAnalyticsManager sIAnalyticsManagerStub = new IAnalyticsManager() {};
@@ -45,7 +62,7 @@ public class AnalyticsHelper {
      * @return IAnalyticsManager implementation.
      */
     public static IAnalyticsManager makeAnalyticsManager(@NonNull Context context,
-            @NonNull MediaBrowserCompat browser, @NonNull Bundle rootExtras) {
+            @Nullable MediaBrowserCompat browser, @NonNull Bundle rootExtras) {
         int batchinterval  = context.getResources().getInteger(
                 com.android.car.media.common.R.integer.analytics_send_batch_interval);
         int batchSize = context.getResources().getInteger(
@@ -54,7 +71,7 @@ public class AnalyticsHelper {
 
         // We return unimplemented stub when analytics not enabled. This way we do not need this
         //  check at every capture point.
-        if (ANALYTICS_ENABLED && optIn) {
+        if (ANALYTICS_ENABLED && optIn && browser != null) {
             return new AnalyticsManager(context, browser, batchinterval, batchSize);
         } else {
             return sIAnalyticsManagerStub;
@@ -63,5 +80,85 @@ public class AnalyticsHelper {
 
     private static boolean getOptIn(Bundle rootExtras) {
         return rootExtras.getBoolean(Constants.ANALYTICS_ROOT_KEY_OPT_IN, false);
+    }
+
+    /**
+     * Creates a sends a visible items event for the items that became visible and another event
+     * for the items that became hidden.
+     * @return the currently visible items.
+     */
+    public static List<String> sendVisibleItemsInc(
+            @AnalyticsEvent.ViewComponent int viewComp,
+            MediaItemsRepository repo, MediaItemMetadata parentItem, List<String> prevItems,
+            List<MediaItemMetadata> items, int currFirst, int currLast, boolean fromScroll) {
+        return sendVisibleItemsInc(viewComp, repo, parentItem != null ? parentItem.getId() : null,
+                prevItems,
+                items.stream().map(MediaItemMetadata::getId).collect(Collectors.toList()),
+                currFirst, currLast, fromScroll);
+    }
+
+    /**
+     * Creates a sends a visible items event for the items that became visible and another event
+     * for the items that became hidden.
+     * @return the currently visible items.
+     */
+    public static List<String> sendVisibleItemsInc(
+            @AnalyticsEvent.ViewComponent int viewComp,
+            MediaItemsRepository repo, String parentItem, List<String> prevItems,
+            List<String> items, int currFirst, int currLast, boolean fromScroll) {
+
+        // Handle empty list by hiding previous and returning empty.
+        if (items.isEmpty() && !prevItems.isEmpty()) {
+            repo.getAnalyticsManager().sendVisibleItemsEvents(
+                    parentItem, viewComp, VIEW_ACTION_HIDE,
+                    fromScroll ? VIEW_ACTION_MODE_SCROLL : VIEW_ACTION_MODE_NONE,
+                    new ArrayList<>(prevItems));
+            return List.of();
+        }
+
+        // If for any reason there are no visible items or error state
+        // we have nothing to show, hide prev
+        if (currFirst == NO_POSITION
+                || currLast == NO_POSITION
+                || currLast > items.size()
+                || items == null) {
+
+            if (!prevItems.isEmpty()) {
+                repo.getAnalyticsManager().sendVisibleItemsEvents(
+                        parentItem, viewComp, VIEW_ACTION_HIDE,
+                        fromScroll ? VIEW_ACTION_MODE_SCROLL : VIEW_ACTION_MODE_NONE,
+                        new ArrayList<>(prevItems));
+            }
+
+            return List.of();
+        }
+
+        //Needed because wide search RV is sometimes given first and last swapped.
+        //TODO(b/309150765): remove when fixed.
+        int limitedMin = Math.min(currFirst, currLast + 1);
+        int limitedMax = Math.max(currFirst, currLast + 1);
+
+        List<String> currItemsSublist = new ArrayList<>(items
+                .subList(limitedMin, Math.min(limitedMax, items.size())));
+
+        List<String> delta = new ArrayList<>(prevItems);
+        List<String> deltaNew = new ArrayList<>(currItemsSublist);
+        currItemsSublist.forEach(delta::remove);
+        prevItems.forEach(deltaNew::remove);
+
+        if (!delta.isEmpty()) {
+            repo.getAnalyticsManager().sendVisibleItemsEvents(
+                    parentItem, viewComp, VIEW_ACTION_HIDE,
+                    fromScroll ? VIEW_ACTION_MODE_SCROLL : VIEW_ACTION_MODE_NONE,
+                    new ArrayList<>(delta));
+        }
+        if (!deltaNew.isEmpty()) {
+            repo.getAnalyticsManager().sendVisibleItemsEvents(
+                    parentItem, viewComp, VIEW_ACTION_SHOW,
+                    fromScroll ? VIEW_ACTION_MODE_SCROLL : VIEW_ACTION_MODE_NONE,
+                    new ArrayList<>(deltaNew));
+        }
+
+        return currItemsSublist;
     }
 }

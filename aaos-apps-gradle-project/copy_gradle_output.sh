@@ -44,6 +44,8 @@ cp $OUTPUT_DIR/test-rotary-ime/outputs/apk/aaos/release/test-rotary-ime-aaos-rel
 cp $OUTPUT_DIR/test-rotary-ime/outputs/apk/platform/release/test-rotary-ime-platform-release.apk $1/RotaryIME_platform_cert.apk
 cp $OUTPUT_DIR/test-media-app/automotive/outputs/apk/aaos/release/automotive-aaos-release.apk $1/TestMediaApp.apk
 cp $OUTPUT_DIR/test-media-app/automotive/outputs/apk/platform/release/automotive-platform-release.apk $1/TestMediaApp_platform_cert.apk
+cp $OUTPUT_DIR/car-radio-app/outputs/apk/aaos/release/car-radio-app-aaos-release.apk $1/CarRadioApp.apk
+cp $OUTPUT_DIR/car-bugreport-app/outputs/apk/prod/release/car-bugreport-app-prod-release.apk $1/CarBugReportApp.apk
 
 # AARs
 cp $OUTPUT_DIR/car-ui-lib/outputs/aar/car-ui-lib-release.aar $1/car-ui-lib.aar
@@ -57,6 +59,7 @@ cp $OUTPUT_DIR/car-media-extensions/outputs/aar/car-media-extensions-release.aar
 cp $OUTPUT_DIR/car-telephony-common/outputs/aar/car-telephony-common-release.aar $1/car-telephony-common.aar
 cp $OUTPUT_DIR/car-messenger-common/model/outputs/aar/model-release.aar $1/car-messaging-models.aar
 cp $OUTPUT_DIR/car-messenger-common/outputs/aar/car-messenger-common-release.aar $1/car-messenger-common.aar
+cp $OUTPUT_DIR/car-broadcastradio-support/outputs/aar/car-broadcastradio-support-release.aar $1/car-broadcastradio-support.aar
 
 # Tests
 cp $OUTPUT_DIR/car-calendar-app/outputs/apk/androidTest/platform/debug/car-calendar-app-platform-debug-androidTest.apk $1/CarCalendarUnitTests.apk
@@ -72,3 +75,5 @@ cp $OUTPUT_DIR/car-apps-common/outputs/apk/androidTest/debug/car-apps-common-deb
 cp $OUTPUT_DIR/car-media-common/outputs/apk/androidTest/debug/car-media-common-debug-androidTest.apk $1/CarMediaCommonUnitTests.apk
 cp $OUTPUT_DIR/car-media-app/outputs/apk/androidTest/platform/debug/car-media-app-platform-debug-androidTest.apk  $1/CarMediaUnitTests.apk
 cp $OUTPUT_DIR/car-media-extensions/outputs/apk/androidTest/debug/car-media-extensions-debug-androidTest.apk $1/CarMediaExtensionsUnitTests.apk
+cp $OUTPUT_DIR/car-broadcastradio-support/outputs/apk/androidTest/debug/car-broadcastradio-support-debug-androidTest.apk $1/CarBroadcastRadioSupportLibTests.apk
+cp $OUTPUT_DIR/car-bugreport-app/outputs/apk/androidTest/platform/debug/car-bugreport-app-platform-debug-androidTest.apk $1/CarBugReportUnitTests.apk

@@ -15,11 +15,13 @@
  */
 package com.android.car.ui.appstyledview;
 
+import android.app.Activity;
+import android.content.Context;
 import android.view.View;
-import android.view.WindowManager.LayoutParams;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.android.car.ui.appstyledview.AppStyledDialogController.NavIcon;
 import com.android.car.ui.plugin.oemapis.appstyledview.AppStyledViewControllerOEMV2;
@@ -31,18 +33,25 @@ public class AppStyledViewControllerAdapterV2 implements AppStyledViewController
     @NonNull
     private final AppStyledViewControllerOEMV2 mOemController;
 
-    public AppStyledViewControllerAdapterV2(@NonNull AppStyledViewControllerOEMV2 controllerOEMV2) {
+    private final AppStyledDialog mDialog;
+    private View mContent;
+
+    public AppStyledViewControllerAdapterV2(@NonNull Context context,
+            @NonNull AppStyledViewControllerOEMV2 controllerOEMV2) {
         mOemController = controllerOEMV2;
         mOemController.setNavIcon(AppStyledViewControllerOEMV2.NAV_ICON_CLOSE);
+        mDialog = new AppStyledDialog((Activity) context) {
+            @Override
+            public WindowManager.LayoutParams getDialogWindowLayoutParam(
+                    WindowManager.LayoutParams params) {
+                return mOemController.getDialogWindowLayoutParam(params);
+            }
+        };
     }
 
-    /**
-     * Returns the view that will be displayed on the screen.
-     */
     @Override
-    public View getAppStyledView(@Nullable View contentView) {
-        mOemController.setContent(contentView);
-        return mOemController.getView();
+    public void setContent(@NonNull View content) {
+        mContent = content;
     }
 
     @Override
@@ -65,11 +74,6 @@ public class AppStyledViewControllerAdapterV2 implements AppStyledViewController
     }
 
     @Override
-    public LayoutParams getDialogWindowLayoutParam(LayoutParams params) {
-        return mOemController.getDialogWindowLayoutParam(params);
-    }
-
-    @Override
     public int getContentAreaWidth() {
         return mOemController.getContentAreaWidth();
     }
@@ -82,5 +86,51 @@ public class AppStyledViewControllerAdapterV2 implements AppStyledViewController
     @Override
     public void setSceneType(int sceneType) {
         // Do nothing. Scene type not supported in AppStyledViewControllerOEMV2.
+    }
+
+    @Override
+    public void show() {
+        if (mContent == null) {
+            return;
+        }
+
+        if (mContent.getParent() != null) {
+            ((ViewGroup) mContent.getParent()).removeView(mContent);
+        }
+
+        mOemController.setContent(mContent);
+
+        View wrappedContent = mOemController.getView();
+        if (wrappedContent == null) {
+            return;
+        }
+
+        if (wrappedContent.getParent() != null) {
+            ((ViewGroup) wrappedContent.getParent()).removeView(wrappedContent);
+        }
+
+        mDialog.setContentView(wrappedContent);
+
+        mDialog.show();
+    }
+
+    @Override
+    public void dismiss() {
+        mDialog.dismiss();
+    }
+
+    @Override
+    public void setOnDismissListener(Runnable runnable) {
+        if (runnable == null) {
+            mDialog.setOnDismissListener(null);
+            return;
+        }
+
+        mDialog.setOnDismissListener(dialog -> runnable.run());
+    }
+
+    @Override
+    public WindowManager.LayoutParams getAttributes() {
+        return mDialog.getWindowLayoutParams();
     }
 }

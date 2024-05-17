@@ -44,14 +44,15 @@ public class MediaLinkHandler {
     private final View mDisplayView;
     private String mLinkedMediaId;
 
-    MediaLinkHandler(@Nullable MediaItemsRepository repository,
+    public MediaLinkHandler(@Nullable MediaItemsRepository repository,
             @Nullable MediaLinkDelegate delegate, @Nullable View displayView) {
         mMediaItemsRepository = repository;
         mControllerDelegate = delegate;
         mDisplayView = displayView;
     }
 
-    void setLinkedMediaId(String mediaId) {
+    /** Set the {@link MediaBrowserCompat.MediaItem} to navigate to when the view is clicked */
+    public void setLinkedMediaId(String mediaId) {
         if (mDisplayView == null) {
             return;
         }

@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
  *
  * @deprecated Use {@link RecyclerViewOEMV3} instead
  */
+@Deprecated
 public interface RecyclerViewOEMV2 {
 
     /** See {@code androidx.recyclerview.widget.RecyclerView.OnScrollListener} */

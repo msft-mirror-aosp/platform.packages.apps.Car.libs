@@ -43,24 +43,24 @@
             android:alpha="@dimen/album_art_scrim_alpha"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/playback_container"
+            android:id="@id/playback_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/app_icon"
+                android:id="@id/app_icon"
                 android:layout_width="@dimen/app_selector_icon_size"
                 android:layout_height="@dimen/app_selector_icon_size"
                 android:layout_gravity="center"
                 android:layout_marginStart="@dimen/playback_fragment_text_margin_x"
                 android:background="?android:attr/selectableItemBackground"
                 android:src="@drawable/ic_app_switch"
-                app:layout_constraintTop_toTopOf="@+id/app_name"
-                app:layout_constraintBottom_toBottomOf="@+id/app_name"
+                app:layout_constraintTop_toTopOf="@id/app_name"
+                app:layout_constraintBottom_toBottomOf="@id/app_name"
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <TextView
-                android:id="@+id/app_name"
+                android:id="@id/app_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/playback_fragment_text_margin_top"
@@ -69,12 +69,12 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:singleLine="true"
                 android:includeFontPadding="false"
-                app:layout_constraintStart_toEndOf="@+id/app_icon"
+                app:layout_constraintStart_toEndOf="@id/app_icon"
                 app:layout_constraintEnd_toStartOf="@+id/app_selector_container"
                 app:layout_constraintTop_toTopOf="parent"/>
 
             <TextView
-                android:id="@+id/title"
+                android:id="@id/title"
                 style="@style/PlaybackTitleStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -83,10 +83,10 @@
                 android:layout_marginEnd="@dimen/playback_fragment_text_margin_x"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/app_name"/>
+                app:layout_constraintTop_toBottomOf="@id/app_name"/>
 
             <TextView
-                android:id="@+id/subtitle"
+                android:id="@id/subtitle"
                 style="@style/PlaybackSubtitleStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -95,28 +95,28 @@
                 android:layout_marginEnd="@dimen/playback_fragment_text_margin_x"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/app_selector_container"
-                app:layout_constraintTop_toBottomOf="@+id/title"/>
+                app:layout_constraintTop_toBottomOf="@id/title"/>
 
             <com.android.car.apps.common.UxrTextView
-                android:id="@+id/error_message"
+                android:id="@id/error_message"
                 style="@style/FullScreenErrorMessageStyle"
                 android:layout_marginHorizontal="@dimen/playback_fragment_text_margin_x"
                 android:maxLines="@integer/widget_error_text_max_lines"
                 app:layout_constraintVertical_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/app_name"
-                app:layout_constraintBottom_toTopOf="@+id/error_button"
+                app:layout_constraintTop_toBottomOf="@id/app_name"
+                app:layout_constraintBottom_toTopOf="@id/error_button"
             />
 
             <com.android.car.apps.common.UxrButton
-                android:id="@+id/error_button"
+                android:id="@id/error_button"
                 style="@style/FullScreenErrorButtonStyle"
                 android:layout_marginTop="@dimen/playback_fragment_error_button_margin_top"
                 android:layout_marginBottom="@dimen/playback_fragment_error_button_margin_bottom"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/error_message"
+                app:layout_constraintTop_toBottomOf="@id/error_message"
                 app:layout_constraintBottom_toBottomOf="parent"
             />
 
@@ -127,8 +127,8 @@
                 android:layout_height="@dimen/app_selector_icon_touch_target"
                 android:background="?android:attr/selectableItemBackground"
                 android:layout_marginEnd="@dimen/app_selector_margin_x"
-                app:layout_constraintTop_toTopOf="@+id/app_name"
-                app:layout_constraintBottom_toBottomOf="@+id/app_name"
+                app:layout_constraintTop_toTopOf="@id/app_name"
+                app:layout_constraintBottom_toBottomOf="@id/app_name"
                 app:layout_constraintEnd_toEndOf="parent">
 
                 <ImageView
@@ -141,7 +141,7 @@
             </FrameLayout>
 
             <com.android.car.media.common.PlaybackControlsActionBar
-                android:id="@+id/playback_controls"
+                android:id="@id/playback_controls"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/playback_fragment_controls_margin_bottom"
