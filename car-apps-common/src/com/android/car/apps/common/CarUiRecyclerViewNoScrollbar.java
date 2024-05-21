@@ -91,7 +91,6 @@ public final class CarUiRecyclerViewNoScrollbar extends FrameLayout
 
     @NonNull
     private final CarUxRestrictionsUtil mCarUxRestrictionsUtil;
-    private boolean mScrollBarEnabled;
     @Nullable
     private GridDividerItemDecoration mDividerItemDecorationGrid;
     @Nullable
@@ -168,7 +167,6 @@ public final class CarUiRecyclerViewNoScrollbar extends FrameLayout
                 defStyleAttr,
                 0);
 
-        mScrollBarEnabled = false;
         @LayoutRes int layout = R.layout.car_ui_recycler_view_no_scrollbar;
 
         LayoutInflater factory = LayoutInflater.from(context);
@@ -219,14 +217,23 @@ public final class CarUiRecyclerViewNoScrollbar extends FrameLayout
             setLayoutManager(new LinearLayoutManager(getContext()));
         }
 
+        if (isVerticalFadingEdgeEnabled()) {
+            mRecyclerView.setVerticalFadingEdgeEnabled(true);
+            mRecyclerView.setFadingEdgeLength(getVerticalFadingEdgeLength());
+            setVerticalFadingEdgeEnabled(false);
+            setFadingEdgeLength(0);
+        }
+        if (isHorizontalFadingEdgeEnabled()) {
+            mRecyclerView.setHorizontalFadingEdgeEnabled(true);
+            mRecyclerView.setFadingEdgeLength(getHorizontalFadingEdgeLength());
+            setHorizontalFadingEdgeEnabled(false);
+            setFadingEdgeLength(0);
+        }
+
         a.recycle();
 
         mRecyclerView.setVerticalScrollBarEnabled(false);
         mRecyclerView.setHorizontalScrollBarEnabled(false);
-
-        if (!mScrollBarEnabled) {
-            return;
-        }
     }
 
     @Override
