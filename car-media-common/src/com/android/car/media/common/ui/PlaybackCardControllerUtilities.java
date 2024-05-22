@@ -142,17 +142,6 @@ public final class PlaybackCardControllerUtilities {
     }
 
     /**
-     * Set enabled and selected state on playButton based on {@link PlaybackViewModel.Action}.
-     */
-    // TODO (b/339303311): Remove this function once PlaybackCardController children use
-    //  PlaybackCardControllerUtilities#updatePlayButtonWithPlaybackState
-    //  with non-null playbackController
-    public static void updatePlayButtonWithPlaybackState(@Nullable View playButton,
-            PlaybackStateWrapper playbackState) {
-        updatePlayButtonWithPlaybackState(playButton, playbackState, null);
-    }
-
-    /**
      * Update non-null buttons in actions list with skipPrev, skipNext, and custom actions. If
      * defaultButtonDrawable is non-null, any any unfilled actions in the list are assigned this
      * Drawable and set to VISIBLE, if defaultButtonDrawable is null, any unfilled actions in the
