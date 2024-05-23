@@ -26,11 +26,11 @@ public class IntentUtils {
     private static final String TAG = "IntentUtils";
 
     /**
-     *  Intent extra for specifying BlockingActivity's exit button visibility. Passed value should
-     *  be either View.VISIBLE, View.INVISIBLE or View.GONE.
+     *  Intent extra for specifying whether MediaBlockingActivity should dismiss when the car
+     *  becomes parked. Passed value should be either true of false.
      */
-    public static final String EXTRA_MEDIA_BLOCKING_ACTIVITY_EXIT_BUTTON_VISIBILITY =
-            "MEDIA_BLOCKING_ACTIVITY_EXIT_BUTTON_VISIBILITY";
+    public static final String EXTRA_MEDIA_BLOCKING_ACTIVITY_DISMISS_ON_PARK =
+            "MEDIA_BLOCKING_ACTIVITY_DISMISS_ON_PARK";
 
     private IntentUtils() {
     }

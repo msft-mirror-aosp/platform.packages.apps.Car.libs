@@ -201,7 +201,7 @@ public class MediaSessionHelper extends MediaController.Callback {
                 playableControllers.add(mediaController);
             }
 
-            if (isActive(playbackState.getState())) {
+            if (isPausedOrActive(playbackState.getState())) {
                 activeControllers.add(mediaController);
             } else {
                 // Since playback state changes don't trigger an active media session change, we
@@ -231,7 +231,7 @@ public class MediaSessionHelper extends MediaController.Callback {
 
     @Override
     public void onPlaybackStateChanged(@Nullable PlaybackState state) {
-        if (state != null && isActive(state.getState())) {
+        if (state != null && isPausedOrActive(state.getState())) {
             onMediaControllersChange(
                     mMediaSessionManager.getActiveSessions(/* notificationListener= */ null));
         }
@@ -244,7 +244,7 @@ public class MediaSessionHelper extends MediaController.Callback {
             return false;
         }
 
-        return isActive(playbackState.getState())
+        return isPausedOrActive(playbackState.getState())
             || (playbackState.getActions() & PlaybackStateCompat.ACTION_PLAY) != 0;
     }
 
@@ -268,9 +268,12 @@ public class MediaSessionHelper extends MediaController.Callback {
     private void updatePlayableMediaSources(List<MediaController> mediaControllers) {
         mPlayableMediaSources.setValue(mInputFactory.getMediaSources(mediaControllers));
     }
-
-    /* Copy of PlaybackState.isActive() which is only available for minsdk >=S  */
-    private boolean isActive(int playbackState) {
+    /**
+     * We want to add STATE_PAUSED to PlaybackState.isActive() because we are interested in the
+     * media source with focus, which would otherwise be passed over if MediaSessionHelper is
+     * initialized while it is paused.
+     */
+    private boolean isPausedOrActive(int playbackState) {
         switch (playbackState) {
             case PlaybackState.STATE_FAST_FORWARDING:
             case PlaybackState.STATE_REWINDING:
@@ -280,6 +283,7 @@ public class MediaSessionHelper extends MediaController.Callback {
             case PlaybackState.STATE_BUFFERING:
             case PlaybackState.STATE_CONNECTING:
             case PlaybackState.STATE_PLAYING:
+            case PlaybackState.STATE_PAUSED:
                 return true;
         }
         return false;
