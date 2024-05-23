@@ -105,7 +105,6 @@ public class PlaybackCardController {
     protected void setupController() {
         getViewsFromWidget();
         setUpDataModelObservers();
-        setUpPlayPauseButton();
         setUpSeekBar();
         setUpQueueButton();
         setUpHistoryButton();
@@ -166,7 +165,6 @@ public class PlaybackCardController {
     }
 
     /** Find views by id and assign to class fields */
-    // TODO b/324930427: Fill in ids once children of Controller need them
     private void getViewsFromWidget() {
         mTitle = mView.findViewById(R.id.title);
         mAlbumCover = mView.findViewById(R.id.album_art);
@@ -213,26 +211,6 @@ public class PlaybackCardController {
     /** Get the {@link LifecycleOwner} of the ViewGroup of this Controller */
     protected LifecycleOwner getViewLifecycleOwner() {
         return mViewLifecycle;
-    }
-
-    /** Do any necessary set up for the mPlayPauseButton like setting OnClickListener */
-    // TODO (b/339303311): Remove this function once PlaybackCardController children use
-    //  PlaybackCardControllerUtilities#updatePlayButtonWithPlaybackState
-    //  with non-null playbackController
-    protected void setUpPlayPauseButton() {
-        if (mPlayPauseButton != null) {
-            mPlayPauseButton.setOnClickListener(playPauseButton -> {
-                PlaybackController playbackController =
-                        mDataModel.getPlaybackController().getValue();
-                if (playbackController != null && playPauseButton.isEnabled()) {
-                    if (playPauseButton.isSelected()) {
-                        playbackController.pause();
-                    } else {
-                        playbackController.play();
-                    }
-                }
-            });
-        }
     }
 
     /** Do any necessary set up for the mSeekBar like setting OnSeekBarChangeListener */
