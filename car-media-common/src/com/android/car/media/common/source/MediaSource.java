@@ -42,13 +42,13 @@ import androidx.annotation.VisibleForTesting;
 
 import com.android.car.apps.common.BitmapUtils;
 import com.android.car.apps.common.IconCropper;
+import com.android.car.apps.common.imaging.ImageBinder;
 import com.android.car.media.common.R;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
 
 /**
  * This represents a source of media content. It provides convenient methods to access media source
@@ -337,6 +337,16 @@ public class MediaSource {
         return intent;
     }
 
+    /**
+     * Loads a given ImageRef depending on the type of MediaSource. For AAOS audio apps with an MBS,
+     * prevent or flag remote uris depending on the system configuration. For other MediaSources,
+     * allow the loading of remote uris.
+     */
+    public <T extends ImageBinder.ImageRef> void loadImage(ImageBinder<T> imageBinder,
+            Context context, T imageRef) {
+        imageBinder.setImage(context, imageRef, /* preventRemoteUris= */ mBrowseService != null);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -494,7 +504,6 @@ public class MediaSource {
     }
 
     private static List<ResolveInfo> queryIntentServices(Context context, Intent intent, int flag) {
-        return context.getPackageManager()
-                .queryIntentServices(intent, flag);
+        return context.getPackageManager().queryIntentServices(intent, flag);
     }
 }

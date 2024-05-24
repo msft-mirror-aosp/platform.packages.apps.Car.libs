@@ -51,14 +51,13 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 
-
 /**
  * A singleton that fetches images and offers a simple memory cache. The requests and the replies
  * all happen on the UI thread.
  */
-public class LocalImageFetcher {
+public class ImageFetcher {
 
-    private static final String TAG = "LocalImageFetcher";
+    private static final String TAG = "ImageFetcher";
     private static final boolean L_WARN = Log.isLoggable(TAG, Log.WARN);
     private static final boolean L_DEBUG = Log.isLoggable(TAG, Log.DEBUG);
 
@@ -66,12 +65,12 @@ public class LocalImageFetcher {
     private static final int MB = KB * KB;
 
     /** Should not be reset to null once created. */
-    private static LocalImageFetcher sInstance;
+    private static ImageFetcher sInstance;
 
     /** Returns the singleton. */
-    public static LocalImageFetcher getInstance(Context context) {
+    public static ImageFetcher getInstance(Context context) {
         if (sInstance == null) {
-            sInstance = new LocalImageFetcher(context);
+            sInstance = new ImageFetcher(context);
         }
         return sInstance;
     }
@@ -89,7 +88,7 @@ public class LocalImageFetcher {
     private final boolean mFlagRemoteImages;
 
     @UiThread
-    private LocalImageFetcher(Context context) {
+    private ImageFetcher(Context context) {
         Resources res = context.getResources();
         int maxPools = res.getInteger(R.integer.image_fetcher_thread_pools_max_count);
         mPoolSize = res.getInteger(R.integer.image_fetcher_thread_pool_size);
@@ -124,7 +123,8 @@ public class LocalImageFetcher {
 
     /** Fetches an image. The resulting drawable may be null. */
     @UiThread
-    public void getImage(Context context, ImageKey key, BiConsumer<ImageKey, Drawable> consumer) {
+    public void getImage(Context context, ImageKey key, BiConsumer<ImageKey, Drawable> consumer,
+            boolean preventRemoteImages) {
         Drawable cached = mMemoryCache.get(key);
         if (cached != null) {
             consumer.accept(key, cached);
@@ -146,7 +146,7 @@ public class LocalImageFetcher {
         if (task == null) {
             String packageName = UriUtils.getPackageName(context, key.mImageUri);
             if (packageName != null) {
-                task = new ImageLoadingTask(context, key, mFlagRemoteImages);
+                task = new ImageLoadingTask(context, key, mFlagRemoteImages, preventRemoteImages);
                 mTasks.put(key, task);
                 task.executeOnExecutor(getThreadPool(packageName));
                 if (L_DEBUG) {
@@ -216,14 +216,17 @@ public class LocalImageFetcher {
 
         private final WeakReference<Context> mWeakContext;
         private final ImageKey mImageKey;
-        private final boolean mFlagRemoteImages;
+        private final boolean mFlagRemoteImages; // means load audio but tint
+        private final boolean mPreventRemoteImages; // means remote image should be tinted or null
 
 
         @UiThread
-        ImageLoadingTask(Context context, ImageKey request, boolean flagRemoteImages) {
+        ImageLoadingTask(Context context, ImageKey request, boolean flagRemoteImages,
+                boolean preventRemoteImages) {
             mWeakContext = new WeakReference<>(context.getApplicationContext());
             mImageKey = request;
             mFlagRemoteImages = flagRemoteImages;
+            mPreventRemoteImages = preventRemoteImages;
         }
 
         /** Runs in the background. */
@@ -265,21 +268,10 @@ public class LocalImageFetcher {
                     ContentResolver resolver = context.getContentResolver();
                     ImageDecoder.Source src = ImageDecoder.createSource(resolver, imageUri);
                     return ImageDecoder.decodeDrawable(src, mOnHeaderDecodedListener);
-                } else if (mFlagRemoteImages) {
-                    mAllocatorMode = ImageDecoder.ALLOCATOR_SOFTWARE; // Needed for canvas drawing.
-                    URL url = new URL(imageUri.toString());
-
-                    try (InputStream is = new BufferedInputStream(url.openStream());
-                         ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
-
-                        CarAppsIOUtils.copy(is, bytes);
-                        ImageDecoder.Source src =
-                                ImageDecoder.createSource(ByteBuffer.wrap(bytes.toByteArray()));
-                        Bitmap decoded = ImageDecoder.decodeBitmap(src, mOnHeaderDecodedListener);
-                        Bitmap tinted = BitmapUtils.createTintedBitmap(decoded,
-                                context.getColor(R.color.improper_image_refs_tint_color));
-                        return new BitmapDrawable(context.getResources(), tinted);
-                    }
+                } else if (mPreventRemoteImages && mFlagRemoteImages) {
+                    return loadRemoteUri(context, imageUri, /* shouldTintDrawable= */ true);
+                } else if (!mPreventRemoteImages) {
+                    return loadRemoteUri(context, imageUri, /* shouldTintDrawable= */ false);
                 }
             } catch (IOException ioe) {
                 Log.e(TAG, "ImageLoadingTask#doInBackground: " + ioe);
@@ -300,9 +292,28 @@ public class LocalImageFetcher {
                 if (sInstance != null) {
                     sInstance.fulfilRequests(this, drawable);
                 } else {
-                    Log.e(TAG, "ImageLoadingTask#onPostExecute: LocalImageFetcher was reset !");
+                    Log.e(TAG, "ImageLoadingTask#onPostExecute: ImageFetcher was reset !");
                 }
             }
+        }
+
+        private Drawable loadRemoteUri(Context context, Uri imageUri, boolean shouldTintDrawable)
+                throws IOException {
+            mAllocatorMode = ImageDecoder.ALLOCATOR_SOFTWARE; // Needed for canvas drawing.
+            URL url = new URL(imageUri.toString());
+
+            InputStream is = new BufferedInputStream(url.openStream());
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+
+            CarAppsIOUtils.copy(is, bytes);
+            ImageDecoder.Source src =
+                    ImageDecoder.createSource(ByteBuffer.wrap(bytes.toByteArray()));
+            Bitmap decoded = ImageDecoder.decodeBitmap(src, mOnHeaderDecodedListener);
+            if (shouldTintDrawable) {
+                decoded = BitmapUtils.createTintedBitmap(decoded,
+                        context.getColor(R.color.improper_image_refs_tint_color));
+            }
+            return new BitmapDrawable(context.getResources(), decoded);
         }
     }
 }

@@ -33,7 +33,7 @@
     <!-- The number of threads in each pool used to fetch images. -->
     <integer name="image_fetcher_thread_pool_size">3</integer>
 
-    <!-- The amount of memory (in megabytes) LocalImageFetcher allocates to caching bitmaps
+    <!-- The amount of memory (in megabytes) ImageFetcher allocates to caching bitmaps
         (and drawables) in memory. -->
     <integer name="bitmap_memory_cache_max_size_mb">5</integer>
 

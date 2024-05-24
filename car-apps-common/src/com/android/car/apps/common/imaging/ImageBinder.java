@@ -104,6 +104,19 @@ public class ImageBinder<T extends ImageBinder.ImageRef> {
 
     /** Fetches a new image if needed. */
     public void setImage(Context context, @Nullable T newRef) {
+        setImage(context, newRef, /* preventRemoteUris= */ true);
+    }
+
+    /**
+     *  Fetches a new image if needed, allowing for remote uris to be returned.
+     *
+     * @param context the context to query the image with
+     * @param newRef the image reference to load
+     * @param preventRemoteUris indicates whether a valid remote uri image reference should be
+     * returned. This should be true when the image reference comes from a source for which remote
+     * uris are forbidden, such as aaos audio applications.
+     */
+    public void setImage(Context context, @Nullable T newRef, boolean preventRemoteUris) {
         if (isSameImage(context, newRef)) {
             return;
         }
@@ -137,7 +150,8 @@ public class ImageBinder<T extends ImageBinder.ImageRef> {
                 mFetchReceiver.accept(null, null);
             } else {
                 mCurrentKey = new ImageKey(mCurrentRef.getImageURI(), mMaxImageSize);
-                getImageFetcher(context).getImage(context, mCurrentKey, mFetchReceiver);
+                getImageFetcher(context).getImage(context, mCurrentKey, mFetchReceiver,
+                        preventRemoteUris);
             }
         }
     }
@@ -152,8 +166,8 @@ public class ImageBinder<T extends ImageBinder.ImageRef> {
         return false;
     }
 
-    private LocalImageFetcher getImageFetcher(Context context) {
-        return LocalImageFetcher.getInstance(context);
+    private ImageFetcher getImageFetcher(Context context) {
+        return ImageFetcher.getInstance(context);
     }
 
     protected void prepareForNewBinding(Context context) {
