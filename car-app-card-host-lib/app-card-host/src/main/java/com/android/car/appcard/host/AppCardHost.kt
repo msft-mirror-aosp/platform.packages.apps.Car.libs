@@ -109,7 +109,8 @@ class AppCardHost internal constructor(
     fastUpdateRateMs = max(fastUpdateRate.toDouble(), MINIMUM_FAST_UPDATE_RATE_MS.toDouble())
       .toInt()
 
-    val expectedBrokerPermission = context.resources.getString(R.string.host_permission)
+    val expectedBrokerPermission =
+      context.resources.getString(com.android.car.appcard.R.string.host_permission)
     brokerFactory = ContentProviderBrokerFactory(
       context,
       contentResolver,
