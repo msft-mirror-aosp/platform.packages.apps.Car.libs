@@ -346,16 +346,20 @@ public class PlaybackCardController {
 
     /** Update mAlbumArtBinder {@link ArtworkRef} with {@link MediaItemMetadata#getArtworkKey()}  */
     private void updateMetadataAlbumCoverArtworkRef(ArtworkRef artworkRef) {
-        if (mAlbumCover != null && artworkRef != null) {
-            mAlbumArtBinder.setImage(mView.getContext(), artworkRef);
+        MediaSource mediaSource =
+                mViewModel.getMediaSourceViewModel().getPrimaryMediaSource().getValue();
+        if (mAlbumCover != null && artworkRef != null && mediaSource != null) {
+            mediaSource.loadImage(mAlbumArtBinder, mView.getContext(), artworkRef);
         }
     }
 
     /** Update mLogoBinder {@link UriArtRef} with {@link MediaItemMetadata}  */
     private void updateMetadataLogoWithUri(MediaItemMetadata metadata) {
-        if (mLogo != null) {
+        MediaSource mediaSource =
+                mViewModel.getMediaSourceViewModel().getPrimaryMediaSource().getValue();
+        if (mLogo != null && mediaSource != null) {
             Uri logoUri = mLogo.prepareToDisplay(metadata);
-            mLogoBinder.setImage(mView.getContext(), new UriArtRef(logoUri));
+            mediaSource.loadImage(mLogoBinder, mView.getContext(), new UriArtRef(logoUri));
         }
     }
 
