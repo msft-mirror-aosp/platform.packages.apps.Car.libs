@@ -25,6 +25,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.util.Size
+import androidx.annotation.Px
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
@@ -166,17 +167,41 @@ internal class MediaAppCardProvider(
 
     // Get maximum center image size
     val size = appCardContext?.imageAppCardContext?.getMaxImageSize(ImageAppCard::class.java)
-    val side = size?.let { Math.min(it.width, size.height) }
+    val side = size?.let { Math.min(it.width, it.height) } ?: DEFAULT_IMAGE_SIDE
 
     val image = Image.newBuilder(IMAGE_ID)
-      .setImageData(side?.let { drawableToBitmap(drawable, it, side) })
+      .setImageData(drawableToBitmap(drawable, side, side))
       .setColorFilter(Image.ColorFilter.NO_TINT)
       .build()
 
-    return ImageAppCard.newBuilder(appCardId)
+    val builder = ImageAppCard.newBuilder(appCardId)
       .setImage(image)
       .setPrimaryText(BLANK_PRIMARY_TEXT)
       .setSecondaryText(BLANK_SECONDARY_TEXT)
+
+    getBlankAppCardHeader()?.let {
+      builder.setHeader(it)
+    }
+
+    return builder.build()
+  }
+
+  private fun getBlankAppCardHeader(): Header? {
+    // Get maximum center header size
+    val headerSize = appCardContext?.imageAppCardContext?.getMaxImageSize(Header::class.java)
+    val headerSide = headerSize?.let { Math.min(it.width, it.height) } ?: DEFAULT_HEADER_IMAGE_SIDE
+
+    val headerDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_music) ?: return null
+
+    val headerBitmap = drawableToBitmap(headerDrawable, headerSide, headerSide)
+    val headerImage = Image.newBuilder(HEADER_IMAGE_ID)
+      .setImageData(headerBitmap)
+      .setColorFilter(Image.ColorFilter.TINT)
+      .setContentScale(Image.ContentScale.FILL_BOUNDS)
+      .build()
+
+    return Header.newBuilder(HEADER_ID)
+      .setImage(headerImage)
       .build()
   }
 
@@ -274,5 +299,7 @@ internal class MediaAppCardProvider(
     private const val BLANK_NO_IMAGE_PRIMARY_TEXT = "No media in session"
     private const val BLANK_PRIMARY_TEXT = "Select Media"
     private const val BLANK_SECONDARY_TEXT = ""
+    @Px private const val DEFAULT_HEADER_IMAGE_SIDE = 1000
+    @Px private const val DEFAULT_IMAGE_SIDE = 100
   }
 }
