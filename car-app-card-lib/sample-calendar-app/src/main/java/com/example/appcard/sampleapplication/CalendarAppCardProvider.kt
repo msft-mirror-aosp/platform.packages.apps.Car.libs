@@ -79,7 +79,11 @@ class CalendarAppCardProvider(
       .setSecondaryText(getSecondaryText())
 
     if (!calculatedIsInteractable) {
-      builder.setImage(getImage(latestAppCardContext))
+      if (clockMode && !switchable) {
+        builder.setProgressBar(getProgressBar())
+      } else {
+        builder.setImage(getImage(latestAppCardContext))
+      }
     } else {
       // setup app card buttons depending on the number of minimum guaranteed buttons
       // the host supports
@@ -192,10 +196,12 @@ class CalendarAppCardProvider(
       cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG_FORMAT, Locale.getDefault())
     val month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG_FORMAT, Locale.getDefault())
 
-    return if (!calculatedIsInteractable) {
-      "$day • $month"
-    } else if (!clockMode) {
-      day
+    return if (!clockMode) {
+      if (!calculatedIsInteractable) {
+        "$day • $month"
+      } else {
+        day
+      }
     } else {
       if (is24hr) {
         val format = SimpleDateFormat(TIME_FORMAT_24)
@@ -274,12 +280,11 @@ class CalendarAppCardProvider(
   }
 
   private fun getHeader(): Header {
-    val preText = if (isInteractable) INTERACTABLE_TITLE + SPACE else ""
     val clockPreText = if (is24hr) TITLE_TIME_24 + SPACE else TITLE_TIME_12 + SPACE
 
     return Header.newBuilder(HEADER_COMPONENT_ID)
       .setImage(getHeaderImage())
-      .setTitle(preText + (if (clockMode) clockPreText + CLOCK_TITLE else CALENDAR_TITLE))
+      .setTitle((if (clockMode) clockPreText + CLOCK_TITLE else CALENDAR_TITLE))
       .build()
   }
 
@@ -352,7 +357,6 @@ class CalendarAppCardProvider(
     private const val DATE_FORMAT = "MM/dd/yy"
     private const val CALENDAR_TITLE = "Calendar"
     private const val CLOCK_TITLE = "Clock"
-    private const val INTERACTABLE_TITLE = "Interactable"
     private const val TITLE_TIME_24 = "24-hr"
     private const val TITLE_TIME_12 = "12-hr"
     private const val SPACE = " "
