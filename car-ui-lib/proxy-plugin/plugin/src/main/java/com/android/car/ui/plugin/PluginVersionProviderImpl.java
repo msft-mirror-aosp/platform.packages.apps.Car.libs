@@ -78,7 +78,6 @@ public class PluginVersionProviderImpl implements PluginVersionProviderOEMV1 {
             }
         }
 
-        Context pluginContext = new PluginContextWrapper(context, packageName);
         switch (maxVersion) {
             // There was a bug in car-ui-lib which only passed 1 as the max supported version of the
             // car-ui-lib plugin, even when there were more versions supported (e.g., V2, V3, V4).
@@ -91,18 +90,18 @@ public class PluginVersionProviderImpl implements PluginVersionProviderOEMV1 {
             case 2:
             case 3:
             case 4:
-                return new PluginFactoryImplV2(pluginContext);
+                return new PluginFactoryImplV2(context);
             case 5:
-                return new PluginFactoryImplV5(pluginContext);
+                return new PluginFactoryImplV5(context);
             case 6:
-                return new PluginFactoryImplV6(pluginContext);
+                return new PluginFactoryImplV6(context);
             case 7:
-                return new PluginFactoryImplV7(pluginContext);
+                return new PluginFactoryImplV7(context);
             case 8:
-                return new PluginFactoryImplV8(pluginContext);
+                return new PluginFactoryImplV8(context);
             // Keep the newest version as default case and add old versions above
             default:
-                return new PluginFactoryImplV9(pluginContext);
+                return new PluginFactoryImplV9(context);
         }
     }
 
