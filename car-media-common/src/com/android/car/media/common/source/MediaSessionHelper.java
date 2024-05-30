@@ -44,11 +44,12 @@ import java.util.List;
 /**
  * Source of MediaSources that listens to {@link MediaSessionManager} media session changes.
  * <p>
- * This class keeps track of three different types of media sessions:
+ * This class keeps track of two different types of media sessions:
  * 1. The most important media session with an active playback state, tracked by getMediaSource().
  *    In scenarios with multiple media sessions, it prioritizes the most important returned from
  *    MediaSessionManager.
- * 2. All media sessions with an active playback state, tracked by getActiveMediaSources()
+ * 2. All media sessions with an active or paused playback state, tracked by
+ *    getActiveOrPausedMediaSources()
  * <p>
  * For non-active MediaSessions, listeners are created to be notified if one of the others become
  * active, since playback changes don't always trigger a session change.
@@ -60,7 +61,7 @@ public class MediaSessionHelper extends MediaController.Callback {
     private static final String LAST_ACTIVE_MEDIA_SOURCE = "last_active_media_source";
     private final Context mContext;
     private final MutableLiveData<MediaSource> mPrimaryMediaSource = new MutableLiveData<>(null);
-    private final MutableLiveData<List<MediaSource>> mActiveMediaSources =
+    private final MutableLiveData<List<MediaSource>> mActiveOrPausedMediaSources =
             new MutableLiveData<>(Collections.emptyList());
     private final MediaSessionManager mMediaSessionManager;
     private final InputFactory mInputFactory;
@@ -161,17 +162,21 @@ public class MediaSessionHelper extends MediaController.Callback {
         return mPrimaryMediaSource;
     }
 
-    /** Returns a filtered live data of {@link MediaSource} with active playback states. */
-    public LiveData<List<MediaSource>> getActiveMediaSources() {
-        return mActiveMediaSources;
+    /**
+     *  Returns a filtered live data of {@link MediaSource} with active or paused playback states.
+     */
+    public LiveData<List<MediaSource>> getActiveOrPausedMediaSources() {
+        return mActiveOrPausedMediaSources;
     }
 
     private void onMediaControllersChange(List<MediaController> controllers) {
         unregisterSessionCallbacks();
 
-        List<MediaController> activeControllers = parseMediaControllers(controllers);
+        List<MediaController> activeControllers = new ArrayList<>();
+        List<MediaController> activeOrPausedControllers = new ArrayList<>();
+        parseMediaControllers(controllers, activeControllers, activeOrPausedControllers);
         updatePrimaryMediaSource(activeControllers);
-        updateActiveMediaSources(activeControllers);
+        updateActiveOrPausedMediaSources(activeOrPausedControllers);
     }
 
     /**
@@ -179,13 +184,16 @@ public class MediaSessionHelper extends MediaController.Callback {
      * the non active ones to be notified if they become active.
      *
      * @param controllers the list of MediaControllers to parse through
+     * @param activeControllers the list to which active MediaControllers will be added to
+     * @param activeOrPausedControllers the list to which active or paused MediaControllers will be
+     * added to
      */
-    private List<MediaController> parseMediaControllers(List<MediaController> controllers) {
+    private void parseMediaControllers(List<MediaController> controllers,
+            List<MediaController> activeControllers,
+            List<MediaController> activeOrPausedControllers) {
         if (controllers == null || controllers.isEmpty()) {
-            return Collections.emptyList();
+            return;
         }
-
-        List<MediaController> activeControllers = new ArrayList<>();
 
         for (MediaController mediaController : controllers) {
             PlaybackState playbackState = mediaController.getPlaybackState();
@@ -193,16 +201,17 @@ public class MediaSessionHelper extends MediaController.Callback {
                 continue;
             }
 
-            if (isPausedOrActive(playbackState.getState())) {
+            if (isActive(playbackState.getState())) {
                 activeControllers.add(mediaController);
-            } else {
-                // Since playback state changes don't trigger an active media session change, we
-                // need to listen to the other media sessions in case another one becomes active.
-                registerForPlaybackChanges(mediaController);
+                activeOrPausedControllers.add(mediaController);
+            } else if (isPaused(playbackState.getState())) {
+                activeOrPausedControllers.add(mediaController);
             }
-        }
 
-        return activeControllers;
+            // Since playback state changes don't trigger an active media session change, we
+            // need to listen to the other media sessions in case another one becomes active.
+            registerForPlaybackChanges(mediaController);
+        }
     }
 
     private void registerForPlaybackChanges(MediaController controller) {
@@ -241,18 +250,21 @@ public class MediaSessionHelper extends MediaController.Callback {
         }
     }
 
-    private void updateActiveMediaSources(List<MediaController> activeMediaControllers) {
-        // Only update when there are active media sources
+    private void updateActiveOrPausedMediaSources(List<MediaController> activeMediaControllers) {
+        // Only update when there are active or paused media sources
         if (activeMediaControllers != null && !activeMediaControllers.isEmpty()) {
-            mActiveMediaSources.setValue(mInputFactory.getMediaSources(activeMediaControllers));
+            mActiveOrPausedMediaSources
+                .setValue(mInputFactory.getMediaSources(activeMediaControllers));
         }
     }
 
     private void setInitialMediaSource() {
-        List<MediaController> mediaControllers =
-                parseMediaControllers(mMediaSessionManager.getActiveSessions(null));
+        List<MediaController> activeMediaControllers = new ArrayList<>();
+        List<MediaController> activeOrPausedMediaControllers = new ArrayList<>();
+        parseMediaControllers(mMediaSessionManager.getActiveSessions(null),
+                activeMediaControllers, activeOrPausedMediaControllers);
 
-        if (mediaControllers.isEmpty()) {
+        if (activeMediaControllers.isEmpty()) {
             // Check the last saved media source
             String mediaSourceName = getLastActiveMediaSource();
             if (TextUtils.isEmpty(mediaSourceName)) {
@@ -269,10 +281,10 @@ public class MediaSessionHelper extends MediaController.Callback {
                 mediaSource = MediaSource.create(mContext, mediaSourceName);
             }
             mPrimaryMediaSource.setValue(mediaSource);
-            mActiveMediaSources.setValue(Collections.singletonList(mediaSource));
+            mActiveOrPausedMediaSources.setValue(Collections.singletonList(mediaSource));
         } else {
-            updatePrimaryMediaSource(mediaControllers);
-            updateActiveMediaSources(mediaControllers);
+            updatePrimaryMediaSource(activeMediaControllers);
+            updateActiveOrPausedMediaSources(activeOrPausedMediaControllers);
         }
     }
 
@@ -309,12 +321,9 @@ public class MediaSessionHelper extends MediaController.Callback {
 
         return componentName.flattenToString();
     }
-    /**
-     * We want to add STATE_PAUSED to PlaybackState.isActive() because we are interested in the
-     * media source with focus, which would otherwise be passed over if MediaSessionHelper is
-     * initialized while it is paused.
-     */
-    private boolean isPausedOrActive(int playbackState) {
+
+    /* Copy of PlaybackState.isActive() which is only available for minsdk >=S  */
+    private boolean isActive(int playbackState) {
         switch (playbackState) {
             case PlaybackState.STATE_FAST_FORWARDING:
             case PlaybackState.STATE_REWINDING:
@@ -324,9 +333,18 @@ public class MediaSessionHelper extends MediaController.Callback {
             case PlaybackState.STATE_BUFFERING:
             case PlaybackState.STATE_CONNECTING:
             case PlaybackState.STATE_PLAYING:
-            case PlaybackState.STATE_PAUSED:
                 return true;
         }
         return false;
+    }
+
+    /** Returns if a playback state is paused. */
+    private boolean isPaused(int playbackState) {
+        return playbackState == PlaybackState.STATE_PAUSED;
+    }
+
+    /** Returns whether a playback state is active or paused. */
+    private boolean isPausedOrActive(int playbackState) {
+        return isActive(playbackState) || isPaused(playbackState);
     }
 }
