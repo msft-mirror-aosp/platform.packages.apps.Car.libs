@@ -22,15 +22,19 @@ import android.content.ComponentName;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.UserManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.ContextCompat;
 
 import com.android.car.ui.CarUiLayoutInflaterFactory;
 import com.android.car.ui.R;
@@ -45,18 +49,18 @@ import java.util.HashSet;
 
 /**
  * {@link ContentProvider ContentProvider's} onCreate() methods are "called for all registered
- * content providers on the application main thread at application launch time." This means we
- * can use a content provider to register for Activity lifecycle callbacks before any activities
- * have started, for installing the CarUi base layout into all activities.
- *
- * Notice that in many of the methods in this class we're using reflection to make method calls.
- * As it's explained in (b/156532465), {@link CarUiInstaller} is loaded from
- * GMSCore's ContainerActivity classloader which is different than the classloader of the Activity
- * that's passed as an argument to these methods. This happens when the Activity's module is loaded
+ * content providers on the application main thread at application launch time." This means we can
+ * use a content provider to register for Activity lifecycle callbacks before any activities have
+ * started, for installing the CarUi base layout into all activities.
+ * <p>
+ * Notice that in many of the methods in this class we're using reflection to make method calls. As
+ * it's explained in (b/156532465), {@link CarUiInstaller} is loaded from GMSCore's
+ * ContainerActivity classloader which is different than the classloader of the Activity that's
+ * passed as an argument to these methods. This happens when the Activity's module is loaded
  * dynamically. That means {@link CarUiInstaller} will have a different classloader than the
  * Activity. Hence we will need to use the Activity's classloader to load
- * {@link BaseLayoutController} class otherwise the base layout will be loaded
- * by the wrong classloader. And then calls to {@see CarUi#getToolbar(Activity)} will return null.
+ * {@link BaseLayoutController} class otherwise the base layout will be loaded by the wrong
+ * classloader. And then calls to {@see CarUi#getToolbar(Activity)} will return null.
  */
 // TODO: (b/200322953)
 @SuppressLint("LogConditional")
@@ -85,12 +89,24 @@ public class CarUiInstaller extends ContentProvider {
                     + " Need app to call register by itself");
             return false;
         }
-
-        new Thread(() -> {
-            Object unused = PluginFactorySingleton.get(context.getApplicationContext());
-        }).start();
-
         Application application = (Application) context.getApplicationContext();
+
+        // Optimize plugin start time by creating a factory as early as possible
+        Thread startOptimization = new Thread(() -> {
+            Object unused = PluginFactorySingleton.get(context.getApplicationContext());
+
+        });
+        // Approximate boot complete state by checking for user unlocked state
+        UserManager userManager = application.getSystemService(UserManager.class);
+        if (userManager.isUserUnlocked()) {
+            startOptimization.start();
+        } else {
+            CarUiUserUnlockedReceiver receiver = new CarUiUserUnlockedReceiver(startOptimization);
+            IntentFilter filter = new IntentFilter(Intent.ACTION_USER_UNLOCKED);
+            ContextCompat.registerReceiver(application, receiver, filter,
+                    ContextCompat.RECEIVER_NOT_EXPORTED);
+        }
+
         register(application);
 
         return true;
@@ -98,8 +114,8 @@ public class CarUiInstaller extends ContentProvider {
 
     /**
      * In some cases {@link CarUiInstaller#onCreate} is called before the {@link Application}
-     * instance is created. In those cases applications have to call this method separately
-     * after the Application instance is fully initialized.
+     * instance is created. In those cases applications have to call this method separately after
+     * the Application instance is fully initialized.
      */
     public static void register(@NonNull Application application) {
         if (hasAlreadyRegistered(application)) {
@@ -326,8 +342,8 @@ public class CarUiInstaller extends ContentProvider {
             layoutInflater.setFactory2(new CarUiLayoutInflaterFactory());
         } else if (!(layoutInflater.getFactory2()
                 instanceof CarUiLayoutInflaterFactory)
-                        && !(layoutInflater.getFactory2()
-                                instanceof AppCompatDelegate)) {
+                && !(layoutInflater.getFactory2()
+                instanceof AppCompatDelegate)) {
             throw new AssertionError(layoutInflater.getFactory2()
                     + " must extend CarUiLayoutInflaterFactory");
         }
