@@ -303,7 +303,8 @@ public class MediaSessionHelper extends MediaController.Callback {
 
     private String getCarMediaServiceSession() {
         Car car = Car.createCar(mContext);
-        CarMediaManager carMediaManager = car.getCarManager(CarMediaManager.class);
+        CarMediaManager carMediaManager =
+                    (CarMediaManager) car.getCarManager(Car.CAR_MEDIA_SERVICE);
         ComponentName componentName = carMediaManager.getMediaSource(MEDIA_SOURCE_MODE_PLAYBACK);
         car.disconnect();
 
