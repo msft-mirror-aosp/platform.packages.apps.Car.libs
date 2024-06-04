@@ -176,4 +176,11 @@ public class CarMediaManagerHelper {
                 .findFirst()
                 .orElse(null);
     }
+
+    /**
+     * Retrieve a list of media sources.
+     */
+    public List<ComponentName> getLastMediaSources(int mode) {
+        return mCarMediaManager.getLastMediaSources(CarMediaManager.MEDIA_SOURCE_MODE_PLAYBACK);
+    }
 }
