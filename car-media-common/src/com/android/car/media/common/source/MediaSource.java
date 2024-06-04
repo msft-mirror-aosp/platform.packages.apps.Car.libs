@@ -57,7 +57,8 @@ import java.util.Objects;
  */
 public class MediaSource {
     private static final String TAG = "MediaSource";
-    private static final String ANDROIDX_CAR_APP_LAUNCHABLE = "androidx.car.app.launchable";
+    @VisibleForTesting
+    static final String ANDROIDX_CAR_APP_LAUNCHABLE = "androidx.car.app.launchable";
 
     private static List<String> sCustomMediaComponents;
     @Nullable
