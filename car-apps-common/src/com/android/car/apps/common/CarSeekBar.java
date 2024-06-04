@@ -34,12 +34,27 @@ public class CarSeekBar extends DrawableStateSeekBar {
     private Drawable mIcon;
     private InsetDrawable mIconContainer;
 
-    public CarSeekBar(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context, attrs);
+    public CarSeekBar(Context context) {
+        super(context);
+        init(context);
     }
 
-    private void init(Context context, AttributeSet attrs) {
+    public CarSeekBar(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(context);
+    }
+
+    public CarSeekBar(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init(context);
+    }
+
+    public CarSeekBar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        init(context);
+    }
+
+    private void init(Context context) {
         mContext = context;
         LayerDrawable sliderIconDrawable = (LayerDrawable) mContext.getDrawable(
                 R.drawable.car_seekbar_slider_icon);
