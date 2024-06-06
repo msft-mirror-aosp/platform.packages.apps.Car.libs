@@ -95,5 +95,5 @@ jar cvfM $1/jacoco/car-calendar-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car
 jar cvfM $1/jacoco/car-messenger-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-messenger-app/intermediates/jacoco_instrumented_classes/platformDebug/out .
 jar cvfM $1/jacoco/car-media-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-media-app/intermediates/jacoco_instrumented_classes/platformDebug/out .
 jar cvfM $1/jacoco/car-dialer-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-dialer-app/intermediates/jacoco_instrumented_classes/platformDebug/out .
-jar cvfM $1/jacoco-report-classes-all.zip -C $1/jacoco .
+jar cvfM $1/jacoco-report-classes-all.jar -C $1/jacoco .
 rm -r $1/jacoco
