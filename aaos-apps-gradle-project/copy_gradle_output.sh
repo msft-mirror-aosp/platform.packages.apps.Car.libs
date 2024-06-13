@@ -86,14 +86,13 @@ cp $OUTPUT_DIR/car-app-card-lib/outputs/apk/androidTest/debug/car-app-card-lib-d
 cp $OUTPUT_DIR/car-app-card-host-lib/outputs/apk/androidTest/debug/car-app-card-host-lib-debug-androidTest.apk $1/CarAppCardHostLibTests.apk
 
 # JaCoCo
-mkdir $1/jacoco
-mkdir $1/jacoco/car-calendar-app
-mkdir $1/jacoco/car-messenger-app
-mkdir $1/jacoco/car-media-app
-mkdir $1/jacoco/car-dialer-app
-jar cvfM $1/jacoco/car-calendar-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-calendar-app/intermediates/javac/platformDebug/classes .
-jar cvfM $1/jacoco/car-messenger-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-messenger-app/intermediates/javac/fakedebug/classes .
-jar cvfM $1/jacoco/car-media-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-media-app/intermediates/javac/platformdebug/classes .
-jar cvfM $1/jacoco/car-dialer-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-dialer-app/intermediates/javac/emulatorDebug/classes .
-jar cvfM $1/jacoco-report-classes-all.jar -C $1/jacoco .
-rm -r $1/jacoco
+mkdir $OUTPUT_DIR/jacoco
+mkdir $OUTPUT_DIR/jacoco/car-calendar-app
+mkdir $OUTPUT_DIR/jacoco/car-messenger-app
+mkdir $OUTPUT_DIR/jacoco/car-media-app
+mkdir $OUTPUT_DIR/jacoco/car-dialer-app
+jar cvfM $OUTPUT_DIR/jacoco/car-calendar-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-calendar-app/intermediates/javac/platformDebug/classes .
+jar cvfM $OUTPUT_DIR/jacoco/car-messenger-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-messenger-app/intermediates/javac/fakeDebug/classes .
+jar cvfM $OUTPUT_DIR/jacoco/car-media-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-media-app/intermediates/javac/platformDebug/classes .
+jar cvfM $OUTPUT_DIR/jacoco/car-dialer-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-dialer-app/intermediates/javac/emulatorDebug/classes .
+jar cvfM $1/jacoco-report-classes-all.jar -C $OUTPUT_DIR/jacoco .
