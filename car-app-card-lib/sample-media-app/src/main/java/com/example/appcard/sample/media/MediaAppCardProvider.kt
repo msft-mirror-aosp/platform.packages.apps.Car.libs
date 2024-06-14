@@ -16,7 +16,6 @@
 
 package com.example.appcard.sample.media
 
-import android.car.media.CarMediaManager.MEDIA_SOURCE_MODE_PLAYBACK
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -50,7 +49,7 @@ internal class MediaAppCardProvider(
   private var maxHeaderIconSize: Size? = null
   private var albumArtBinder: ImageBinder<MediaItemMetadata.ArtworkRef>? = null
   private var albumImageBitmap: Drawable? = null
-  private val mediaModels = MediaModels(context, MEDIA_SOURCE_MODE_PLAYBACK)
+  private val mediaModels = MediaModels(context)
   private val mediaSourceObserver = Observer<Any> {
     updateModel()
   }
