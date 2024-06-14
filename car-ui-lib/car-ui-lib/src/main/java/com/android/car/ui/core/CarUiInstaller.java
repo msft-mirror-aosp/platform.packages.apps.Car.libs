@@ -24,6 +24,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -89,12 +90,19 @@ public class CarUiInstaller extends ContentProvider {
                     + " Need app to call register by itself");
             return false;
         }
+
+        PackageManager packageManager = context.getPackageManager();
+        // This {@link ContentProvider} also gets initialized on other form factors.
+        // Prevent initialization if not on a automotive device.
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) {
+            return true;
+        }
+
         Application application = (Application) context.getApplicationContext();
 
         // Optimize plugin start time by creating a factory as early as possible
         Thread startOptimization = new Thread(() -> {
             Object unused = PluginFactorySingleton.get(context.getApplicationContext());
-
         });
         // Approximate boot complete state by checking for user unlocked state
         UserManager userManager = application.getSystemService(UserManager.class);
