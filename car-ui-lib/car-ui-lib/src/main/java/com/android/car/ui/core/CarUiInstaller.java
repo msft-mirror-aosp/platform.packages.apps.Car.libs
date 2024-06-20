@@ -35,7 +35,6 @@ import android.view.LayoutInflater;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.content.ContextCompat;
 
 import com.android.car.ui.CarUiLayoutInflaterFactory;
 import com.android.car.ui.R;
@@ -111,8 +110,7 @@ public class CarUiInstaller extends ContentProvider {
         } else {
             CarUiUserUnlockedReceiver receiver = new CarUiUserUnlockedReceiver(startOptimization);
             IntentFilter filter = new IntentFilter(Intent.ACTION_USER_UNLOCKED);
-            ContextCompat.registerReceiver(application, receiver, filter,
-                    ContextCompat.RECEIVER_NOT_EXPORTED);
+            application.registerReceiver(receiver, filter, 0);
         }
 
         register(application);
