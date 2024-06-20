@@ -92,9 +92,11 @@ mkdir $OUTPUT_DIR/jacoco/car-messenger-app
 mkdir $OUTPUT_DIR/jacoco/car-media-app
 mkdir $OUTPUT_DIR/jacoco/car-dialer-app
 mkdir $OUTPUT_DIR/jacoco/car-caruilib-app
+mkdir $OUTPUT_DIR/jacoco/car-rotarylib-app
 jar cvfM $OUTPUT_DIR/jacoco/car-calendar-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-calendar-app/intermediates/javac/platformDebug/classes .
 jar cvfM $OUTPUT_DIR/jacoco/car-messenger-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-messenger-app/intermediates/javac/fakeDebug/classes .
 jar cvfM $OUTPUT_DIR/jacoco/car-media-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-media-app/intermediates/javac/platformDebug/classes .
 jar cvfM $OUTPUT_DIR/jacoco/car-dialer-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-dialer-app/intermediates/javac/emulatorDebug/classes .
 jar cvfM $OUTPUT_DIR/jacoco/car-caruilib-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-caruilib-app/intermediates/javac/debug/classes .
+jar cvfM $OUTPUT_DIR/jacoco/car-rotarylib-app/jacoco-report-classes.jar -C $OUTPUT_DIR/car-rotary-lib/intermediates/javac/debug/classes .
 jar cvfM $1/jacoco-report-classes-all.jar -C $OUTPUT_DIR/jacoco .
