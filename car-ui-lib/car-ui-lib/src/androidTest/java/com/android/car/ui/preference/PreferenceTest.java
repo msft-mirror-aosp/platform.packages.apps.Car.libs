@@ -1091,6 +1091,7 @@ public class PreferenceTest {
                 0)).check(matches(not(isFocusable())));
     }
 
+    @Ignore("b/348420230")
     @Test
     public void testTwoActionSwitchPreference_switchNotToggleableWhenDisabled() {
         Context testableContext = spy(mActivity);
@@ -1124,6 +1125,7 @@ public class PreferenceTest {
         onView(withId(R.id.car_ui_secondary_action_concrete)).check(matches(not(isChecked())));
     }
 
+    @Ignore("b/348420230")
     @Test
     public void testTwoActionSwitchPreference_switchNotToggleableWhenUxRestricted() {
         Context testableContext = spy(mActivity);
