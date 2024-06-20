@@ -115,8 +115,8 @@ public final class PluginFactoryStub implements PluginFactory {
             }
         }
 
-        // Update display cut out insets on DecorView
-        handleDisplayCutOut(context);
+        // Update display cut out and system bar insets on DecorView
+        handleSystemInsets(context, baseLayout);
 
         InsetsUpdater insetsUpdater = new InsetsUpdater(baseLayout, contentView);
         insetsUpdater.replaceInsetsChangedListenerWith(insetsChangedListener);
@@ -124,12 +124,8 @@ public final class PluginFactoryStub implements PluginFactory {
         return toolbarController;
     }
 
-    private void handleDisplayCutOut(Context context) {
+    private void handleSystemInsets(Context context, View baseLayout) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
-            return;
-        }
-
-        if (!context.getResources().getBoolean(R.bool.car_ui_omit_display_cut_out_insets)) {
             return;
         }
 
@@ -140,21 +136,53 @@ public final class PluginFactoryStub implements PluginFactory {
         }
 
         Activity activity = (Activity) unwrappedContext;
-
         Window baseLayoutWindow = activity.getWindow();
         WindowManager.LayoutParams lp = baseLayoutWindow.getAttributes();
 
-        if (lp.layoutInDisplayCutoutMode
-                != WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS) {
+        boolean omitDisplayCutouts = context.getResources().getBoolean(
+                R.bool.car_ui_omit_display_cut_out_insets)
+                && lp.layoutInDisplayCutoutMode
+                == WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
+
+        // Build.VERSION_CODES.VANILLA_ICE_CREAM
+        int vanillaIceCreamBuildVersion = 35;
+        // Remove display cut-out insets on DecorView
+        if (omitDisplayCutouts && Build.VERSION.SDK_INT < vanillaIceCreamBuildVersion) {
+            baseLayoutWindow.getDecorView().setOnApplyWindowInsetsListener(
+                    (v, insets) -> v.onApplyWindowInsets(new WindowInsets.Builder(insets).setInsets(
+                            WindowInsets.Type.displayCutout(),
+                            android.graphics.Insets.NONE).build()));
             return;
         }
 
-        // Remove display cut-out insets on DecorView
-        baseLayoutWindow.getDecorView().setOnApplyWindowInsetsListener((v, insets) -> {
-            insets = new WindowInsets.Builder(insets).setInsets(
-                    WindowInsets.Type.displayCutout(), android.graphics.Insets.NONE).build();
-            return v.onApplyWindowInsets(insets);
-        });
+        // edgeToEdge enforcement handling
+        if (Build.VERSION.SDK_INT >= vanillaIceCreamBuildVersion) {
+            baseLayout.setOnApplyWindowInsetsListener((v, insets) -> {
+                // Android 35+ Changes: when 'omitDisplayCutouts' is set as true, we don't
+                // require to explicitly consume the insets, apps by default renders in unsafeArea.
+                // One key difference from previous version is that apps can still monitor
+                // displayCutout insets (not consumed).
+
+                // Always handle and consume systemBar insets.
+                int insetTypeMask = WindowInsets.Type.systemBars();
+                if (!omitDisplayCutouts) {
+                    // Handle and consume displayCutout insets when not requested to omit.
+                    insetTypeMask |= WindowInsets.Type.displayCutout();
+                }
+                android.graphics.Insets newInsets = insets.getInsets(
+                        insetTypeMask);
+                // Set safeArea margins for baseLayout
+                ViewGroup.MarginLayoutParams mlp =
+                        (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+                mlp.topMargin = newInsets.top;
+                mlp.leftMargin = newInsets.left;
+                mlp.bottomMargin = newInsets.bottom;
+                mlp.rightMargin = newInsets.right;
+                v.setLayoutParams(mlp);
+                return v.onApplyWindowInsets(new WindowInsets.Builder(insets).setInsets(
+                        insetTypeMask, android.graphics.Insets.NONE).build());
+            });
+        }
     }
 
     @NonNull

@@ -1,0 +1,85 @@
+// Copyright (C) 2024 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+car_app_card_host_lib_static_libs = [
+    // ensure unbundled
+    "androidx.annotation_annotation",
+    "androidx.legacy_legacy-support-v4",
+    "car-app-card-lib-source",
+    "guava",
+
+    // Kotlin
+    "kotlin-stdlib",
+    "kotlinx-coroutines-android",
+]
+
+android_library {
+    name: "car-app-card-host-lib-source",
+    min_sdk_version: "31",
+    target_sdk_version: "34",
+    sdk_version: "system_current",
+    manifest: "src/main/AndroidManifest.xml",
+    proto: {
+        type: "lite",
+        include_dirs: ["packages/apps/Car/libs/car-app-card-lib/app-card/src/main/java/com/android/car/appcard/protos"],
+        canonical_path_from_root: false,
+    },
+    optimize: {
+        enabled: false,
+    },
+    srcs: [
+        "src/main/java/**/*.kt",
+    ],
+    static_libs: car_app_card_host_lib_static_libs,
+}
+
+
+android_test {
+    name: "car-app-card-host-lib-tests",
+    certificate: ":com-android-car-apps-test",
+    manifest: "src/androidTest/AndroidManifest.xml",
+    srcs: [
+        "src/main/java/**/*.kt",
+        "src/androidTest/java/**/*.kt",
+    ],
+    proto: {
+        type: "lite",
+    },
+    // Enforce the jni libraries to be grouped into the APK file.
+    use_embedded_native_libs: true,
+    libs: [
+        "android.test.runner",
+        "android.test.base",
+        "android.car-stubs",
+        "android.test.mock.stubs",
+    ],
+    static_libs: [
+        "androidx.test.rules",
+        "androidx.test.espresso.core",
+        "androidx.test.espresso.contrib",
+        "androidx.test.ext.junit",
+        "car-app-card-lib-source",
+        "kotlin-test",
+        "platform-test-annotations",
+        "mockito-robolectric-prebuilt",
+        "mockito-target-extended-minus-junit4",
+        "mockito-kotlin2",
+        "truth",
+    ],
+    // runtime cc library which is used by mockito-target-inline.
+    jni_libs: [
+        "libdexmakerjvmtiagent",
+        "libstaticjvmtiagent",
+    ],
+}

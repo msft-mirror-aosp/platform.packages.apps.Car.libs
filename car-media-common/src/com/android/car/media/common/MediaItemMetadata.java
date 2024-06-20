@@ -570,18 +570,26 @@ public class MediaItemMetadata {
                 getDescriptionLinkMediaId());
     }
 
+    @NonNull
     @Override
     public String toString() {
-        return "[Id: "
-                + (mMediaDescription != null ? mMediaDescription.getMediaId() : "-")
-                + ", Queue Id: "
-                + (mQueueId != null ? mQueueId : "-")
-                + ", title: "
-                + mMediaDescription != null ? mMediaDescription.getTitle().toString() : "-"
-                + ", subtitle: "
-                + mMediaDescription != null ? mMediaDescription.getSubtitle().toString() : "-"
-                + ", album art URI: "
-                + (mMediaDescription != null ? mMediaDescription.getIconUri() : "-")
-                + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("[Queue Id: ");
+        sb.append(mQueueId);
+        if (mMediaDescription == null) {
+            sb.append("No mMediaDescription!!]");
+        } else {
+            sb.append(", Media Id: ");
+            sb.append(mMediaDescription.getMediaId());
+            sb.append(", title: ");
+            sb.append(mMediaDescription.getTitle());
+            sb.append(", subtitle: ");
+            sb.append(mMediaDescription.getSubtitle());
+            sb.append(", album art URI: ");
+            sb.append(mMediaDescription.getIconUri());
+            sb.append("]");
+        }
+
+        return sb.toString();
     }
 }

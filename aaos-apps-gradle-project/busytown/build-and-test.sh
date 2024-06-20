@@ -8,7 +8,7 @@ echo "Starting $0 at $(date)"
 
 # Set default version codes and names, allow overrides from the calling shell
 DEFAULT_VERSION_CODE=34
-DEFAULT_VERSION_NAME=34
+DEFAULT_VERSION_NAME=${BUILD_NUMBER:-34}
 
 cd "$GRADLE_PROJ_DIR"
 
