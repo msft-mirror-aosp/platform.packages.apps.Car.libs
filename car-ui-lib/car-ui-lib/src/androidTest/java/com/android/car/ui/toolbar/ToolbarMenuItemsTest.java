@@ -416,6 +416,7 @@ public class ToolbarMenuItemsTest {
 
         runWithActivityAndToolbar((activity, toolbar) -> menuItem[0].setEnabled(false));
 
+        onView(isRoot()).perform(waitForView(withText("Test!"), 500));
         onView(withText("Test!")).perform(click());
 
         verify(callback, times(1)).onClick(menuItem[0]);
