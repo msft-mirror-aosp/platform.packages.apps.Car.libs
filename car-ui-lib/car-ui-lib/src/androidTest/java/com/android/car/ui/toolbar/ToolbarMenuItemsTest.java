@@ -71,7 +71,7 @@ public class ToolbarMenuItemsTest {
     public static Object[] data() {
         // It's important to do no plugin first, so that the plugin will
         // still be enabled when this test finishes
-        return new Object[] { false, true };
+        return new Object[]{false, true};
     }
 
     public ToolbarMenuItemsTest(boolean pluginEnabled) {
@@ -84,8 +84,8 @@ public class ToolbarMenuItemsTest {
 
     @Test
     public void menuItems_findMenuItemById_shouldWork() {
-        MenuItem[] menuItem = new MenuItem[] { null };
-        MenuItem[] foundMenuItem = new MenuItem[] { null };
+        MenuItem[] menuItem = new MenuItem[]{null};
+        MenuItem[] foundMenuItem = new MenuItem[]{null};
         runWithActivityAndToolbar((activity, toolbar) -> {
             menuItem[0] = MenuItem.builder(activity)
                     .setTitle("Button!")
@@ -101,7 +101,7 @@ public class ToolbarMenuItemsTest {
     @Test
     public void menuItems_text_shouldShow() {
         MenuItem.OnClickListener callback = mock(MenuItem.OnClickListener.class);
-        MenuItem[] menuItem = new MenuItem[] { null };
+        MenuItem[] menuItem = new MenuItem[]{null};
         runWithActivityAndToolbar((activity, toolbar) -> {
             menuItem[0] = MenuItem.builder(activity)
                     .setTitle("Button!")
@@ -120,7 +120,7 @@ public class ToolbarMenuItemsTest {
     @Test
     public void menuItems_icon_shouldShow() {
         MenuItem.OnClickListener callback = mock(MenuItem.OnClickListener.class);
-        MenuItem[] menuItem = new MenuItem[] { null };
+        MenuItem[] menuItem = new MenuItem[]{null};
         runWithActivityAndToolbar((activity, toolbar) -> {
             menuItem[0] = MenuItem.builder(activity)
                     .setTitle("test_menuitem")
@@ -147,7 +147,7 @@ public class ToolbarMenuItemsTest {
     @Test
     public void menuItems_textAndIcon_shouldShow() {
         MenuItem.OnClickListener callback = mock(MenuItem.OnClickListener.class);
-        MenuItem[] menuItem = new MenuItem[] { null };
+        MenuItem[] menuItem = new MenuItem[]{null};
         runWithActivityAndToolbar((activity, toolbar) -> {
             menuItem[0] = MenuItem.builder(activity)
                     .setTitle("Test!")
@@ -168,13 +168,15 @@ public class ToolbarMenuItemsTest {
             menuItem[0].setIcon(R.drawable.ic_launcher);
         });
 
+        onView(isRoot()).perform(waitForView(withText("Test title!"), 500));
+
         onView(withText("Test!")).check(doesNotExistOrIsNotDisplayed());
         onView(withText("Test title!")).check(matches(isDisplayed()));
     }
 
     @Test
     public void menuItems_removeIcon_shouldShowText() {
-        MenuItem[] menuItem = new MenuItem[] { null };
+        MenuItem[] menuItem = new MenuItem[]{null};
         runWithActivityAndToolbar((activity, toolbar) -> {
             menuItem[0] = MenuItem.builder(activity)
                     .setTitle("Test!")
@@ -196,7 +198,7 @@ public class ToolbarMenuItemsTest {
     @Test
     public void menuItems_switch_shouldShow() {
         MenuItem.OnClickListener callback = mock(MenuItem.OnClickListener.class);
-        MenuItem[] menuItem = new MenuItem[] { null };
+        MenuItem[] menuItem = new MenuItem[]{null};
         runWithActivityAndToolbar((activity, toolbar) -> {
             menuItem[0] = MenuItem.builder(activity)
                     .setCheckable()
@@ -222,7 +224,7 @@ public class ToolbarMenuItemsTest {
     @Test
     public void menuItems_overflowText_shouldWork() {
         MenuItem.OnClickListener callback = mock(MenuItem.OnClickListener.class);
-        MenuItem[] menuItem = new MenuItem[] { null };
+        MenuItem[] menuItem = new MenuItem[]{null};
         runWithActivityAndToolbar((activity, toolbar) -> {
             menuItem[0] = MenuItem.builder(activity)
                     .setTitle("Test title!")
@@ -249,9 +251,9 @@ public class ToolbarMenuItemsTest {
     public void menuItems_setMenuItems_worksWithOverflowDialogOpen() {
         runWithActivityAndToolbar((activity, toolbar) -> toolbar.setMenuItems(
                 Collections.singletonList(MenuItem.builder(activity)
-                    .setTitle("Test title!")
-                    .setDisplayBehavior(MenuItem.DisplayBehavior.NEVER)
-                    .build())));
+                        .setTitle("Test title!")
+                        .setDisplayBehavior(MenuItem.DisplayBehavior.NEVER)
+                        .build())));
 
         // Open overflow menu, change the menu item to have a different title by calling
         // setMenuItems, then verify it updated correctly
@@ -282,7 +284,7 @@ public class ToolbarMenuItemsTest {
     @Test
     public void menuItems_overflowIconAndText_shouldWork() {
         MenuItem.OnClickListener callback = mock(MenuItem.OnClickListener.class);
-        MenuItem[] menuItem = new MenuItem[] { null };
+        MenuItem[] menuItem = new MenuItem[]{null};
         runWithActivityAndToolbar((activity, toolbar) -> {
             menuItem[0] = MenuItem.builder(activity)
                     .setTitle("Test title!")
@@ -304,17 +306,19 @@ public class ToolbarMenuItemsTest {
 
     @Test
     public void menuItems_overflow2To1_shouldWork() {
-        MenuItem[] menuItem = new MenuItem[] { null, null };
+        MenuItem[] menuItem = new MenuItem[]{null, null};
         runWithActivityAndToolbar((activity, toolbar) -> {
             menuItem[0] = MenuItem.builder(activity)
                     .setTitle("Overflow MenuItem 1!")
                     .setDisplayBehavior(MenuItem.DisplayBehavior.NEVER)
-                    .setOnClickListener(i -> {})
+                    .setOnClickListener(i -> {
+                    })
                     .build();
             menuItem[1] = MenuItem.builder(activity)
                     .setTitle("Overflow MenuItem 2!")
                     .setDisplayBehavior(MenuItem.DisplayBehavior.NEVER)
-                    .setOnClickListener(i -> {})
+                    .setOnClickListener(i -> {
+                    })
                     .build();
             toolbar.setMenuItems(Arrays.asList(menuItem));
         });
@@ -348,7 +352,7 @@ public class ToolbarMenuItemsTest {
 
         onView(isRoot()).perform(waitForView(withText("Menu Item 1")));
 
-        boolean[] equal = new boolean[] { false };
+        boolean[] equal = new boolean[]{false};
         runWithActivityAndToolbar((activity, toolbar) ->
                 equal[0] = menuItems.equals(toolbar.getMenuItems()));
 
@@ -380,7 +384,7 @@ public class ToolbarMenuItemsTest {
 
     @Test
     public void menuItems_setVisibility_shouldHide() {
-        MenuItem[] menuItem = new MenuItem[] { null };
+        MenuItem[] menuItem = new MenuItem[]{null};
         runWithActivityAndToolbar((activity, toolbar) -> {
             menuItem[0] = MenuItem.builder(activity)
                     .setTitle("Button!")
@@ -400,7 +404,7 @@ public class ToolbarMenuItemsTest {
     @Test
     public void menuItems_setEnabled_shouldDisable() {
         MenuItem.OnClickListener callback = mock(MenuItem.OnClickListener.class);
-        MenuItem[] menuItem = new MenuItem[] { null };
+        MenuItem[] menuItem = new MenuItem[]{null};
         runWithActivityAndToolbar((activity, toolbar) -> {
             menuItem[0] = MenuItem.builder(activity)
                     .setTitle("Test!")
@@ -425,7 +429,7 @@ public class ToolbarMenuItemsTest {
     @Test
     public void menuItems_activatable_test() {
         MenuItem.OnClickListener callback = mock(MenuItem.OnClickListener.class);
-        MenuItem[] menuItem = new MenuItem[] { null };
+        MenuItem[] menuItem = new MenuItem[]{null};
         runWithActivityAndToolbar((activity, toolbar) -> {
             menuItem[0] = MenuItem.builder(activity)
                     .setTitle("Test!")
@@ -449,7 +453,7 @@ public class ToolbarMenuItemsTest {
     public void menuItems_changeOnClickListener_shouldCallNewListener() {
         MenuItem.OnClickListener callback1 = mock(MenuItem.OnClickListener.class);
         MenuItem.OnClickListener callback2 = mock(MenuItem.OnClickListener.class);
-        MenuItem[] menuItem = new MenuItem[] { null };
+        MenuItem[] menuItem = new MenuItem[]{null};
         runWithActivityAndToolbar((activity, toolbar) -> {
             menuItem[0] = MenuItem.builder(activity)
                     .setTitle("Button!")
