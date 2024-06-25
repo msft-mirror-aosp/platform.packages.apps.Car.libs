@@ -48,6 +48,7 @@ cp $GRADLE_OUTPUT_DIR/car-radio-app/outputs/apk/aaos/release/car-radio-app-aaos-
 cp $GRADLE_OUTPUT_DIR/car-bugreport-app/outputs/apk/prod/release/car-bugreport-app-prod-release.apk $1/CarBugReportApp.apk || exit 1
 cp $GRADLE_OUTPUT_DIR/car-app-card-sample-calendar-app/outputs/apk/platform/release/car-app-card-sample-calendar-app-platform-release.apk $1/car-app-card-sample-calendar-app-platform-release.apk || exit 1
 cp $GRADLE_OUTPUT_DIR/car-app-card-sample-media-app/outputs/apk/platform/release/car-app-card-sample-media-app-platform-release.apk $1/car-app-card-sample-media-app-platform-release.apk || exit 1
+cp $GRADLE_OUTPUT_DIR/car-app-card-sample-weather-app/outputs/apk/platform/release/car-app-card-sample-weather-app-platform-release.apk $1/car-app-card-sample-weather-app-platform-release.apk || exit 1
 cp $GRADLE_OUTPUT_DIR/car-app-card-host-sample-app/outputs/apk/platform/release/car-app-card-host-sample-app-platform-release.apk $1/car-app-card-host-sample-app-platform-release.apk || exit 1
 
 # AARs
