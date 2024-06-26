@@ -48,6 +48,79 @@
     <color name="car_background">@color/color_background</color>
     <color name="car_on_background">@color/color_on_background</color>
 
+    <!-- surface colors -->
+    <color name="car_surface">@color/color_surface</color>
+    <color name="car_on_surface">@color/color_on_surface</color>
+    <color name="car_surface_dim">@color/car_neutral_6</color>
+    <color name="car_surface_bright">@color/car_neutral_24</color>
+    <color name="car_inverse_surface">@color/color_surface_inverse</color>
+    <color name="car_inverse_on_surface">@color/color_on_surface_inverse</color>
+    <color name="car_surface_container">@color/car_neutral_12</color>
+    <color name="car_surface_container_low">@color/car_neutral_10</color>
+    <color name="car_surface_container_lowest">@color/car_neutral_4</color>
+    <color name="car_surface_container_high">@color/car_neutral_17</color>
+    <color name="car_surface_container_highest">@color/car_neutral_22</color>
+    <color name="car_surface_variant">@color/color_surface_variant</color>
+    <color name="car_on_surface_variant">@color/color_on_surface_variant</color>
+    <color name="car_outline">@color/car_neutral_variant_60</color>
+    <color name="car_outline_variant">@color/car_neutral_variant_30</color>
+    <color name="car_scrim">@color/car_neutral_0</color>
+    <color name="car_shadow">@color/car_neutral_0</color>
+    <color name="car_inverse_primary">@color/car_primary_40</color>
+    <color name="car_surface_1">#222429</color>
+    <color name="car_surface_2">#272930</color>
+    <color name="car_surface_3">#2b2e37</color>
+    <color name="car_surface_4">#2d2f39</color>
+    <color name="car_surface_5">#30333e</color>
+
+    <!-- red colors -->
+    <color name="car_red_color">@color/car_red_70</color>
+    <color name="car_red_on_color">@color/car_red_10</color>
+    <color name="car_red_color_container">@color/car_red_30</color>
+    <color name="car_red_on_color_container">@color/car_red_90</color>
+    <color name="car_red_tint">#dc362e</color>
+    <color name="car_decline_red">#d77163</color>
+    <color name="car_on_decline_red">#1c0f0d</color>
+
+    <!-- blue colors -->
+    <color name="car_blue_color">@color/car_blue_70</color>
+    <color name="car_blue_on_color">@color/car_blue_10</color>
+    <color name="car_blue_color_container">@color/car_blue_30</color>
+    <color name="car_blue_on_color_container">@color/car_blue_90</color>
+    <color name="car_blue_tint">#4285f4</color>
+
+    <!-- green colors -->
+    <color name="car_green_color">@color/car_green_70</color>
+    <color name="car_green_on_color">@color/car_green_10</color>
+    <color name="car_green_color_container">@color/car_green_30</color>
+    <color name="car_green_on_color_container">@color/car_green_90</color>
+    <color name="car_green_tint">#37be5f</color>
+    <color name="car_confirm_green">#75b885</color>
+    <color name="car_on_confirm_green">#0f1811</color>
+
+    <!-- yellow colors -->
+    <color name="car_yellow_color">@color/car_yellow_70</color>
+    <color name="car_yellow_on_color">@color/car_yellow_10</color>
+    <color name="car_yellow_color_container">@color/car_yellow_30</color>
+    <color name="car_yellow_on_color_container">@color/car_yellow_90</color>
+    <color name="car_yellow_tint">#fbbc04</color>
+
+    <!-- control highlight colors -->
+    <color name="car_control_highlight">#99d9e2ff</color>
+
+    <!-- indicator colors -->
+    <color name = "car_icon_indicator_color">@color/car_red_tint</color>
+
+    <!-- control focus colors -->
+    <color name="car_focus_ring">@color/car_primary</color>
+    <color name="car_focus_background">#99b0c5ff</color>
+
+    <!-- TODO(b/302163073) - update rotary specs -->
+    <!-- Rotary Colors -->
+    <color name="car_rotary_focus_stroke_color">#94CBFF</color>
+    <color name="car_rotary_focus_fill_color">#3D94CBFF</color>
+    <color name="car_rotary_focus_pressed_fill_color">#8A94CBFF</color>
+
     <!-- primary colors -->
     <color name="car_primary_0">@color/color_primary_palette_0</color>
     <color name="car_primary_10">@color/color_primary_palette_10</color>
