@@ -13,9 +13,12 @@
 // limitations under the License.
 
 android_library {
-    name: "token-customization-base",
+    name: "token-customization-shim",
     resource_dirs: ["src/main/res"],
     manifest: "src/main/AndroidManifest.xml",
     sdk_version: "current",
+    static_libs: [
+        "token-customization-base"
+    ],
 }
 

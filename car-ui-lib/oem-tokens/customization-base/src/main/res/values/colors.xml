@@ -99,4 +99,18 @@
     <color name="color_neutral_variant_palette_95">#FFECED</color>
     <color name="color_neutral_variant_palette_99">#FFFBFF</color>
     <color name="color_neutral_variant_palette_100">#FFFFFF</color>
+
+    <color name="color_error_palette_100">#FFFFFF</color>
+    <color name="color_error_palette_99">#FCFCFC</color>
+    <color name="color_error_palette_95">#FFEDE9</color>
+    <color name="color_error_palette_90">#FFDAD4</color>
+    <color name="color_error_palette_80">#FFB4A9</color>
+    <color name="color_error_palette_70">#FF897A</color>
+    <color name="color_error_palette_60">#FF5449</color>
+    <color name="color_error_palette_50">#DD3730</color>
+    <color name="color_error_palette_40">#BA1B1B</color>
+    <color name="color_error_palette_30">#930006</color>
+    <color name="color_error_palette_20">#680003</color>
+    <color name="color_error_palette_10">#410001</color>
+    <color name="color_error_palette_0">#000000</color>
 </resources>
