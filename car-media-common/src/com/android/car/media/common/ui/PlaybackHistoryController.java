@@ -130,8 +130,9 @@ public class PlaybackHistoryController {
             mAlbumArt = itemView.findViewById(R.id.history_card_album_art);
             mAppTitleInactive = itemView.findViewById(R.id.history_card_app_title_inactive);
             mAppIconInactive = itemView.findViewById(R.id.history_item_app_icon_inactive);
-            int size = mAlbumArt.getMeasuredWidth();
-            mAlbumArtBinder = new ImageViewBinder<>(new Size(size, size), mAlbumArt);
+            int max = itemView.getContext().getResources().getInteger(
+                    com.android.car.media.common.R.integer.media_items_bitmap_max_size_px);
+            mAlbumArtBinder = new ImageViewBinder<>(new Size(max, max), mAlbumArt);
         }
 
         void bindView(MediaSource mediaSource) {
