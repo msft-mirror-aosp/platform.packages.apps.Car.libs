@@ -23,6 +23,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -249,6 +250,19 @@ public final class PlaybackCardControllerUtilities {
             } else {
                 break;
             }
+        }
+    }
+
+    /**
+     * Enable or disable seekbar seeking depending on whether the media supports it or not.
+     */
+    public static void updateSeekbarWithPlaybackState(SeekBar seekBar,
+            PlaybackStateWrapper playbackState) {
+        if (seekBar != null) {
+            boolean enabled = playbackState != null && playbackState.isSeekToEnabled();
+            final boolean shouldHandleTouch = seekBar.getThumb() != null && enabled;
+            seekBar.setOnTouchListener(
+                    (v, event) -> !shouldHandleTouch /* consumeEvent */);
         }
     }
 }

@@ -263,28 +263,40 @@ public class MediaSessionHelper extends MediaController.Callback {
         List<MediaController> activeOrPausedMediaControllers = new ArrayList<>();
         parseMediaControllers(mMediaSessionManager.getActiveSessions(null),
                 activeMediaControllers, activeOrPausedMediaControllers);
+        MediaSource savedMediaSource = null;
 
+        // Setup initial activeMediaController
         if (activeMediaControllers.isEmpty()) {
-            // Check the last saved media source
-            String mediaSourceName = getLastActiveMediaSource();
-            if (TextUtils.isEmpty(mediaSourceName)) {
-                // Initialize with default values
+            // Get the last saved media source
+            String savedMediaSourceName = getLastActiveMediaSource();
+            if (TextUtils.isEmpty(savedMediaSourceName)) {
+                // Don't change default values
                 return;
             }
-            ComponentName componentName = ComponentName.unflattenFromString(mediaSourceName);
-            MediaSource mediaSource;
-            if (componentName != null) {
-                // Initialize using MBS
-                mediaSource = MediaSource.create(mContext, componentName);
-            } else {
-                // Initialize using package name
-                mediaSource = MediaSource.create(mContext, mediaSourceName);
-            }
-            mPrimaryMediaSource.setValue(mediaSource);
-            mActiveOrPausedMediaSources.setValue(Collections.singletonList(mediaSource));
+            savedMediaSource = createSavedMediaSource(savedMediaSourceName);
+            mPrimaryMediaSource.setValue(savedMediaSource);
         } else {
             updatePrimaryMediaSource(activeMediaControllers);
+        }
+
+        // Setup initial activeOrPausedMediaSources
+        if (activeOrPausedMediaControllers.isEmpty()) {
+            if (savedMediaSource != null) {
+                mActiveOrPausedMediaSources.setValue(Collections.singletonList(savedMediaSource));
+            }
+        } else {
             updateActiveOrPausedMediaSources(activeOrPausedMediaControllers);
+        }
+    }
+
+    private MediaSource createSavedMediaSource(String savedMediaSourceName) {
+        ComponentName componentName = ComponentName.unflattenFromString(savedMediaSourceName);
+        if (componentName != null) {
+            // Initialize using MBS
+            return MediaSource.create(mContext, componentName);
+        } else {
+            // Initialize using package name
+            return MediaSource.create(mContext, savedMediaSourceName);
         }
     }
 
