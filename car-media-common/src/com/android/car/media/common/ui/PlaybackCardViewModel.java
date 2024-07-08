@@ -134,7 +134,9 @@ public class PlaybackCardViewModel extends AndroidViewModel {
                 continue;
             }
             MediaSource mediaSource = MediaSource.create(mContext, componentName);
-            historyList.add(mediaSource);
+            if (mediaSource != null) {
+                historyList.add(mediaSource);
+            }
         }
 
         mHistoryListData.setValue(historyList);
