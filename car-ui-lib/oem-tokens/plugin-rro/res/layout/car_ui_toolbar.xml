@@ -112,12 +112,14 @@
             <TextView android:id="@+id/car_ui_toolbar_title"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
+                      android:textAppearance="?com.android.oem.tokens:textAppearanceHeadlineSmall"
                       android:singleLine="true"
                       style="@style/Widget.CarUi.Toolbar.Title"/>
             <TextView android:id="@+id/car_ui_toolbar_subtitle"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:visibility="gone"
+                      android:textAppearance="?com.android.oem.tokens:textAppearanceBodySmall"
                       style="@style/Widget.CarUi.Toolbar.Subtitle"/>
         </LinearLayout>
 

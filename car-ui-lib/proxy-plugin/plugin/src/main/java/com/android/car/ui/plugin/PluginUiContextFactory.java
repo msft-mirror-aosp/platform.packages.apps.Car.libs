@@ -47,7 +47,7 @@ public final class PluginUiContextFactory {
     /**
      * A map from app contexts to their corresponding plugin ui contexts.
      */
-    private Map<Context, Context> mAppToPluginContextMap = new WeakHashMap<>();
+    private final Map<Context, Context> mAppToPluginContextMap = new WeakHashMap<>();
 
     public PluginUiContextFactory(@NonNull Context pluginContext) {
         mPluginContext = pluginContext;
@@ -102,6 +102,16 @@ public final class PluginUiContextFactory {
         }
         mAppToPluginContextMap.put(sourceContext, uiContext);
         mRecentUiContext = new WeakReference<>(uiContext);
+
+        // Add required theme attributes to support OEM Design Tokens
+        int oemStyleOverride = uiContext.getResources().getIdentifier("OemStyle",
+                "style", "com.android.oem.tokens");
+        if (oemStyleOverride == 0) {
+            uiContext.getTheme().applyStyle(com.chassis.car.ui.plugin.R.style.OemTokensBase, true);
+        } else {
+            uiContext.getTheme().applyStyle(com.chassis.car.ui.plugin.R.style.OemTokens, true);
+            uiContext.getTheme().applyStyle(oemStyleOverride, true);
+        }
 
         return new ContextWrapper(sourceContext) {
             @Override

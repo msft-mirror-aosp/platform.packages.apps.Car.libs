@@ -20,9 +20,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:state_enabled="false"
         android:alpha="?android:attr/disabledAlpha"
-        android:color="@color/car_on_surface_variant"/>
+        android:color="?com.android.oem.tokens:colorOnSurfaceVariant"/>
     <item app:state_ux_restricted="true"
         android:alpha="?android:attr/disabledAlpha"
-        android:color="@color/car_on_surface_variant"/>
-    <item android:color="@color/car_on_surface_variant"/>
+        android:color="?com.android.oem.tokens:colorOnSurfaceVariant"/>
+    <item android:color="?com.android.oem.tokens:colorOnSurfaceVariant"/>
 </selector>

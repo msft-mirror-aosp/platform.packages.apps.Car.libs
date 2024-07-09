@@ -19,20 +19,20 @@
     <item
         android:state_checked="true" app:state_ux_restricted="true"
         android:alpha="?android:attr/disabledAlpha"
-        android:color="@color/car_on_primary" />
+        android:color="?com.android.oem.tokens:colorOnPrimary" />
     <item
         android:state_checked="false" app:state_ux_restricted="true"
         android:alpha="?android:attr/disabledAlpha"
-        android:color="@color/car_secondary" />
+        android:color="?com.android.oem.tokens:colorSecondary" />
     <item
         android:state_checked="true" android:state_enabled="false"
         android:alpha="?android:attr/disabledAlpha"
-        android:color="@color/car_on_primary" />
+        android:color="?com.android.oem.tokens:colorOnPrimary" />
     <item
         android:state_enabled="false"
         android:alpha="?android:attr/disabledAlpha"
-        android:color="@color/car_secondary" />
+        android:color="?com.android.oem.tokens:colorSecondary" />
     <item
-        android:state_checked="true" android:color="@color/car_on_primary" />
-    <item android:color="@color/car_secondary" />
+        android:state_checked="true" android:color="?com.android.oem.tokens:colorOnPrimary" />
+    <item android:color="?com.android.oem.tokens:colorSecondary" />
 </selector>

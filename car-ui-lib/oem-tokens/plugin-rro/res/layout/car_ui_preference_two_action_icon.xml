@@ -61,14 +61,14 @@
                     android:textAlignment="viewStart"
                     android:maxLines="2"
                     android:ellipsize="end"
-                    android:textAppearance="@style/TextAppearance.CarUi.PreferenceTitle"/>
+                    android:textAppearance="?com.android.oem.tokens:textAppearanceBodyMedium"/>
 
                 <com.android.car.ui.uxr.DrawableStateTextView
                     android:id="@android:id/summary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAlignment="viewStart"
-                    android:textAppearance="@style/TextAppearance.CarUi.PreferenceSummary"
+                    android:textAppearance="?com.android.oem.tokens:textAppearanceBodySmall"
                     android:maxLines="2"/>
             </LinearLayout>
         </RelativeLayout>

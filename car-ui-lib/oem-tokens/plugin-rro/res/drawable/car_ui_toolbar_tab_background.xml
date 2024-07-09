@@ -25,13 +25,13 @@
     <item android:state_focused="true" android:state_activated="true">
         <shape android:shape="rectangle">
             <solid android:color="@color/car_rotary_focus_fill_color"/>
-            <solid android:color="@color/car_secondary_container"/>
+            <solid android:color="?com.android.oem.tokens:colorSecondaryContainer"/>
             <stroke android:width="@dimen/car_rotary_focus_stroke_width" android:color="@color/car_rotary_focus_stroke_color"/>
         </shape>
     </item>
     <item android:state_activated="true">
         <shape>
-            <solid android:color="@color/car_secondary_container"/>
+            <solid android:color="?com.android.oem.tokens:colorSecondaryContainer"/>
             <corners android:radius="@dimen/car_selectable_item_radius"/>
         </shape>
     </item>
@@ -43,7 +43,7 @@
         </shape>
     </item>
     <item>
-        <ripple android:color="@color/car_secondary_container">
+        <ripple android:color="?com.android.oem.tokens:colorSecondaryContainer">
             <item android:id="@android:id/mask">
                 <shape android:shape="rectangle">
                     <solid android:color="@android:color/white"/>

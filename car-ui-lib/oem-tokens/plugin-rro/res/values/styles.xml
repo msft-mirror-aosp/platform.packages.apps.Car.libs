@@ -98,19 +98,6 @@
         <item name="android:textSize">32sp</item>
     </style>
 
-    <style name="TextAppearance.CarUi.PreferenceCategoryTitle"
-           parent="TextAppearance.Car.Subhead.Medium">
-        <item name="android:textColor">@color/car_on_surface_variant</item>
-    </style>
-
-    <style name="TextAppearance.CarUi.PreferenceSummary" parent="TextAppearance.Car.Body.Small">
-        <item name="android:textColor">@color/car_ui_preference_summary_color</item>
-    </style>
-
-    <style name="TextAppearance.CarUi.PreferenceTitle" parent="TextAppearance.Car.Body.Large">
-        <item name="android:textColor">@color/car_ui_preference_title_color</item>
-    </style>
-
     <style name="TextAppearance.CarUi.Body3">
         <item name="android:textSize">24sp</item>
     </style>
@@ -121,13 +108,12 @@
         <item name="android:textColor">@color/car_ui_text_color_secondary</item>
     </style>
 
-    <style name="TextAppearance.CarUi.AlertDialog.Title" parent="TextAppearance.Car.Subhead.Large">
+    <style name="TextAppearance.CarUi.AlertDialog.Title" parent="TextAppearance.CarUi" >
+        <item name="android:textSize">36sp</item>
+        <item name="android:lineHeight">44dp</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">@color/car_on_surface</item>
+        <item name="android:textColor">?com.android.oem.tokens:colorOnSurface</item>
         <item name="android:stateListAnimator">@null</item>
-    </style>
-
-    <style name="TextAppearance.CarUi.AlertDialog.Subtitle" parent="TextAppearance.Car.Body.Medium">
     </style>
 
     <style name="Widget.CarUi.Toolbar.Container"></style>

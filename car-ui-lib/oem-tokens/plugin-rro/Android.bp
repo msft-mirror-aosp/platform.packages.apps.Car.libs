@@ -16,12 +16,17 @@ package {
     default_applicable_licenses: ["Android-Apache-2.0"],
 }
 
-runtime_resource_overlay {
+android_app {
     name: "token-plugin-rro",
     manifest: "AndroidManifest.xml",
+    sdk_version: "current",
     resource_dirs: ["res"],
-    static_libs: [
-        "token-customization-base",
-        "token-customization-shim"
-    ]
+    aaptflags: [
+        "--no-resource-deduping",
+        "--no-resource-removal"
+    ],
+    libs: [
+       "token-shared-lib",
+    ],
+    enforce_uses_libs:false
 }
