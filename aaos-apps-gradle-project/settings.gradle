@@ -113,3 +113,6 @@ project(':car-app-card-host-sample-app').projectDir = new File('../car-app-card-
 
 include ':car-app-card-sample-media-app'
 project(':car-app-card-sample-media-app').projectDir = new File('../car-app-card-lib/sample-media-app')
+
+include ':car-app-card-sample-weather-app'
+project(':car-app-card-sample-weather-app').projectDir = new File('../car-app-card-lib/sample-weather-app')
