@@ -260,6 +260,9 @@ public final class PlaybackCardControllerUtilities {
             PlaybackStateWrapper playbackState) {
         if (seekBar != null) {
             boolean enabled = playbackState != null && playbackState.isSeekToEnabled();
+            if (seekBar.getThumb() != null) {
+                seekBar.getThumb().mutate().setAlpha(enabled ? 255 : 0);
+            }
             final boolean shouldHandleTouch = seekBar.getThumb() != null && enabled;
             seekBar.setOnTouchListener(
                     (v, event) -> !shouldHandleTouch /* consumeEvent */);
