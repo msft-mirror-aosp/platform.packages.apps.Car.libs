@@ -14,6 +14,11 @@
  limitations under the License.
 -->
 <resources>
+    <dimen name="car_rotary_focus_stroke_width">8dp</dimen>
+    <dimen name="car_rotary_focus_pressed_stroke_width">4dp</dimen>
+
+    <dimen name="car_selectable_item_radius">24dp</dimen>
+
     <dimen name="car_ui_toolbar_margin">76dp</dimen>
     <!-- Paddings -->
     <dimen name="car_ui_padding_0">4dp</dimen>
