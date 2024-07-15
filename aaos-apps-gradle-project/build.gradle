@@ -80,4 +80,8 @@ allprojects {
     ext.buildOutputPath = gradle.ext.repoRootPath + "/out/aaos-apps-gradle-build/"
     buildDir = new File(project.parent == null ? ext.buildOutputPath :
             project.parent.buildDir.path + "/" + project.name)
+
+    // Re-exports for Kotlin build scripts
+    ext.aaosLatestSDK = gradle.ext.aaosLatestSDK
+    ext.lib_car_system_stubs = gradle.ext.lib_car_system_stubs
 }
