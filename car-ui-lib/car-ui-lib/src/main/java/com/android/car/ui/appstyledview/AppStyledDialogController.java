@@ -161,7 +161,11 @@ public final class AppStyledDialogController {
         Objects.requireNonNull(contentView);
 
         TypedValue tv = new TypedValue();
-        contentView.getContext().getTheme().resolveAttribute(R.attr.carUiActivity, tv, true);
+        // Use reflection to resolve attribute ID to be compatible with dynamically loaded
+        // GMSCore modules
+        int attrId = contentView.getResources().getIdentifier("carUiActivity", "attr",
+                contentView.getContext().getPackageName());
+        contentView.getContext().getTheme().resolveAttribute(attrId, tv, true);
         if (tv.type != 0) {
             throw new IllegalStateException(
                     "Content view MUST NOT be rendered with a theme that inherits from Theme"

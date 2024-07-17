@@ -37,7 +37,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.android.car.ui.CarUiLayoutInflaterFactory;
-import com.android.car.ui.R;
 import com.android.car.ui.baselayout.Insets;
 import com.android.car.ui.pluginsupport.PluginFactorySingleton;
 import com.android.car.ui.utils.CarUiUtils;
@@ -134,7 +133,11 @@ public class CarUiInstaller extends ContentProvider {
                     private boolean mIsActivityStartedForFirstTime = false;
 
                     private boolean shouldRun(Activity activity) {
-                        return CarUiUtils.getThemeBoolean(activity, R.attr.carUiActivity);
+                        // Use reflection to resolve attribute ID to be compatible with
+                        // dynamically loaded GMSCore modules
+                        int attrId = activity.getResources().getIdentifier("carUiActivity", "attr",
+                                activity.getPackageName());
+                        return CarUiUtils.getThemeBoolean(activity, attrId);
                     }
 
                     @Override
