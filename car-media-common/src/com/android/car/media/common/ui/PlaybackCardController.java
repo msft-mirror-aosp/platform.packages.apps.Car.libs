@@ -339,9 +339,11 @@ public class PlaybackCardController {
         } else {
             ViewUtils.setVisible(mTitle, false);
             ViewUtils.setVisible(mSubtitle, false);
-            ViewUtils.setVisible(mAlbumCover, false);
             ViewUtils.setVisible(mDescription, false);
-            ViewUtils.setVisible(mLogo, false);
+            // Set current images to null
+            Context context = mView.getContext();
+            mAlbumArtBinder.setImage(context, /* newRef= */ null);
+            mLogoBinder.setImage(context, /* newRef= */ null);
         }
     }
 
