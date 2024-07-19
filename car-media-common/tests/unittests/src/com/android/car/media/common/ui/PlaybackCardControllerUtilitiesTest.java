@@ -16,6 +16,14 @@
 
 package com.android.car.media.common.ui;
 
+import static androidx.media3.session.CommandButton.ICON_REWIND;
+import static androidx.media3.session.CommandButton.ICON_SKIP_BACK_15;
+import static androidx.media3.session.CommandButton.ICON_UNDEFINED;
+import static androidx.media3.session.MediaConstants.EXTRAS_KEY_COMMAND_BUTTON_ICON_COMPAT;
+
+import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.getFirstCustomActionInSet;
+import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.skipBackStandardActions;
+import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.skipForwardStandardActions;
 import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.updateActionsWithPlaybackState;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -27,6 +35,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -35,6 +44,7 @@ import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.android.car.media.common.CustomPlaybackAction;
+import com.android.car.media.common.R;
 import com.android.car.media.common.playback.PlaybackViewModel.PlaybackController;
 import com.android.car.media.common.playback.PlaybackViewModel.PlaybackStateWrapper;
 import com.android.car.media.common.playback.PlaybackViewModel.RawCustomPlaybackAction;
@@ -327,6 +337,71 @@ public class PlaybackCardControllerUtilitiesTest {
         assertThat(mButton5.getDrawable()).isEqualTo(null);
     }
 
+    @Test
+    public void getFirstCustomActionInSet_skipBackSet_returnsSkipBackCustomAction() {
+        RawCustomPlaybackAction skipBack15StandardAction = createStandardCustomAction(
+                ICON_SKIP_BACK_15);
+        List<RawCustomPlaybackAction> customActionList = List.of(mRawCustomAction1,
+                skipBack15StandardAction);
+
+        RawCustomPlaybackAction returnedCustomAction = getFirstCustomActionInSet(
+                customActionList, skipBackStandardActions);
+
+        assertThat(returnedCustomAction).isEqualTo(skipBack15StandardAction);
+    }
+
+    @Test
+    public void getFirstCustomActionInSet_skipForwardSet_noForwardStandardAction_returnsNull() {
+        RawCustomPlaybackAction skipBack15StandardAction = createStandardCustomAction(
+                ICON_SKIP_BACK_15);
+        List<RawCustomPlaybackAction> customActionList = List.of(mRawCustomAction1,
+                skipBack15StandardAction);
+
+        RawCustomPlaybackAction returnedCustomAction = getFirstCustomActionInSet(
+                customActionList, skipForwardStandardActions);
+
+        assertThat(returnedCustomAction).isEqualTo(null);
+    }
+
+    @Test
+    public void getFirstCustomActionInSet_skipBackSet_noStandardActions_returnsNull() {
+        List<RawCustomPlaybackAction> customActionList = List.of(mRawCustomAction1,
+                mRawCustomAction2);
+
+        RawCustomPlaybackAction returnedCustomAction = getFirstCustomActionInSet(
+                customActionList, skipBackStandardActions);
+
+        assertThat(returnedCustomAction).isEqualTo(null);
+    }
+
+    @Test
+    public void getFirstCustomActionInSet_skipBackSet_undefinedStandardAction_returnsNull() {
+        RawCustomPlaybackAction undefinedAction = createStandardCustomAction(
+                ICON_UNDEFINED);
+        List<RawCustomPlaybackAction> customActionList = List.of(mRawCustomAction1,
+                undefinedAction);
+
+        RawCustomPlaybackAction returnedCustomAction = getFirstCustomActionInSet(
+                customActionList, skipBackStandardActions);
+
+        assertThat(returnedCustomAction).isEqualTo(null);
+    }
+
+    @Test
+    public void getFirstCustomActionInSet_skipBackSet_multipleBackStandardAction_returnsFirst() {
+        RawCustomPlaybackAction skipBack15StandardAction = createStandardCustomAction(
+                ICON_SKIP_BACK_15);
+        RawCustomPlaybackAction rewindStandardAction = createStandardCustomAction(
+                ICON_REWIND);
+        List<RawCustomPlaybackAction> customActionList = List.of(mRawCustomAction1,
+                skipBack15StandardAction, rewindStandardAction);
+
+        RawCustomPlaybackAction returnedCustomAction = getFirstCustomActionInSet(
+                customActionList, skipBackStandardActions);
+
+        assertThat(returnedCustomAction).isEqualTo(skipBack15StandardAction);
+    }
+
     private void setSkipPreviousReserved(boolean reserved) {
         when(mStateWrapper.iSkipPreviousReserved()).thenReturn(reserved);
     }
@@ -356,5 +431,13 @@ public class PlaybackCardControllerUtilitiesTest {
         assertThat(button.getDrawable()).isEqualTo(imageDrawable);
         assertThat(((ColorDrawable) button.getBackground()).getColor()).isEqualTo(
                 backgroundColor);
+    }
+
+    private RawCustomPlaybackAction createStandardCustomAction(int standardAction) {
+        Bundle extras = new Bundle();
+        extras.putInt(EXTRAS_KEY_COMMAND_BUTTON_ICON_COMPAT, standardAction);
+        RawCustomPlaybackAction actionWithExtras = new RawCustomPlaybackAction(
+                R.drawable.ic_star_empty, null, "action", extras);
+        return actionWithExtras;
     }
 }
