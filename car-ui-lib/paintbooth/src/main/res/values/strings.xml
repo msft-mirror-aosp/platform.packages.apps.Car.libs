@@ -414,4 +414,17 @@
   <string name="theme_name">Theme Name:</string>
   <string name="multiple_intent">Chooser Activity</string>
   <string name="default_background_color">#90CAF9</string>
+
+  <!-- AppStyledView related screen-->
+  <string name="scrollview">ScrollView</string>
+  <string name="welcome">Welcome</string>
+  <string name="btn_1">Button One</string>
+  <string name="btn_2">Button Two</string>
+  <string name="btn_3">Button Three</string>
+  <string name="btn_4">Button Four</string>
+  <string name="btn_5">Button Five</string>
+  <string name="btn_6">Button Six</string>
+  <string name="btn_7">Button Seven</string>
+  <string name="btn_8">Button Eight</string>
+  <string name="btn_9">Button Nine</string>
 </resources>
