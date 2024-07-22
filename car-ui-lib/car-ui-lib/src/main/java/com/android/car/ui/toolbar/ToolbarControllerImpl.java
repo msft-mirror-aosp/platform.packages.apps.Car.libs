@@ -50,7 +50,6 @@ import com.android.car.ui.AlertDialogBuilder;
 import com.android.car.ui.CarUiText;
 import com.android.car.ui.R;
 import com.android.car.ui.imewidescreen.CarUiImeSearchListItem;
-import com.android.car.ui.plugin.oemapis.toolbar.ImeSearchInterfaceOEMV2;
 import com.android.car.ui.recyclerview.CarUiContentListItem;
 import com.android.car.ui.recyclerview.CarUiListItem;
 import com.android.car.ui.recyclerview.CarUiListItemAdapter;
@@ -1223,10 +1222,15 @@ public final class ToolbarControllerImpl implements ToolbarController {
     }
 
     /**
-     * Returns a ImeSearchInterfaceOEMV2 implementation.
+     * Returns {@code com.android.car.ui.plugin.oemapis.toolbar.ImeSearchInterfaceOEMV2}
+     *
+     * OEM interfaces cannot be referenced outside of adapter classes, which are loaded in a custom
+     * classloader. As a workaround, return type is {@code Object}. This method is never called in
+     * the static implementation and only exists to support functionality required in the proxy
+     * plugin, which has a static dependency on OEM API.
      */
-    public ImeSearchInterfaceOEMV2 getImeSearchInterface() {
-        return new ImeSearchInterfaceOEMV2() {
+    public Object getImeSearchInterface() {
+        return new com.android.car.ui.plugin.oemapis.toolbar.ImeSearchInterfaceOEMV2() {
             @Override
             public void setSearchTextViewConsumer(
                     @Nullable com.android.car.ui.plugin.oemapis.Consumer<TextView> consumer) {
