@@ -135,7 +135,7 @@ public final class ToolbarAdapterProxyV2 implements ToolbarControllerOEMV2 {
 
     @Override
     public ImeSearchInterfaceOEMV2 getImeSearchInterface() {
-        return mToolbarController.getImeSearchInterface();
+        return (ImeSearchInterfaceOEMV2) mToolbarController.getImeSearchInterface();
     }
 
     @Override
