@@ -23,6 +23,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
+import android.icu.util.MeasureUnit
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
@@ -46,6 +47,7 @@ import java.util.TimerTask
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.floor
 import kotlin.math.pow
+import kotlin.math.roundToInt
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.OkHttpClient
@@ -70,10 +72,19 @@ class WeatherAppCardProvider(
   private var pointsDisposable: Disposable? = null
   private var forecastResponse: ForecastResponse? = null
   private var forecastDisposable: Disposable? = null
+  private var carTemperatureUnit: MeasureUnit? = null
+  private var latestPeriod: Period? = null
 
   init {
     if (permissionGranted()) {
       initLocationManager()
+    }
+  }
+
+  fun setTempUnit(newMeasureUnit: MeasureUnit) {
+    carTemperatureUnit = newMeasureUnit
+    latestPeriod?.let {
+      update.sendUpdate(getAppCard(it))
     }
   }
 
@@ -175,14 +186,41 @@ class WeatherAppCardProvider(
     return loading()
   }
 
+  private fun Int.convertTemp(from: MeasureUnit, to: MeasureUnit): Int = if (from == to) {
+    this
+  } else if (to == MeasureUnit.CELSIUS) {
+    TemperatureConverter.convertFahrenheitToCelsius(this.toFloat()).roundToInt()
+  } else {
+    TemperatureConverter.convertCelsiusToFahrenheit(this.toFloat()).roundToInt()
+  }
+
   private fun getAppCard(period: Period): ImageAppCard {
+    period.temperature ?: return getErrorAppCard(INVALID_TEMP)
+    period.temperatureUnit ?: return getErrorAppCard(INVALID_TEMP)
+
+    latestPeriod = period
+    val temperatureUnit = if (period.temperatureUnit == TEMP_F_UNIT) {
+      MeasureUnit.FAHRENHEIT
+    } else {
+      MeasureUnit.CELSIUS
+    }
+    val temperature = carTemperatureUnit?.let {
+      period.temperature.convertTemp(temperatureUnit, it)
+    } ?: period.temperature
+    val temperatureUnitText = carTemperatureUnit?.let {
+      if (it == MeasureUnit.FAHRENHEIT) {
+        TEMP_F_UNIT
+      } else {
+        TEMP_C_UNIT
+      }
+    } ?: period.temperatureUnit
     val primaryText = period.temperatureTrend?.let {
       if (it == TEMP_RISING) {
-        "${period.temperature} ${period.temperatureUnit} $TEMP_RISING_ICON"
+        "$temperature $temperatureUnitText $TEMP_RISING_ICON"
       } else {
-        "${period.temperature} ${period.temperatureUnit} $TEMP_FALLING_ICON"
+        "$temperature $temperatureUnitText $TEMP_FALLING_ICON"
       }
-    } ?: "${period.temperature} ${period.temperatureUnit}"
+    } ?: "$temperature $temperatureUnit"
     return ImageAppCard.newBuilder(id)
       .setPrimaryText(primaryText)
       .setSecondaryText(period.shortForecast ?: period.detailedForecast ?: FORECAST_NOT_FOUND)
@@ -288,7 +326,11 @@ class WeatherAppCardProvider(
 
   private fun getOkHttpClient(): OkHttpClient {
     val logger = HttpLoggingInterceptor().also {
-      it.level = HttpLoggingInterceptor.Level.BODY
+      it.level = if (Log.isLoggable(TAG, Log.DEBUG)) {
+        HttpLoggingInterceptor.Level.BASIC
+      } else {
+        HttpLoggingInterceptor.Level.NONE
+      }
     }
 
     return OkHttpClient.Builder()
@@ -391,6 +433,7 @@ class WeatherAppCardProvider(
     private const val HEADER_IMAGE_ID = "HEADER_IMAGE_ID"
     private const val ERROR_PERIODS = "Forecast periods not found"
     private const val ERROR_FIRST_PERIOD = "First period not found"
+    private const val INVALID_TEMP = "Invalid temperature received"
     private const val USER_AGENT_HEADER = "User-Agent"
     private const val USER_AGENT_VALUE = "Sample Weather App Card"
     private const val ERROR_PRIMARY = "Error"
@@ -401,6 +444,8 @@ class WeatherAppCardProvider(
     private const val TEMP_RISING = "rising"
     private const val TEMP_RISING_ICON = "↑"
     private const val TEMP_FALLING_ICON = "↓"
+    private const val TEMP_F_UNIT = "F"
+    private const val TEMP_C_UNIT = "C"
     private const val FORECAST_NOT_FOUND = "Forecast Unavailable"
   }
 }

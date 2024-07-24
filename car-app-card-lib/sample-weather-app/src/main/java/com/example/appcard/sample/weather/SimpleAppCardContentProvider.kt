@@ -16,13 +16,21 @@
 
 package com.example.appcard.sample.weather
 
+import android.car.Car
+import android.car.VehiclePropertyIds
+import android.car.VehicleUnit
+import android.car.hardware.CarPropertyValue
+import android.car.hardware.property.CarPropertyManager
+import android.icu.util.MeasureUnit
+import android.util.Log
 import com.android.car.appcard.AppCard
 import com.android.car.appcard.AppCardContentProvider
 import com.android.car.appcard.AppCardContext
 import com.android.car.appcard.component.Component
 
 /** An [AppCardContentProvider] that supplies sample calendar app card */
-class SimpleAppCardContentProvider : AppCardContentProvider() {
+class SimpleAppCardContentProvider : AppCardContentProvider(),
+                                     CarPropertyManager.CarPropertyEventCallback {
   private lateinit var weatherAppCardProvider: WeatherAppCardProvider
 
   override val authority: String = AUTHORITY
@@ -33,6 +41,8 @@ class SimpleAppCardContentProvider : AppCardContentProvider() {
     override fun sendComponentUpdate(id: String, component: Component) =
       sendAppCardComponentUpdate(id, component)
   }
+
+  private var propertyManager: CarPropertyManager? = null
 
   /** Setup [AppCardContentProvider] and its constituents */
   override fun onCreate(): Boolean {
@@ -45,6 +55,22 @@ class SimpleAppCardContentProvider : AppCardContentProvider() {
         WEATHER_ID,
         appCardUpdater
       )
+    }
+
+    Car.createCar(
+      context, null,
+      Car.CAR_WAIT_TIMEOUT_DO_NOT_WAIT
+    ) { car: Car?, ready: Boolean ->
+      if (ready) {
+        propertyManager = car?.getCarManager(CarPropertyManager::class.java)
+        propertyManager?.registerCallback(
+          this,
+          VehiclePropertyIds.HVAC_TEMPERATURE_DISPLAY_UNITS,
+          CarPropertyManager.SENSOR_RATE_ONCHANGE
+        )
+      } else {
+        Log.w(TAG, "Car service disconnected")
+      }
     }
 
     return result
@@ -77,6 +103,34 @@ class SimpleAppCardContentProvider : AppCardContentProvider() {
     }
   }
 
+  override fun onChangeEvent(newVehicleUnit: CarPropertyValue<*>?) {
+    newVehicleUnit ?: return
+
+    if (newVehicleUnit.propertyId != VehiclePropertyIds.HVAC_TEMPERATURE_DISPLAY_UNITS) {
+      return
+    }
+
+    if (newVehicleUnit.value != VehicleUnit.FAHRENHEIT &&
+      newVehicleUnit.value != VehicleUnit.CELSIUS
+    ) {
+      return
+    }
+
+    val newMeasureUnit = if (newVehicleUnit.value == VehicleUnit.FAHRENHEIT) {
+      Log.i(TAG, "Temperature Unit changed to Fahrenheit")
+      MeasureUnit.FAHRENHEIT
+    } else {
+      Log.i(TAG, "Temperature Unit changed to Celsius")
+      MeasureUnit.CELSIUS
+    }
+
+    weatherAppCardProvider.setTempUnit(newMeasureUnit)
+  }
+
+  override fun onErrorEvent(propertyId: Int, areaId: Int) {
+    Log.e(TAG, "Car property error: propertyId($propertyId) with areaId($areaId)")
+  }
+
   interface AppCardUpdater {
     /** Queue up a full [AppCard] update */
     fun sendUpdate(appCard: AppCard)
@@ -86,6 +140,7 @@ class SimpleAppCardContentProvider : AppCardContentProvider() {
   }
 
   companion object {
+    private const val TAG = "SimpleAppCardContentProvider"
     private const val AUTHORITY = "com.example.appcard.sample.weather"
     private const val WEATHER_ID = "sampleWeatherAppCard"
   }
