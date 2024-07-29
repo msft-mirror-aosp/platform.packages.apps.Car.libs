@@ -16,7 +16,9 @@
 
 import com.android.build.gradle.tasks.VerifyLibraryResourcesTask
 
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+}
 
 android {
     namespace 'com.android.car.oem.tokens'
