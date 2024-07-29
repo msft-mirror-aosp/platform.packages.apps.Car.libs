@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.car.unbundled.conventions
+package buildSrc
 
 plugins {
     id("com.android.library")
