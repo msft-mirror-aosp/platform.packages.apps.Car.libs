@@ -17,6 +17,8 @@
 package com.android.car.media.common.playback;
 
 import static androidx.lifecycle.Transformations.switchMap;
+import static androidx.media3.common.Player.COMMAND_PLAY_PAUSE;
+import static androidx.media3.session.CommandButton.ICON_UNDEFINED;
 
 import static com.android.car.apps.common.util.LiveDataFunctions.dataOf;
 import static com.android.car.media.common.playback.PlaybackStateAnnotations.Actions;
@@ -39,10 +41,13 @@ import android.util.Log;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.OptIn;
 import androidx.annotation.VisibleForTesting;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.media.utils.MediaConstants;
+import androidx.media3.common.util.UnstableApi;
+import androidx.media3.session.CommandButton;
 
 import com.android.car.media.common.CustomPlaybackAction;
 import com.android.car.media.common.MediaItemMetadata;
@@ -848,10 +853,20 @@ public class PlaybackViewModel {
          * @return the converted CustomPlaybackAction or null if appropriate {@link Resources}
          * cannot be obtained
          */
+        @UnstableApi
+        @OptIn(markerClass = UnstableApi.class)
         @Nullable
         public CustomPlaybackAction fetchDrawable(@NonNull Context context) {
             Drawable icon;
-            if (mPackageName == null) {
+            @CommandButton.Icon int iconId = (mExtras == null) ? ICON_UNDEFINED : mExtras.getInt(
+                    androidx.media3.session.MediaConstants.EXTRAS_KEY_COMMAND_BUTTON_ICON_COMPAT,
+                    ICON_UNDEFINED);
+            // TODO: use CommandButton#getIconResIdForIconConstant once public.
+            CommandButton button = new CommandButton.Builder(iconId)
+                    .setPlayerCommand(COMMAND_PLAY_PAUSE).build();
+            if (button.iconResId != 0) {
+                icon = context.getDrawable(button.iconResId);
+            } else if (mPackageName == null) {
                 icon = context.getDrawable(mIcon);
             } else {
                 Resources resources = getResourcesForPackage(context, mPackageName);

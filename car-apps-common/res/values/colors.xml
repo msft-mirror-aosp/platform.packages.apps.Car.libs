@@ -65,6 +65,10 @@
     <color name="hero_button_background_color">@color/car_grey_868</color>
     <color name="hero_button_text_color">@color/primary_text_color</color>
 
+    <!-- Car seekbar -->
+    <color name="car_slider_color">#B0C5FF</color>
+    <color name="car_seekbar_background_color">#404659</color>
+    <color name="car_seekbar_icon_color">#002B76</color>
 
 
     <!--

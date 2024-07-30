@@ -42,6 +42,7 @@ import androidx.annotation.VisibleForTesting;
 
 import com.android.car.apps.common.BitmapUtils;
 import com.android.car.apps.common.IconCropper;
+import com.android.car.apps.common.imaging.ImageBinder;
 import com.android.car.media.common.R;
 
 import java.net.URISyntaxException;
@@ -49,21 +50,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-
 /**
  * This represents a source of media content. It provides convenient methods to access media source
  * metadata, such as application name and icon. Media content can either be derived from a
- * {@link MediaBrowserService} or a {@link MediaControllerCompat}.
+ * {@link MediaBrowserService} or a {@link MediaControllerCompat} or a PackageName.
  */
 public class MediaSource {
     private static final String TAG = "MediaSource";
-    private static final String ANDROIDX_CAR_APP_LAUNCHABLE = "androidx.car.app.launchable";
+    @VisibleForTesting
+    static final String ANDROIDX_CAR_APP_LAUNCHABLE = "androidx.car.app.launchable";
 
     private static List<String> sCustomMediaComponents;
     @Nullable
     private final ComponentName mBrowseService;
     @Nullable
     private final MediaControllerCompat mMediaController;
+    @NonNull
+    private final String mPackageName;
     @NonNull
     private final CharSequence mDisplayName;
     @NonNull
@@ -91,8 +94,8 @@ public class MediaSource {
             CharSequence displayName = extractDisplayName(ctx, serviceInfo, packageName);
             Drawable icon = extractIcon(ctx, serviceInfo, packageName);
             ComponentName browseService = new ComponentName(packageName, className);
-            return new MediaSource(browseService, null, displayName, icon, new IconCropper(ctx),
-                    ctx.getPackageManager());
+            return new MediaSource(browseService, /* mediaController= */ null, packageName,
+                    displayName, icon, new IconCropper(ctx), ctx.getPackageManager());
         } catch (PackageManager.NameNotFoundException e) {
             Log.w(TAG, "Component not found " + componentName.flattenToString());
             return null;
@@ -120,8 +123,37 @@ public class MediaSource {
             CharSequence displayName = extractDisplayName(context, serviceInfo, packageName);
             Drawable icon = extractIcon(context, serviceInfo, packageName);
 
-            return new MediaSource(/* componentName= */ componentName, mediaController, displayName,
+            return new MediaSource(componentName, mediaController, packageName, displayName,
                     icon, new IconCropper(context), context.getPackageManager());
+        } catch (NameNotFoundException e) {
+            Log.w(TAG, "App not found " + packageName);
+            return null;
+        }
+    }
+
+    /**
+     * Creates a {@link MediaSource} for the given package name. This constructor should be avoided
+     * when possible as it may not map to any mbs or media session and doesn't handle multiple
+     * sources per package.
+     */
+    @Nullable
+    public static MediaSource create(@NonNull Context context, @NonNull String packageName) {
+        try {
+            ServiceInfo serviceInfo = null;
+            ComponentName componentName = getPackageNameMBS(context, packageName);
+            if (componentName != null) {
+                serviceInfo = getBrowseServiceInfo(context, componentName);
+                String className = serviceInfo != null ? serviceInfo.name : null;
+                if (TextUtils.isEmpty(className)) {
+                    serviceInfo = null;
+                }
+            }
+
+            CharSequence displayName = extractDisplayName(context, serviceInfo, packageName);
+            Drawable icon = extractIcon(context, serviceInfo, packageName);
+
+            return new MediaSource(componentName, /* mediaController= */ null, packageName,
+                    displayName, icon, new IconCropper(context), context.getPackageManager());
         } catch (NameNotFoundException e) {
             Log.w(TAG, "App not found " + packageName);
             return null;
@@ -130,11 +162,12 @@ public class MediaSource {
 
     @VisibleForTesting
     public MediaSource(@Nullable ComponentName browseService,
-            @Nullable MediaControllerCompat mediaController, @NonNull CharSequence displayName,
-            @NonNull Drawable icon, @NonNull IconCropper iconCropper,
-            @NonNull PackageManager packageManager) {
+            @Nullable MediaControllerCompat mediaController, @NonNull String packageName,
+            @NonNull CharSequence displayName, @NonNull Drawable icon,
+            @NonNull IconCropper iconCropper, @NonNull PackageManager packageManager) {
         mBrowseService = browseService;
         mMediaController = mediaController;
+        mPackageName = packageName;
         mDisplayName = displayName;
         mIcon = icon;
         mIconCropper = iconCropper;
@@ -220,9 +253,7 @@ public class MediaSource {
      *  @return the browse service defined in the controller's manifest if provided, null otherwise
      */
     @Nullable
-    private static ComponentName getServiceFromManifest(Context context,
-            MediaControllerCompat controller) {
-        String packageName = controller.getPackageName();
+    private static ComponentName getServiceFromManifest(Context context, String packageName) {
         Intent mediaIntent = new Intent();
         mediaIntent.setPackage(packageName);
         mediaIntent.setAction(MediaBrowserService.SERVICE_INTERFACE);
@@ -261,13 +292,7 @@ public class MediaSource {
      */
     @NonNull
     public String getPackageName() {
-        if (mBrowseService != null) {
-            return mBrowseService.getPackageName();
-        } else if (mMediaController != null) {
-            return mMediaController.getPackageName();
-        }
-        Log.e(TAG, "getPackageName() has null BrowseService and Controller");
-        return ""; // Should never happen
+        return mPackageName;
     }
 
     /**
@@ -309,14 +334,7 @@ public class MediaSource {
     public Intent getIntent() {
         // Only intent to a templated app with mbs
         if (mBrowseService == null) {
-            if (mMediaController == null) {
-                // Should not happen
-                Log.e(TAG, "getIntent() with null BrowseService and MediaController");
-                return null;
-            }
-
-            String packageName = mMediaController.getPackageName();
-            return createMediaSessionIntent(packageName);
+            return createMediaSessionIntent();
         }
 
         Intent intent = new Intent(CarMediaIntents.ACTION_MEDIA_TEMPLATE);
@@ -326,8 +344,8 @@ public class MediaSource {
     }
 
     @Nullable
-    private Intent createMediaSessionIntent(String packageName) {
-        Intent intent = mPackageManager.getLaunchIntentForPackage(packageName);
+    private Intent createMediaSessionIntent() {
+        Intent intent = mPackageManager.getLaunchIntentForPackage(mPackageName);
         if (intent == null) {
             return null;
         }
@@ -337,6 +355,16 @@ public class MediaSource {
         return intent;
     }
 
+    /**
+     * Loads a given ImageRef depending on the type of MediaSource. For AAOS audio apps with an MBS,
+     * prevent or flag remote uris depending on the system configuration. For other MediaSources,
+     * allow the loading of remote uris.
+     */
+    public <T extends ImageBinder.ImageRef> void loadImage(ImageBinder<T> imageBinder,
+            Context context, T imageRef) {
+        imageBinder.setImage(context, imageRef, /* preventRemoteUris= */ mBrowseService != null);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -344,8 +372,13 @@ public class MediaSource {
         MediaSource that = (MediaSource) o;
         if (mBrowseService != null) {
             return Objects.equals(mBrowseService, that.mBrowseService);
+        } else if (that.mBrowseService == null && mMediaController != null) {
+            return Objects.equals(mMediaController, that.mMediaController);
+        } else if (that.mBrowseService == null && that.mMediaController == null) {
+            return Objects.equals(mPackageName, that.mPackageName);
+        } else {
+            return false;
         }
-        return Objects.equals(mMediaController, that.mMediaController);
     }
 
     @Override
@@ -354,9 +387,9 @@ public class MediaSource {
             return Objects.hash(mBrowseService);
         } else if (mMediaController != null) {
             return Objects.hash(mMediaController);
+        } else {
+            return Objects.hash(mPackageName);
         }
-        Log.e(TAG, "hashCode() has null BrowseService and Controller");
-        return 0; // Should never happen
     }
 
     @Override
@@ -366,9 +399,9 @@ public class MediaSource {
             return mBrowseService.flattenToString();
         } else if (mMediaController != null) {
             return mMediaController.toString();
+        } else {
+            return mPackageName;
         }
-        Log.e(TAG, "toString() has null BrowseService and Controller");
-        return ""; // Should never happen
     }
 
     /**
@@ -457,8 +490,15 @@ public class MediaSource {
         // manifest
         ComponentName componentName = getServiceFromExtras(mediaController);
         if (componentName == null) {
-            componentName = getServiceFromManifest(context, mediaController);
+            return getPackageNameMBS(context, mediaController.getPackageName());
         }
+
+        // Only intent if the app is media templated
+        return isAudioMediaSource(context, componentName) ? componentName : null;
+    }
+
+    private static ComponentName getPackageNameMBS(Context context, String packageName) {
+        ComponentName componentName = getServiceFromManifest(context, packageName);
 
         // Only intent if the app is media templated
         return isAudioMediaSource(context, componentName) ? componentName : null;
@@ -494,7 +534,6 @@ public class MediaSource {
     }
 
     private static List<ResolveInfo> queryIntentServices(Context context, Intent intent, int flag) {
-        return context.getPackageManager()
-                .queryIntentServices(intent, flag);
+        return context.getPackageManager().queryIntentServices(intent, flag);
     }
 }

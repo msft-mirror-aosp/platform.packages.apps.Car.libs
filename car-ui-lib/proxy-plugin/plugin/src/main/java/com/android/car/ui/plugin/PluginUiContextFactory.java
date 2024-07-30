@@ -13,29 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.android.car.ui.plugin;
+
+import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.UiContext;
 
 import com.chassis.car.ui.plugin.CarUiProxyLayoutInflaterFactory;
 
 import java.lang.ref.WeakReference;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
- * This class maintains plugin ui contexts per app, which are used to inflate views with the plugin.
+ * This class maintains plugin ui contexts per app, which are used to inflate views with the
+ * plugin.
  */
 public final class PluginUiContextFactory {
-    /** The singular context generated from the plugin package in {@code PluginFactorySingleton}. */
+    /**
+     * The singular context generated from the plugin package in {@code PluginFactorySingleton}.
+     */
     private final Context mPluginContext;
-    /** The most recently created/referenced plugin ui context. */
+    /**
+     * The most recently created/referenced plugin ui context.
+     */
     private WeakReference<Context> mRecentUiContext = null;
+    /**
+     * A map from app contexts to their corresponding plugin ui contexts.
+     */
+    private Map<Context, Context> mAppToPluginContextMap = new WeakHashMap<>();
 
     public PluginUiContextFactory(@NonNull Context pluginContext) {
         mPluginContext = pluginContext;
@@ -45,7 +57,7 @@ public final class PluginUiContextFactory {
      * Returns the most recently referenced plugin ui context from {@code getPluginUiContext}. This
      * is used by PluginFactoryImplV# to obtain a relevant ui context without a source context
      * (i.e., for createListItemAdapter which does not receive a context as a parameter).
-     *
+     * <p>
      * Note: list items are always used with a RecyclerView, so mRecentUiContext will be set in
      * createRecyclerView method, which should happen before createListItemAdapter.
      *
@@ -66,32 +78,45 @@ public final class PluginUiContextFactory {
      *
      * @param sourceContext A ui context, normally an Activity context.
      */
-    public Context getPluginUiContext(@UiContext Context sourceContext) {
-        Context pluginContext = new ContextWrapper(sourceContext) {
+    @NonNull
+    public Context getPluginUiContext(@NonNull Context sourceContext) {
+        Context uiContext = mAppToPluginContextMap.get(sourceContext);
+        if (uiContext == null) {
+            uiContext = mPluginContext;
+            if (!uiContext.isUiContext()) {
+                uiContext = uiContext
+                        .createWindowContext(sourceContext.getDisplay(), TYPE_APPLICATION, null);
+            }
+        }
+        Configuration currentConfiguration = uiContext.getResources().getConfiguration();
+        Configuration newConfiguration = sourceContext.getResources().getConfiguration();
+        if (currentConfiguration.diff(newConfiguration) != 0) {
+            uiContext = uiContext.createConfigurationContext(newConfiguration);
+        }
+
+        // Add a custom layout inflater that can handle things like CarUiTextView that is in the
+        // layout files of the car-ui-lib static implementation
+        LayoutInflater inflater = LayoutInflater.from(uiContext);
+        if (inflater.getFactory2() == null) {
+            inflater.setFactory2(new CarUiProxyLayoutInflaterFactory());
+        }
+        mAppToPluginContextMap.put(sourceContext, uiContext);
+        mRecentUiContext = new WeakReference<>(uiContext);
+
+        return new ContextWrapper(sourceContext) {
             @Override
             public Resources getResources() {
-                return mPluginContext.getResources();
+                return mAppToPluginContextMap.get(sourceContext).getResources();
             }
 
             @Override
             public Object getSystemService(@NonNull String name) {
                 if (LAYOUT_INFLATER_SERVICE.equals(name)) {
-                    return mPluginContext.getSystemService(name);
+                    return mAppToPluginContextMap.get(sourceContext).getSystemService(name);
                 }
 
                 return super.getSystemService(name);
             }
         };
-
-        // Add a custom layout inflater that can handle things like CarUiTextView that is in the
-        // layout files of the car-ui-lib static implementation
-        LayoutInflater inflater = LayoutInflater.from(pluginContext);
-        if (inflater.getFactory2() == null) {
-            inflater.setFactory2(new CarUiProxyLayoutInflaterFactory());
-        }
-
-        mRecentUiContext = new WeakReference<>(pluginContext);
-
-        return pluginContext;
     }
 }

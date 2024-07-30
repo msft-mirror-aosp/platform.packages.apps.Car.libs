@@ -23,6 +23,7 @@ car_media_common_static_libs = [
     "androidx.legacy_legacy-support-v4",
     "androidx.recyclerview_recyclerview",
     "androidx.mediarouter_mediarouter",
+    "androidx.media3.media3-session",
     "androidx-constraintlayout_constraintlayout",
     "androidx-constraintlayout_constraintlayout-solver",
     "androidx.lifecycle_lifecycle-common-java8",

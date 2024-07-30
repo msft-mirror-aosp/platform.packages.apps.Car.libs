@@ -50,10 +50,16 @@ public class MediaTestUtils {
     public static MediaSource newFakeMediaSource(@NonNull PackageManager packageManager,
             @Nullable ComponentName browseService,
             @Nullable MediaControllerCompat mediaController) {
+        String packageName = "";
+        if (browseService != null) {
+            packageName = browseService.getPackageName();
+        } else if (mediaController != null) {
+            packageName = mediaController.getPackageName();
+        }
         String displayName = browseService == null ? "" : browseService.getClassName();
         Drawable icon = new ColorDrawable();
         IconCropper iconCropper = new IconCropper(new Path());
-        return new MediaSource(
-                browseService, mediaController, displayName, icon, iconCropper, packageManager);
+        return new MediaSource(browseService, mediaController, packageName, displayName, icon,
+                iconCropper, packageManager);
     }
 }

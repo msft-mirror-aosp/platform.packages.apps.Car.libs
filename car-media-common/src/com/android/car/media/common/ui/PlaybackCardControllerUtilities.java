@@ -102,32 +102,45 @@ public final class PlaybackCardControllerUtilities {
     }
 
     /**
-     * Set enabled and selected state on playButton based on {@link PlaybackViewModel.Action}
+     * Set enabled and selected state on playButton based on {@link PlaybackViewModel.Action}, as
+     * well as the onClickListener.
      */
     public static void updatePlayButtonWithPlaybackState(@Nullable View playButton,
-            PlaybackStateWrapper playbackState) {
+            PlaybackStateWrapper playbackState, @Nullable PlaybackController playbackController) {
         if (playButton != null) {
             @PlaybackViewModel.Action int action = (playbackState != null)
                     ? playbackState.getMainAction() : PlaybackViewModel.ACTION_DISABLED;
             switch (action) {
                 case PlaybackViewModel.ACTION_DISABLED:
-                case PlaybackViewModel.ACTION_STOP:
                     playButton.setEnabled(false);
                     playButton.setSelected(false);
+                    playButton.setOnClickListener(null);
                     break;
                 case PlaybackViewModel.ACTION_PLAY:
                     playButton.setEnabled(true);
                     playButton.setSelected(false);
+                    if (playbackController != null) {
+                        playButton.setOnClickListener(view -> playbackController.play());
+                    }
                     break;
                 case PlaybackViewModel.ACTION_PAUSE:
                     playButton.setEnabled(true);
                     playButton.setSelected(true);
+                    if (playbackController != null) {
+                        playButton.setOnClickListener(view -> playbackController.pause());
+                    }
+                    break;
+                case PlaybackViewModel.ACTION_STOP:
+                    playButton.setEnabled(true);
+                    playButton.setSelected(true);
+                    if (playbackController != null) {
+                        playButton.setOnClickListener(view -> playbackController.stop());
+                    }
                     break;
             }
         }
     }
 
-    // TODO (b/328617319): Add unit tests for this function
     /**
      * Update non-null buttons in actions list with skipPrev, skipNext, and custom actions. If
      * defaultButtonDrawable is non-null, any any unfilled actions in the list are assigned this

@@ -21,9 +21,16 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-/** */
+/** Utility class for methods and constants related to intents */
 public class IntentUtils {
     private static final String TAG = "IntentUtils";
+
+    /**
+     *  Intent extra for specifying whether MediaBlockingActivity should dismiss when the car
+     *  becomes parked. Passed value should be either true of false.
+     */
+    public static final String EXTRA_MEDIA_BLOCKING_ACTIVITY_DISMISS_ON_PARK =
+            "MEDIA_BLOCKING_ACTIVITY_DISMISS_ON_PARK";
 
     private IntentUtils() {
     }
