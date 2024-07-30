@@ -43,10 +43,17 @@ buildscript {
     } else {
         gradle.ext.platformCertPath = gradle.ext.repoRootPath + "/packages/apps/Car/libs/certs/platform.keystore"
     }
-    gradle.ext.soongBash = gradle.ext.repoRootPath + "/build/soong/soong_ui.bash"
+
     gradle.ext.platformSdkVersion = "34" // Change this to the most recent android API level.
+
+    // If the checkout includes Soong bash and `PLATFORM_SDK_VERSION` is set then use that instead.
+    gradle.ext.soongBash = gradle.ext.repoRootPath + "/build/soong/soong_ui.bash"
     if (file(gradle.ext.soongBash).exists()) {
-        gradle.ext.platformSdkVersion = (gradle.ext.soongBash + " --dumpvar-mode PLATFORM_SDK_VERSION").execute().text.trim()
+        // Note: This will only return a value if a target was set with `lunch`
+        def engPlatSdkVersion =  (gradle.ext.soongBash + " --dumpvar-mode PLATFORM_SDK_VERSION").execute().text.trim()
+        if (! engPlatSdkVersion.isBlank()) {
+            gradle.ext.platformSdkVersion = engPlatSdkVersion
+        }
     }
 
     gradle.ext.getVersionCode = { ->
