@@ -23,4 +23,12 @@ cd "$GRADLE_PROJ_DIR"
     assembleAndroidTest \
     test
 
+if [[ $1 != 0 ]]
+then
+  echo "check_status: non-zero exit code -> $1"
+  exit $1
+else
+  echo "check_status: exit code $1 continue.."
+fi
+
 echo "Completing $0 at $(date)"
