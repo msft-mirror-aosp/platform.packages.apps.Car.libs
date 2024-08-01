@@ -178,9 +178,8 @@ jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-media-app/jacoco-report-classes.jar -C $G
 check_status $?
 jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-dialer-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-dialer-app/intermediates/javac/emulatorDebug/classes .
 check_status $?
-# TODO: no such file or directory
-# jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-caruilib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-caruilib-app/intermediates/javac/debug/classes .
-# check_status $?
+jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-caruilib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-ui-lib/intermediates/javac/debug/classes .
+check_status $?
 jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-rotarylib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-rotary-lib/intermediates/javac/debug/classes .
 check_status $?
 jar cvfM $1/jacoco-report-classes-all.jar -C $GRADLE_OUTPUT_DIR/jacoco .
