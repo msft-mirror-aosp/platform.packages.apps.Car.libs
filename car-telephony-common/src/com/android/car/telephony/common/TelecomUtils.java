@@ -581,7 +581,7 @@ public class TelecomUtils {
             @Nullable String initials,
             @Nullable String identifier) {
         int numberOfLetter = context.getResources().getInteger(
-                R.integer.config_number_of_letters_shown_for_avatar);
+                com.android.car.apps.common.R.integer.config_number_of_letters_shown_for_avatar);
         String letters = initials != null
                 ? initials.substring(0, Math.min(initials.length(), numberOfLetter)) : null;
         LetterTileDrawable letterTileDrawable = new LetterTileDrawable(context.getResources(),
