@@ -17,7 +17,7 @@
 // Library-level build file
 plugins {
     id 'com.android.library'
-    id 'com.android.car.unbundled.conventions.local-publish'
+    id 'buildSrc.local-publish'
 }
 
 android {
