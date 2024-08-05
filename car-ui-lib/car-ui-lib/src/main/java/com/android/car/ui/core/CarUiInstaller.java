@@ -132,6 +132,7 @@ public class CarUiInstaller extends ContentProvider {
                     private Insets mInsets = null;
                     private boolean mIsActivityStartedForFirstTime = false;
 
+                    @SuppressLint("DiscouragedApi")
                     private boolean shouldRun(Activity activity) {
                         // Use reflection to resolve attribute ID to be compatible with
                         // dynamically loaded GMSCore modules
