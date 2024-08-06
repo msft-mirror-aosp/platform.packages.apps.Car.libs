@@ -24,6 +24,7 @@ import androidx.lifecycle.LiveData;
 import com.android.car.media.common.browse.MediaItemsRepository;
 import com.android.car.media.common.playback.PlaybackViewModel;
 import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
+import com.android.car.media.common.source.MediaSessionHelper.NotificationProvider;
 
 /** Helps manage related "models". */
 public class MediaModels {
@@ -61,9 +62,25 @@ public class MediaModels {
 
     /**
      * Creates models tied to {@link MediaSessionHelper#getMediaSource}
+     *
+     * @deprecated use {@link #MediaModels(Context, NotificationProvider)} instead
      */
+    @Deprecated
     public MediaModels(Context context) {
         MediaSessionHelper helper = MediaSessionHelper.getInstance(context);
+        LiveData<MediaSource> srcData = helper.getMediaSource();
+        mMediaSourceViewModel = new MediaSourceViewModel(context, srcData);
+        LiveData<BrowsingState> browseState = mMediaSourceViewModel.getBrowsingState();
+        String debugId = "ActiveSource";
+        mMediaItemsRepository = new MediaItemsRepository(context, browseState, debugId);
+        mPlaybackViewModel = new PlaybackViewModel(context, browseState, debugId);
+    }
+
+    /**
+     * Creates models tied to {@link MediaSessionHelper#getMediaSource}
+     */
+    public MediaModels(Context context, NotificationProvider notificationProvider) {
+        MediaSessionHelper helper = MediaSessionHelper.getInstance(context, notificationProvider);
         LiveData<MediaSource> srcData = helper.getMediaSource();
         mMediaSourceViewModel = new MediaSourceViewModel(context, srcData);
         LiveData<BrowsingState> browseState = mMediaSourceViewModel.getBrowsingState();

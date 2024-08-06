@@ -18,6 +18,7 @@ package com.android.car.media.common.source;
 
 import static android.car.media.CarMediaManager.MEDIA_SOURCE_MODE_PLAYBACK;
 
+import android.app.Notification;
 import android.car.Car;
 import android.car.media.CarMediaManager;
 import android.content.ComponentName;
@@ -26,6 +27,7 @@ import android.content.SharedPreferences;
 import android.media.session.MediaController;
 import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
+import android.service.notification.StatusBarNotification;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
@@ -51,6 +53,12 @@ import java.util.List;
  * 2. All media sessions with an active or paused playback state, tracked by
  *    getActiveOrPausedMediaSources()
  * <p>
+ *
+ * Apps may not want their media sessions to be externally controlled, which may include legal
+ * reasons, and instead rely on the creation of a media notification to give users the ability to
+ * control the session when the app is backgrounded. For this reason callers must provide access to
+ * notifications for MediaSessionHelper to filter the media sessions.
+ *
  * For non-active MediaSessions, listeners are created to be notified if one of the others become
  * active, since playback changes don't always trigger a session change.
  */
@@ -67,17 +75,43 @@ public class MediaSessionHelper extends MediaController.Callback {
     private final InputFactory mInputFactory;
     private final List<MediaController> mMediaControllersList = new ArrayList<>();
     private final SharedPreferences mSharedPrefs;
+    @Nullable
+    private final NotificationProvider mNotificationProvider;
 
     private final MediaSessionManager.OnActiveSessionsChangedListener mActiveSessionsListener =
             this::onMediaControllersChange;
     private static MediaSessionHelper sInstance;
 
-    /** Returns the singleton. */
+    /**
+     *  Returns the singleton.
+     * @deprecated Use {@link #getInstance(Context, NotificationProvider)} instead
+     */
+    @Deprecated
     public static MediaSessionHelper getInstance(@NonNull Context context) {
         if (sInstance == null) {
             sInstance = new MediaSessionHelper(context.getApplicationContext());
         }
         return sInstance;
+    }
+
+    /** Returns the singleton. */
+    public static MediaSessionHelper getInstance(@NonNull Context context,
+            @NonNull NotificationProvider notificationProvider) {
+        if (sInstance == null) {
+            sInstance =
+                    new MediaSessionHelper(context.getApplicationContext(), notificationProvider);
+        }
+        return sInstance;
+    }
+
+    /** Class that provides a list of active notifications. */
+    public interface NotificationProvider {
+
+        /** Returns a list of currently active notifications */
+        StatusBarNotification[] getActiveNotifications();
+
+        /** Returns whether the notification is a media notification or not */
+        boolean isMediaNotification(Notification notification);
     }
 
     /**
@@ -135,12 +169,20 @@ public class MediaSessionHelper extends MediaController.Callback {
         };
     }
 
+    @Deprecated
     private MediaSessionHelper(@NonNull Context appContext) {
-        this(appContext, createInputFactory(appContext));
+        this(appContext, null, createInputFactory(appContext));
     }
 
-    private MediaSessionHelper(Context appContext, InputFactory inputFactory) {
+    private MediaSessionHelper(@NonNull Context appContext,
+            @NonNull NotificationProvider notificationProvider) {
+        this(appContext, notificationProvider, createInputFactory(appContext));
+    }
+
+    private MediaSessionHelper(Context appContext, NotificationProvider notificationProvider,
+            InputFactory inputFactory) {
         mContext = appContext;
+        mNotificationProvider = notificationProvider;
         mInputFactory = inputFactory;
         mSharedPrefs = appContext.getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
         // Register our listener to be notified of changes in the active media sessions.
@@ -172,11 +214,39 @@ public class MediaSessionHelper extends MediaController.Callback {
     private void onMediaControllersChange(List<MediaController> controllers) {
         unregisterSessionCallbacks();
 
+        List<MediaController> filteredControllers =
+                getMediaControllersWithMediaNotifications(controllers);
+
         List<MediaController> activeControllers = new ArrayList<>();
         List<MediaController> activeOrPausedControllers = new ArrayList<>();
-        parseMediaControllers(controllers, activeControllers, activeOrPausedControllers);
+        parseMediaControllers(filteredControllers, activeControllers, activeOrPausedControllers);
         updatePrimaryMediaSource(activeControllers);
         updateActiveOrPausedMediaSources(activeOrPausedControllers);
+    }
+
+    private List<MediaController> getMediaControllersWithMediaNotifications(
+            List<MediaController> controllers) {
+        List<MediaController> mediaNotificationMediaControllers = new ArrayList<>();
+
+        // TODO: cleanup once non-notificationprovider constructor is removed
+        if (mNotificationProvider == null) {
+            return controllers;
+        }
+
+        List<String> mediaNotificationPackageNames =
+                getMediaNotificationPackages(mNotificationProvider.getActiveNotifications());
+
+        for (MediaController mediaController : controllers) {
+            MediaSource mediaSource = mInputFactory.getMediaSource(mediaController);
+            // We only want media sources with MBS or have a media notification indicating they want
+            // to allow background playback.
+            if (mediaSource != null && (mediaSource.getBrowseServiceComponentName() != null
+                    || mediaNotificationPackageNames.contains(mediaController.getPackageName()))) {
+                mediaNotificationMediaControllers.add(mediaController);
+            }
+        }
+
+        return mediaNotificationMediaControllers;
     }
 
     /**
@@ -359,5 +429,27 @@ public class MediaSessionHelper extends MediaController.Callback {
     /** Returns whether a playback state is active or paused. */
     private boolean isPausedOrActive(int playbackState) {
         return isActive(playbackState) || isPaused(playbackState);
+    }
+
+    /**
+     *  Parses through a list of notifications for those with media style and a media session.
+     *  Returns a list of associated package names.
+     */
+    private List<String> getMediaNotificationPackages(StatusBarNotification[] activeNotifications) {
+        List<String> mediaStyleNotificationPackages = new ArrayList<>();
+
+        for (StatusBarNotification sbn : activeNotifications) {
+            Notification notification = sbn.getNotification();
+
+            if (notification.extras == null) {
+                continue;
+            }
+
+            if (mNotificationProvider.isMediaNotification(notification)) {
+                mediaStyleNotificationPackages.add(sbn.getPackageName());
+            }
+        }
+
+        return mediaStyleNotificationPackages;
     }
 }
