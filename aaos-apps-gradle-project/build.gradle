@@ -69,6 +69,10 @@ buildscript {
     }
 }
 
+plugins {
+    alias(libs.plugins.protobuf.gradlePlugin) apply false
+}
+
 allprojects {
     repositories {
         google()
