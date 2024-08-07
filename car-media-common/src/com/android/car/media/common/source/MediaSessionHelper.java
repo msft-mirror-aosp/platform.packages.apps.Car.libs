@@ -39,6 +39,7 @@ import androidx.annotation.VisibleForTesting;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,7 +58,8 @@ import java.util.List;
  * Apps may not want their media sessions to be externally controlled, which may include legal
  * reasons, and instead rely on the creation of a media notification to give users the ability to
  * control the session when the app is backgrounded. For this reason callers must provide access to
- * notifications for MediaSessionHelper to filter the media sessions.
+ * notifications for MediaSessionHelper to filter the media sessions. This requirement may be
+ * relaxed once a wider range of automotive targeted apps as available.
  *
  * For non-active MediaSessions, listeners are created to be notified if one of the others become
  * active, since playback changes don't always trigger a session change.
@@ -67,7 +69,7 @@ public class MediaSessionHelper extends MediaController.Callback {
     private static final String TAG = "MediaSessionHelper";
     private static final String SHARED_PREF = MediaSessionHelper.class.getCanonicalName();
     private static final String LAST_ACTIVE_MEDIA_SOURCE = "last_active_media_source";
-    private final Context mContext;
+    private  final WeakReference<Context> mContext;
     private final MutableLiveData<MediaSource> mPrimaryMediaSource = new MutableLiveData<>(null);
     private final MutableLiveData<List<MediaSource>> mActiveOrPausedMediaSources =
             new MutableLiveData<>(Collections.emptyList());
@@ -84,7 +86,7 @@ public class MediaSessionHelper extends MediaController.Callback {
 
     /**
      *  Returns the singleton.
-     * @deprecated Use {@link #getInstance(Context, NotificationProvider)} instead
+     *  @deprecated Use {@link #getInstance(Context, NotificationProvider)} instead
      */
     @Deprecated
     public static MediaSessionHelper getInstance(@NonNull Context context) {
@@ -174,19 +176,26 @@ public class MediaSessionHelper extends MediaController.Callback {
         this(appContext, null, createInputFactory(appContext));
     }
 
-    private MediaSessionHelper(@NonNull Context appContext,
+    /**
+     *  Creates a new class instance.
+     */
+    public MediaSessionHelper(@NonNull Context context,
             @NonNull NotificationProvider notificationProvider) {
-        this(appContext, notificationProvider, createInputFactory(appContext));
+        this(context, notificationProvider, createInputFactory(context));
     }
 
-    private MediaSessionHelper(Context appContext, NotificationProvider notificationProvider,
+    private MediaSessionHelper(Context context, NotificationProvider notificationProvider,
             InputFactory inputFactory) {
-        mContext = appContext;
+        mContext = new WeakReference<>(context);
         mNotificationProvider = notificationProvider;
         mInputFactory = inputFactory;
-        mSharedPrefs = appContext.getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
+        if (context.getApplicationContext() != null) {
+            // Get application shared preferences if available
+            context = context.getApplicationContext();
+        }
+        mSharedPrefs = context.getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
         // Register our listener to be notified of changes in the active media sessions.
-        mMediaSessionManager = mInputFactory.getMediaSessionManager(appContext);
+        mMediaSessionManager = mInputFactory.getMediaSessionManager(mContext.get());
         if (mMediaSessionManager == null) {
             Log.e(TAG, "MediaSessionManager is null");
             return;
@@ -209,6 +218,11 @@ public class MediaSessionHelper extends MediaController.Callback {
      */
     public LiveData<List<MediaSource>> getActiveOrPausedMediaSources() {
         return mActiveOrPausedMediaSources;
+    }
+
+    /** Indicate that this class should no longer be used */
+    public void onCleared() {
+        mMediaSessionManager.removeOnActiveSessionsChangedListener(mActiveSessionsListener);
     }
 
     private void onMediaControllersChange(List<MediaController> controllers) {
@@ -363,10 +377,10 @@ public class MediaSessionHelper extends MediaController.Callback {
         ComponentName componentName = ComponentName.unflattenFromString(savedMediaSourceName);
         if (componentName != null) {
             // Initialize using MBS
-            return MediaSource.create(mContext, componentName);
+            return MediaSource.create(mContext.get(), componentName);
         } else {
             // Initialize using package name
-            return MediaSource.create(mContext, savedMediaSourceName);
+            return MediaSource.create(mContext.get(), savedMediaSourceName);
         }
     }
 
@@ -396,7 +410,7 @@ public class MediaSessionHelper extends MediaController.Callback {
     }
 
     private String getCarMediaServiceSession() {
-        Car car = Car.createCar(mContext);
+        Car car = Car.createCar(mContext.get());
         CarMediaManager carMediaManager =
                     (CarMediaManager) car.getCarManager(Car.CAR_MEDIA_SERVICE);
         ComponentName componentName = carMediaManager.getMediaSource(MEDIA_SOURCE_MODE_PLAYBACK);

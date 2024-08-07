@@ -32,14 +32,16 @@ public class MediaModels {
     private final MediaSourceViewModel mMediaSourceViewModel;
     private final MediaItemsRepository mMediaItemsRepository;
     private final PlaybackViewModel mPlaybackViewModel;
+    private CarMediaManagerHelper mCarMediaManagerHelper;
+    private MediaSessionHelper mMediaSessionHelper;
 
     /**
      * Creates models tied to {@link CarMediaManagerHelper#getAudioSource} for the given
      * {@link CarMediaManager} mode.
      */
     public MediaModels(Context context, int mode) {
-        CarMediaManagerHelper helper = CarMediaManagerHelper.getInstance(context);
-        LiveData<MediaSource> srcData = helper.getAudioSource(mode);
+        mCarMediaManagerHelper = new CarMediaManagerHelper(context);
+        LiveData<MediaSource> srcData = mCarMediaManagerHelper.getAudioSource(mode);
         mMediaSourceViewModel = new MediaSourceViewModel(context, srcData);
         LiveData<BrowsingState> browseState = mMediaSourceViewModel.getBrowsingState();
         String debugId = CarMediaManagerHelper.getMode(mode) + "-AudioSource";
@@ -80,8 +82,8 @@ public class MediaModels {
      * Creates models tied to {@link MediaSessionHelper#getMediaSource}
      */
     public MediaModels(Context context, NotificationProvider notificationProvider) {
-        MediaSessionHelper helper = MediaSessionHelper.getInstance(context, notificationProvider);
-        LiveData<MediaSource> srcData = helper.getMediaSource();
+        mMediaSessionHelper = new MediaSessionHelper(context, notificationProvider);
+        LiveData<MediaSource> srcData = mMediaSessionHelper.getMediaSource();
         mMediaSourceViewModel = new MediaSourceViewModel(context, srcData);
         LiveData<BrowsingState> browseState = mMediaSourceViewModel.getBrowsingState();
         String debugId = "ActiveSource";
@@ -104,4 +106,16 @@ public class MediaModels {
         return mPlaybackViewModel;
     }
 
+    /** Clears the models. */
+    public void onCleared() {
+        mMediaSourceViewModel.onCleared();
+        mMediaItemsRepository.onCleared();
+        mPlaybackViewModel.onCleared();
+        if (mCarMediaManagerHelper != null) {
+            mCarMediaManagerHelper.onCleared();
+        }
+        if (mMediaSessionHelper != null) {
+            mMediaSessionHelper.onCleared();
+        }
+    }
 }
