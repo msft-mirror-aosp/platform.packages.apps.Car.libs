@@ -111,6 +111,8 @@ public class AsyncEntityLoader<T> extends AsyncTaskLoader<T> {
                 entity = mEntityConverter.convertToEntity(cursor);
                 cursor.close();
             }
+        } catch (Exception e) {
+            Log.e(TAG, "Exception loading query", e);
         } finally {
             if (cursor != null) {
                 cursor.close();
