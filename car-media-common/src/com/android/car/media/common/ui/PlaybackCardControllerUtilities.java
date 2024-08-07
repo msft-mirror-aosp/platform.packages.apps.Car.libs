@@ -16,6 +16,23 @@
 
 package com.android.car.media.common.ui;
 
+import static androidx.media3.session.CommandButton.ICON_FAST_FORWARD;
+import static androidx.media3.session.CommandButton.ICON_NEXT;
+import static androidx.media3.session.CommandButton.ICON_PREVIOUS;
+import static androidx.media3.session.CommandButton.ICON_REWIND;
+import static androidx.media3.session.CommandButton.ICON_SKIP_BACK;
+import static androidx.media3.session.CommandButton.ICON_SKIP_BACK_10;
+import static androidx.media3.session.CommandButton.ICON_SKIP_BACK_15;
+import static androidx.media3.session.CommandButton.ICON_SKIP_BACK_30;
+import static androidx.media3.session.CommandButton.ICON_SKIP_BACK_5;
+import static androidx.media3.session.CommandButton.ICON_SKIP_FORWARD;
+import static androidx.media3.session.CommandButton.ICON_SKIP_FORWARD_10;
+import static androidx.media3.session.CommandButton.ICON_SKIP_FORWARD_15;
+import static androidx.media3.session.CommandButton.ICON_SKIP_FORWARD_30;
+import static androidx.media3.session.CommandButton.ICON_SKIP_FORWARD_5;
+import static androidx.media3.session.CommandButton.ICON_UNDEFINED;
+import static androidx.media3.session.MediaConstants.EXTRAS_KEY_COMMAND_BUTTON_ICON_COMPAT;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -37,10 +54,22 @@ import com.android.car.media.common.playback.PlaybackViewModel.PlaybackControlle
 import com.android.car.media.common.playback.PlaybackViewModel.PlaybackStateWrapper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /** Static utility functions used to give base logic to views in {@link PlaybackCardController} */
 public final class PlaybackCardControllerUtilities {
+
+    public static Set<Integer> skipForwardStandardActions = Collections.unmodifiableSet(
+            new HashSet<>(Arrays.asList(ICON_NEXT, ICON_SKIP_FORWARD, ICON_SKIP_FORWARD_5,
+                    ICON_SKIP_FORWARD_10, ICON_SKIP_FORWARD_15, ICON_SKIP_FORWARD_30,
+                    ICON_FAST_FORWARD)));
+    public static Set<Integer> skipBackStandardActions = Collections.unmodifiableSet(
+            new HashSet<>(Arrays.asList(ICON_PREVIOUS, ICON_SKIP_BACK, ICON_SKIP_BACK_5,
+                    ICON_SKIP_BACK_10, ICON_SKIP_BACK_15, ICON_SKIP_BACK_30, ICON_REWIND)));
 
     /**
      * Set text on the non-null TextView if the text is non-empty, or sets the
@@ -200,6 +229,28 @@ public final class PlaybackCardControllerUtilities {
                     }
                 });
                 isSkipNextHandled = true;
+            } else {
+                PlaybackViewModel.RawCustomPlaybackAction skipForwardCustomAction =
+                        getFirstCustomActionInSet(customActions, skipForwardStandardActions);
+                if (skipForwardCustomAction != null) {
+                    if (skipNextBackgroundDrawable != null) {
+                        button.setBackground(skipNextBackgroundDrawable);
+                    }
+                    CustomPlaybackAction customAction = skipForwardCustomAction
+                            .fetchDrawable(context);
+                    if (customAction != null) {
+                        button.setImageDrawable(customAction.mIcon);
+                        ViewUtils.setVisible(button, true);
+                        button.setOnClickListener(v -> {
+                            if (playbackController != null) {
+                                playbackController.doCustomAction(
+                                        customAction.mAction, customAction.mExtras);
+                            }
+                        });
+                        customActions.remove(skipForwardCustomAction);
+                        isSkipNextHandled = true;
+                    }
+                }
             }
         }
         // Now handle the skip prev button
@@ -221,6 +272,28 @@ public final class PlaybackCardControllerUtilities {
                     }
                 });
                 startingSlotForCustomActions++;
+            } else {
+                PlaybackViewModel.RawCustomPlaybackAction skipBackCustomAction =
+                        getFirstCustomActionInSet(customActions, skipBackStandardActions);
+                if (skipBackCustomAction != null) {
+                    if (skipPrevBackgroundDrawable != null) {
+                        button.setBackground(skipPrevBackgroundDrawable);
+                    }
+                    CustomPlaybackAction customAction = skipBackCustomAction
+                            .fetchDrawable(context);
+                    if (customAction != null) {
+                        button.setImageDrawable(customAction.mIcon);
+                        ViewUtils.setVisible(button, true);
+                        button.setOnClickListener(v -> {
+                            if (playbackController != null) {
+                                playbackController.doCustomAction(
+                                        customAction.mAction, customAction.mExtras);
+                            }
+                        });
+                        customActions.remove(skipBackCustomAction);
+                        startingSlotForCustomActions++;
+                    }
+                }
             }
         }
 
@@ -267,5 +340,25 @@ public final class PlaybackCardControllerUtilities {
             seekBar.setOnTouchListener(
                     (v, event) -> !shouldHandleTouch /* consumeEvent */);
         }
+    }
+
+    /**
+     * Returns the first custom action that matches a standard
+     * {@link androidx.media3.session.CommandButton} in the Set.
+     */
+    @Nullable
+    public static PlaybackViewModel.RawCustomPlaybackAction getFirstCustomActionInSet(
+            List<PlaybackViewModel.RawCustomPlaybackAction> customActions,
+            Set<Integer> standardActionsSet) {
+        for (PlaybackViewModel.RawCustomPlaybackAction a : customActions) {
+            int standardIconId = a.mExtras != null
+                    ? a.mExtras.getInt(EXTRAS_KEY_COMMAND_BUTTON_ICON_COMPAT) : ICON_UNDEFINED;
+            if (standardIconId != ICON_UNDEFINED
+                    && standardActionsSet.contains(standardIconId)) {
+                return a;
+
+            }
+        }
+        return null;
     }
 }
