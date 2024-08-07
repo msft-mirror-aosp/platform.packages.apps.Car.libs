@@ -146,7 +146,7 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
     }
 
     private float getVerticalInset(DisplayMetrics displayMetrics) {
-        // Inset API not supported before Android R. Fallback to 90 percent of display size
+        // Inset API not supported before Android R. Fallback to approximation
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             Context unwrappedContext = CarUiUtils.unwrapContext(mContext);
             WindowInsets windowInsets =
@@ -158,11 +158,26 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
             return systemBarInsets.top + systemBarInsets.bottom;
         }
 
-        return (float) (displayMetrics.heightPixels * (1 - VISIBLE_SCREEN_PERCENTAGE));
+        float fallbackInset =
+                (float) (displayMetrics.heightPixels * (1 - VISIBLE_SCREEN_PERCENTAGE));
+        Activity activity = CarUiUtils.getActivity(mContext);
+        if (activity == null) {
+            return fallbackInset;
+        }
+
+        WindowInsets insets =
+                activity.getWindow().getDecorView().getRootView().getRootWindowInsets();
+        if (insets == null) {
+            return fallbackInset;
+        }
+
+        Insets systemBarInsets = WindowInsetsCompat.toWindowInsetsCompat(
+                insets).getInsets(WindowInsetsCompat.Type.systemBars());
+        return systemBarInsets.top + systemBarInsets.bottom;
     }
 
     private float getHorizontalInset(DisplayMetrics displayMetrics) {
-        // Inset API not supported before Android R. Fallback to 90 percent of display size
+        // Inset API not supported before Android R. Fallback to approximation
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             Context unwrappedContext = CarUiUtils.unwrapContext(mContext);
             android.graphics.Insets systemBarInsets = unwrappedContext.getSystemService(
@@ -172,7 +187,22 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
             return systemBarInsets.left + systemBarInsets.right;
         }
 
-        return (float) (displayMetrics.widthPixels * (1 - VISIBLE_SCREEN_PERCENTAGE));
+        float fallbackInset =
+                (float) (displayMetrics.widthPixels * (1 - VISIBLE_SCREEN_PERCENTAGE));
+        Activity activity = CarUiUtils.getActivity(mContext);
+        if (activity == null) {
+            return fallbackInset;
+        }
+
+        WindowInsets insets =
+                activity.getWindow().getDecorView().getRootView().getRootWindowInsets();
+        if (insets == null) {
+            return fallbackInset;
+        }
+
+        Insets systemBarInsets = WindowInsetsCompat.toWindowInsetsCompat(
+                insets).getInsets(WindowInsetsCompat.Type.systemBars());
+        return systemBarInsets.left + systemBarInsets.right;
     }
 
 
