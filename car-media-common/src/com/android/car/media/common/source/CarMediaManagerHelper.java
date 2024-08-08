@@ -47,7 +47,11 @@ public class CarMediaManagerHelper {
 
     private static CarMediaManagerHelper sInstance;
 
-    /** Returns the singleton. */
+    /**
+     *  Returns the singleton.
+     *  @deprecated Apps should maintain their own instance(s) of CarMediaManagerHelper.
+     */
+    @Deprecated
     public static CarMediaManagerHelper getInstance(@NonNull Context context) {
         if (sInstance == null) {
             sInstance = new CarMediaManagerHelper(context.getApplicationContext());
@@ -85,22 +89,23 @@ public class CarMediaManagerHelper {
     private final CarMediaManager.MediaSourceChangedListener[] mMediaSourceListeners = {null, null};
 
     private final ArrayList<MutableLiveData<MediaSource>> mAudioSources = new ArrayList<>(2);
+    private final int[] mModes = new int[]{MEDIA_SOURCE_MODE_BROWSE, MEDIA_SOURCE_MODE_PLAYBACK};
 
-    private CarMediaManagerHelper(@NonNull Context appContext) {
-        this(appContext, createInputFactory(appContext));
+    public CarMediaManagerHelper(@NonNull Context context) {
+        this(context, createInputFactory(context));
     }
 
     @VisibleForTesting
-    private CarMediaManagerHelper(@NonNull Context appContext, InputFactory factory) {
+    private CarMediaManagerHelper(@NonNull Context context, InputFactory factory) {
         mInputFactory = factory;
         mAudioSources.add(dataOf(null));
         mAudioSources.add(dataOf(null));
 
         mCar = mInputFactory.getCarApi();
         mCarMediaManager = mInputFactory.getCarMediaManager(mCar);
-        mHandler = new Handler(appContext.getMainLooper());
+        mHandler = new Handler(context.getMainLooper());
 
-        for (int mode : new int[]{MEDIA_SOURCE_MODE_BROWSE, MEDIA_SOURCE_MODE_PLAYBACK}) {
+        for (int mode : mModes) {
             mMediaSourceListeners[mode] = componentName -> mHandler.post(
                     () -> updateMediaSource(componentName, mode));
             mCarMediaManager.addMediaSourceListener(mMediaSourceListeners[mode], mode);
@@ -111,12 +116,12 @@ public class CarMediaManagerHelper {
         }
     }
 
-    private static InputFactory createInputFactory(@NonNull Context appContext) {
+    private static InputFactory createInputFactory(@NonNull Context context) {
         return new InputFactory() {
 
             @Override
             public Car getCarApi() {
-                return Car.createCar(appContext);
+                return Car.createCar(context);
             }
 
             @Override
@@ -126,12 +131,12 @@ public class CarMediaManagerHelper {
 
             @Override
             public MediaSource getMediaSource(ComponentName componentName) {
-                return componentName == null ? null : MediaSource.create(appContext, componentName);
+                return componentName == null ? null : MediaSource.create(context, componentName);
             }
 
             @Override
             public boolean isAudioMediaSource(ComponentName componentName) {
-                return MediaSource.isAudioMediaSource(appContext, componentName);
+                return MediaSource.isAudioMediaSource(context, componentName);
             }
         };
     }
@@ -182,5 +187,13 @@ public class CarMediaManagerHelper {
      */
     public List<ComponentName> getLastMediaSources(int mode) {
         return mCarMediaManager.getLastMediaSources(CarMediaManager.MEDIA_SOURCE_MODE_PLAYBACK);
+    }
+
+    /** Call to clear the model */
+    public void onCleared() {
+        for (int mode : mModes) {
+            mCarMediaManager.removeMediaSourceListener(mMediaSourceListeners[mode], mode);
+        }
+        mCar.disconnect();
     }
 }
