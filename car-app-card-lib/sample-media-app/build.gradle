@@ -17,7 +17,6 @@
 plugins {
     id "org.jetbrains.kotlin.android"
     id 'com.android.application'
-    id "com.google.protobuf" version "0.9.4"
 }
 
 android {
