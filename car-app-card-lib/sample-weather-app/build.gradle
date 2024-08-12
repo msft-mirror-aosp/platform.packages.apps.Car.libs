@@ -17,6 +17,7 @@
 plugins {
     id "org.jetbrains.kotlin.android"
     id 'com.android.application'
+    id 'buildSrc.jdk.jdk8'
 }
 
 android {
@@ -28,15 +29,6 @@ android {
         targetSdkVersion gradle.ext.aaosTargetSDK
         versionCode gradle.ext.getVersionCode()
         versionName gradle.ext.getVersionName()
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
     }
 
     signingConfigs {

@@ -16,6 +16,7 @@
 
 plugins {
     id 'com.android.application'
+    id 'buildSrc.jdk.jdk8'
 }
 
 android {
@@ -25,11 +26,6 @@ android {
     defaultConfig {
         minSdkVersion 28
         targetSdkVersion gradle.ext.aaosTargetSDK
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     buildFeatures {

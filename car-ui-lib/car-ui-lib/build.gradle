@@ -19,6 +19,7 @@
 plugins {
     id 'com.android.library'
     id 'buildSrc.local-publish'
+    id 'buildSrc.jdk.jdk8'
 }
 
 android {
@@ -34,11 +35,6 @@ android {
         versionName "2.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'proguard-rules.pro', 'proguard-rules-platform.pro'
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     sourceSets {
