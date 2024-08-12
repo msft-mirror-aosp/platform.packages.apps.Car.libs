@@ -1,9 +1,11 @@
 # People who can approve changes for submission.
 johnchoi@google.com
-stenning@google.com
-igorr@google.com
 
 # Engs
-pardis@google.com
+farivar@google.com
 jjoz@google.com
 
+# For urgent reviews only
+dnek@google.com
+arnaudberry@google.com
+stenning@google.com
