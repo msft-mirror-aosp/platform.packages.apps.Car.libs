@@ -69,7 +69,7 @@ public class MediaSessionHelper extends MediaController.Callback {
     private static final String TAG = "MediaSessionHelper";
     private static final String SHARED_PREF = MediaSessionHelper.class.getCanonicalName();
     private static final String LAST_ACTIVE_MEDIA_SOURCE = "last_active_media_source";
-    private  final WeakReference<Context> mContext;
+    private final WeakReference<Context> mContext;
     private final MutableLiveData<MediaSource> mPrimaryMediaSource = new MutableLiveData<>(null);
     private final MutableLiveData<List<MediaSource>> mActiveOrPausedMediaSources =
             new MutableLiveData<>(Collections.emptyList());
