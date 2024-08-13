@@ -205,6 +205,7 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
 
         params.dimAmount = CarUiUtils.getFloat(mContext.getResources(),
                 R.dimen.car_ui_app_styled_dialog_dim_amount);
+        params.flags = params.flags | WindowManager.LayoutParams.FLAG_DIM_BEHIND;
 
         switch (mSceneType) {
             case AppStyledDialogController.SceneType.ENTER:
