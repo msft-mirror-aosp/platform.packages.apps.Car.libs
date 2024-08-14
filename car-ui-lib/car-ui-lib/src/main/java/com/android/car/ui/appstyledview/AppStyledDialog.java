@@ -81,6 +81,7 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
     private WindowManager.LayoutParams mBaseLayoutParams;
     @AppStyledDialogController.SceneType
     private int mSceneType;
+    private boolean mRenderInDisplayCutout;
 
 
     public AppStyledDialog(@NonNull Context context) {
@@ -105,6 +106,8 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
             if (mBaseLayoutParams.layoutInDisplayCutoutMode
                     != WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS) {
                 types = types | WindowInsetsCompat.Type.displayCutout();
+            } else {
+                mRenderInDisplayCutout = true;
             }
             mBaseLayoutParams.setFitInsetsTypes(types);
         }
@@ -146,16 +149,20 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
     }
 
     private float getVerticalInset(DisplayMetrics displayMetrics) {
+        int insetType = WindowInsetsCompat.Type.systemBars();
+        if (!mRenderInDisplayCutout) {
+            insetType = insetType | WindowInsetsCompat.Type.displayCutout();
+        }
+
         // Inset API not supported before Android R. Fallback to approximation
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             Context unwrappedContext = CarUiUtils.unwrapContext(mContext);
             WindowInsets windowInsets =
                     unwrappedContext.getSystemService(
                             WindowManager.class).getCurrentWindowMetrics().getWindowInsets();
-            android.graphics.Insets systemBarInsets = windowInsets.getInsets(
-                    WindowInsetsCompat.Type.systemBars());
+            android.graphics.Insets insets = windowInsets.getInsets(insetType);
 
-            return systemBarInsets.top + systemBarInsets.bottom;
+            return insets.top + insets.bottom;
         }
 
         float fallbackInset =
@@ -165,26 +172,30 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
             return fallbackInset;
         }
 
-        WindowInsets insets =
+        WindowInsets windowInsets =
                 activity.getWindow().getDecorView().getRootView().getRootWindowInsets();
-        if (insets == null) {
+        if (windowInsets == null) {
             return fallbackInset;
         }
 
-        Insets systemBarInsets = WindowInsetsCompat.toWindowInsetsCompat(
-                insets).getInsets(WindowInsetsCompat.Type.systemBars());
-        return systemBarInsets.top + systemBarInsets.bottom;
+        Insets insets = WindowInsetsCompat.toWindowInsetsCompat(windowInsets).getInsets(insetType);
+        return insets.top + insets.bottom;
     }
 
     private float getHorizontalInset(DisplayMetrics displayMetrics) {
+        int insetType = WindowInsetsCompat.Type.systemBars();
+        if (!mRenderInDisplayCutout) {
+            insetType = insetType | WindowInsetsCompat.Type.displayCutout();
+        }
+
         // Inset API not supported before Android R. Fallback to approximation
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             Context unwrappedContext = CarUiUtils.unwrapContext(mContext);
-            android.graphics.Insets systemBarInsets = unwrappedContext.getSystemService(
-                    WindowManager.class).getCurrentWindowMetrics().getWindowInsets().getInsets(
-                    WindowInsetsCompat.Type.systemBars());
+            WindowInsets windowInsets = unwrappedContext.getSystemService(
+                    WindowManager.class).getCurrentWindowMetrics().getWindowInsets();
+            android.graphics.Insets insets = windowInsets.getInsets(insetType);
 
-            return systemBarInsets.left + systemBarInsets.right;
+            return insets.left + insets.right;
         }
 
         float fallbackInset =
@@ -194,17 +205,15 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
             return fallbackInset;
         }
 
-        WindowInsets insets =
+        WindowInsets windowInsets =
                 activity.getWindow().getDecorView().getRootView().getRootWindowInsets();
-        if (insets == null) {
+        if (windowInsets == null) {
             return fallbackInset;
         }
 
-        Insets systemBarInsets = WindowInsetsCompat.toWindowInsetsCompat(
-                insets).getInsets(WindowInsetsCompat.Type.systemBars());
-        return systemBarInsets.left + systemBarInsets.right;
+        Insets insets = WindowInsetsCompat.toWindowInsetsCompat(windowInsets).getInsets(insetType);
+        return insets.left + insets.right;
     }
-
 
     /**
      * Returns the layout params for the AppStyledView dialog
