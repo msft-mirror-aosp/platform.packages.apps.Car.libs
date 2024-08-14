@@ -30,9 +30,7 @@ import static com.android.car.ui.preference.CarUiPreferenceViewStub.TWO_ACTION_T
 import static com.android.car.ui.preference.CarUiPreferenceViewStub.TWO_ACTION_TEXT_BORDERLESS;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.content.res.Resources;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,11 +39,9 @@ import android.widget.FrameLayout;
 import com.android.car.ui.plugin.oemapis.preference.PreferenceOEMV1;
 import com.android.car.ui.plugin.oemapis.preference.PreferenceViewAttributesOEMV1;
 import com.android.car.ui.preference.CarUiPreferenceViewStub.PreferenceType;
+import com.android.car.ui.utils.CarUiUtils;
 
 import com.chassis.car.ui.plugin.R;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 
 /**
@@ -179,43 +175,7 @@ public class PreferenceAdapterProxy implements PreferenceOEMV1 {
             return mAppPackageName;
         }
 
-        SparseArray<String> r = getAssignedPackageIdentifiers(mSourceContext.getAssets());
-        for (int i = 0, n = r.size(); i < n; i++) {
-            final int id = r.keyAt(i);
-            // skip anything not in the app space (0x7f)
-            if (id != 0x7f) {
-                continue;
-            }
-
-            String packageName = mSourceContext.getResources().getResourcePackageName(id);
-            // Check if car-ui-lib resources are present under this package name
-            if (mSourceContext.getResources().getIdentifier(
-                    "car_ui_plugin_package_provider_authority_name", "string", packageName) != 0) {
-                mAppPackageName = packageName;
-                return mAppPackageName;
-            }
-        }
-
-        mAppPackageName = mSourceContext.getPackageName();
+        mAppPackageName = CarUiUtils.getAppPackageName(mSourceContext);
         return mAppPackageName;
-    }
-
-    private static SparseArray<String> getAssignedPackageIdentifiers(AssetManager am) {
-        final Class<? extends AssetManager> rClazz = am.getClass();
-        Throwable cause;
-        try {
-            final Method callback = rClazz.getMethod("getAssignedPackageIdentifiers");
-            Object invoke = callback.invoke(am);
-            return (SparseArray<String>) invoke;
-        } catch (NoSuchMethodException e) {
-            // No rewriting to be done.
-            return new SparseArray<>();
-        } catch (IllegalAccessException e) {
-            cause = e;
-        } catch (InvocationTargetException e) {
-            cause = e.getCause();
-        }
-
-        throw new RuntimeException("Failed to find R classes ", cause);
     }
 }
