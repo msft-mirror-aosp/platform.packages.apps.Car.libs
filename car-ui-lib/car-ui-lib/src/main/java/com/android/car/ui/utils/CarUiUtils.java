@@ -19,6 +19,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -46,6 +47,7 @@ import androidx.annotation.UiThread;
 import com.android.car.ui.R;
 import com.android.car.ui.uxr.DrawableStateView;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -497,5 +499,48 @@ public final class CarUiUtils {
         WindowManager wm = context.getSystemService(WindowManager.class);
         wm.getDefaultDisplay().getRealMetrics(displayMetrics);
         return displayMetrics;
+    }
+
+    /**
+     * Use reflection to get app package name from the assigned package identifiers in the provided
+     * {@link Context}. Due to performance implications, use method sparingly.
+     */
+    public static String getAppPackageName(@NonNull Context context) {
+        SparseArray<String> r = getAssignedPackageIdentifiers(context.getAssets());
+        for (int i = 0, n = r.size(); i < n; i++) {
+            final int id = r.keyAt(i);
+            // skip anything not in the app space (0x7f)
+            if (id != 0x7f) {
+                continue;
+            }
+
+            String packageName = r.valueAt(i);
+            // Check if car-ui-lib resources are present under this package name
+            if (context.getResources().getIdentifier(
+                    "car_ui_plugin_package_provider_authority_name", "string", packageName) != 0) {
+                return packageName;
+            }
+        }
+
+        return context.getPackageName();
+    }
+
+    private static SparseArray<String> getAssignedPackageIdentifiers(AssetManager am) {
+        final Class<? extends AssetManager> rClazz = am.getClass();
+        Throwable cause;
+        try {
+            final Method callback = rClazz.getMethod("getAssignedPackageIdentifiers");
+            Object invoke = callback.invoke(am);
+            return (SparseArray<String>) invoke;
+        } catch (NoSuchMethodException e) {
+            // No rewriting to be done.
+            return new SparseArray<>();
+        } catch (IllegalAccessException e) {
+            cause = e;
+        } catch (InvocationTargetException e) {
+            cause = e.getCause();
+        }
+
+        throw new RuntimeException("Failed to find R classes ", cause);
     }
 }
