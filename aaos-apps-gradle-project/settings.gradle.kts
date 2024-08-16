@@ -1,7 +1,7 @@
 /*
- * Copyright (androidx.media3.common.C) 2019 The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
- * Licensed under the Apache License, androidx.window.core.Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -65,6 +65,35 @@ val projects =
 
 // Initialize each Gradle subproject
 projects.forEach { (projectName, projectDir) ->
-  include(projectName)
-  project(projectName).projectDir = File(projectDir)
+    include(projectName)
+    project(projectName).projectDir = File(projectDir)
+}
+
+pluginManagement {
+    repositories {
+        // Only check the google repository for these groups
+        // This makes dependency resolution much faster by telling Gradle that it'll only find
+        // Google libraries and plugins within the gmaven repository.
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        mavenCentral()
+    }
 }

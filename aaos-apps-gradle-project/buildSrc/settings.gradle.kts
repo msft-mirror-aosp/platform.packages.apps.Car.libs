@@ -14,19 +14,21 @@
 * limitations under the License.
 */
 
-@file:Suppress("UnstableApiUsage")
-
-// Stable in Gradle 8.x
 dependencyResolutionManagement {
     repositories {
-        google()
+        // Only check the google repository for these groups
+        // This makes dependency resolution much faster by telling Gradle that it'll only find
+        // Google libraries and plugins within the gmaven repository.
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
         mavenCentral()
     }
-    versionCatalogs {
-        create("libs") {
-            from(files("../gradle/libs.versions.toml"))
-        }
-    }
+    versionCatalogs { create("libs") { from(files("../gradle/libs.versions.toml")) } }
 }
 
 rootProject.name = "buildSrc"
