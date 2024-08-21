@@ -18,6 +18,7 @@ package com.android.car.ui.preference;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.swipeRight;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
@@ -1125,7 +1126,6 @@ public class PreferenceTest {
         onView(withId(R.id.car_ui_secondary_action_concrete)).check(matches(not(isChecked())));
     }
 
-    @Ignore("b/348420230")
     @Test
     public void testTwoActionSwitchPreference_switchNotToggleableWhenUxRestricted() {
         Context testableContext = spy(mActivity);
@@ -1142,13 +1142,15 @@ public class PreferenceTest {
         preference.setOrder(0);
         mActivity.addPreference(preference);
         // Scroll to preference
-        mActivity.runOnUiThread(() -> mActivity.scrollToPreference("twoaction"));
+        mActivity.runOnUiThread(() -> {
+            mActivity.scrollToPreference("twoaction");
 
-        // Set preference to be unchecked and ux restricted
-        preference.setSecondaryActionChecked(false);
-        preference.setUxRestricted(true);
-        assertTrue(preference.isUxRestricted());
-        preference.setOnClickWhileRestrictedListener(mock(Consumer.class));
+            // Set preference to be unchecked and ux restricted
+            preference.setSecondaryActionChecked(false);
+            preference.setUxRestricted(true);
+            assertTrue(preference.isUxRestricted());
+            preference.setOnClickWhileRestrictedListener(mock(Consumer.class));
+        });
 
         // Ensure switch stays unchecked when clicked
         onView(withId(R.id.car_ui_secondary_action_concrete)).perform(click());
@@ -1182,7 +1184,7 @@ public class PreferenceTest {
 
         // Enter value
         String value = "test value";
-        onView(withId(android.R.id.edit)).perform(typeText(value));
+        onView(withId(android.R.id.edit)).perform(typeText(value), closeSoftKeyboard());
         onView(withText(positiveButtonText)).perform(click());
 
         // Confirm value updated by simple summary provider
