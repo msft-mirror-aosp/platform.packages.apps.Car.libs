@@ -27,7 +27,8 @@ import com.android.car.ui.utils.CarUiUtils;
 /** Singleton class regrouping common library feature flags. */
 public class CommonFlags {
 
-    @SuppressWarnings("StaticFieldLeak") // We store the application context, not an activity.
+    // We store the application context if available, not an activity.
+    @SuppressWarnings("StaticFieldLeak")
     private static CommonFlags sInstance;
 
     /** Returns the singleton. */
@@ -42,7 +43,8 @@ public class CommonFlags {
     private Boolean mFlagImproperImageRefs;
 
     private CommonFlags(@NonNull Context context) {
-        mApplicationContext = context.getApplicationContext();
+        mApplicationContext = context.getApplicationContext() != null
+                ? context.getApplicationContext() : context;
     }
 
     /**
