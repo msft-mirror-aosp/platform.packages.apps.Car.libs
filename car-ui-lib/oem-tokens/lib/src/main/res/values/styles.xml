@@ -434,7 +434,8 @@
         <item name="com.android.oem.tokens:shapeCornerMedium">24dp</item>
         <item name="com.android.oem.tokens:shapeCornerLarge">48dp</item>
         <item name="com.android.oem.tokens:shapeCornerExtraLarge">48dp</item>
-        <item name="com.android.oem.tokens:shapeCornerFull">128dp</item>
+        <!-- Set to arbitrarily large value ensure full corner radius for shapes of all sizes-->
+        <item name="com.android.oem.tokens:shapeCornerFull">1000dp</item>
     </style>
 
     <style name="BaseTextAppearance">
