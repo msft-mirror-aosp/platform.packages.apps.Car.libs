@@ -16,12 +16,15 @@
 
 package com.android.car.ui;
 
+import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -160,6 +163,9 @@ public class AlertDialogBuilderTest {
         onView(withText("Item 1"))
                 .inRoot(RootWithDecorMatcher.get(dialog))
                 .check(matches(isDisplayed()));
+        onData(instanceOf(FakeCursor.class))
+                .atPosition(1)
+                .perform(scrollTo());
         onView(withText("Item 2"))
                 .inRoot(RootWithDecorMatcher.get(dialog))
                 .check(matches(isDisplayed()));
