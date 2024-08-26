@@ -8,7 +8,13 @@ gradle-app.setting
 .gradletasknamecache
 
 # IntelliJ
-.idea/
+**/.idea/**
+!**/.idea/codeStyleSettings.xml
+!**/.idea/codeStyles
+!**/.idea/codeStyles/Project.xml
+!**/.idea/codeStyles/codeStyleConfig.xml
+!**/.idea/ktfmt.xml
+!**/.idea/externalDependencies.xml
 *.iml
 
 # Python
