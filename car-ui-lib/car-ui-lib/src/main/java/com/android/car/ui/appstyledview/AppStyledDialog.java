@@ -148,6 +148,7 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
         window.setAttributes(getDialogWindowLayoutParam(mBaseLayoutParams));
     }
 
+    @SuppressLint("NewApi")
     private float getVerticalInset(DisplayMetrics displayMetrics) {
         int insetType = WindowInsetsCompat.Type.systemBars();
         if (!mRenderInDisplayCutout) {
@@ -182,6 +183,7 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
         return insets.top + insets.bottom;
     }
 
+    @SuppressLint("NewApi")
     private float getHorizontalInset(DisplayMetrics displayMetrics) {
         int insetType = WindowInsetsCompat.Type.systemBars();
         if (!mRenderInDisplayCutout) {
