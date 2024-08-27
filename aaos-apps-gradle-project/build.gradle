@@ -68,13 +68,6 @@ allprojects {
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
     }
 
-    // Send all the build files to the out folder under the root of the repo init.
-    // Gradle creates that folder if it doesn't exist.
-    // Keep in sync with ./copy_gradle_output.sh
-    ext.buildOutputPath = gradle.ext.repoRootPath + "/out/aaos-apps-gradle-build/"
-    buildDir = new File(project.parent == null ? ext.buildOutputPath :
-            project.parent.buildDir.path + "/" + project.name)
-
     // Re-exports for Kotlin build scripts
     ext.aaosLatestSDK = gradle.ext.aaosLatestSDK
     ext.lib_car_system_stubs = gradle.ext.lib_car_system_stubs
