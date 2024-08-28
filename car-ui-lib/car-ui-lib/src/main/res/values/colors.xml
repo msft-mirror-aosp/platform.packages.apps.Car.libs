@@ -53,4 +53,8 @@
     <color name="car_ui_ime_wide_screen_description_color">#FFF</color>
     <color name="car_ui_ime_wide_screen_search_item_title_color">#FFF</color>
     <color name="car_ui_ime_wide_screen_search_item_sub_title_color">#FFF</color>
+
+    <!-- App Styled View  -->
+
+    <color name="car_ui_app_styled_view_nav_icon_color">@color/car_ui_toolbar_nav_icon_color</color>
 </resources>
