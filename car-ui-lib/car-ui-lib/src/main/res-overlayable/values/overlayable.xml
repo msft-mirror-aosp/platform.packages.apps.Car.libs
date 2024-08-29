@@ -160,6 +160,7 @@ limitations under the License.-->
       <item type="bool" name="car_ui_toolbar_tab_flexible_layout"/>
       <item type="bool" name="car_ui_toolbar_tabs_on_second_row"/>
       <item type="color" name="car_ui_activity_background_color"/>
+      <item type="color" name="car_ui_app_styled_view_nav_icon_color"/>
       <item type="color" name="car_ui_color_accent"/>
       <item type="color" name="car_ui_dialog_icon_color"/>
       <item type="color" name="car_ui_ime_wide_screen_description_color"/>

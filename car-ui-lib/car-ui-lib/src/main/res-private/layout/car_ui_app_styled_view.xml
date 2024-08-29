@@ -50,7 +50,7 @@
                 android:id="@+id/car_ui_app_styled_view_icon_close"
                 android:layout_width="@dimen/car_ui_toolbar_nav_icon_size"
                 android:layout_height="@dimen/car_ui_toolbar_nav_icon_size"
-                android:tint="@color/car_ui_toolbar_nav_icon_color"
+                android:tint="@color/car_ui_app_styled_view_nav_icon_color"
                 android:layout_gravity="center"
                 android:scaleType="fitXY"
                 tools:ignore="UseAppTint" />
