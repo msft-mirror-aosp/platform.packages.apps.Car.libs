@@ -99,9 +99,9 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
             return;
         }
 
-        mBaseLayoutParams = new WindowManager.LayoutParams();
-        mBaseLayoutParams.copyFrom(window.getAttributes());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            mBaseLayoutParams = new WindowManager.LayoutParams();
+            mBaseLayoutParams.copyFrom(window.getAttributes());
             int types = WindowInsetsCompat.Type.systemBars();
             if (mBaseLayoutParams.layoutInDisplayCutoutMode
                     != WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS) {
@@ -110,6 +110,9 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
                 mRenderInDisplayCutout = true;
             }
             mBaseLayoutParams.setFitInsetsTypes(types);
+        } else {
+            // #copyFrom() does not correctly copy params state in Android Q
+            mBaseLayoutParams = window.getAttributes();
         }
 
         updateAttributes();
