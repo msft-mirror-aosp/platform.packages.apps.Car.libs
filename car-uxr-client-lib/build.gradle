@@ -24,6 +24,7 @@ plugins {
 
 android {
     compileSdkVersion gradle.ext.aaosLatestSDK
+    namespace "com.android.car.uxr"
 
     defaultConfig {
         minSdkVersion 28

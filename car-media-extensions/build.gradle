@@ -23,6 +23,8 @@ plugins {
 
 android {
     compileSdkVersion gradle.ext.aaosLatestSDK
+    namespace "com.android.car.media.extensions"
+
     defaultConfig {
         minSdkVersion 28
         targetSdkVersion gradle.ext.aaosTargetSDK
