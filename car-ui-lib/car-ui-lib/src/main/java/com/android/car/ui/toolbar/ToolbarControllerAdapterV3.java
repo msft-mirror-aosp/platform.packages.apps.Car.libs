@@ -428,6 +428,9 @@ public final class ToolbarControllerAdapterV3 implements ToolbarController {
 
     @Override
     public void setMenuItems(@Nullable List<MenuItem> items) {
+        if (items == null) {
+            items = Collections.emptyList();
+        }
         mClientMenuItems = items;
         update(mAdapterState.copy()
                 .setMenuItems(convertList(items, item -> new MenuItemAdapterV1(this, item)))
