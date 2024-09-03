@@ -96,6 +96,13 @@ android_library {
 
 android_test {
     name: "CarRotaryLibUnitTests",
+
+    sdk_version: "current",
+    min_sdk_version: "28",
+    target_sdk_version: "current",
+    // sc-car only supports up to java 8.
+    java_version: "1.8",
+
     // CERTIFICATE is defined in car-ui-lib build file.
     certificate: CERTIFICATE,
     libs: [
@@ -125,6 +132,5 @@ android_test {
         "libstaticjvmtiagent",
     ],
 
-    platform_apis: true,
     test_suites: ["device-tests"],
 }
