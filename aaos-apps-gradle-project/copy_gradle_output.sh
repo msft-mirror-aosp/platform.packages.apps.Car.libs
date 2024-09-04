@@ -1,10 +1,12 @@
 #!/bin/bash
 
+SCRIPTS_DIR=$(realpath "${0%/*}")
+
 # Function validating the exit code of the previous command
 # Usage: "check_status $?"
 # Where $? returns the exit code of the previous command
 # To be used after each command that needs to be validated for correctness
-check_status () {
+check_status() {
   if [[ $1 != 0 ]]
   then
     echo "check_status: non-zero exit code -> $1"
@@ -19,26 +21,28 @@ check_status () {
 
 if [ -z "${1+x}" ]
 then
-    echo "destination directory is required"
-    exit 1
+  echo "destination directory is required"
+  exit 1
 fi
 
 if [[ -f $1 ]]
 then
-    echo "target $1 exists as a file!!"
-    exit 1
+  echo "target $1 exists as a file!!"
+  exit 1
 elif [[ ! -d $1 ]]
 then
-    echo "creating $1 directory"
-    mkdir $1
+  echo "creating $1 directory"
+  mkdir $1
 else
-    echo "$1 directory already there"
+  echo "$1 directory already there"
 fi
 
 cd "$(dirname "$0")"
 check_status $?
 # Keep in sync with ./build.gradle
-GRADLE_OUTPUT_DIR=../../../../../out/aaos-apps-gradle-build
+ROOT_DIR=$(realpath "$SCRIPTS_DIR/../../../../../")
+JAVA_HOME="$ROOT_DIR/prebuilts/jdk/jdk17/linux-x86"
+GRADLE_OUTPUT_DIR="$ROOT_DIR/out/aaos-apps-gradle-build"
 
 # APKs
 cp $GRADLE_OUTPUT_DIR/car-calendar-app/outputs/apk/prod/release/car-calendar-app-prod-release.apk $1/CarCalendarApp.apk
@@ -142,7 +146,7 @@ cp $GRADLE_OUTPUT_DIR/car-apps-common/outputs/apk/androidTest/debug/car-apps-com
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-media-common/outputs/apk/androidTest/debug/car-media-common-debug-androidTest.apk $1/CarMediaCommonUnitTests.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/androidTest/platform/debug/car-media-app-platform-debug-androidTest.apk  $1/CarMediaUnitTests.apk
+cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/androidTest/platform/debug/car-media-app-platform-debug-androidTest.apk $1/CarMediaUnitTests.apk
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-media-extensions/outputs/apk/androidTest/debug/car-media-extensions-debug-androidTest.apk $1/CarMediaExtensionsUnitTests.apk
 check_status $?
@@ -178,25 +182,25 @@ mkdir $GRADLE_OUTPUT_DIR/jacoco/car-rotarylib-app
 check_status $?
 mkdir $GRADLE_OUTPUT_DIR/jacoco/oem-token-lib-app
 check_status $?
-jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-calendar-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-calendar-app/intermediates/javac/platformDebug/classes .
+$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-calendar-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-calendar-app/intermediates/javac/platformDebug/classes .
 check_status $?
-jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-messenger-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-messenger-app/intermediates/javac/fakeDebug/classes .
+$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-messenger-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-messenger-app/intermediates/javac/fakeDebug/classes .
 check_status $?
-jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-media-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-media-app/intermediates/javac/platformDebug/classes .
+$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-media-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-media-app/intermediates/javac/platformDebug/classes .
 check_status $?
-jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-dialer-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-dialer-app/intermediates/javac/emulatorDebug/classes .
+$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-dialer-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-dialer-app/intermediates/javac/emulatorDebug/classes .
 check_status $?
-jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-caruilib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-ui-lib/intermediates/javac/debug/classes .
+$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-caruilib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-ui-lib/intermediates/javac/debug/classes .
 check_status $?
-jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-caruilib-testing-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-ui-lib-testing/intermediates/javac/debug/classes .
+$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-caruilib-testing-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-ui-lib-testing/intermediates/javac/debug/classes .
 check_status $?
-jar cvfM $GRADLE_OUTPUT_DIR/jacoco/oem-token-lib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/oem-token-lib/intermediates/javac/debug/classes .
+$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/oem-token-lib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/oem-token-lib/intermediates/javac/debug/classes .
 check_status $?
-jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-uxr-client-lib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-uxr-client-lib/intermediates/javac/debug/classes .
+$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-uxr-client-lib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-uxr-client-lib/intermediates/javac/debug/classes .
 check_status $?
-jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-assist-lib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-assist-lib/intermediates/javac/debug/classes .
+$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-assist-lib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-assist-lib/intermediates/javac/debug/classes .
 check_status $?
-jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-rotarylib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-rotary-lib/intermediates/javac/debug/classes .
+$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-rotarylib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-rotary-lib/intermediates/javac/debug/classes .
 check_status $?
-jar cvfM $1/jacoco-report-classes-all.jar -C $GRADLE_OUTPUT_DIR/jacoco .
+$JAVA_HOME/bin/jar cvfM $1/jacoco-report-classes-all.jar -C $GRADLE_OUTPUT_DIR/jacoco .
 check_status $?
