@@ -28,7 +28,7 @@ android {
 
     defaultConfig {
         minSdkVersion 30 // Media requires apis that became public in R.
-        targetSdkVersion gradle.ext.aaosTargetSDK
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

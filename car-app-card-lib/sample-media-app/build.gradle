@@ -26,7 +26,7 @@ android {
     compileSdkVersion gradle.ext.aaosLatestSDK
     defaultConfig {
         minSdkVersion 31
-        targetSdkVersion gradle.ext.aaosTargetSDK
+        targetSdkVersion 33
         versionCode gradle.ext.getVersionCode()
         versionName gradle.ext.getVersionName()
     }
