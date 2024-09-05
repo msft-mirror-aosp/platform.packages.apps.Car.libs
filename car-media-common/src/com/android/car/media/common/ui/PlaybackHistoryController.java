@@ -20,6 +20,7 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.text.TextUtils;
 import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +36,7 @@ import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.apps.common.imaging.ImageViewBinder;
+import com.android.car.apps.common.util.ViewUtils;
 import com.android.car.media.common.MediaItemMetadata;
 import com.android.car.media.common.R;
 import com.android.car.media.common.playback.PlaybackViewModel;
@@ -147,8 +149,13 @@ public class PlaybackHistoryController {
 
         private void updateView(MediaItemMetadata mediaItemMetadata) {
             if (mediaItemMetadata == null) {
-                PlaybackCardControllerUtilities.updateTextViewAndVisibility(mAppTitleInactive,
-                        mMediaSource.getDisplayName(mContext));
+                if (mAppTitleInactive != null) {
+                    mAppTitleInactive.setText(mContext.getString(R.string.open_action_for_app_title,
+                            mMediaSource.getDisplayName(mContext)));
+                }
+                ViewUtils.setVisible(mAppTitleInactive, !TextUtils.isEmpty(
+                        mMediaSource.getDisplayName(mContext)));
+
                 PlaybackCardControllerUtilities.updateImageViewDrawableAndVisibility(
                         mAppIconInactive, mMediaSource.getIcon());
                 mActiveView.setVisibility(View.GONE);
