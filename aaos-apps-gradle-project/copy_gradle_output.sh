@@ -176,6 +176,8 @@ mkdir $GRADLE_OUTPUT_DIR/jacoco/car-assist-lib-app
 check_status $?
 mkdir $GRADLE_OUTPUT_DIR/jacoco/car-rotarylib-app
 check_status $?
+mkdir $GRADLE_OUTPUT_DIR/jacoco/oem-token-lib-app
+check_status $?
 jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-calendar-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-calendar-app/intermediates/javac/platformDebug/classes .
 check_status $?
 jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-messenger-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-messenger-app/intermediates/javac/fakeDebug/classes .
@@ -187,6 +189,8 @@ check_status $?
 jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-caruilib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-ui-lib/intermediates/javac/debug/classes .
 check_status $?
 jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-caruilib-testing-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-ui-lib-testing/intermediates/javac/debug/classes .
+check_status $?
+jar cvfM $GRADLE_OUTPUT_DIR/jacoco/oem-token-lib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/oem-token-lib/intermediates/javac/debug/classes .
 check_status $?
 jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-uxr-client-lib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-uxr-client-lib/intermediates/javac/debug/classes .
 check_status $?
