@@ -29,54 +29,27 @@ car_ui_lib_static_libs = [
     "androidx.asynclayoutinflater_asynclayoutinflater",
 ]
 
-android_library {
-    name: "car-ui-lib-resources",
-
-    sdk_version: "current",
-    min_sdk_version: "28",
-    target_sdk_version: "current",
-    // sc-car only supports up to java 8.
-    java_version: "1.8",
-
-    manifest: "car-ui-lib/src/main/AndroidManifest-resourceOnly.xml",
-    resource_dirs: [
-        "car-ui-lib/src/main/res",
-        "car-ui-lib/src/main/res-private"
-    ],
-
-    static_libs: [
-        "androidx.appcompat_appcompat",
-        "androidx-constraintlayout_constraintlayout",
-        "androidx.preference_preference",
-        "androidx.recyclerview_recyclerview",
-        "car-rotary-lib-resources",
-    ],
-    apex_available: [
-        "com.android.permission",
-        "//apex_available:platform",
+filegroup {
+    name: "car-ui-lib-src",
+    srcs: [
+        "car-ui-lib/src/main/java/**/*.java",
     ],
 }
 
-android_library {
+filegroup {
+    name: "car-ui-lib-resources",
+    srcs: [
+        "car-ui-lib/src/main/res",
+        "car-ui-lib/src/main/res-private",
+    ],
+}
+
+filegroup {
     name: "car-ui-lib-overlayable-resources",
-
-    sdk_version: "current",
-    min_sdk_version: "28",
-    target_sdk_version: "current",
-    // sc-car only supports up to java 8.
-    java_version: "1.8",
-
-    manifest: "car-ui-lib/src/main/AndroidManifest-resourceOnly.xml",
-    resource_dirs: [
+    srcs: [
+        "car-ui-lib/src/main/res",
+        "car-ui-lib/src/main/res-private",
         "car-ui-lib/src/main/res-overlayable",
-    ],
-
-    static_libs: [
-        "car-ui-lib-resources",
-    ],
-    apex_available: [
-        "com.android.permission",
-        "//apex_available:platform",
     ],
 }
 
@@ -90,7 +63,14 @@ android_library {
     java_version: "1.8",
 
     manifest: "car-ui-lib/src/main/AndroidManifest.xml",
-    srcs: ["car-ui-lib/src/main/java/**/*.java"],
+    srcs: [
+        ":car-ui-lib-src",
+        ":car-rotary-lib-src",
+    ],
+    resource_dirs: [
+        ":car-ui-lib-resources",
+        ":car-rotary-lib-resources",
+    ],
     optimize: {
         proguard_flags_files: [
             "car-ui-lib/proguard-rules.pro",
@@ -101,7 +81,7 @@ android_library {
         "android.car-stubs",
         "car-ui-lib-oem-apis-source",
     ],
-    static_libs: ["car-ui-lib-resources", "car-rotary-lib-no-overlayable",] + car_ui_lib_static_libs,
+    static_libs: car_ui_lib_static_libs,
     apex_available: [
         "com.android.permission",
         "//apex_available:platform",
@@ -144,7 +124,14 @@ android_library {
     java_version: "1.8",
 
     manifest: "car-ui-lib/src/main/AndroidManifest.xml",
-    srcs: ["car-ui-lib/src/main/java/**/*.java"],
+    srcs: [
+        ":car-ui-lib-src",
+        ":car-rotary-lib-src",
+    ],
+    resource_dirs: [
+        ":car-ui-lib-overlayable-resources",
+        ":car-rotary-lib-overlayable-resources",
+    ],
     optimize: {
         proguard_flags_files: [
             "car-ui-lib/proguard-rules.pro",
@@ -155,7 +142,7 @@ android_library {
         "android.car-stubs",
         "car-ui-lib-oem-apis-source",
     ],
-    static_libs: ["car-ui-lib-overlayable-resources", "car-rotary-lib",] + car_ui_lib_static_libs,
+    static_libs: car_ui_lib_static_libs,
     apex_available: [
         "com.android.permission",
         "//apex_available:platform",
@@ -195,7 +182,7 @@ android_library_import {
     name: "car-ui-lib-prebuilt",
     aars: [":car-ui-lib-aar"],
     sdk_version: "current",
-    static_libs: ["car-ui-lib-overlayable-resources", "car-rotary-lib", ] + car_ui_lib_static_libs,
+    static_libs: car_ui_lib_static_libs,
 }
 
 car_ui_lib_testing_support_static_libs = [

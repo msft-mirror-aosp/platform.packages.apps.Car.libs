@@ -163,15 +163,16 @@ public final class CarUiRecyclerViewNoScrollbar extends FrameLayout
             @Nullable AttributeSet attrs, int defStyleAttr) {
         TypedArray a = context.obtainStyledAttributes(
                 attrs,
-                R.styleable.CarUiRecyclerView,
+                com.android.car.ui.R.styleable.CarUiRecyclerView,
                 defStyleAttr,
                 0);
 
-        @LayoutRes int layout = R.layout.car_ui_recycler_view_no_scrollbar;
+        @LayoutRes int layout = com.android.car.ui.R.layout.car_ui_recycler_view_no_scrollbar;
 
         LayoutInflater factory = LayoutInflater.from(context);
         View rootView = factory.inflate(layout, this, true);
-        ViewGroup recyclerViewContainer = requireViewById(R.id.car_ui_recycler_view);
+        ViewGroup recyclerViewContainer = requireViewById(
+            com.android.car.ui.R.id.car_ui_recycler_view);
         if (recyclerViewContainer instanceof CarUiRecyclerViewContainer) {
             // To keep backwards compatibility CarUiRecyclerViewContainer is a FrameLayout
             // that has a RecyclerView at index 0
@@ -181,24 +182,30 @@ public final class CarUiRecyclerViewNoScrollbar extends FrameLayout
         }
 
         boolean rotaryScrollEnabled = a.getBoolean(
-                R.styleable.CarUiRecyclerView_rotaryScrollEnabled, /* defValue=*/ false);
-        int orientation = a.getInt(R.styleable.CarUiRecyclerView_android_orientation,
-                LinearLayout.VERTICAL);
+            com.android.car.ui.R.styleable.CarUiRecyclerView_rotaryScrollEnabled,
+            /* defValue=*/ false);
+        int orientation = a.getInt(
+            com.android.car.ui.R.styleable.CarUiRecyclerView_android_orientation,
+            LinearLayout.VERTICAL);
         initRotaryScroll(mRecyclerView, rotaryScrollEnabled, orientation);
 
         @CarUiRecyclerViewLayout int carUiRecyclerViewLayout =
-                a.getInt(R.styleable.CarUiRecyclerView_layoutStyle, CarUiRecyclerViewLayout.LINEAR);
-        mNumOfColumns = a.getInt(R.styleable.CarUiRecyclerView_numOfColumns, /* defValue= */ 2);
+                a.getInt(com.android.car.ui.R.styleable.CarUiRecyclerView_layoutStyle,
+                    CarUiRecyclerViewLayout.LINEAR);
+        mNumOfColumns = a.getInt(com.android.car.ui.R.styleable.CarUiRecyclerView_numOfColumns,
+            /* defValue= */ 2);
         mEnableDividers = a.getBoolean(
-                R.styleable.CarUiRecyclerView_enableDivider, /* defValue= */ false);
+            com.android.car.ui.R.styleable.CarUiRecyclerView_enableDivider, /* defValue= */ false);
 
         mDividerItemDecorationLinear = new LinearDividerItemDecoration(
                 ContextCompat.getDrawable(context, R.drawable.recyclerview_divider));
 
         mDividerItemDecorationGrid =
                 new GridDividerItemDecoration(
-                        ContextCompat.getDrawable(context, R.drawable.car_ui_divider),
-                        ContextCompat.getDrawable(context, R.drawable.car_ui_divider),
+                        ContextCompat.getDrawable(context,
+                            com.android.car.ui.R.drawable.car_ui_divider),
+                        ContextCompat.getDrawable(context,
+                            com.android.car.ui.R.drawable.car_ui_divider),
                         mNumOfColumns);
 
         mIsInitialized = true;
@@ -206,7 +213,8 @@ public final class CarUiRecyclerViewNoScrollbar extends FrameLayout
         // Set to false so the items below the toolbar are visible.
         mRecyclerView.setClipToPadding(true);
         // Check if a layout manager has already been set via XML
-        String layoutManagerInXml = a.getString(R.styleable.CarUiRecyclerView_layoutManager);
+        String layoutManagerInXml = a.getString(
+            com.android.car.ui.R.styleable.CarUiRecyclerView_layoutManager);
         if (!TextUtils.isEmpty(layoutManagerInXml)) {
             createLayoutManager(context, layoutManagerInXml, attrs, defStyleAttr, 0);
         } else if (carUiRecyclerViewLayout == CarUiRecyclerViewLayout.GRID) {

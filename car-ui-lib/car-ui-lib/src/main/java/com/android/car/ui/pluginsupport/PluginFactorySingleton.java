@@ -87,7 +87,10 @@ public final class PluginFactorySingleton {
                 synchronized (LOCK) {
                     result = sInstance;
                     if (result == null) {
-                        loadPlugin(context.getApplicationContext());
+                        // Only use application context if explicitly required. Dynamically
+                        // loaded GMS Core modules require layouts to be inflated with Activity
+                        // context.
+                        loadPlugin(context);
                         result = sInstance;
                     }
                 }

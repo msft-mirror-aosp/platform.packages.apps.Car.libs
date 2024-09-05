@@ -16,19 +16,17 @@
 
 // Library-level build file
 
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+    id 'buildSrc.jdk.jdk8'
+}
 
 android {
     compileSdkVersion gradle.ext.aaosLatestSDK
 
     defaultConfig {
         minSdkVersion 28
-        targetSdkVersion gradle.ext.aaosTargetSDK
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        targetSdkVersion 33
     }
 
     buildFeatures {

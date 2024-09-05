@@ -57,7 +57,7 @@ public class CarUiEditTextPreference extends EditTextPreference
     }
 
     public CarUiEditTextPreference(Context context, AttributeSet attrs) {
-        this(context, attrs, getAttr(context, R.attr.editTextPreferenceStyle,
+        this(context, attrs, getAttr(context, androidx.preference.R.attr.editTextPreferenceStyle,
                 android.R.attr.editTextPreferenceStyle));
     }
 

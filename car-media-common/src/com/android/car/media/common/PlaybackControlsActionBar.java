@@ -62,8 +62,9 @@ public class PlaybackControlsActionBar extends ControlBar {
     }
 
     private void init(Context context) {
-        mOverflowButton = createIconButton(context.getDrawable(R.drawable.ic_overflow_button),
-                R.layout.control_bar_selectable_button);
+        mOverflowButton = createIconButton(context.getDrawable(
+                com.android.car.apps.common.R.drawable.ic_overflow_button),
+                com.android.car.apps.common.R.layout.control_bar_selectable_button);
         mOverflowButton.setId(R.id.overflow);
         setExpandCollapseView(mOverflowButton);
 

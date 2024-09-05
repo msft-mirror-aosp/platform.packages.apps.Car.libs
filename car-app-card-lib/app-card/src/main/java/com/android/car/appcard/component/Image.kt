@@ -21,6 +21,7 @@ import android.util.Log
 import com.android.car.appcard.internal.proto.Image.ImageMessage
 import com.google.protobuf.ByteString
 import java.io.ByteArrayOutputStream
+import java.security.MessageDigest
 
 /**
  * Image is a component that contains an image and information on how the image should be displayed.
@@ -44,10 +45,13 @@ class Image private constructor(builder: Builder) : Component(builder) {
   var imageData: Bitmap?
     private set
 
+  private var imageHashString: String? = null
+
   init {
     imageData = builder.imageData
     contentScale = builder.contentScale
     colorFilter = builder.colorFilter
+    updateImageHash()
   }
 
   /**
@@ -70,6 +74,7 @@ class Image private constructor(builder: Builder) : Component(builder) {
 
     component.imageData?.let {
       imageData = component.imageData
+      updateImageHash()
     }
 
     contentScale = component.contentScale
@@ -83,7 +88,8 @@ class Image private constructor(builder: Builder) : Component(builder) {
 
     if (other !is Image) return false
 
-    val imageEquals = imageData?.sameAs(other.imageData) ?: (other.imageData == null)
+    val imageEquals =
+      imageHashString?.let { it == other.imageHashString } ?: (other.imageHashString == null)
     return imageEquals && super.equals(other) && contentScale == other.contentScale &&
       colorFilter == other.colorFilter
   }
@@ -94,6 +100,13 @@ class Image private constructor(builder: Builder) : Component(builder) {
     result = 31 * result + colorFilter.hashCode()
     result = 31 * result + (imageData?.hashCode() ?: 0)
     return result
+  }
+
+  private fun updateImageHash() {
+    val md = MessageDigest.getInstance(HASH_ALGORITHM)
+    val imageByteArray = imageData?.let { toByteArray(it) }
+    val hashBytes = imageByteArray?.let { md.digest(it) }
+    imageHashString = hashBytes?.joinToString { HEX_FORMAT.format(it) }
   }
 
   /**
@@ -139,20 +152,24 @@ class Image private constructor(builder: Builder) : Component(builder) {
       }
 
       contentScale = if (imageMessage.getContentScale() ==
-        com.android.car.appcard.internal.proto.Image.ContentScale.FILL_BOUNDS) {
+        com.android.car.appcard.internal.proto.Image.ContentScale.FILL_BOUNDS
+      ) {
         ContentScale.FILL_BOUNDS
       } else if (imageMessage.getContentScale() ==
-        com.android.car.appcard.internal.proto.Image.ContentScale.FIT) {
+        com.android.car.appcard.internal.proto.Image.ContentScale.FIT
+      ) {
         ContentScale.FIT
       } else {
         throw IllegalStateException("ContentScale must not be unrecognized")
       }
 
       colorFilter = if (imageMessage.getColorFilter() ==
-        com.android.car.appcard.internal.proto.Image.ColorFilter.TINT) {
+        com.android.car.appcard.internal.proto.Image.ColorFilter.TINT
+      ) {
         ColorFilter.TINT
       } else if (imageMessage.getColorFilter() ==
-        com.android.car.appcard.internal.proto.Image.ColorFilter.NO_TINT) {
+        com.android.car.appcard.internal.proto.Image.ColorFilter.NO_TINT
+      ) {
         ColorFilter.NO_TINT
       } else {
         throw IllegalStateException("ContentScale must not be unrecognized")
@@ -192,6 +209,8 @@ class Image private constructor(builder: Builder) : Component(builder) {
     private const val TAG = "Image"
     private const val BITMAP_QUALITY = 100
     private const val BITMAP_OFFSET = 0
+    private const val HASH_ALGORITHM = "SHA-512"
+    private const val HEX_FORMAT = "%02x"
 
     /**
      * @return an instance of [Builder]
@@ -200,7 +219,7 @@ class Image private constructor(builder: Builder) : Component(builder) {
     fun newBuilder(componentId: String) = Builder(componentId)
 
     private fun toContentScale(
-      contentScale: ContentScale
+      contentScale: ContentScale,
     ): com.android.car.appcard.internal.proto.Image.ContentScale {
       return if (contentScale == ContentScale.FILL_BOUNDS) {
         com.android.car.appcard.internal.proto.Image.ContentScale.FILL_BOUNDS
@@ -210,7 +229,7 @@ class Image private constructor(builder: Builder) : Component(builder) {
     }
 
     private fun toColorFilter(
-      colorFilter: ColorFilter
+      colorFilter: ColorFilter,
     ): com.android.car.appcard.internal.proto.Image.ColorFilter {
       return if (colorFilter == ColorFilter.NO_TINT) {
         com.android.car.appcard.internal.proto.Image.ColorFilter.NO_TINT

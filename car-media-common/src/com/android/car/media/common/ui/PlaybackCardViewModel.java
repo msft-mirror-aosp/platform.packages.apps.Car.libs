@@ -115,6 +115,12 @@ public class PlaybackCardViewModel extends AndroidViewModel {
         return mHistoryListData;
     }
 
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        mModels.onCleared();
+    }
+
     private void updateHistoryList(List<MediaSource> mediaSources) {
         List<MediaSource> historyList = new ArrayList<>();
 
@@ -134,7 +140,9 @@ public class PlaybackCardViewModel extends AndroidViewModel {
                 continue;
             }
             MediaSource mediaSource = MediaSource.create(mContext, componentName);
-            historyList.add(mediaSource);
+            if (mediaSource != null) {
+                historyList.add(mediaSource);
+            }
         }
 
         mHistoryListData.setValue(historyList);

@@ -16,7 +16,10 @@
 
 // Library-level build file
 
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+    id 'buildSrc.jdk.jdk8'
+}
 
 android {
     namespace 'com.android.car.ui.plugin.oemapis'
@@ -24,15 +27,10 @@ android {
 
     defaultConfig {
         minSdkVersion 28
-        targetSdkVersion gradle.ext.aaosTargetSDK
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     testOptions {

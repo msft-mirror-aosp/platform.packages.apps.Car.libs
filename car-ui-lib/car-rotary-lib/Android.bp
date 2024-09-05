@@ -16,48 +16,25 @@ package {
     default_applicable_licenses: ["Android-Apache-2.0"],
 }
 
-android_library {
-    name: "car-rotary-lib-resources",
-
-    sdk_version: "current",
-    min_sdk_version: "28",
-    target_sdk_version: "current",
-    // sc-car only supports up to java 8.
-    java_version: "1.8",
-
-    manifest: "src/main/AndroidManifest.xml",
-    resource_dirs: [
-        "src/main/res",
-    ],
-    static_libs: [
-        "androidx.recyclerview_recyclerview",
-    ],
-    apex_available: [
-        "com.android.permission",
-        "//apex_available:platform",
+filegroup {
+    name: "car-rotary-lib-src",
+    srcs: [
+        "src/main/java/**/*.java",
     ],
 }
 
-android_library {
+filegroup {
+    name: "car-rotary-lib-resources",
+    srcs: [
+        "src/main/res",
+    ],
+}
+
+filegroup {
     name: "car-rotary-lib-overlayable-resources",
-
-    sdk_version: "current",
-    min_sdk_version: "28",
-    target_sdk_version: "current",
-    // sc-car only supports up to java 8.
-    java_version: "1.8",
-
-    manifest: "src/main/AndroidManifest.xml",
-    resource_dirs: [
+    srcs: [
+        "src/main/res",
         "src/main/res-overlayable",
-    ],
-    static_libs: [
-        "androidx.recyclerview_recyclerview",
-        "car-rotary-lib-resources",
-    ],
-    apex_available: [
-        "com.android.permission",
-        "//apex_available:platform",
     ],
 }
 
@@ -72,6 +49,9 @@ android_library {
 
     manifest: "src/main/AndroidManifest.xml",
     srcs: ["src/main/java/**/*.java"],
+    resource_dirs: [
+        ":car-rotary-lib-overlayable-resources",
+    ],
     optimize: {
         enabled: false,
     },
@@ -79,8 +59,6 @@ android_library {
         "androidx.annotation_annotation",
         "androidx-constraintlayout_constraintlayout",
         "androidx.recyclerview_recyclerview",
-        "car-rotary-lib-resources",
-        "car-rotary-lib-overlayable-resources",
     ],
     apex_available: [
         "com.android.permission",
@@ -99,6 +77,9 @@ android_library {
 
     manifest: "src/main/AndroidManifest.xml",
     srcs: ["src/main/java/**/*.java"],
+    resource_dirs: [
+        ":car-rotary-lib-resources",
+    ],
     optimize: {
         enabled: false,
     },
@@ -106,7 +87,6 @@ android_library {
         "androidx.annotation_annotation",
         "androidx-constraintlayout_constraintlayout",
         "androidx.recyclerview_recyclerview",
-        "car-rotary-lib-resources",
     ],
     apex_available: [
         "com.android.permission",
@@ -116,6 +96,13 @@ android_library {
 
 android_test {
     name: "CarRotaryLibUnitTests",
+
+    sdk_version: "current",
+    min_sdk_version: "28",
+    target_sdk_version: "current",
+    // sc-car only supports up to java 8.
+    java_version: "1.8",
+
     // CERTIFICATE is defined in car-ui-lib build file.
     certificate: CERTIFICATE,
     libs: [
@@ -145,6 +132,5 @@ android_test {
         "libstaticjvmtiagent",
     ],
 
-    platform_apis: true,
     test_suites: ["device-tests"],
 }

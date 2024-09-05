@@ -17,7 +17,8 @@
 plugins {
     id "org.jetbrains.kotlin.android"
     id 'com.android.library'
-    id "com.google.protobuf" version "0.9.4"
+    alias(libs.plugins.protobuf)
+    id 'buildSrc.jdk.jdk8'
 }
 
 android {
@@ -27,19 +28,10 @@ android {
     compileSdkVersion gradle.ext.aaosLatestSDK
     defaultConfig {
         minSdkVersion 31
-        targetSdkVersion gradle.ext.aaosTargetSDK
+        targetSdkVersion 33
         versionCode gradle.ext.getVersionCode()
         versionName gradle.ext.getVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
     }
 
     testOptions {
@@ -62,24 +54,13 @@ android {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:4.26.0"
+        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
     }
-
-    plugins {
-        javalite {
-            artifact = 'com.google.protobuf:protoc-gen-javalite:3.0.0'
-        }
-    }
-
     generateProtoTasks {
         all().forEach { task ->
-            task.plugins{
-                java {
-                    option 'lite'
-                }
-                kotlin {
-                    option 'lite'
-                }
+            task.builtins {
+                java { option 'lite' }
+                kotlin { option 'lite' }
             }
         }
     }
@@ -93,7 +74,7 @@ dependencies {
 
     implementation project(":car-app-card-lib")
     implementation 'com.google.guava:guava:33.1.0-android'
-    implementation 'com.google.protobuf:protobuf-kotlin-lite:4.26.0'
+    implementation libs.protobuf.kotlin.lite
 
     androidTestCompileOnly files(gradle.ext.lib_system_stubs)
     androidTestImplementation 'com.google.truth:truth:1.1.3'

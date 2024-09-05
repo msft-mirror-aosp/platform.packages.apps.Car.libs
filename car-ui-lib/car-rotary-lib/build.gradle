@@ -18,7 +18,8 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.android.car.unbundled.conventions.local-publish'
+    id 'buildSrc.local-publish'
+    id 'buildSrc.jdk.jdk8'
 }
 
 android {
@@ -28,14 +29,9 @@ android {
 
     defaultConfig {
         minSdkVersion 28
-        targetSdkVersion gradle.ext.aaosTargetSDK
+        targetSdkVersion 33
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testApplicationId "com.android.car.rotary.test"
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     testOptions {

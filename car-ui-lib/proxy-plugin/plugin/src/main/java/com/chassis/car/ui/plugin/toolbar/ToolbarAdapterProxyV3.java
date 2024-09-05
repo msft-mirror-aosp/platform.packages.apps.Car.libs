@@ -139,7 +139,7 @@ public final class ToolbarAdapterProxyV3 implements ToolbarControllerOEMV3 {
 
     @Override
     public ImeSearchInterfaceOEMV2 getImeSearchInterface() {
-        return mToolbarController.getImeSearchInterface();
+        return (ImeSearchInterfaceOEMV2) mToolbarController.getImeSearchInterface();
     }
 
     @Override

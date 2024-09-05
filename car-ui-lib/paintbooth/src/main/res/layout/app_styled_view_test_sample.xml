@@ -29,8 +29,8 @@
           android:layout_height="wrap_content"
           android:layout_gravity="center"
           android:layout_marginTop="80dp"
-          android:text="ScrollView"
-          android:textSize="25dp"
+          android:text="@string/scrollview"
+          android:textSize="25sp"
           android:textStyle="bold" />
 
       <TextView
@@ -39,7 +39,7 @@
           android:layout_height="wrap_content"
           android:layout_gravity="center"
           android:layout_marginTop="20dp"
-          android:text="Welcome" />
+          android:text="@string/welcome" />
 
         <Button
             android:layout_width="wrap_content"
@@ -47,7 +47,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="60dp"
             android:background="@drawable/button_background_for_rotary"
-            android:text="Button One" />
+            android:text="@string/btn_1" />
 
         <Button
             android:layout_width="wrap_content"
@@ -55,7 +55,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="60dp"
             android:background="@drawable/button_background_for_rotary"
-            android:text="Button Two" />
+            android:text="@string/btn_2" />
 
         <Button
             android:layout_width="wrap_content"
@@ -63,7 +63,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="60dp"
             android:background="@drawable/button_background_for_rotary"
-            android:text="Button Three" />
+            android:text="@string/btn_3" />
 
         <Button
             android:layout_width="wrap_content"
@@ -71,11 +71,14 @@
             android:layout_gravity="center"
             android:layout_marginTop="60dp"
             android:background="@drawable/button_background_for_rotary"
-            android:text="Button Four" />
+            android:text="@string/btn_4" />
 
       <EditText
           android:layout_width="match_parent"
-          android:layout_height="wrap_content"/>
+          android:layout_height="wrap_content"
+          android:inputType="text"
+          android:hint="@string/welcome"
+          android:autofillHints="" />
 
         <Button
             android:layout_width="wrap_content"
@@ -83,7 +86,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="60dp"
             android:background="@drawable/button_background_for_rotary"
-            android:text="Button Five" />
+            android:text="@string/btn_5" />
 
         <Button
             android:layout_width="wrap_content"
@@ -91,7 +94,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="60dp"
             android:background="@drawable/button_background_for_rotary"
-            android:text="Button Six" />
+            android:text="@string/btn_6" />
 
         <Button
             android:layout_width="wrap_content"
@@ -99,7 +102,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="60dp"
             android:background="@drawable/button_background_for_rotary"
-            android:text="Button Seven" />
+            android:text="@string/btn_7" />
 
         <Button
             android:layout_width="wrap_content"
@@ -107,7 +110,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="60dp"
             android:background="@drawable/button_background_for_rotary"
-            android:text="Button Eight" />
+            android:text="@string/btn_8" />
 
         <Button
             android:layout_width="wrap_content"
@@ -115,6 +118,6 @@
             android:layout_gravity="center"
             android:layout_marginTop="60dp"
             android:background="@drawable/button_background_for_rotary"
-            android:text="Button Nine" />
+            android:text="@string/btn_9" />
     </LinearLayout>
 </com.android.car.ui.FocusArea>

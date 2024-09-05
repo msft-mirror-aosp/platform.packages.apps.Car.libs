@@ -16,12 +16,15 @@
 
 package com.android.car.media.common.source;
 
+import static androidx.car.app.mediaextensions.MediaBrowserExtras.KEY_ROOT_HINT_MEDIA_HOST_VERSION;
+
 import static com.android.car.apps.common.util.CarAppsDebugUtils.idHash;
 import static com.android.car.media.common.MediaConstants.BROWSE_CUSTOM_ACTIONS_ACTION_LIMIT;
 import static com.android.car.media.common.MediaConstants.KEY_ROOT_HINT_MEDIA_SESSION_API;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.media.MediaBrowserCompat;
 import android.util.Log;
@@ -306,12 +309,16 @@ public class MediaBrowserConnector {
     @NonNull
     protected MediaBrowserCompat createMediaBrowser(@NonNull MediaSource mediaSource,
             @NonNull MediaBrowserCompat.ConnectionCallback callback) {
+        Resources res = mContext.getResources();
         Bundle rootHints = new Bundle();
         rootHints.putInt(KEY_ROOT_HINT_MEDIA_SESSION_API, 1);
         rootHints.putInt(MediaConstants.BROWSER_ROOT_HINTS_KEY_MEDIA_ART_SIZE_PIXELS,
                 mMaxBitmapSizePx);
         rootHints.putInt(BROWSE_CUSTOM_ACTIONS_ACTION_LIMIT,
-                mContext.getResources().getInteger(R.integer.max_custom_actions));
+                res.getInteger(R.integer.max_custom_actions));
+        rootHints.putString(KEY_ROOT_HINT_MEDIA_HOST_VERSION,
+                res.getString(com.android.car.ui.R.string.com_android_car_ui_ub_release_id));
+
         rootHints.putAll(sExtraRootHints);
         ComponentName browseService = mediaSource.getBrowseServiceComponentName();
         return new MediaBrowserCompat(mContext, browseService, callback, rootHints);
