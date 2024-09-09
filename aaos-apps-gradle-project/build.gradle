@@ -18,7 +18,6 @@
 
 buildscript {
     gradle.ext.aaosLatestSDK = 34
-    gradle.ext.aaosTargetSDK = 33
 
     gradle.ext.repoRootPath = rootDir.parentFile.parentFile.parentFile.parentFile.parent
     gradle.ext.lib_car_system_stubs = gradle.ext.repoRootPath + "/prebuilts/sdk/" + gradle.ext.aaosLatestSDK + "/system/android.car-system-stubs.jar"
