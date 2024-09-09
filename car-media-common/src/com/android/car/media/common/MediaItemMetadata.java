@@ -19,6 +19,8 @@ package com.android.car.media.common;
 import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION;
 import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE;
 
+import static androidx.car.app.mediaextensions.MetadataExtras.KEY_EXCLUDE_MEDIA_ITEM_FROM_MIXED_APP_LIST;
+
 import static com.android.car.media.common.MediaConstants.KEY_DESCRIPTION_LINK_MEDIA_ID;
 import static com.android.car.media.common.MediaConstants.KEY_IMMERSIVE_AUDIO;
 import static com.android.car.media.common.MediaConstants.KEY_SUBTITLE_LINK_MEDIA_ID;
@@ -251,6 +253,13 @@ public class MediaItemMetadata {
     /** Returns whether the IMMERSIVE_AUDIO extra is set. */
     public boolean isImmersiveAudio() {
         return (mMetadataCompatBundle != null) && mMetadataCompatBundle.getLong(KEY_IMMERSIVE_AUDIO)
+                == MediaConstants.METADATA_VALUE_ATTRIBUTE_PRESENT;
+    }
+
+    /** Returns whether the EXCLUDE_MEDIA_ITEM extra is set. */
+    public boolean shouldExcludeItemFromMixedAppList() {
+        return (mMetadataCompatBundle != null) && mMetadataCompatBundle.getLong(
+                KEY_EXCLUDE_MEDIA_ITEM_FROM_MIXED_APP_LIST)
                 == MediaConstants.METADATA_VALUE_ATTRIBUTE_PRESENT;
     }
 

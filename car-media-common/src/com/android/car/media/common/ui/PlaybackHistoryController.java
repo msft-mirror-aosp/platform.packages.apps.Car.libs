@@ -148,7 +148,8 @@ public class PlaybackHistoryController {
         }
 
         private void updateView(MediaItemMetadata mediaItemMetadata) {
-            if (mediaItemMetadata == null) {
+            if (mediaItemMetadata == null
+                    || mediaItemMetadata.shouldExcludeItemFromMixedAppList()) {
                 if (mAppTitleInactive != null) {
                     mAppTitleInactive.setText(mContext.getString(R.string.open_action_for_app_title,
                             mMediaSource.getDisplayName(mContext)));
@@ -177,7 +178,9 @@ public class PlaybackHistoryController {
         private void setClickAction(PlaybackViewModel playbackViewModel) {
             itemView.setOnClickListener(v -> {
                 if (playbackViewModel.getPlaybackController().getValue() != null
-                        && playbackViewModel.getMetadata().getValue() != null) {
+                        && playbackViewModel.getMetadata().getValue() != null
+                        && !playbackViewModel.getMetadata().getValue()
+                        .shouldExcludeItemFromMixedAppList()) {
                     playbackViewModel.getPlaybackController().getValue().play();
                 } else {
                     Intent intent = mMediaSource.getIntent();
