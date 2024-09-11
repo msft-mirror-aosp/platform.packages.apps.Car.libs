@@ -376,13 +376,27 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
                                 window.getDecorView().getRootView());
                         mIsImeShown = insets.getInsets(WindowInsetsCompat.Type.ime())
                                 != Insets.NONE;
-                        WindowManager.LayoutParams layoutParams = getDialogWindowLayoutParam(
-                                window.getAttributes());
+                        WindowManager.LayoutParams layoutParams = getWindowLayoutParams();
 
                         int resize = 0;
                         if (mIsImeShown) {
                             // Makes assumption that ime is shown on bottom of screen
                             int imeHeight = bounds.getUpperBound().bottom;
+
+                            // Workaround Android R issue where animation bounds incorrectly
+                            // includes system bar insets
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
+                                Activity activity = CarUiUtils.getActivity(mContext);
+                                if (activity != null) {
+                                    WindowInsetsCompat activityInsets =
+                                            ViewCompat.getRootWindowInsets(
+                                                    activity.getWindow().getDecorView()
+                                                            .getRootView());
+                                    int systemBarBottom = activityInsets.getInsets(
+                                            WindowInsetsCompat.Type.systemBars()).bottom;
+                                    imeHeight = imeHeight - systemBarBottom;
+                                }
+                            }
 
                             int[] location = new int[2];
                             window.getDecorView().getRootView().getLocationOnScreen(location);
