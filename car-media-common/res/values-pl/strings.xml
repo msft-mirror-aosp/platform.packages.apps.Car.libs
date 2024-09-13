@@ -19,8 +19,7 @@
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="album_art" msgid="3392647029019061691">"Okładka albumu"</string>
     <string name="metadata_default_title" msgid="5902775732281325081">"Bez tytułu"</string>
-    <!-- no translation found for open_action_for_app_title (8479719373932210540) -->
-    <skip />
+    <string name="open_action_for_app_title" msgid="8479719373932210540">"Otwórz %1$s"</string>
     <string name="default_error_message" msgid="4044331619453864482">"Coś poszło nie tak. Spróbuj później."</string>
     <string name="error_code_app_error" msgid="3608680401453743688">"Teraz nie można tego zrobić"</string>
     <string name="error_code_not_supported" msgid="8004310657548193089">"Ta aplikacja nie ma takiej funkcji"</string>
