@@ -157,6 +157,25 @@
         <item name="oemColorScrim">?attr/oemColorNeutralPalette10</item>
         <item name="oemColorOutlineVariant">?attr/oemColorNeutralVariantPalette90</item>
         <item name="oemColorSurfaceTint">?attr/oemColorPrimaryPalette10</item>
+        <item name="oemColorSurfaceDim">@color/oem_color_surface_dim</item>
+        <item name="oemColorSurfaceBright">@color/oem_color_surface_bright</item>
+        <item name="oemColorSurfaceContainer">@color/oem_color_surface_container</item>
+        <item name="oemColorSurfaceContainerLow">@color/oem_color_surface_container_low</item>
+        <item name="oemColorSurfaceContainerLowest">@color/oem_color_surface_container_lowest</item>
+        <item name="oemColorSurfaceContainerHigh">@color/oem_color_surface_container_high</item>
+        <item name="oemColorSurfaceContainerHighest">@color/oem_color_surface_container_highest</item>
+        <item name="oemColorBlue">@color/oem_color_blue</item>
+        <item name="oemColorOnBlue">@color/oem_color_on_blue</item>
+        <item name="oemColorBlueContainer">@color/oem_color_blue_container</item>
+        <item name="oemColorOnBlueContainer">@color/oem_color_on_blue_container</item>
+        <item name="oemColorGreen">@color/oem_color_green</item>
+        <item name="oemColorOnGreen">@color/oem_color_on_green</item>
+        <item name="oemColorGreenContainer">@color/oem_color_green_container</item>
+        <item name="oemColorOnGreenContainer">@color/oem_color_on_green_container</item>
+        <item name="oemColorYellow">@color/oem_color_yellow</item>
+        <item name="oemColorOnYellow">@color/oem_color_on_yellow</item>
+        <item name="oemColorYellowContainer">@color/oem_color_yellow_container</item>
+        <item name="oemColorOnYellowContainer">@color/oem_color_on_yellow_container</item>
     </style>
 
     <style name="OemTokens">
@@ -189,6 +208,25 @@
         <item name="oemColorScrim">?com.android.oem.tokens:attr/colorScrim</item>
         <item name="oemColorOutlineVariant">?com.android.oem.tokens:attr/colorOutlineVariant</item>
         <item name="oemColorSurfaceTint">?com.android.oem.tokens:attr/colorSurfaceTint</item>
+        <item name="oemColorSurfaceDim">?com.android.oem.tokens:attr/colorSurfaceDim</item>
+        <item name="oemColorSurfaceBright">?com.android.oem.tokens:attr/colorSurfaceBright</item>
+        <item name="oemColorSurfaceContainer">?com.android.oem.tokens:attr/colorSurfaceContainer</item>
+        <item name="oemColorSurfaceContainerLow">?com.android.oem.tokens:attr/colorSurfaceContainerLow</item>
+        <item name="oemColorSurfaceContainerLowest">?com.android.oem.tokens:attr/colorSurfaceContainerLowest</item>
+        <item name="oemColorSurfaceContainerHigh">?com.android.oem.tokens:attr/colorSurfaceContainerHigh</item>
+        <item name="oemColorSurfaceContainerHighest">?com.android.oem.tokens:attr/colorSurfaceContainerHighest</item>
+        <item name="oemColorBlue">?com.android.oem.tokens:attr/colorBlue</item>
+        <item name="oemColorOnBlue">?com.android.oem.tokens:attr/colorOnBlue</item>
+        <item name="oemColorBlueContainer">?com.android.oem.tokens:attr/colorBlueContainer</item>
+        <item name="oemColorOnBlueContainer">?com.android.oem.tokens:attr/colorOnBlueContainer</item>
+        <item name="oemColorGreen">?com.android.oem.tokens:attr/colorGreen</item>
+        <item name="oemColorOnGreen">?com.android.oem.tokens:attr/colorOnGreen</item>
+        <item name="oemColorGreenContainer">?com.android.oem.tokens:attr/colorGreenContainer</item>
+        <item name="oemColorOnGreenContainer">?com.android.oem.tokens:attr/colorOnGreenContainer</item>
+        <item name="oemColorYellow">?com.android.oem.tokens:attr/colorYellow</item>
+        <item name="oemColorOnYellow">?com.android.oem.tokens:attr/colorOnYellow</item>
+        <item name="oemColorYellowContainer">?com.android.oem.tokens:attr/colorYellowContainer</item>
+        <item name="oemColorOnYellowContainer">?com.android.oem.tokens:attr/colorOnYellowContainer</item>
 
         <item name="oemColorPrimaryPalette100">?com.android.oem.tokens:attr/colorPrimaryPalette100</item>
         <item name="oemColorPrimaryPalette99">?com.android.oem.tokens:attr/colorPrimaryPalette99</item>
@@ -303,6 +341,25 @@
         <item name="com.android.oem.tokens:colorScrim">?attr/oemColorNeutralPalette80</item>
         <item name="com.android.oem.tokens:colorOutlineVariant">?attr/oemColorNeutralVariantPalette30</item>
         <item name="com.android.oem.tokens:colorSurfaceTint">?attr/oemColorPrimaryPalette80</item>
+        <item name="com.android.oem.tokens:colorSurfaceDim">@color/oem_color_surface_dim</item>
+        <item name="com.android.oem.tokens:colorSurfaceBright">@color/oem_color_surface_bright</item>
+        <item name="com.android.oem.tokens:colorSurfaceContainer">@color/oem_color_surface_container</item>
+        <item name="com.android.oem.tokens:colorSurfaceContainerLow">@color/oem_color_surface_container_low</item>
+        <item name="com.android.oem.tokens:colorSurfaceContainerLowest">@color/oem_color_surface_container_lowest</item>
+        <item name="com.android.oem.tokens:colorSurfaceContainerHigh">@color/oem_color_surface_container_high</item>
+        <item name="com.android.oem.tokens:colorSurfaceContainerHighest">@color/oem_color_surface_container_highest</item>
+        <item name="com.android.oem.tokens:colorBlue">@color/oem_color_blue</item>
+        <item name="com.android.oem.tokens:colorOnBlue">@color/oem_color_on_blue</item>
+        <item name="com.android.oem.tokens:colorBlueContainer">@color/oem_color_blue_container</item>
+        <item name="com.android.oem.tokens:colorOnBlueContainer">@color/oem_color_on_blue_container</item>
+        <item name="com.android.oem.tokens:colorGreen">@color/oem_color_green</item>
+        <item name="com.android.oem.tokens:colorOnGreen">@color/oem_color_on_green</item>
+        <item name="com.android.oem.tokens:colorGreenContainer">@color/oem_color_green_container</item>
+        <item name="com.android.oem.tokens:colorOnGreenContainer">@color/oem_color_on_green_container</item>
+        <item name="com.android.oem.tokens:colorYellow">@color/oem_color_yellow</item>
+        <item name="com.android.oem.tokens:colorOnYellow">@color/oem_color_on_yellow</item>
+        <item name="com.android.oem.tokens:colorYellowContainer">@color/oem_color_yellow_container</item>
+        <item name="com.android.oem.tokens:colorOnYellowContainer">@color/oem_color_on_yellow_container</item>
 
         <item name="com.android.oem.tokens:colorPrimaryPalette100">@color/oem_default_color_primary_palette_100</item>
         <item name="com.android.oem.tokens:colorPrimaryPalette99">@color/oem_default_color_primary_palette_99</item>
