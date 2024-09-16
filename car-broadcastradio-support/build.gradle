@@ -19,6 +19,8 @@ plugins {
 }
 
 android {
+    namespace "com.android.car.broadcastradio.support"
+    testNamespace "com.android.car.broadcastradio.tests"
     compileSdkVersion gradle.ext.aaosLatestSDK
 
     defaultConfig {
