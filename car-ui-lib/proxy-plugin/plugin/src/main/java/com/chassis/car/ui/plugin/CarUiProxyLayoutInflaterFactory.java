@@ -39,7 +39,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatViewInflater;
 
-import com.android.car.ui.R;
 import com.android.car.ui.pluginsupport.PluginFactoryStub;
 import com.android.car.ui.preference.CarUiPreferenceViewStub;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
@@ -82,7 +81,7 @@ public class CarUiProxyLayoutInflaterFactory extends AppCompatViewInflater imple
 
     int getPreferenceType(Context context, AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(
-                attrs, R.styleable.Preference, 0, 0);
+                attrs, com.chassis.car.ui.plugin.R.styleable.Preference, 0, 0);
 
         int preferenceType = a.getInt(
                 com.chassis.car.ui.plugin.R.styleable.Preference_carUiPreferenceType,
