@@ -18,6 +18,7 @@ plugins {
     id 'buildSrc.jdk.jdk8'
 }
 android {
+    namespace "com.android.car.assist"
     compileSdkVersion gradle.ext.aaosLatestSDK
 
     defaultConfig {
