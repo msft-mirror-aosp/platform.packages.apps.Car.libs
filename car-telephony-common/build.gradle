@@ -20,6 +20,8 @@ plugins {
 }
 
 android {
+    namespace "com.android.car.telephony"
+    testNamespace "com.android.car.telephony.common.unittests"
     compileSdkVersion gradle.ext.aaosLatestSDK
 
     defaultConfig {
