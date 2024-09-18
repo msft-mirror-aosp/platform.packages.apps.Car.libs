@@ -26,9 +26,14 @@ import android.graphics.drawable.Drawable
 import android.icu.util.MeasureUnit
 import android.location.Location
 import android.location.LocationManager
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.net.Uri
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import androidx.core.content.getSystemService
 import com.android.car.appcard.AppCardContext
 import com.android.car.appcard.ImageAppCard
 import com.android.car.appcard.component.Header
@@ -74,11 +79,15 @@ class WeatherAppCardProvider(
   private var forecastDisposable: Disposable? = null
   private var carTemperatureUnit: MeasureUnit? = null
   private var latestPeriod: Period? = null
+  private var isConnectedToInternet: Boolean = false
 
   init {
     if (permissionGranted()) {
       initLocationManager()
     }
+
+    val connectivityManager = context.getSystemService<ConnectivityManager>()
+    connectivityManager?.registerNetworkCallback(getNetworkRequest(), getNetworkCallBack())
   }
 
   fun setTempUnit(newMeasureUnit: MeasureUnit) {
@@ -133,6 +142,11 @@ class WeatherAppCardProvider(
       locationManager ?: initLocationManager()
     } else {
       return getGrantPermissionAppCard()
+    }
+
+    if (!isConnectedToInternet) {
+      logIfDebuggable("Internet connection isn't established")
+      return getErrorAppCard(INTERNET_CONNECTION_SECONDARY)
     }
 
     val loc = getCurrentLocation()
@@ -375,10 +389,10 @@ class WeatherAppCardProvider(
   @SuppressLint("MissingPermission")
   private fun getCurrentLocation(): Location? {
     val cancellationSignal = null
-    currLocation =
-      currLocation ?: locationManager?.getLastKnownLocation(LocationManager.FUSED_PROVIDER)
+    val locationProvider = getLocationProvider()
+    currLocation = currLocation ?: locationManager?.getLastKnownLocation(locationProvider)
     locationManager?.getCurrentLocation(
-      LocationManager.FUSED_PROVIDER,
+      locationProvider,
       cancellationSignal,
       context.mainExecutor
     ) {
@@ -393,6 +407,33 @@ class WeatherAppCardProvider(
       }
     }
     return currLocation
+  }
+
+  private fun getLocationProvider(): String {
+    locationManager?.isProviderEnabled(LocationManager.FUSED_PROVIDER)?.let {
+      if (it) {
+        logIfDebuggable("Using fused provider for location")
+        return LocationManager.FUSED_PROVIDER
+      }
+    }
+    logIfDebuggable("Using passive provider for location")
+    return LocationManager.PASSIVE_PROVIDER
+  }
+
+  private fun getNetworkRequest() = NetworkRequest.Builder()
+    .addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+    .build()
+
+  private fun getNetworkCallBack() = object : ConnectivityManager.NetworkCallback() {
+    override fun onAvailable(network: Network) {
+      super.onAvailable(network)
+      isConnectedToInternet = true
+    }
+
+    override fun onLost(network: Network) {
+      super.onLost(network)
+      isConnectedToInternet = false
+    }
   }
 
   private fun drawableToBitmap(drawable: Drawable, width: Int, height: Int): Bitmap {
@@ -438,6 +479,7 @@ class WeatherAppCardProvider(
     private const val USER_AGENT_VALUE = "Sample Weather App Card"
     private const val ERROR_PRIMARY = "Error"
     private const val LOCATION_PERMISSION_SECONDARY = "Location permission required"
+    private const val INTERNET_CONNECTION_SECONDARY = "Internet connection required"
     private const val LOADING_PRIMARY = "Loading..."
     private const val LOADING_SECONDARY = ""
     private const val WEATHER_HEADER = "Weather"
