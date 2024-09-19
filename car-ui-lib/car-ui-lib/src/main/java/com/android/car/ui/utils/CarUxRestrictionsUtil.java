@@ -17,11 +17,14 @@ package com.android.car.ui.utils;
 
 import static android.car.drivingstate.CarUxRestrictions.UX_RESTRICTIONS_LIMIT_STRING_LENGTH;
 
+import android.app.Activity;
+import android.app.Application;
 import android.car.Car;
 import android.car.drivingstate.CarUxRestrictions;
 import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.Context;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -31,6 +34,7 @@ import androidx.annotation.VisibleForTesting;
 import com.android.car.ui.R;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -43,9 +47,12 @@ import java.util.WeakHashMap;
  */
 public class CarUxRestrictionsUtil {
     private static final String TAG = "CarUxRestrictionsUtil";
+    private static final Map<Context, CarUxRestrictionsUtil> sContextToUtilMap =
+            new WeakHashMap<>();
 
     @NonNull
     private CarUxRestrictions mCarUxRestrictions = getDefaultRestrictions();
+    private Car mCar;
 
     private final Set<OnUxRestrictionsChangedListener> mObservers =
             Collections.newSetFromMap(new WeakHashMap<>());
@@ -61,16 +68,16 @@ public class CarUxRestrictionsUtil {
                     observer.onRestrictionsChanged(mCarUxRestrictions);
                 }
             };
-    private static CarUxRestrictionsUtil sInstance = null;
 
-    private CarUxRestrictionsUtil(@Nullable Context context) {
+    private CarUxRestrictionsUtil(@NonNull Context context) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 Car.createCar(context, null,
                         Car.CAR_WAIT_TIMEOUT_DO_NOT_WAIT,
                         (Car car, boolean ready) -> {
                             if (ready) {
-                                registerCarUxRestrictionsListener(car, mListener);
+                                mCar = car;
+                                registerCarUxRestrictionsListener(mListener);
                             } else {
                                 Log.w(TAG, "Car service disconnected, assuming fully"
                                         + " restricted uxr");
@@ -78,8 +85,8 @@ public class CarUxRestrictionsUtil {
                             }
                         });
             } else {
-                Car car = Car.createCar(context);
-                registerCarUxRestrictionsListener(car, mListener);
+                mCar = Car.createCar(context);
+                registerCarUxRestrictionsListener(mListener);
             }
         } catch (RuntimeException e) {
             // Can't catch more specific exception, because
@@ -109,15 +116,71 @@ public class CarUxRestrictionsUtil {
     }
 
     /**
-     * Returns the singleton sInstance of this class
+     * Returns the singleton instance of this class. Instance created with this should be
+     * disconnected from car service by calling disconnect() before the passed {code Context} is
+     * released.
      */
     @NonNull
-    public static CarUxRestrictionsUtil getInstance(Context context) {
-        if (sInstance == null) {
-            sInstance = new CarUxRestrictionsUtil(context);
+    public static CarUxRestrictionsUtil getInstance(@NonNull Context context) {
+        CarUxRestrictionsUtil util = sContextToUtilMap.get(context);
+        if (util == null) {
+            util = new CarUxRestrictionsUtil(context);
+            sContextToUtilMap.put(context, util);
         }
 
-        return sInstance;
+        Activity activity = CarUiUtils.getActivity(context);
+        if (activity == null) {
+            return util;
+        }
+
+        // If an application context is used, we should re-use static instance and not
+        // register activity lifecycle callbacks
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            activity.registerActivityLifecycleCallbacks(
+                    new Application.ActivityLifecycleCallbacks() {
+                        @Override
+                        public void onActivityCreated(@NonNull Activity activity,
+                                                      @Nullable Bundle savedInstanceState) {
+                            // Do nothing
+                        }
+
+                        @Override
+                        public void onActivityStarted(@NonNull Activity activity) {
+                            // Do nothing
+                        }
+
+                        @Override
+                        public void onActivityResumed(@NonNull Activity activity) {
+                            // Do nothing
+                        }
+
+                        @Override
+                        public void onActivityPaused(@NonNull Activity activity) {
+                            // Do nothing
+                        }
+
+                        @Override
+                        public void onActivityStopped(@NonNull Activity activity) {
+                            // Do nothing
+                        }
+
+                        @Override
+                        public void onActivitySaveInstanceState(@NonNull Activity activity,
+                                                                @NonNull Bundle outState) {
+                            // Do nothing
+                        }
+
+                        @Override
+                        public void onActivityDestroyed(@NonNull Activity activity) {
+                            CarUxRestrictionsUtil util = sContextToUtilMap.get(activity);
+                            if (util != null && util.mCar != null) {
+                                util.mCar.disconnect();
+                            }
+                        }
+                    });
+        }
+
+        return util;
     }
 
     /**
@@ -180,12 +243,21 @@ public class CarUxRestrictionsUtil {
         mListener.onUxRestrictionsChanged(mCarUxRestrictions);
     }
 
-    private static void registerCarUxRestrictionsListener(
-            @NonNull Car car,
+    /**
+     * Disconnect restriction util from car service. Should be called before the {code Context}
+     * passed to {@link #getInstance(Context)} is released .
+     */
+    public void disconnect() {
+        if (mCar != null) {
+            mCar.disconnect();
+        }
+    }
+
+    private void registerCarUxRestrictionsListener(
             @NonNull CarUxRestrictionsManager.OnUxRestrictionsChangedListener listener) {
         try {
             CarUxRestrictionsManager carUxRestrictionsManager =
-                    (CarUxRestrictionsManager) car.getCarManager(
+                    (CarUxRestrictionsManager) mCar.getCarManager(
                             Car.CAR_UX_RESTRICTION_SERVICE);
             carUxRestrictionsManager.registerListener(listener);
             listener.onUxRestrictionsChanged(
