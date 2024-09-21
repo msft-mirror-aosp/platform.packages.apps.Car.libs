@@ -372,8 +372,10 @@ public class MediaSource {
         MediaSource that = (MediaSource) o;
         if (mBrowseService != null) {
             return Objects.equals(mBrowseService, that.mBrowseService);
-        } else if (that.mBrowseService == null && mMediaController != null) {
-            return Objects.equals(mMediaController, that.mMediaController);
+        } else if (that.mBrowseService == null && that.mMediaController != null
+                && mMediaController != null) {
+            return Objects.equals(mMediaController.getSessionToken(),
+                    that.mMediaController.getSessionToken());
         } else if (that.mBrowseService == null && that.mMediaController == null) {
             return Objects.equals(mPackageName, that.mPackageName);
         } else {
