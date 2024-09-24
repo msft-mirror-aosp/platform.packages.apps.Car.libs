@@ -50,8 +50,8 @@ android_test {
     // Enforce the jni libraries to be grouped into the APK file.
     use_embedded_native_libs: true,
     libs: [
-        "android.test.runner",
-        "android.test.base",
+        "android.test.runner.stubs.system",
+        "android.test.base.stubs.system",
         "android.car-stubs",
         "android.test.mock.stubs",
     ],

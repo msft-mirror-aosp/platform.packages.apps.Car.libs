@@ -29,8 +29,8 @@ android_test {
     certificate: ":com-android-car-apps-test",
 
     libs: [
-        "android.test.runner",
-        "android.test.base",
+        "android.test.runner.stubs.system",
+        "android.test.base.stubs.system",
         "android.car-stubs",
         "android.test.mock.stubs"
     ],

@@ -41,8 +41,8 @@ android_test {
     resource_dirs: ["src/androidTest/res"],
     srcs: ["src/androidTest/java/**/*.java"],
     libs: [
-        "android.test.runner",
-        "android.test.base",
+        "android.test.runner.stubs.system",
+        "android.test.base.stubs.system",
         "token-shared-lib",
     ],
     static_libs: [
