@@ -210,9 +210,8 @@ public class InMemoryPhoneBook implements Observer<List<Contact>> {
         }
         if (mPhoneNumberContactMap.containsKey(accountName)) {
             String minMatch = PhoneNumberUtils.toCallerIDMinMatch(phoneNumber);
-            return  mPhoneNumberContactMap.get(accountName).get(minMatch);
+            return mPhoneNumberContactMap.get(accountName).get(minMatch);
         }
-
         return null;
     }
 

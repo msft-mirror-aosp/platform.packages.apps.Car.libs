@@ -45,6 +45,7 @@ import androidx.annotation.OptIn;
 import androidx.annotation.VisibleForTesting;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.media.utils.MediaConstants;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.session.CommandButton;
@@ -162,6 +163,9 @@ public class PlaybackViewModel {
                     state -> state == null ? dataOf(new PlaybackProgress(0L, 0L))
                             : new ProgressLiveData(state.mState, state.getMaxProgress()));
 
+    private final LiveData<BrowsingState> mBrowsingState;
+    private final Observer<BrowsingState> mObserver = this::onBrowsingStateChanged;
+
     private final WeakReference<Context> mContext;
     private final String mDebugId;
     private final InputFactory mInputFactory;
@@ -186,7 +190,8 @@ public class PlaybackViewModel {
         mDebugId = debugId + " ";
         mInputFactory = factory;
         mColorsFactory = new MediaSourceColors.Factory(context.getApplicationContext());
-        browsingState.observeForever(this::onBrowsingStateChanged);
+        mBrowsingState = browsingState;
+        mBrowsingState.observeForever(mObserver);
     }
 
     private void onBrowsingStateChanged(BrowsingState browsingState) {
@@ -274,6 +279,11 @@ public class PlaybackViewModel {
     @VisibleForTesting
     MediaMetadataCompat getMediaMetadata() {
         return mMediaControllerCallback.mMediaMetadata;
+    }
+
+    /** Call to clear the model */
+    public void onCleared() {
+        mBrowsingState.removeObserver(mObserver);
     }
 
     private String getLogPrefix() {

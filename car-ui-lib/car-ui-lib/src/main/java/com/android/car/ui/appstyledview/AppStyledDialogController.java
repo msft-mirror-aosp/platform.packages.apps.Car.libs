@@ -276,7 +276,8 @@ public final class AppStyledDialogController {
      */
     @Deprecated
     public Context createContentViewConfigurationContext(Context context) {
-        return createContentViewConfigurationContext(context, R.style.Theme_AppCompat_Light);
+        return createContentViewConfigurationContext(context,
+                androidx.appcompat.R.style.Theme_AppCompat_Light);
     }
 
     /**

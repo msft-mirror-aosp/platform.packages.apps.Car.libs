@@ -183,7 +183,7 @@ public class AppStyledViewControllerImpl implements AppStyledViewController {
     @Override
     public void setContent(@Nullable View contentView) {
         mContent = contentView;
-        createAppStyledView(contentView);
+        View unused = createAppStyledView(contentView);
     }
 
     private void updateNavIcon() {

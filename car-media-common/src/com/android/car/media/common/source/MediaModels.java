@@ -24,6 +24,7 @@ import androidx.lifecycle.LiveData;
 import com.android.car.media.common.browse.MediaItemsRepository;
 import com.android.car.media.common.playback.PlaybackViewModel;
 import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
+import com.android.car.media.common.source.MediaSessionHelper.NotificationProvider;
 
 /** Helps manage related "models". */
 public class MediaModels {
@@ -31,14 +32,16 @@ public class MediaModels {
     private final MediaSourceViewModel mMediaSourceViewModel;
     private final MediaItemsRepository mMediaItemsRepository;
     private final PlaybackViewModel mPlaybackViewModel;
+    private CarMediaManagerHelper mCarMediaManagerHelper;
+    private MediaSessionHelper mMediaSessionHelper;
 
     /**
      * Creates models tied to {@link CarMediaManagerHelper#getAudioSource} for the given
      * {@link CarMediaManager} mode.
      */
     public MediaModels(Context context, int mode) {
-        CarMediaManagerHelper helper = CarMediaManagerHelper.getInstance(context);
-        LiveData<MediaSource> srcData = helper.getAudioSource(mode);
+        mCarMediaManagerHelper = new CarMediaManagerHelper(context);
+        LiveData<MediaSource> srcData = mCarMediaManagerHelper.getAudioSource(mode);
         mMediaSourceViewModel = new MediaSourceViewModel(context, srcData);
         LiveData<BrowsingState> browseState = mMediaSourceViewModel.getBrowsingState();
         String debugId = CarMediaManagerHelper.getMode(mode) + "-AudioSource";
@@ -61,10 +64,26 @@ public class MediaModels {
 
     /**
      * Creates models tied to {@link MediaSessionHelper#getMediaSource}
+     *
+     * @deprecated use {@link #MediaModels(Context, NotificationProvider)} instead
      */
+    @Deprecated
     public MediaModels(Context context) {
         MediaSessionHelper helper = MediaSessionHelper.getInstance(context);
         LiveData<MediaSource> srcData = helper.getMediaSource();
+        mMediaSourceViewModel = new MediaSourceViewModel(context, srcData);
+        LiveData<BrowsingState> browseState = mMediaSourceViewModel.getBrowsingState();
+        String debugId = "ActiveSource";
+        mMediaItemsRepository = new MediaItemsRepository(context, browseState, debugId);
+        mPlaybackViewModel = new PlaybackViewModel(context, browseState, debugId);
+    }
+
+    /**
+     * Creates models tied to {@link MediaSessionHelper#getMediaSource}
+     */
+    public MediaModels(Context context, NotificationProvider notificationProvider) {
+        mMediaSessionHelper = new MediaSessionHelper(context, notificationProvider);
+        LiveData<MediaSource> srcData = mMediaSessionHelper.getMediaSource();
         mMediaSourceViewModel = new MediaSourceViewModel(context, srcData);
         LiveData<BrowsingState> browseState = mMediaSourceViewModel.getBrowsingState();
         String debugId = "ActiveSource";
@@ -87,4 +106,16 @@ public class MediaModels {
         return mPlaybackViewModel;
     }
 
+    /** Clears the models. */
+    public void onCleared() {
+        mMediaSourceViewModel.onCleared();
+        mMediaItemsRepository.onCleared();
+        mPlaybackViewModel.onCleared();
+        if (mCarMediaManagerHelper != null) {
+            mCarMediaManagerHelper.onCleared();
+        }
+        if (mMediaSessionHelper != null) {
+            mMediaSessionHelper.onCleared();
+        }
+    }
 }

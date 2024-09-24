@@ -38,7 +38,8 @@ public final class ImeSearchInterfaceProxy {
     @NonNull
     public static ImeSearchInterfaceOEMV1 getImeSearchInterfaceV1(
             @NonNull ToolbarControllerImpl toolbarController) {
-        ImeSearchInterfaceOEMV2 imeSearchInterface = toolbarController.getImeSearchInterface();
+        ImeSearchInterfaceOEMV2 imeSearchInterface =
+                (ImeSearchInterfaceOEMV2) toolbarController.getImeSearchInterface();
         return new ImeSearchInterfaceOEMV1() {
             @Override
             public void setSearchTextViewConsumer(

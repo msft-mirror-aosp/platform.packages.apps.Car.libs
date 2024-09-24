@@ -21,6 +21,7 @@ import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.up
 import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.updateMediaLink;
 import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.updatePlayButtonWithPlaybackState;
 import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.updateProgressTimesAndSeparator;
+import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.updateSeekbarWithPlaybackState;
 import static com.android.car.media.common.ui.PlaybackCardControllerUtilities.updateTextViewAndVisibility;
 
 import android.content.Context;
@@ -338,9 +339,11 @@ public class PlaybackCardController {
         } else {
             ViewUtils.setVisible(mTitle, false);
             ViewUtils.setVisible(mSubtitle, false);
-            ViewUtils.setVisible(mAlbumCover, false);
             ViewUtils.setVisible(mDescription, false);
-            ViewUtils.setVisible(mLogo, false);
+            // Set current images to null
+            Context context = mView.getContext();
+            mAlbumArtBinder.setImage(context, /* newRef= */ null);
+            mLogoBinder.setImage(context, /* newRef= */ null);
         }
     }
 
@@ -429,6 +432,7 @@ public class PlaybackCardController {
                     mView.getContext().getDrawable(R.drawable.ic_skip_previous),
                     mView.getContext().getDrawable(R.drawable.ic_skip_next), null, null,
                     false, null);
+            updateSeekbarWithPlaybackState(mSeekBar, playbackState);
         }
     }
 }

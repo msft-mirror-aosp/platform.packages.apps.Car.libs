@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// MUST be a resource only library
 android_library {
     name: "oem-token-lib-source",
 

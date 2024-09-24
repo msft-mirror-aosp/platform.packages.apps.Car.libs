@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+    id 'buildSrc.jdk.jdk8'
+}
 
 android {
     namespace 'com.android.oem.tokens'
@@ -22,14 +25,9 @@ android {
     defaultConfig {
         applicationId "com.android.oem.tokens"
         minSdkVersion 28
-        targetSdkVersion gradle.ext.aaosTargetSDK
+        targetSdkVersion 33
         versionCode gradle.ext.getVersionCode()
         versionName gradle.ext.getVersionName()
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     signingConfigs {

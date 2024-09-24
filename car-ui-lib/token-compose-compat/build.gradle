@@ -3,6 +3,7 @@ import com.android.build.gradle.tasks.VerifyLibraryResourcesTask
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'buildSrc.jdk.jdk8'
 }
 
 android {
@@ -16,20 +17,12 @@ android {
         versionName "1.0"
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
-
     buildFeatures {
         compose true
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.8"
+        kotlinCompilerExtensionVersion = composeCompilerVersion
     }
 }
 

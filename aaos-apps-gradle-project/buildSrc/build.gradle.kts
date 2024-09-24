@@ -16,15 +16,8 @@
 plugins {
     `kotlin-dsl`
 }
-repositories {
-    mavenCentral()
-    google()
-}
-
-val androidGradlePluginVersion: String by project
-val kotlinGradlePluginVersion: String by project
 
 dependencies {
-    implementation("com.android.tools.build:gradle:$androidGradlePluginVersion")
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinGradlePluginVersion")
+    implementation(libs.android.gradlePlugin)
+    implementation(libs.kotlin.gradlePlugin)
 }

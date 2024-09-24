@@ -42,6 +42,7 @@ import androidx.annotation.Nullable;
 import androidx.car.app.mediaextensions.analytics.host.IAnalyticsManager;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.android.car.apps.common.util.FutureData;
 import com.android.car.media.common.CustomBrowseAction;
@@ -139,13 +140,16 @@ public class MediaItemsRepository {
     private final MediaItemsLiveData mSearchMediaItems = new MediaItemsLiveData(/*loading*/ false);
     private final MutableLiveData<Map<String, CustomBrowseAction>> mCustomBrowseActions =
             dataOf(Collections.emptyMap());
+    private final LiveData<BrowsingState> mBrowsingStateLiveDataSource;
+    private final Observer<BrowsingState> mObserver = this::onMediaBrowsingStateChanged;
     private String mSearchQuery;
 
     public MediaItemsRepository(Context context, LiveData<BrowsingState> browsingState,
             String debugId) {
         mContext = new WeakReference<>(context);
         mDebugId = debugId + " ";
-        browsingState.observeForever(this::onMediaBrowsingStateChanged);
+        mBrowsingStateLiveDataSource = browsingState;
+        mBrowsingStateLiveDataSource.observeForever(this::onMediaBrowsingStateChanged);
     }
 
     /**
@@ -236,6 +240,11 @@ public class MediaItemsRepository {
             mSearchMediaItems.setLoading();
             mBrowsingState.mBrowser.search(mSearchQuery, options, mSearchCallback);
         }
+    }
+
+    /** Call to clear the model */
+    public void onCleared() {
+        mBrowsingStateLiveDataSource.removeObserver(mObserver);
     }
 
     private void clearSearchResults() {

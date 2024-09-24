@@ -106,7 +106,8 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
                 context.getResources().getBoolean(R.bool.show_circular_progress_bar);
         mCircularProgressBar = findViewById(R.id.circular_progress_bar);
 
-        BackgroundImageView artBackground = findViewById(R.id.art_background);
+        BackgroundImageView artBackground = findViewById(
+                com.android.car.apps.common.R.id.art_background);
         if (artBackground != null) {
             int max = getResources().getInteger(R.integer.media_items_bitmap_max_size_px);
             Size maxArtSize = new Size(max, max);
@@ -114,14 +115,16 @@ public class MinimizedPlaybackControlBar extends MinimizedControlBar {
                     artBackground::setBackgroundDrawable);
         }
 
-        FrameLayout extraSlot = findViewById(R.id.minimized_control_bar_extra_slot);
+        FrameLayout extraSlot = findViewById(
+                com.android.car.apps.common.R.id.minimized_control_bar_extra_slot);
         if (extraSlot != null) {
             mContentFormatView = (ContentFormatView) LayoutInflater.from(context).inflate(
                     R.layout.minimized_content_format, extraSlot, false);
             extraSlot.addView(mContentFormatView);
         }
 
-        mSeparatorView = findViewById(R.id.minimized_control_bar_subtitle_separator);
+        mSeparatorView = findViewById(
+                com.android.car.apps.common.R.id.minimized_control_bar_subtitle_separator);
         mViewSeparatedFromExtraSlot = findViewWithTag("view_separated_from_extra_slot");
     }
 

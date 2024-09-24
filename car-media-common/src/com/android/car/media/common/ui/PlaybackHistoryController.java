@@ -16,7 +16,9 @@
 
 package com.android.car.media.common.ui;
 
+import android.app.ActivityOptions;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.util.Size;
 import android.view.LayoutInflater;
@@ -140,8 +142,7 @@ public class PlaybackHistoryController {
             MediaModels models = new MediaModels(mContext, mediaSource);
             PlaybackViewModel playbackViewModel = models.getPlaybackViewModel();
             playbackViewModel.getMetadata().observe(mLifecycleOwner, this::updateView);
-            playbackViewModel.getPlaybackController().observe(mLifecycleOwner,
-                    this::setClickAction);
+            setClickAction(playbackViewModel);
         }
 
         private void updateView(MediaItemMetadata mediaItemMetadata) {
@@ -166,12 +167,19 @@ public class PlaybackHistoryController {
             mInactiveView.setVisibility(View.GONE);
         }
 
-        private void setClickAction(PlaybackViewModel.PlaybackController playbackController) {
-            if (playbackController != null) {
-                itemView.setOnClickListener(v -> playbackController.play());
-            } else {
-                itemView.setOnClickListener(v -> mContext.startActivity(mMediaSource.getIntent()));
-            }
+        private void setClickAction(PlaybackViewModel playbackViewModel) {
+            itemView.setOnClickListener(v -> {
+                if (playbackViewModel.getPlaybackController().getValue() != null
+                        && playbackViewModel.getMetadata().getValue() != null) {
+                    playbackViewModel.getPlaybackController().getValue().play();
+                } else {
+                    Intent intent = mMediaSource.getIntent();
+                    if (intent != null) {
+                        ActivityOptions options = ActivityOptions.makeBasic();
+                        mContext.startActivity(intent, options.toBundle());
+                    }
+                }
+            });
         }
 
         void onViewAttachedToWindow() {

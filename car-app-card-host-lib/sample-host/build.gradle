@@ -19,7 +19,7 @@ import com.android.build.gradle.tasks.VerifyLibraryResourcesTask
 plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.android.application'
-    id "com.google.protobuf" version "0.9.4"
+    id 'buildSrc.jdk.jdk8'
 }
 
 android {
@@ -28,18 +28,9 @@ android {
     compileSdkVersion gradle.ext.aaosLatestSDK
     defaultConfig {
         minSdkVersion 31
-        targetSdkVersion gradle.ext.aaosTargetSDK
+        targetSdkVersion 33
         versionCode gradle.ext.getVersionCode()
         versionName gradle.ext.getVersionName()
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
     }
 
     signingConfigs {
@@ -86,7 +77,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.8"
+        kotlinCompilerExtensionVersion = composeCompilerVersion
     }
 }
 

@@ -46,8 +46,8 @@ public class ControlBarHelper {
             return;
         }
         boolean useMediaSourceColor =
-                context.getResources().getBoolean(
-                        R.bool.use_media_source_color_for_minimized_progress_bar);
+                context.getResources().getBoolean(com.android.car.apps.common
+                        .R.bool.use_media_source_color_for_minimized_progress_bar);
         if (useMediaSourceColor) {
             model.getMediaSourceColors().observe(owner,
                     sourceColors -> {
