@@ -126,6 +126,8 @@ public class CarUxRestrictionsUtil {
         if (util == null) {
             util = new CarUxRestrictionsUtil(context);
             sContextToUtilMap.put(context, util);
+        } else {
+            return util;
         }
 
         Activity activity = CarUiUtils.getActivity(context);
