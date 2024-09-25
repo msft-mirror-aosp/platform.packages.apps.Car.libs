@@ -6,6 +6,7 @@ local.properties
 build/
 gradle-app.setting
 .gradletasknamecache
+.kotlin/
 
 # IntelliJ
 **/.idea/**

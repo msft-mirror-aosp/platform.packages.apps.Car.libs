@@ -16,6 +16,28 @@
 
 rootProject.name = "AAOS Apps"
 
+pluginManagement {
+    repositories {
+        // Only check the google repository for these groups
+        // This makes dependency resolution much faster by telling Gradle that it'll only find
+        // Google libraries and plugins within the gmaven repository.
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        gradlePluginPortal()
+    }
+    includeBuild("buildLogic")
+
+}
+
+plugins {
+    id("aaosApps.buildLogic.settings")
+}
+
 /**
  * List of Unbundled projects and their corresponding relative paths. This is used to configure the
  * projects within this build.
@@ -67,22 +89,6 @@ val projects =
 projects.forEach { (projectName, projectDir) ->
     include(projectName)
     project(projectName).projectDir = File(projectDir)
-}
-
-pluginManagement {
-    repositories {
-        // Only check the google repository for these groups
-        // This makes dependency resolution much faster by telling Gradle that it'll only find
-        // Google libraries and plugins within the gmaven repository.
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
-        gradlePluginPortal()
-    }
 }
 
 dependencyResolutionManagement {

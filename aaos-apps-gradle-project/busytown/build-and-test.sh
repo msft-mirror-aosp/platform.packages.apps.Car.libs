@@ -21,7 +21,8 @@ cd "$GRADLE_PROJ_DIR"
     -x :oem-token-lib:verifyReleaseResources \
     assemble \
     assembleAndroidTest \
-    test
+    test \
+    :buildLogic:plugin:check
 
 if [[ $? != 0 ]]
 then
