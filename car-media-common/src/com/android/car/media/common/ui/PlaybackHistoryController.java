@@ -32,7 +32,9 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.ConcatAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.apps.common.imaging.ImageViewBinder;
@@ -45,8 +47,6 @@ import com.android.car.media.common.source.MediaSource;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.recyclerview.ContentLimiting;
 import com.android.car.ui.recyclerview.ContentLimitingAdapter;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -211,16 +211,36 @@ public class PlaybackHistoryController {
     private class MediaHistoryListAdapter extends
             ContentLimitingAdapter<HistoryItemViewHolder> implements ContentLimiting {
 
+        private final DiffUtil.ItemCallback<MediaSource> mDiffUtil =
+                new DiffUtil.ItemCallback<MediaSource>() {
+            @Override
+            public boolean areItemsTheSame(
+                    @NonNull MediaSource oldSource, @NonNull MediaSource newSource) {
+                return oldSource.equals(newSource);
+            }
+            @Override
+            public boolean areContentsTheSame(
+                    @NonNull MediaSource oldSource, @NonNull MediaSource newSource) {
+                // the same as areItemsTheSame since the content/metadata updates are handled
+                // by the ViewHolder
+                return oldSource.equals(newSource);
+            }
+        };
+        private final AsyncListDiffer<MediaSource> mAsyncListDiffer =
+                new AsyncListDiffer(this, mDiffUtil);
+
         private List<MediaSource> mHistoryList = new ArrayList<>();
 
         public void setHistoryList(List<MediaSource> historyList) {
             mHistoryList.clear();
             mHistoryList.addAll(historyList);
-            notifyDataSetChanged();
+            // Cannot submit the same list reference, the adapter considers it the same as old list
+            List<MediaSource> copy = new ArrayList<>(mHistoryList);
+            mAsyncListDiffer.submitList(copy);
         }
 
         @Override
-        protected HistoryItemViewHolder onCreateViewHolderImpl(@NonNull @NotNull ViewGroup parent,
+        protected HistoryItemViewHolder onCreateViewHolderImpl(@NonNull ViewGroup parent,
                 int viewType) {
             View itemView = LayoutInflater.from(parent.getContext())
                     .inflate(mItemLayout, parent, false);
