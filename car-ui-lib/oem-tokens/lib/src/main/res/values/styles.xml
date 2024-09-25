@@ -122,9 +122,9 @@
         <item name="oemShapeCornerExtraSmall">8dp</item>
         <item name="oemShapeCornerSmall">16dp</item>
         <item name="oemShapeCornerMedium">24dp</item>
-        <item name="oemShapeCornerLarge">48dp</item>
+        <item name="oemShapeCornerLarge">32dp</item>
         <item name="oemShapeCornerExtraLarge">48dp</item>
-        <item name="oemShapeCornerFull">128dp</item>
+        <item name="oemShapeCornerFull">1000dp</item>
     </style>
 
     <style name="OemTokensBase" parent="OemTokensParent">
