@@ -35,6 +35,7 @@ public class CarUiUserUnlockedReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (Intent.ACTION_USER_UNLOCKED.equals(intent.getAction())) {
             mBookTask.start();
+            context.unregisterReceiver(this);
         }
     }
 }
