@@ -45,45 +45,31 @@ JAVA_HOME="$ROOT_DIR/prebuilts/jdk/jdk17/linux-x86"
 GRADLE_OUTPUT_DIR="$ROOT_DIR/out/aaos-apps-gradle-build"
 
 # APKs
-cp $GRADLE_OUTPUT_DIR/car-calendar-app/outputs/apk/prod/release/car-calendar-app-prod-release.apk $1/CarCalendarApp.apk
-check_status $?
-cp $GRADLE_OUTPUT_DIR/car-calendar-app/outputs/apk/platform/release/car-calendar-app-platform-release.apk $1/CarCalendarApp_platform_cert.apk
+cp $GRADLE_OUTPUT_DIR/car-calendar-app/outputs/apk/unbundled/release/car-calendar-app-unbundled-release.apk $1/CarCalendarApp.apk
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-dialer-app/outputs/apk/production/release/car-dialer-app-production-release.apk $1/CarDialerApp.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/car-dialer-app/outputs/apk/platform/release/car-dialer-app-platform-release.apk $1/CarDialerApp_platform_cert.apk
+cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/platformAosp/release/car-media-app-platformAosp-release.apk $1/CarMediaApp_aosp_cert.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/aaos/release/car-media-app-aaos-release.apk $1/CarMediaApp_aaos_cert.apk
-check_status $?
-cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/platform/release/car-media-app-platform-release.apk $1/CarMediaApp.apk
+cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/platformGoogle/release/car-media-app-platformGoogle-release.apk $1/CarMediaApp.apk
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-messenger-app/outputs/apk/prod/release/car-messenger-app-prod-release.apk $1/CarMessengerApp.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/car-messenger-app/outputs/apk/platform/release/car-messenger-app-platform-release.apk $1/CarMessengerApp_platform_cert.apk
+cp $GRADLE_OUTPUT_DIR/PaintBooth/outputs/apk/unbundled/release/PaintBooth-unbundled-release.apk $1/PaintBooth.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/PaintBooth/outputs/apk/aaos/release/PaintBooth-aaos-release.apk $1/PaintBooth.apk
+cp $GRADLE_OUTPUT_DIR/oem-token-shared-lib/outputs/apk/unbundled/release/oem-token-shared-lib-unbundled-release.apk $1/oem-token-shared-lib.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/PaintBooth/outputs/apk/platform/release/PaintBooth-platform-release.apk $1/PaintBooth_platform_cert.apk
+cp $GRADLE_OUTPUT_DIR/test-rotary-playground/outputs/apk/unbundled/release/test-rotary-playground-unbundled-release.apk $1/RotaryPlayground.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/oem-token-shared-lib/outputs/apk/aaos/release/oem-token-shared-lib-aaos-release.apk $1/oem-token-shared-lib.apk
+cp $GRADLE_OUTPUT_DIR/test-rotary-ime/outputs/apk/unbundled/release/test-rotary-ime-unbundled-release.apk $1/RotaryIME.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/oem-token-shared-lib/outputs/apk/platform/release/oem-token-shared-lib-platform-release.apk $1/oem-token-shared-lib_platform_cert.apk
+cp $GRADLE_OUTPUT_DIR/test-media-app/automotive/outputs/apk/unbundled/release/automotive-unbundled-release.apk $1/TestMediaApp.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/test-rotary-playground/outputs/apk/aaos/release/test-rotary-playground-aaos-release.apk $1/RotaryPlayground.apk
+cp $GRADLE_OUTPUT_DIR/car-radio-app/outputs/apk/unbundled/release/car-radio-app-unbundled-release.apk $1/CarRadioApp.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/test-rotary-playground/outputs/apk/platform/release/test-rotary-playground-platform-release.apk $1/RotaryPlayground_platform_cert.apk
+cp $GRADLE_OUTPUT_DIR/car-bugreport-app/outputs/apk/platformGoogle/release/car-bugreport-app-platformGoogle-release.apk $1/CarBugReportApp.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/test-rotary-ime/outputs/apk/aaos/release/test-rotary-ime-aaos-release.apk $1/RotaryIME.apk
-check_status $?
-cp $GRADLE_OUTPUT_DIR/test-rotary-ime/outputs/apk/platform/release/test-rotary-ime-platform-release.apk $1/RotaryIME_platform_cert.apk
-check_status $?
-cp $GRADLE_OUTPUT_DIR/test-media-app/automotive/outputs/apk/aaos/release/automotive-aaos-release.apk $1/TestMediaApp.apk
-check_status $?
-cp $GRADLE_OUTPUT_DIR/test-media-app/automotive/outputs/apk/platform/release/automotive-platform-release.apk $1/TestMediaApp_platform_cert.apk
-check_status $?
-cp $GRADLE_OUTPUT_DIR/car-radio-app/outputs/apk/aaos/release/car-radio-app-aaos-release.apk $1/CarRadioApp.apk
-check_status $?
-cp $GRADLE_OUTPUT_DIR/car-bugreport-app/outputs/apk/prod/release/car-bugreport-app-prod-release.apk $1/CarBugReportApp.apk
+cp $GRADLE_OUTPUT_DIR/car-bugreport-app/outputs/apk/platformAosp/release/car-bugreport-app-platformAosp-release.apk $1/CarBugReportApp_aosp_cert.apk
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-app-card-sample-calendar-app/outputs/apk/platform/release/car-app-card-sample-calendar-app-platform-release.apk $1/car-app-card-sample-calendar-app-platform-release.apk
 check_status $?
@@ -125,7 +111,7 @@ cp $GRADLE_OUTPUT_DIR/car-app-card-host-lib/outputs/aar/car-app-card-host-lib-re
 check_status $?
 
 # Tests
-cp $GRADLE_OUTPUT_DIR/car-calendar-app/outputs/apk/androidTest/platform/debug/car-calendar-app-platform-debug-androidTest.apk $1/CarCalendarUnitTests.apk
+cp $GRADLE_OUTPUT_DIR/car-calendar-app/outputs/apk/androidTest/unbundled/debug/car-calendar-app-unbundled-debug-androidTest.apk $1/CarCalendarUnitTests.apk
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-rotary-lib/outputs/apk/androidTest/debug/car-rotary-lib-debug-androidTest.apk $1/CarRotaryLibUnitTests.apk
 check_status $?
@@ -146,13 +132,17 @@ cp $GRADLE_OUTPUT_DIR/car-apps-common/outputs/apk/androidTest/debug/car-apps-com
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-media-common/outputs/apk/androidTest/debug/car-media-common-debug-androidTest.apk $1/CarMediaCommonUnitTests.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/androidTest/platform/debug/car-media-app-platform-debug-androidTest.apk $1/CarMediaUnitTests.apk
+cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/androidTest/platformGoogle/debug/car-media-app-platformGoogle-debug-androidTest.apk  $1/CarMediaUnitTests.apk
+check_status $?
+cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/androidTest/platformAosp/debug/car-media-app-platformAosp-debug-androidTest.apk  $1/CarMediaUnitTests_aosp_cert.apk
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-media-extensions/outputs/apk/androidTest/debug/car-media-extensions-debug-androidTest.apk $1/CarMediaExtensionsUnitTests.apk
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-broadcastradio-support/outputs/apk/androidTest/debug/car-broadcastradio-support-debug-androidTest.apk $1/CarBroadcastRadioSupportLibTests.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/car-bugreport-app/outputs/apk/androidTest/platform/debug/car-bugreport-app-platform-debug-androidTest.apk $1/CarBugReportUnitTests.apk
+cp $GRADLE_OUTPUT_DIR/car-bugreport-app/outputs/apk/androidTest/platformGoogle/debug/car-bugreport-app-platformGoogle-debug-androidTest.apk $1/CarBugReportUnitTests.apk
+check_status $?
+cp $GRADLE_OUTPUT_DIR/car-bugreport-app/outputs/apk/androidTest/platformAosp/debug/car-bugreport-app-platformAosp-debug-androidTest.apk $1/CarBugReportUnitTests_aosp_cert.apk
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-app-card-lib/outputs/apk/androidTest/debug/car-app-card-lib-debug-androidTest.apk $1/CarAppCardLibTests.apk
 check_status $?
@@ -192,11 +182,11 @@ mkdir $GRADLE_OUTPUT_DIR/jacoco/car-telephony-common-app
 check_status $?
 mkdir $GRADLE_OUTPUT_DIR/jacoco/car-messenger-common-app
 check_status $?
-$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-calendar-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-calendar-app/intermediates/javac/platformDebug/classes .
+$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-calendar-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-calendar-app/intermediates/javac/unbundledDebug/classes .
 check_status $?
 $JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-messenger-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-messenger-app/intermediates/javac/fakeDebug/classes .
 check_status $?
-$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-media-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-media-app/intermediates/javac/platformDebug/classes .
+$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-media-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-media-app/intermediates/javac/platformGoogleDebug/classes .
 check_status $?
 $JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-dialer-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-dialer-app/intermediates/javac/emulatorDebug/classes .
 check_status $?
