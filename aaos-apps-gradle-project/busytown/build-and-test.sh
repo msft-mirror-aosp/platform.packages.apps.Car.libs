@@ -2,15 +2,14 @@
 set -eou pipefail
 
 SCRIPTS_DIR=$(realpath "${0%/*}")
-
-echo "Starting $0 at $(date)"
 . "$SCRIPTS_DIR/envsetup.sh"
+
+# Functions defined in envsetup.sh
+setup_build_environment
 
 # Set default version codes and names, allow overrides from the calling shell
 DEFAULT_VERSION_CODE=34
 DEFAULT_VERSION_NAME=${BUILD_NUMBER:-34}
-
-cd "$GRADLE_PROJ_DIR"
 
 # Run the build
 # (Keep each line separate to keep merges clean)
@@ -24,12 +23,4 @@ cd "$GRADLE_PROJ_DIR"
     test \
     :buildLogic:check
 
-if [[ $? != 0 ]]
-then
-  echo "check_status: non-zero exit code -> $?"
-  exit $?
-else
-  echo "check_status: exit code $? continue.."
-fi
-
-echo "Completing $0 at $(date)"
+wrap_up_build $?
