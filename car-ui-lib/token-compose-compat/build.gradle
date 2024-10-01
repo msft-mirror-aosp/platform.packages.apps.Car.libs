@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace 'com.android.car.oem.tokens.compose.compat'
-    compileSdk 33
+    compileSdk gradle.ext.aaosLatestSDK
 
     defaultConfig {
         minSdk 29
