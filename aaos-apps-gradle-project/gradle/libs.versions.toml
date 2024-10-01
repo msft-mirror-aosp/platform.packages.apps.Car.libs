@@ -6,7 +6,9 @@ compileSdk = "34"
 buildToolsVersion = "30.0.3"
 
 androidGradlePlugin = "7.4.2"
+designcompose = "0.30.0"
 kotlin = "1.9.21"
+ksp = "1.9.21-1.0.16"
 protobuf = "4.27.2"
 protobufGradlePlugin = "0.9.4"
 robolectric = "4.12"
@@ -22,6 +24,8 @@ robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectr
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 androidLibrary = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+designcompose = { id = "com.android.designcompose", version.ref = "designcompose" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobufGradlePlugin" }
