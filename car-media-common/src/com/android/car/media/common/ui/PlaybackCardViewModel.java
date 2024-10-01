@@ -62,7 +62,7 @@ public class PlaybackCardViewModel extends AndroidViewModel {
         mContext = getApplication().getApplicationContext();
         mModels = models;
         mCarMediaManagerHelper = CarMediaManagerHelper.getInstance(getApplication());
-        mMediaSessionHelper = MediaSessionHelper.getInstance(getApplication());
+        mMediaSessionHelper = mModels.getMediaSessionHelper();
         mMediaSessionHelper.getActiveOrPausedMediaSources().observeForever(this::updateHistoryList);
         mNeedsInitialization = false;
     }

@@ -170,7 +170,7 @@ public class PlaybackHistoryController {
                     mMediaSource.getDisplayName(itemView.getContext()));
             PlaybackCardControllerUtilities.updateImageViewDrawableAndVisibility(mAppIcon,
                     mMediaSource.getIcon());
-            mAlbumArtBinder.setImage(itemView.getContext(), mediaItemMetadata.getArtworkKey());
+            mMediaSource.loadImage(mAlbumArtBinder, mContext, mediaItemMetadata.getArtworkKey());
             mActiveView.setVisibility(View.VISIBLE);
             mInactiveView.setVisibility(View.GONE);
         }
