@@ -21,11 +21,13 @@ import android.app.Application;
 import android.car.media.CarMediaManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.android.car.media.common.browse.MediaItemsRepository;
 import com.android.car.media.common.playback.PlaybackViewModel;
@@ -43,6 +45,7 @@ import java.util.Set;
 /** ViewModel used to track state of media widgets that use the {@link PlaybackCardController} */
 public class PlaybackCardViewModel extends AndroidViewModel {
 
+    private static final String TAG = "PlaybackCardViewModel";
     private Context mContext;
     private MediaModels mModels;
     private CarMediaManagerHelper mCarMediaManagerHelper;
@@ -52,6 +55,7 @@ public class PlaybackCardViewModel extends AndroidViewModel {
     private boolean mQueueVisible = false;
     private boolean mHistoryVisible = false;
     private boolean mOverflowExpanded = false;
+    private final Observer<List<MediaSource>> mObserver = this::updateHistoryList;
 
     public PlaybackCardViewModel(@NonNull Application application) {
         super(application);
@@ -62,8 +66,15 @@ public class PlaybackCardViewModel extends AndroidViewModel {
         mContext = getApplication().getApplicationContext();
         mModels = models;
         mCarMediaManagerHelper = CarMediaManagerHelper.getInstance(getApplication());
+        // Use provided MediaSessionHelper if available
         mMediaSessionHelper = mModels.getMediaSessionHelper();
-        mMediaSessionHelper.getActiveOrPausedMediaSources().observeForever(this::updateHistoryList);
+        if (mMediaSessionHelper != null) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, "Initializing history list");
+            }
+            mMediaSessionHelper.getActiveOrPausedMediaSources()
+                    .observeForever(mObserver);
+        }
         mNeedsInitialization = false;
     }
 
@@ -112,6 +123,10 @@ public class PlaybackCardViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<MediaSource>> getHistoryList() {
+        if (mMediaSessionHelper == null) {
+            throw new RuntimeException("Provided MediaModels was not instantiated with a"
+                    + " MediaSessionHelper");
+        }
         return mHistoryListData;
     }
 
@@ -119,6 +134,9 @@ public class PlaybackCardViewModel extends AndroidViewModel {
     protected void onCleared() {
         super.onCleared();
         mModels.onCleared();
+        if (mMediaSessionHelper != null) {
+            mMediaSessionHelper.getActiveOrPausedMediaSources().removeObserver(mObserver);
+        }
     }
 
     private void updateHistoryList(List<MediaSource> mediaSources) {
