@@ -19,12 +19,12 @@
 plugins {
     id 'com.android.library'
     id 'buildSrc.local-publish'
+    id 'aaosApps.buildLogic'
     id 'buildSrc.jdk.jdk8'
 }
 
 android {
     namespace = "com.android.car.apps.common"
-    compileSdkVersion gradle.ext.aaosLatestSDK
 
     defaultConfig {
         minSdkVersion 28

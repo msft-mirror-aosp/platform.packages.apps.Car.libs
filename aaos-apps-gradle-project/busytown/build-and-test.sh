@@ -22,7 +22,7 @@ cd "$GRADLE_PROJ_DIR"
     assemble \
     assembleAndroidTest \
     test \
-    :buildLogic:plugin:check
+    :buildLogic:check
 
 if [[ $? != 0 ]]
 then

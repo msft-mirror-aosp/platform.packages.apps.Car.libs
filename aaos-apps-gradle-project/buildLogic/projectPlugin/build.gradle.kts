@@ -30,12 +30,18 @@ plugins {
     alias(libs.plugins.kotlinJvm)
 }
 
+
 gradlePlugin {
-    // Define the plugin
-    val settingsPlugin by plugins.creating {
-        id = "aaosApps.buildLogic.settings"
-        implementationClass = "aaosApps.buildLogic.SettingsPlugin"
+    // Define the plugins
+    val projectPlugin by plugins.creating {
+        id = "aaosApps.buildLogic"
+        implementationClass = "aaosApps.buildLogic.project.ProjectPlugin"
     }
+}
+
+dependencies {
+    implementation(libs.android.gradlePlugin)
+
 }
 
 testing {

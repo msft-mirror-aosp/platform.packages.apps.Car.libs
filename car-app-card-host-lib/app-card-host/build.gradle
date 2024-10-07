@@ -18,6 +18,7 @@ plugins {
     id "org.jetbrains.kotlin.android"
     id 'com.android.library'
     alias(libs.plugins.protobuf)
+    id 'aaosApps.buildLogic'
     id 'buildSrc.jdk.jdk8'
 }
 
@@ -25,7 +26,6 @@ android {
     namespace 'com.android.car.appcard.host'
     testNamespace 'com.android.car.appcard.host.test'
 
-    compileSdkVersion gradle.ext.aaosLatestSDK
     defaultConfig {
         minSdkVersion 31
         targetSdkVersion 33

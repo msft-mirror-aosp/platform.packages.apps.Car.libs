@@ -19,12 +19,13 @@
 plugins {
     id 'com.android.library'
     id 'buildSrc.local-publish'
+    id 'aaosApps.buildLogic'
     id 'buildSrc.jdk.jdk8'
 }
 
 android {
     namespace = "com.android.car.media.common"
-    compileSdkVersion gradle.ext.aaosLatestSDK
+
 
     defaultConfig {
         minSdkVersion 30 // Media requires apis that became public in R.
