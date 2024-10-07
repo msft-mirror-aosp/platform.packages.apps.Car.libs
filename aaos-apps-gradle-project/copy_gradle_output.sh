@@ -71,13 +71,13 @@ cp $GRADLE_OUTPUT_DIR/car-bugreport-app/outputs/apk/platformGoogle/release/car-b
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-bugreport-app/outputs/apk/platformAosp/release/car-bugreport-app-platformAosp-release.apk $1/CarBugReportApp_aosp_cert.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/car-app-card-sample-calendar-app/outputs/apk/platform/release/car-app-card-sample-calendar-app-platform-release.apk $1/car-app-card-sample-calendar-app-platform-release.apk
+cp $GRADLE_OUTPUT_DIR/car-app-card-sample-calendar-app/outputs/apk/platformGoogle/release/car-app-card-sample-calendar-app-platformGoogle-release.apk $1/car-app-card-sample-calendar-app-platform-release.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/car-app-card-sample-media-app/outputs/apk/platform/release/car-app-card-sample-media-app-platform-release.apk $1/car-app-card-sample-media-app-platform-release.apk
+cp $GRADLE_OUTPUT_DIR/car-app-card-sample-media-app/outputs/apk/platformGoogle/release/car-app-card-sample-media-app-platformGoogle-release.apk $1/car-app-card-sample-media-app-platform-release.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/car-app-card-sample-weather-app/outputs/apk/platform/release/car-app-card-sample-weather-app-platform-release.apk $1/car-app-card-sample-weather-app-platform-release.apk
+cp $GRADLE_OUTPUT_DIR/car-app-card-sample-weather-app/outputs/apk/platformGoogle/release/car-app-card-sample-weather-app-platformGoogle-release.apk $1/car-app-card-sample-weather-app-platform-release.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/car-app-card-host-sample-app/outputs/apk/platform/release/car-app-card-host-sample-app-platform-release.apk $1/car-app-card-host-sample-app-platform-release.apk
+cp $GRADLE_OUTPUT_DIR/car-app-card-host-sample-app/outputs/apk/platformGoogle/release/car-app-card-host-sample-app-platformGoogle-release.apk $1/car-app-card-host-sample-app-platform-release.apk
 check_status $?
 
 # AARs

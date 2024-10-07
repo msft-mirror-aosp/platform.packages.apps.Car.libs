@@ -23,12 +23,10 @@ buildscript {
     gradle.ext.lib_car_system_stubs = gradle.ext.repoRootPath + "/prebuilts/sdk/" + gradle.ext.aaosLatestSDK + "/system/android.car-system-stubs.jar"
     gradle.ext.lib_system_stubs = gradle.ext.repoRootPath + "/prebuilts/sdk/" + gradle.ext.aaosLatestSDK + "/system/android.jar"
     gradle.ext.unbundledCertPath = gradle.ext.repoRootPath + "/packages/apps/Car/libs/certs/com_android_car_apps_test.jks"
-    gradle.ext.aaosCertPath = gradle.ext.unbundledCertPath // DEPRECATED, use unbundledCertPath
     gradle.ext.chassisCertPath = gradle.ext.repoRootPath + "/vendor/auto/embedded/prebuilts/car-ui-lib/chassis_upload_key.jks"
 
     gradle.ext.platformGoogleCertPath = gradle.ext.repoRootPath + "/vendor/google/certs/devkeys/platform.keystore"
     gradle.ext.platformAospCertPath = gradle.ext.repoRootPath + "/packages/apps/Car/libs/certs/platform.keystore"
-    gradle.ext.platformCertPath = gradle.ext.platformGoogleCertPath // DEPRECATED, use google and aosp certs
 
     gradle.ext.platformSdkVersion = "34" // Change this to the most recent android API level.
 
