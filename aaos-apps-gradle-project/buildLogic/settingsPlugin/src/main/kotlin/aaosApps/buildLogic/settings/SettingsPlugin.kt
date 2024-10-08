@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package aaosApps.buildLogic
+package aaosApps.buildLogic.settings
 
+import java.io.File
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.initialization.Settings
-import java.io.File
 
 @Suppress("UnstableApiUsage")
 class SettingsPlugin : Plugin<Settings> {

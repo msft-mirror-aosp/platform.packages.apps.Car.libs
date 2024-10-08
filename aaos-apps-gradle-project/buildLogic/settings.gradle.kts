@@ -26,7 +26,8 @@
 
 rootProject.name = "buildLogic"
 
-include("plugin")
+include("settingsPlugin")
+include("projectPlugin")
 
 // Send all the build files to the out folder under the root of the repo init.
 gradle.lifecycle.beforeProject {

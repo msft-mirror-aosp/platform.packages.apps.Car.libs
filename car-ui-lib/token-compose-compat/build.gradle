@@ -3,12 +3,12 @@ import com.android.build.gradle.tasks.VerifyLibraryResourcesTask
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'aaosApps.buildLogic'
     id 'buildSrc.jdk.jdk8'
 }
 
 android {
     namespace 'com.android.car.oem.tokens.compose.compat'
-    compileSdk gradle.ext.aaosLatestSDK
 
     defaultConfig {
         minSdk 29

@@ -18,11 +18,11 @@
 plugins {
     id 'com.android.library'
     id 'buildSrc.local-publish'
+    id 'aaosApps.buildLogic'
     id 'buildSrc.jdk.jdk8'
 }
 
 android {
-    compileSdkVersion gradle.ext.aaosLatestSDK
     namespace "com.android.car.media.extensions"
 
     defaultConfig {

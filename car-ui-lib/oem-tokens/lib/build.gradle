@@ -18,6 +18,7 @@ import com.android.build.gradle.tasks.VerifyLibraryResourcesTask
 
 plugins {
     id 'com.android.library'
+    id 'aaosApps.buildLogic'
     id 'buildSrc.jdk.jdk8'
 }
 
@@ -25,7 +26,6 @@ android {
     namespace 'com.android.car.oem.tokens'
     testNamespace 'com.android.car.oem.tokens.test'
 
-    compileSdkVersion gradle.ext.aaosLatestSDK
     defaultConfig {
         minSdkVersion 28
         targetSdkVersion 33
