@@ -16,22 +16,10 @@
 
 rootProject.name = "AAOS Apps"
 
-pluginManagement {
-    repositories {
-        // Only check the google repository for these groups
-        // This makes dependency resolution much faster by telling Gradle that it'll only find
-        // Google libraries and plugins within the gmaven repository.
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
-        gradlePluginPortal()
-    }
-    includeBuild("buildLogic")
+apply(from = "buildLogic/metaConfig/plugin-repositories.gradle.kts")
 
+pluginManagement {
+    includeBuild("buildLogic")
 }
 
 plugins {
@@ -91,15 +79,4 @@ projects.forEach { (projectName, projectDir) ->
     project(projectName).projectDir = File(projectDir)
 }
 
-dependencyResolutionManagement {
-    repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
-        mavenCentral()
-    }
-}
+apply(from = "buildLogic/metaConfig/build-repositories.gradle.kts")

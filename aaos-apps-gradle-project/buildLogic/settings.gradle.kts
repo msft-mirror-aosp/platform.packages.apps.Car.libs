@@ -26,6 +26,8 @@
 
 rootProject.name = "buildLogic"
 
+apply(from = "metaConfig/plugin-repositories.gradle.kts")
+
 include("settingsPlugin")
 include("projectPlugin")
 
@@ -69,10 +71,7 @@ gradle.lifecycle.beforeProject {
 }
 
 dependencyResolutionManagement {
-    repositories {
-        google()
-        mavenCentral()
-    }
+    // Need to manually load the libs.versions.toml, since it's in the root project
     versionCatalogs {
         create("libs") {
             from(files("../gradle/libs.versions.toml"))
@@ -81,3 +80,5 @@ dependencyResolutionManagement {
         }
     }
 }
+
+apply(from = "metaConfig/build-repositories.gradle.kts")
