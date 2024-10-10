@@ -370,16 +370,22 @@ public class MediaSource {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MediaSource that = (MediaSource) o;
-        if (mBrowseService != null) {
+        if (mBrowseService != null || that.mBrowseService != null) {
+            // If at least one browse service is not null, compare them
             return Objects.equals(mBrowseService, that.mBrowseService);
-        } else if (that.mBrowseService == null && that.mMediaController != null
-                && mMediaController != null) {
+        } else if (mMediaController != null && that.mMediaController != null
+                && (mMediaController.getSessionToken() != null
+                || that.mMediaController.getSessionToken() != null)) {
+            // At least one session token is not null, compare them
             return Objects.equals(mMediaController.getSessionToken(),
                     that.mMediaController.getSessionToken());
-        } else if (that.mBrowseService == null && that.mMediaController == null) {
-            return Objects.equals(mPackageName, that.mPackageName);
-        } else {
+        } else if (mMediaController == null ^ that.mMediaController == null) {
+            // If there is only one not null media controller return false
             return false;
+        } else {
+            // Both MediaSources either have null browse services and media controllers, or both
+            // have media controllers with null session tokens, compare package names
+            return Objects.equals(mPackageName, that.mPackageName);
         }
     }
 
