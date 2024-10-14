@@ -129,7 +129,7 @@ class WeatherAppCardProvider(
     latestAppCardContext = appCardContext
 
     if (!timerSetup.getAndSet(true)) {
-      timer.scheduleAtFixedRate(object : TimerTask() {
+      timer.schedule(object : TimerTask() {
         override fun run() {
           latestAppCardContext.let {
             update.sendUpdate(getAppCard(it))
