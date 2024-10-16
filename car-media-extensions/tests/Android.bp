@@ -37,7 +37,7 @@ android_test {
     privileged: true,
 
     min_sdk_version: "30",
-    target_sdk_version: "31",
+    target_sdk_version: "34",
     sdk_version: "system_current",
 
     manifest: "AndroidManifest.xml",

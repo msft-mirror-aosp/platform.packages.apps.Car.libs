@@ -29,7 +29,7 @@ android {
 
     defaultConfig {
         minSdkVersion 30 // Media requires apis that became public in R.
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

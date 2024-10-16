@@ -46,7 +46,7 @@ android_library {
 
     sdk_version: "current",
     min_sdk_version: "28", // P
-    target_sdk_version: "31",
+    target_sdk_version: "34",
 
     static_libs: car_apps_common_static_libs,
 }
