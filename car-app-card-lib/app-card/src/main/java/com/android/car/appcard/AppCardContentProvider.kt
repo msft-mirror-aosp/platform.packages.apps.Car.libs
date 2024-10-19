@@ -46,7 +46,7 @@ abstract class AppCardContentProvider : ContentProvider(), LifecycleOwner {
   private val lock = Any()
   private val dispatcher = ProviderLifecycleDispatcher(provider = this)
 
-  override fun getLifecycle(): Lifecycle = dispatcher.lifecycle
+  override val lifecycle: Lifecycle = dispatcher.lifecycle
 
   /**
    * @return authority of provider in manifest
