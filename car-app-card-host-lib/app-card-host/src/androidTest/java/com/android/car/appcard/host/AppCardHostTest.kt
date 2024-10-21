@@ -144,7 +144,7 @@ class AppCardHostTest {
       .thenReturn(contentProviderClient)
   }
   private val resources = mock<Resources> {
-    on(it.getString(eq(R.string.host_permission))).thenReturn(TEST_PERMISSION)
+    on(it.getString(any<Int>())).thenReturn(TEST_PERMISSION)
   }
   private val context = mock<Context> {
     on(it.createContextAsUser(any<UserHandle>(), any<Int>())).thenReturn(it)
