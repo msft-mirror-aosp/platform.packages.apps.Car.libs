@@ -69,4 +69,5 @@ allprojects {
     // Re-exports for Kotlin build scripts
     ext.aaosLatestSDK = gradle.ext.aaosLatestSDK
     ext.lib_car_system_stubs = gradle.ext.lib_car_system_stubs
+    ext.lib_system_stubs = gradle.ext.lib_system_stubs
 }
