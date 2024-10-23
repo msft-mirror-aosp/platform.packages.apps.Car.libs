@@ -13,7 +13,7 @@
 // limitations under the License.
 
 android_app {
-    name: "car-app-card-lib-calendar-sample",
+    name: "car-app-card-sample-calendar-app-platform-release",
     min_sdk_version: "31",
     target_sdk_version: "34",
     sdk_version: "current",
@@ -30,7 +30,7 @@ android_app {
     resource_dirs: ["src/main/res"],
     static_libs : [
         "androidx.legacy_legacy-support-v4",
-        "car-app-card-lib-source",
+        "car-app-card-lib-prebuilt",
         "car-ui-lib-prebuilt",
         // Kotlin
         "kotlin-stdlib",
