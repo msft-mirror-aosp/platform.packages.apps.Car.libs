@@ -129,7 +129,6 @@ cp $GRADLE_OUTPUT_DIR/car-messenger-app/outputs/apk/fake/debug/car-messenger-app
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-messenger-app/outputs/apk/androidTest/fake/debug/car-messenger-app-fake-debug-androidTest.apk $1/CarMessengerUnitTests.apk
 check_status $?
-
 cp $GRADLE_OUTPUT_DIR/car-apps-common/outputs/apk/androidTest/debug/car-apps-common-debug-androidTest.apk $1/CarAppsCommonUnitTests.apk
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-media-common/outputs/apk/androidTest/debug/car-media-common-debug-androidTest.apk $1/CarMediaCommonUnitTests.apk
@@ -149,6 +148,8 @@ check_status $?
 cp $GRADLE_OUTPUT_DIR/car-app-card-lib/outputs/apk/androidTest/debug/car-app-card-lib-debug-androidTest.apk $1/CarAppCardLibTests.apk
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-app-card-host-lib/outputs/apk/androidTest/debug/car-app-card-host-lib-debug-androidTest.apk $1/CarAppCardHostLibTests.apk
+check_status $?
+cp $GRADLE_OUTPUT_DIR/driver-ui/outputs/apk/androidTest/default/debug/driver-ui-default-debug-androidTest.apk $1/DriverUITests.apk
 check_status $?
 
 # JaCoCo
@@ -184,6 +185,9 @@ mkdir $GRADLE_OUTPUT_DIR/jacoco/car-telephony-common-app
 check_status $?
 mkdir $GRADLE_OUTPUT_DIR/jacoco/car-messenger-common-app
 check_status $?
+mkdir $GRADLE_OUTPUT_DIR/jacoco/driverui-app
+check_status $?
+
 $JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-calendar-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-calendar-app/intermediates/javac/unbundledDebug/classes .
 check_status $?
 $JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-messenger-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-messenger-app/intermediates/javac/fakeDebug/classes .
@@ -213,6 +217,8 @@ check_status $?
 $JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-telephony-common-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-telephony-common/intermediates/javac/debug/classes/com/android/car/telephony .
 check_status $?
 $JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-messenger-common-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-messenger-common/intermediates/javac/debug/classes/com/android/car/messenger/common .
+check_status $?
+$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/driverui-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/driver-ui/intermediates/javac/defaultDebug/classes .
 check_status $?
 $JAVA_HOME/bin/jar cvfM $1/jacoco-report-classes-all.jar -C $GRADLE_OUTPUT_DIR/jacoco .
 check_status $?
