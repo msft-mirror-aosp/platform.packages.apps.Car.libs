@@ -79,6 +79,8 @@ cp $GRADLE_OUTPUT_DIR/car-app-card-sample-weather-app/outputs/apk/platformGoogle
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-app-card-host-sample-app/outputs/apk/platformGoogle/release/car-app-card-host-sample-app-platformGoogle-release.apk $1/car-app-card-host-sample-app-platform-release.apk
 check_status $?
+cp $GRADLE_OUTPUT_DIR/driver-ui/outputs/apk/default/release/driver-ui-default-release-unsigned.apk $1/DriverUI.apk
+check_status $?
 
 # AARs
 cp $GRADLE_OUTPUT_DIR/car-ui-lib/outputs/aar/car-ui-lib-release.aar $1/car-ui-lib.aar

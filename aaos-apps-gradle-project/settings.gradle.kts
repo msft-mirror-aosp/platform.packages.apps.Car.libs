@@ -71,8 +71,8 @@ val projects =
         ":test-media-app:mobile" to "../../tests/TestMediaApp/mobile",
         ":test-rotary-ime" to "../../tests/RotaryIME",
         ":test-rotary-playground" to "../../tests/RotaryPlayground",
-        ":driver-ui" to "../../DriverUI",
-        ":tests" to "../../tests")
+        ":driver-ui" to "../../DriverUI"
+    )
 
 // Initialize each Gradle subproject
 projects.forEach { (projectName, projectDir) ->
