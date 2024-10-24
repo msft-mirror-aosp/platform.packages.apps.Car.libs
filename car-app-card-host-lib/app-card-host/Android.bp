@@ -16,8 +16,9 @@ car_app_card_host_lib_static_libs = [
     // ensure unbundled
     "androidx.annotation_annotation",
     "androidx.legacy_legacy-support-v4",
-    "car-app-card-lib-source",
+    "car-app-card-lib-prebuilt",
     "guava",
+    "libprotobuf-java-lite",
 
     // Kotlin
     "kotlin-stdlib",
@@ -30,11 +31,6 @@ android_library {
     target_sdk_version: "34",
     sdk_version: "system_current",
     manifest: "src/main/AndroidManifest.xml",
-    proto: {
-        type: "lite",
-        include_dirs: ["packages/apps/Car/libs/car-app-card-lib/app-card/src/main/java/com/android/car/appcard/protos"],
-        canonical_path_from_root: false,
-    },
     optimize: {
         enabled: false,
     },
@@ -46,7 +42,7 @@ android_library {
 
 
 android_test {
-    name: "car-app-card-host-lib-tests",
+    name: "CarAppCardHostLibTests",
     certificate: ":com-android-car-apps-test",
     manifest: "src/androidTest/AndroidManifest.xml",
     srcs: [
@@ -69,12 +65,13 @@ android_test {
         "androidx.test.espresso.core",
         "androidx.test.espresso.contrib",
         "androidx.test.ext.junit",
-        "car-app-card-lib-source",
+        "car-app-card-lib-prebuilt",
         "kotlin-test",
-        "platform-test-annotations",
+        "libprotobuf-java-lite",
         "mockito-robolectric-prebuilt",
         "mockito-target-extended-minus-junit4",
         "mockito-kotlin2",
+        "platform-test-annotations",
         "truth",
     ],
     // runtime cc library which is used by mockito-target-inline.
@@ -82,4 +79,28 @@ android_test {
         "libdexmakerjvmtiagent",
         "libstaticjvmtiagent",
     ],
+}
+
+java_genrule {
+    name: "car-app-card-host-lib-aar",
+    srcs: [
+        ":car-app-card-host-lib-source{.aar}",
+    ],
+    out: ["car-app-card-host-lib.aar"],
+    tools: [
+        "make_slim_aar",
+    ],
+    cmd: "dir=packages/apps/Car/libs/car-app-card-host-lib/app-card-host && " +
+        "$(location make_slim_aar) --classes-allowlist com/android/car/appcard/host $(out) " +
+        "$(location :car-app-card-host-lib-source{.aar})",
+    dist: {
+        targets: ["car-app-card-host-lib.aar",]
+    },
+}
+
+android_library_import {
+    name: "car-app-card-host-lib-prebuilt",
+    aars: [":car-app-card-host-lib-aar"],
+    sdk_version: "current",
+    static_libs: car_app_card_host_lib_static_libs,
 }
