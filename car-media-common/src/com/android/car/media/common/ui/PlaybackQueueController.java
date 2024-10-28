@@ -26,6 +26,7 @@ import static com.android.car.ui.recyclerview.RangeFilter.INVALID_INDEX;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
@@ -118,12 +119,15 @@ public class PlaybackQueueController {
         private final View mSpacer;
         private final TextView mTitle;
         private final TextView mSubtitle;
+        private final ViewGroup mIndicatorIconsContainer;
         private final TextView mCurrentTime;
         private final TextView mMaxTime;
         private final TextView mTimeSeparator;
         private final ImageView mActiveIcon;
 
         private final ImageViewBinder<MediaItemMetadata.ArtworkRef> mThumbnailBinder;
+        private final Size mMaxArtSize;
+        private final int mMaxIndicatorIcons;
 
         QueueViewHolder(View itemView) {
             super(itemView);
@@ -133,15 +137,19 @@ public class PlaybackQueueController {
             mSpacer = itemView.findViewById(R.id.spacer);
             mTitle = itemView.findViewById(R.id.queue_list_item_title);
             mSubtitle = itemView.findViewById(R.id.queue_list_item_subtitle);
+            mIndicatorIconsContainer = itemView.findViewById(R.id.queue_list_item_icons);
             mCurrentTime = itemView.findViewById(R.id.current_time);
             mMaxTime = itemView.findViewById(R.id.max_time);
             mTimeSeparator = itemView.findViewById(R.id.separator);
             mActiveIcon = itemView.findViewById(R.id.now_playing_icon);
 
-            int max = itemView.getContext().getResources().getInteger(
+            Resources res = itemView.getContext().getResources();
+            int max = res.getInteger(
                     com.android.car.media.common.R.integer.media_items_bitmap_max_size_px);
-            Size maxArtSize = new Size(max, max);
-            mThumbnailBinder = new ImageViewBinder<>(maxArtSize, mThumbnail);
+            mMaxArtSize = new Size(max, max);
+            mThumbnailBinder = new ImageViewBinder<>(mMaxArtSize, mThumbnail);
+            mMaxIndicatorIcons = res.getInteger(
+                    com.android.car.media.common.R.integer.max_indicator_icons_per_media_item);
         }
 
         void bind(MediaItemMetadata item) {
@@ -177,6 +185,10 @@ public class PlaybackQueueController {
             } else {
                 ViewUtils.setVisible(mSubtitle, false);
             }
+
+            List<Uri> indicatorUris = item.getSmallIconsUriList();
+            PlaybackCardControllerUtilities.bindIndicatorIcons(mIndicatorIconsContainer,
+                    R.layout.indicator_icon, indicatorUris, mMaxIndicatorIcons, mMaxArtSize);
         }
 
         private void setTimeVisible(boolean shouldShowTime) {

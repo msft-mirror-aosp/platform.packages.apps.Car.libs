@@ -36,15 +36,23 @@ import static androidx.media3.session.MediaConstants.EXTRAS_KEY_COMMAND_BUTTON_I
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Size;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 
+import com.android.car.apps.common.imaging.ImageBinder;
+import com.android.car.apps.common.imaging.ImageViewBinder;
+import com.android.car.apps.common.imaging.UriArtRef;
 import com.android.car.apps.common.util.ViewUtils;
 import com.android.car.media.common.CustomPlaybackAction;
 import com.android.car.media.common.MediaLinkHandler;
@@ -361,4 +369,29 @@ public final class PlaybackCardControllerUtilities {
         }
         return null;
     }
+
+    /**
+     * Removes all views from the iconsContainer, then for each uri (up to maxIcons) adds a new
+     * image view (loaded from iconViewResId) and fetches the icon.
+     */
+    public static void bindIndicatorIcons(
+            @Nullable ViewGroup iconsContainer, @LayoutRes int iconViewResId,
+            List<Uri> indicatorUris, int maxIcons, Size maxArtSize) {
+        if (iconsContainer == null || (maxIcons <= 0)) return;
+
+        Context context = iconsContainer.getContext();
+        iconsContainer.removeAllViews();
+        for (int i = 0; i < Math.min(maxIcons, indicatorUris.size()); i++) {
+            ImageView icon = (ImageView) LayoutInflater.from(context).inflate(
+                    iconViewResId, iconsContainer, false);
+
+            ImageViewBinder<ImageBinder.ImageRef> imageBinder =
+                    new ImageViewBinder<>(maxArtSize, icon);
+            imageBinder.setImage(context, new UriArtRef(indicatorUris.get(i)));
+
+            iconsContainer.addView(icon);
+        }
+        ViewUtils.setVisible(iconsContainer, indicatorUris.size() > 0);
+    }
+
 }

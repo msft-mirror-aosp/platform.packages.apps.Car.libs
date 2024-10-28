@@ -20,6 +20,7 @@ import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_
 import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE;
 
 import static androidx.car.app.mediaextensions.MetadataExtras.KEY_EXCLUDE_MEDIA_ITEM_FROM_MIXED_APP_LIST;
+import static androidx.car.app.mediaextensions.MetadataExtras.KEY_TINTABLE_INDICATOR_ICON_URI_LIST;
 
 import static com.android.car.media.common.MediaConstants.KEY_DESCRIPTION_LINK_MEDIA_ID;
 import static com.android.car.media.common.MediaConstants.KEY_IMMERSIVE_AUDIO;
@@ -45,6 +46,7 @@ import androidx.annotation.ArrayRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import androidx.car.app.mediaextensions.MetadataExtras;
 import androidx.media.utils.MediaConstants;
 
 import com.android.car.apps.common.BitmapUtils;
@@ -270,6 +272,29 @@ public class MediaItemMetadata {
             return null;
         }
         return mMetadataCompatBundle.getString(key);
+    }
+
+    /**
+     * Returns the list of non empty uris extracted from the metadata extra:
+     * {@link MetadataExtras#KEY_TINTABLE_INDICATOR_ICON_URI_LIST}.
+     */
+    @NonNull
+    public List<Uri> getSmallIconsUriList() {
+        Bundle extras = mMediaDescription.getExtras();
+        if (extras == null) {
+            return Collections.emptyList();
+        }
+        List<String> extra = extras.getStringArrayList(KEY_TINTABLE_INDICATOR_ICON_URI_LIST);
+        if (extra == null) {
+            return Collections.emptyList();
+        }
+        ArrayList<Uri> result = new ArrayList<>(extra.size());
+        for (String value : extra) {
+            if (!TextUtils.isEmpty(value)) {
+                result.add(Uri.parse(value));
+            }
+        }
+        return result;
     }
 
     /** @return media item description */
