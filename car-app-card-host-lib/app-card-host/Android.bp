@@ -94,7 +94,7 @@ java_genrule {
         "$(location make_slim_aar) --classes-allowlist com/android/car/appcard/host $(out) " +
         "$(location :car-app-card-host-lib-source{.aar})",
     dist: {
-        targets: ["car-app-card-host-lib.aar",]
+        targets: ["car-app-card-host-lib-aar",]
     },
 }
 
