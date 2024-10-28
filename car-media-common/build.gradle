@@ -18,9 +18,8 @@
 
 plugins {
     id 'com.android.library'
-    id 'buildSrc.local-publish'
+    id 'aaosApps.localPublish'
     id 'aaosApps.buildLogic'
-    id 'buildSrc.jdk.jdk8'
 }
 
 android {

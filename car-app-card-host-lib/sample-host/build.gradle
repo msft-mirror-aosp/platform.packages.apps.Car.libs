@@ -20,7 +20,6 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.android.application'
     id 'aaosApps.buildLogic'
-    id 'buildSrc.jdk.jdk8'
 }
 
 android {

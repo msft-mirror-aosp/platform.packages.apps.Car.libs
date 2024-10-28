@@ -1,10 +1,4 @@
 [versions]
-
-# SDK and tooling versions - Used in buildLogic plugins.
-# Android Studio can't tell that so it thinks they're unused
-compileSdk = "35"
-buildToolsVersion = "35.0.0"
-
 androidGradlePlugin = "8.2.2"
 designcompose = "0.32.0"
 mockito = "2.28.4"
@@ -25,6 +19,7 @@ protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protob
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+protobuf-gradle-plugin = { module = "com.google.protobuf:protobuf-gradle-plugin", version.ref = "protobufGradlePlugin" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 
 [plugins]
