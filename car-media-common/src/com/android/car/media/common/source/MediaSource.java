@@ -18,6 +18,8 @@ package com.android.car.media.common.source;
 
 import static android.car.media.CarMediaIntents.EXTRA_MEDIA_COMPONENT;
 
+import android.app.ActivityOptions;
+import android.app.PendingIntent;
 import android.car.Car;
 import android.car.media.CarMediaIntents;
 import android.content.ComponentName;
@@ -30,6 +32,7 @@ import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.service.media.MediaBrowserService;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -353,6 +356,46 @@ public class MediaSource {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         return intent;
+    }
+
+    /**
+     * Launches the activity associated with the MediaSource.
+     *
+     * If this is a MediaController based MediaSource with a defined activity, that PendingIntent
+     * will be used. Otherwise the intent returned from getIntent() will be used.
+     */
+    public void launchActivity(Context context, ActivityOptions activityOptions) {
+        PendingIntent pendingIntent = getPendingIntent();
+        if (pendingIntent != null) {
+            try {
+                Log.i(TAG, "Launching PendingIntent " + pendingIntent);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    pendingIntent.send(activityOptions.toBundle());
+                } else {
+                    pendingIntent.send();
+                }
+            } catch (PendingIntent.CanceledException e) {
+                Log.e(TAG, "Exception trying to launch PendingIntent " + e);
+            }
+        } else {
+            Intent intent = getIntent();
+            if (intent != null) {
+                Log.i(TAG, "Launching intent " + intent);
+                context.startActivity(getIntent(), activityOptions.toBundle());
+            }
+        }
+    }
+
+    /**
+     *  Returns the PendingIntent to open a media controller MediaSource, or null if not available
+     */
+    @Nullable
+    private PendingIntent getPendingIntent() {
+        // Only return PendingIntent from media controllers that define it.
+        if (mBrowseService == null && mMediaController != null) {
+            return mMediaController.getSessionActivity();
+        }
+        return null;
     }
 
     /**
