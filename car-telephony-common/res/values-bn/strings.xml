@@ -19,7 +19,7 @@
     <string name="unknown" msgid="3237922751873109097">"অজানা"</string>
     <string name="voicemail" msgid="2125552157407909509">"ভয়েসমেল"</string>
     <string name="phone_label_with_info" msgid="4652109530699808645">"<xliff:g id="LABEL">%1$s</xliff:g>  ·  <xliff:g id="DURATION">%2$s</xliff:g>"</string>
-    <string name="call_state_connecting" msgid="5930724746375294866">"কানেক্ট হচ্ছে…"</string>
+    <string name="call_state_connecting" msgid="5930724746375294866">"কানেক্ট করা হচ্ছে…"</string>
     <string name="call_state_dialing" msgid="1534599871716648114">"ডায়াল করা হচ্ছে…"</string>
     <string name="call_state_hold" msgid="8063542005458186874">"হোল্ডে রয়েছে"</string>
     <string name="call_state_call_ended" msgid="1432127342949555464">"কল শেষ হয়েছে"</string>
