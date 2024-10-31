@@ -15,15 +15,17 @@
  */
 plugins {
     id 'com.android.library'
+    id 'aaosApps.buildLogic'
     id 'buildSrc.jdk.jdk8'
 }
 
 android {
-    compileSdkVersion gradle.ext.aaosLatestSDK
+    namespace "com.android.car.broadcastradio.support"
+    testNamespace "com.android.car.broadcastradio.tests"
 
     defaultConfig {
         minSdkVersion 33
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'

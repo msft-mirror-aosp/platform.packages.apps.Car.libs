@@ -148,6 +148,40 @@ public class TokenActivity extends Activity {
 
         list.add(new Pair<>("colorOutline", R.attr.oemColorOutline));
 
+        list.add(new Pair<>("colorSurfaceDim", R.attr.oemColorSurfaceDim));
+        list.add(new Pair<>("colorSurfaceBright", R.attr.oemColorSurfaceBright));
+        list.add(new Pair<>("colorSurfaceContainer",
+                R.attr.oemColorSurfaceContainer));
+        list.add(new Pair<>("colorSurfaceContainerLow", R.attr.oemColorSurfaceContainerLow));
+        list.add(new Pair<>("colorSurfaceContainerLowest", R.attr.oemColorSurfaceContainerLowest));
+        list.add(new Pair<>("colorSurfaceContainerHigh",
+                R.attr.oemColorSurfaceContainerHigh));
+        list.add(new Pair<>("colorSurfaceContainerHighest",
+                R.attr.oemColorSurfaceContainerHighest));
+        list.add(new Pair<>("colorShadow",
+                R.attr.oemColorShadow));
+
+        list.add(new Pair<>("colorBlue", R.attr.oemColorBlue));
+        list.add(new Pair<>("colorOnBlue",
+                R.attr.oemColorOnBlue));
+        list.add(new Pair<>("colorBlueContainer", R.attr.oemColorBlueContainer));
+        list.add(new Pair<>("colorOnBlueContainer",
+                R.attr.oemColorOnBlueContainer));
+
+        list.add(new Pair<>("colorGreen", R.attr.oemColorGreen));
+        list.add(new Pair<>("colorOnGreen",
+                R.attr.oemColorOnGreenContainer));
+        list.add(new Pair<>("colorGreenContainer", R.attr.oemColorGreenContainer));
+        list.add(new Pair<>("colorOnGreenContainer",
+                R.attr.oemColorOnGreenContainer));
+
+        list.add(new Pair<>("colorYellow", R.attr.oemColorYellow));
+        list.add(new Pair<>("colorOnYellow",
+                R.attr.oemColorOnYellow));
+        list.add(new Pair<>("colorYellowContainer", R.attr.oemColorYellowContainer));
+        list.add(new Pair<>("colorOnYellowContainer",
+                R.attr.oemColorOnYellowContainer));
+
         return list;
     }
 

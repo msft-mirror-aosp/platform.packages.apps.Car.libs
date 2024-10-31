@@ -20,6 +20,7 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.text.TextUtils;
 import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,10 +32,13 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.ConcatAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.apps.common.imaging.ImageViewBinder;
+import com.android.car.apps.common.util.ViewUtils;
 import com.android.car.media.common.MediaItemMetadata;
 import com.android.car.media.common.R;
 import com.android.car.media.common.playback.PlaybackViewModel;
@@ -43,8 +47,6 @@ import com.android.car.media.common.source.MediaSource;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
 import com.android.car.ui.recyclerview.ContentLimiting;
 import com.android.car.ui.recyclerview.ContentLimitingAdapter;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,9 +148,15 @@ public class PlaybackHistoryController {
         }
 
         private void updateView(MediaItemMetadata mediaItemMetadata) {
-            if (mediaItemMetadata == null) {
-                PlaybackCardControllerUtilities.updateTextViewAndVisibility(mAppTitleInactive,
-                        mMediaSource.getDisplayName(mContext));
+            if (mediaItemMetadata == null
+                    || mediaItemMetadata.shouldExcludeItemFromMixedAppList()) {
+                if (mAppTitleInactive != null) {
+                    mAppTitleInactive.setText(mContext.getString(R.string.open_action_for_app_title,
+                            mMediaSource.getDisplayName(mContext)));
+                }
+                ViewUtils.setVisible(mAppTitleInactive, !TextUtils.isEmpty(
+                        mMediaSource.getDisplayName(mContext)));
+
                 PlaybackCardControllerUtilities.updateImageViewDrawableAndVisibility(
                         mAppIconInactive, mMediaSource.getIcon());
                 mActiveView.setVisibility(View.GONE);
@@ -162,7 +170,7 @@ public class PlaybackHistoryController {
                     mMediaSource.getDisplayName(itemView.getContext()));
             PlaybackCardControllerUtilities.updateImageViewDrawableAndVisibility(mAppIcon,
                     mMediaSource.getIcon());
-            mAlbumArtBinder.setImage(itemView.getContext(), mediaItemMetadata.getArtworkKey());
+            mMediaSource.loadImage(mAlbumArtBinder, mContext, mediaItemMetadata.getArtworkKey());
             mActiveView.setVisibility(View.VISIBLE);
             mInactiveView.setVisibility(View.GONE);
         }
@@ -170,7 +178,9 @@ public class PlaybackHistoryController {
         private void setClickAction(PlaybackViewModel playbackViewModel) {
             itemView.setOnClickListener(v -> {
                 if (playbackViewModel.getPlaybackController().getValue() != null
-                        && playbackViewModel.getMetadata().getValue() != null) {
+                        && playbackViewModel.getMetadata().getValue() != null
+                        && !playbackViewModel.getMetadata().getValue()
+                        .shouldExcludeItemFromMixedAppList()) {
                     playbackViewModel.getPlaybackController().getValue().play();
                 } else {
                     Intent intent = mMediaSource.getIntent();
@@ -201,16 +211,36 @@ public class PlaybackHistoryController {
     private class MediaHistoryListAdapter extends
             ContentLimitingAdapter<HistoryItemViewHolder> implements ContentLimiting {
 
+        private final DiffUtil.ItemCallback<MediaSource> mDiffUtil =
+                new DiffUtil.ItemCallback<MediaSource>() {
+            @Override
+            public boolean areItemsTheSame(
+                    @NonNull MediaSource oldSource, @NonNull MediaSource newSource) {
+                return oldSource.equals(newSource);
+            }
+            @Override
+            public boolean areContentsTheSame(
+                    @NonNull MediaSource oldSource, @NonNull MediaSource newSource) {
+                // the same as areItemsTheSame since the content/metadata updates are handled
+                // by the ViewHolder
+                return oldSource.equals(newSource);
+            }
+        };
+        private final AsyncListDiffer<MediaSource> mAsyncListDiffer =
+                new AsyncListDiffer(this, mDiffUtil);
+
         private List<MediaSource> mHistoryList = new ArrayList<>();
 
         public void setHistoryList(List<MediaSource> historyList) {
             mHistoryList.clear();
             mHistoryList.addAll(historyList);
-            notifyDataSetChanged();
+            // Cannot submit the same list reference, the adapter considers it the same as old list
+            List<MediaSource> copy = new ArrayList<>(mHistoryList);
+            mAsyncListDiffer.submitList(copy);
         }
 
         @Override
-        protected HistoryItemViewHolder onCreateViewHolderImpl(@NonNull @NotNull ViewGroup parent,
+        protected HistoryItemViewHolder onCreateViewHolderImpl(@NonNull ViewGroup parent,
                 int viewType) {
             View itemView = LayoutInflater.from(parent.getContext())
                     .inflate(mItemLayout, parent, false);

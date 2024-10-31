@@ -13,7 +13,7 @@
 // limitations under the License.
 
 android_app {
-    name: "car-app-card-host-sample",
+    name: "car-app-card-host-sample-app-platform-release",
     min_sdk_version: "31",
     target_sdk_version: "34",
     sdk_version: "system_current",
@@ -44,8 +44,8 @@ android_app {
         "androidx.lifecycle_lifecycle-runtime-compose",
         "androidx.lifecycle_lifecycle-runtime-ktx",
         "androidx.legacy_legacy-support-v4",
-        "car-app-card-host-lib-source",
-        "car-app-card-lib-source",
+        "car-app-card-host-lib-prebuilt",
+        "car-app-card-lib-prebuilt",
         "guava",
         "token-compose-compat",
         // Kotlin

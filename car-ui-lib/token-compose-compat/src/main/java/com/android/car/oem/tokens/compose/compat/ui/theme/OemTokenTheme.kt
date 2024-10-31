@@ -202,12 +202,9 @@ fun oemTextStyle(oemContext: Context, textStyle: Int): TextStyle {
     var fontStyle = FontStyle.Normal
     var fontWeight = FontWeight.Normal
 
-    // TODO (b/318754750): Support bold font style
     if (textStyleType == 1) {
         fontWeight = FontWeight.Bold
-    }
-
-    if (textStyleType == 2) {
+    } else if (textStyleType == 2) {
         fontStyle = FontStyle.Italic
     }
 

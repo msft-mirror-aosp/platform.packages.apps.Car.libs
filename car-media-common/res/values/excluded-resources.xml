@@ -51,6 +51,7 @@
     <item type="id" name="spacer"/>
     <item type="id" name="queue_list_item_title"/>
     <item type="id" name="queue_list_item_subtitle"/>
+    <item type="id" name="queue_list_item_icons"/>
     <item type="id" name="separator"/>
     <item type="id" name="now_playing_icon"/>
     <item type="id" name="queue_list"/>

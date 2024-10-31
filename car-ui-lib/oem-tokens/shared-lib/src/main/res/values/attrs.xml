@@ -41,6 +41,24 @@
     <attr name="colorErrorContainer" format="color" />
     <attr name="colorOnErrorContainer" format="color" />
 
+    <!-- Blue color palette -->
+    <attr name="colorBlue" format="color" />
+    <attr name="colorOnBlue" format="color" />
+    <attr name="colorBlueContainer" format="color" />
+    <attr name="colorOnBlueContainer" format="color" />
+
+    <!-- Green color palette -->
+    <attr name="colorGreen" format="color" />
+    <attr name="colorOnGreen" format="color" />
+    <attr name="colorGreenContainer" format="color" />
+    <attr name="colorOnGreenContainer" format="color" />
+
+    <!-- Yellow color palette -->
+    <attr name="colorYellow" format="color" />
+    <attr name="colorOnYellow" format="color" />
+    <attr name="colorYellowContainer" format="color" />
+    <attr name="colorOnYellowContainer" format="color" />
+
     <!-- Neutral color palette -->
     <attr name="colorBackground" format="color" />
     <attr name="colorOnBackground" format="color" />
@@ -54,6 +72,14 @@
     <attr name="colorOutline" format="color" />
     <attr name="colorOutlineVariant" format="color" />
     <attr name="colorScrim" format="color" />
+    <attr name="colorSurfaceDim" format="color" />
+    <attr name="colorSurfaceBright" format="color" />
+    <attr name="colorSurfaceContainer" format="color" />
+    <attr name="colorSurfaceContainerLow" format="color" />
+    <attr name="colorSurfaceContainerLowest" format="color" />
+    <attr name="colorSurfaceContainerHigh" format="color" />
+    <attr name="colorSurfaceContainerHighest" format="color" />
+    <attr name="colorShadow" format="color" />
 
     <!-- Primary tonal palette -->
     <attr name="colorPrimaryPalette100" format="color" />

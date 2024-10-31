@@ -45,6 +45,26 @@
     <public name="colorScrim" id="0x0077001B" type="attr" />
     <public name="colorOutlineVariant" id="0x0077001C" type="attr" />
     <public name="colorSurfaceTint" id="0x0077001D" type="attr" />
+    <public name="colorGreen" id="0x0077001E" type="attr" />
+    <public name="colorOnGreen" id="0x0077001F" type="attr" />
+    <public name="colorGreenContainer" id="0x00770020" type="attr" />
+    <public name="colorOnGreenContainer" id="0x00770021" type="attr" />
+    <public name="colorYellow" id="0x00770022" type="attr" />
+    <public name="colorOnYellow" id="0x00770023" type="attr" />
+    <public name="colorYellowContainer" id="0x00770024" type="attr" />
+    <public name="colorOnYellowContainer" id="0x00770025" type="attr" />
+    <public name="colorSurfaceDim" id="0x00770026" type="attr" />
+    <public name="colorSurfaceBright" id="0x00770027" type="attr" />
+    <public name="colorSurfaceContainer" id="0x00770028" type="attr" />
+    <public name="colorSurfaceContainerLow" id="0x00770029" type="attr" />
+    <public name="colorSurfaceContainerLowest" id="0x0077002A" type="attr" />
+    <public name="colorSurfaceContainerHigh" id="0x0077002B" type="attr" />
+    <public name="colorSurfaceContainerHighest" id="0x0077002C" type="attr" />
+    <public name="colorShadow" id="0x0077002D" type="attr" />
+    <public name="colorBlue" id="0x0077002E" type="attr" />
+    <public name="colorOnBlue" id="0x0077002F" type="attr" />
+    <public name="colorBlueContainer" id="0x00770030" type="attr" />
+    <public name="colorOnBlueContainer" id="0x00770031" type="attr" />
 
     <!-- Primary tonal palette -->
     <public name="colorPrimaryPalette0" id="0x00771000" type="attr" />

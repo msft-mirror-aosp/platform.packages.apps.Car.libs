@@ -19,6 +19,9 @@ package com.android.car.media.common;
 import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION;
 import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE;
 
+import static androidx.car.app.mediaextensions.MetadataExtras.KEY_EXCLUDE_MEDIA_ITEM_FROM_MIXED_APP_LIST;
+import static androidx.car.app.mediaextensions.MetadataExtras.KEY_TINTABLE_INDICATOR_ICON_URI_LIST;
+
 import static com.android.car.media.common.MediaConstants.KEY_DESCRIPTION_LINK_MEDIA_ID;
 import static com.android.car.media.common.MediaConstants.KEY_IMMERSIVE_AUDIO;
 import static com.android.car.media.common.MediaConstants.KEY_SUBTITLE_LINK_MEDIA_ID;
@@ -43,6 +46,7 @@ import androidx.annotation.ArrayRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import androidx.car.app.mediaextensions.MetadataExtras;
 import androidx.media.utils.MediaConstants;
 
 import com.android.car.apps.common.BitmapUtils;
@@ -254,6 +258,13 @@ public class MediaItemMetadata {
                 == MediaConstants.METADATA_VALUE_ATTRIBUTE_PRESENT;
     }
 
+    /** Returns whether the EXCLUDE_MEDIA_ITEM extra is set. */
+    public boolean shouldExcludeItemFromMixedAppList() {
+        return (mMetadataCompatBundle != null) && mMetadataCompatBundle.getLong(
+                KEY_EXCLUDE_MEDIA_ITEM_FROM_MIXED_APP_LIST)
+                == MediaConstants.METADATA_VALUE_ATTRIBUTE_PRESENT;
+    }
+
     /** Returns the string value associated with the given key. */
     @Nullable
     public String getStringProperty(String key) {
@@ -261,6 +272,29 @@ public class MediaItemMetadata {
             return null;
         }
         return mMetadataCompatBundle.getString(key);
+    }
+
+    /**
+     * Returns the list of non empty uris extracted from the metadata extra:
+     * {@link MetadataExtras#KEY_TINTABLE_INDICATOR_ICON_URI_LIST}.
+     */
+    @NonNull
+    public List<Uri> getSmallIconsUriList() {
+        Bundle extras = mMediaDescription.getExtras();
+        if (extras == null) {
+            return Collections.emptyList();
+        }
+        List<String> extra = extras.getStringArrayList(KEY_TINTABLE_INDICATOR_ICON_URI_LIST);
+        if (extra == null) {
+            return Collections.emptyList();
+        }
+        ArrayList<Uri> result = new ArrayList<>(extra.size());
+        for (String value : extra) {
+            if (!TextUtils.isEmpty(value)) {
+                result.add(Uri.parse(value));
+            }
+        }
+        return result;
     }
 
     /** @return media item description */

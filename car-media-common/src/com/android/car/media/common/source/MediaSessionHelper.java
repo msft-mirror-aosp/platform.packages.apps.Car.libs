@@ -43,6 +43,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Source of MediaSources that listens to {@link MediaSessionManager} media session changes.
@@ -59,7 +60,7 @@ import java.util.List;
  * reasons, and instead rely on the creation of a media notification to give users the ability to
  * control the session when the app is backgrounded. For this reason callers must provide access to
  * notifications for MediaSessionHelper to filter the media sessions. This requirement may be
- * relaxed once a wider range of automotive targeted apps as available.
+ * relaxed once a wider range of automotive targeted apps are available.
  *
  * For non-active MediaSessions, listeners are created to be notified if one of the others become
  * active, since playback changes don't always trigger a session change.
@@ -80,7 +81,8 @@ public class MediaSessionHelper extends MediaController.Callback {
     @Nullable
     private final NotificationProvider mNotificationProvider;
 
-    private final MediaSessionManager.OnActiveSessionsChangedListener mActiveSessionsListener =
+    @VisibleForTesting
+    final MediaSessionManager.OnActiveSessionsChangedListener mActiveSessionsListener =
             this::onMediaControllersChange;
     private static MediaSessionHelper sInstance;
 
@@ -184,7 +186,8 @@ public class MediaSessionHelper extends MediaController.Callback {
         this(context, notificationProvider, createInputFactory(context));
     }
 
-    private MediaSessionHelper(Context context, NotificationProvider notificationProvider,
+    @VisibleForTesting
+    MediaSessionHelper(Context context, NotificationProvider notificationProvider,
             InputFactory inputFactory) {
         mContext = new WeakReference<>(context);
         mNotificationProvider = notificationProvider;
@@ -294,6 +297,7 @@ public class MediaSessionHelper extends MediaController.Callback {
 
             // Since playback state changes don't trigger an active media session change, we
             // need to listen to the other media sessions in case another one becomes active.
+            // This includes the active media session, which may be stopped and then resumed later.
             registerForPlaybackChanges(mediaController);
         }
     }
@@ -329,6 +333,10 @@ public class MediaSessionHelper extends MediaController.Callback {
         if (activeMediaControllers != null && !activeMediaControllers.isEmpty()) {
             MediaController primaryMediaController = activeMediaControllers.get(0);
             MediaSource mediaSource = mInputFactory.getMediaSource(primaryMediaController);
+            if (Objects.equals(mediaSource, mPrimaryMediaSource.getValue())) {
+                // Prevent updating with the same media source
+                return;
+            }
             saveLastActiveMediaSource(mediaSource);
             mPrimaryMediaSource.setValue(mediaSource);
         }
@@ -337,6 +345,11 @@ public class MediaSessionHelper extends MediaController.Callback {
     private void updateActiveOrPausedMediaSources(List<MediaController> activeMediaControllers) {
         // Only update when there are active or paused media sources
         if (activeMediaControllers != null && !activeMediaControllers.isEmpty()) {
+            List<MediaSource> mediaSources = mInputFactory.getMediaSources(activeMediaControllers);
+            if (mediaSources.equals(mActiveOrPausedMediaSources.getValue())) {
+                // Prevent updating with the same media sources
+                return;
+            }
             mActiveOrPausedMediaSources
                 .setValue(mInputFactory.getMediaSources(activeMediaControllers));
         }

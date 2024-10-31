@@ -29,15 +29,15 @@ android_test {
     certificate: ":com-android-car-apps-test",
 
     libs: [
-        "android.test.runner",
-        "android.test.base",
+        "android.test.runner.stubs.system",
+        "android.test.base.stubs.system",
         "android.car-stubs",
         "android.test.mock.stubs"
     ],
 
     privileged: true,
     min_sdk_version: "30",
-    target_sdk_version: "31",
+    target_sdk_version: "34",
     sdk_version: "system_current",
 
     manifest: "AndroidManifest.xml",
@@ -58,6 +58,7 @@ android_test {
         "hamcrest-library",
         "androidx.arch.core_core-runtime",
         "androidx.arch.core_core-common",
+        "androidx.media3.media3-session",
         "androidx.mediarouter_mediarouter",
         "android.car-system-stubs",
         "car-apps-common-prebuilt",

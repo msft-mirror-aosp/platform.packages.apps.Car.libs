@@ -106,8 +106,8 @@ android_test {
     // CERTIFICATE is defined in car-ui-lib build file.
     certificate: CERTIFICATE,
     libs: [
-        "android.test.runner",
-        "android.test.base",
+        "android.test.runner.stubs",
+        "android.test.base.stubs",
         "android.car-stubs",
         "android.test.mock.stubs"
     ],

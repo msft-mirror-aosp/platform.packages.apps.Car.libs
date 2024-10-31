@@ -43,15 +43,15 @@ android_library {
 
 
 android_test {
-    name: "car-app-card-lib-tests",
+    name: "CarAppCardLibTests",
     certificate: ":com-android-car-apps-test",
     manifest: "src/androidTest/AndroidManifest.xml",
     srcs: ["src/androidTest/java/**/*.kt"],
     // Enforce the jni libraries to be grouped into the APK file.
     use_embedded_native_libs: true,
     libs: [
-        "android.test.runner",
-        "android.test.base",
+        "android.test.runner.stubs.system",
+        "android.test.base.stubs.system",
         "android.car-stubs",
         "android.test.mock.stubs",
     ],
@@ -60,12 +60,13 @@ android_test {
         "androidx.test.espresso.core",
         "androidx.test.espresso.contrib",
         "androidx.test.ext.junit",
-        "car-app-card-lib-source",
+        "car-app-card-lib-prebuilt",
         "kotlin-test",
-        "platform-test-annotations",
+        "libprotobuf-java-lite",
         "mockito-robolectric-prebuilt",
         "mockito-target-extended-minus-junit4",
         "mockito-kotlin2",
+        "platform-test-annotations",
         "truth",
     ],
     // runtime cc library which is used by mockito-target-inline.
@@ -73,4 +74,28 @@ android_test {
         "libdexmakerjvmtiagent",
         "libstaticjvmtiagent",
     ],
+}
+
+java_genrule {
+    name: "car-app-card-lib-aar",
+    srcs: [
+        ":car-app-card-lib-source{.aar}",
+    ],
+    out: ["car-app-card-lib.aar"],
+    tools: [
+        "make_slim_aar",
+    ],
+    cmd: "dir=packages/apps/Car/libs/car-app-card-lib/app-card && " +
+        "$(location make_slim_aar) --classes-allowlist com/android/car/appcard $(out) " +
+        "$(location :car-app-card-lib-source{.aar}) $$dir/src/main/res",
+    dist: {
+        targets: ["car-app-card-lib-aar",]
+    },
+}
+
+android_library_import {
+    name: "car-app-card-lib-prebuilt",
+    aars: [":car-app-card-lib-aar"],
+    sdk_version: "current",
+    static_libs: car_app_card_lib_static_libs,
 }

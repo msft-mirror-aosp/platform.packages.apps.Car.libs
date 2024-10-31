@@ -16,6 +16,16 @@
 
 rootProject.name = "AAOS Apps"
 
+apply(from = "buildLogic/metaConfig/plugin-repositories.gradle.kts")
+
+pluginManagement {
+    includeBuild("buildLogic")
+}
+
+plugins {
+    id("aaosApps.buildLogic.settings")
+}
+
 /**
  * List of Unbundled projects and their corresponding relative paths. This is used to configure the
  * projects within this build.
@@ -61,7 +71,8 @@ val projects =
         ":test-media-app:mobile" to "../../tests/TestMediaApp/mobile",
         ":test-rotary-ime" to "../../tests/RotaryIME",
         ":test-rotary-playground" to "../../tests/RotaryPlayground",
-        ":tests" to "../../tests")
+        ":driver-ui" to "../../DriverUI"
+    )
 
 // Initialize each Gradle subproject
 projects.forEach { (projectName, projectDir) ->
@@ -69,31 +80,4 @@ projects.forEach { (projectName, projectDir) ->
     project(projectName).projectDir = File(projectDir)
 }
 
-pluginManagement {
-    repositories {
-        // Only check the google repository for these groups
-        // This makes dependency resolution much faster by telling Gradle that it'll only find
-        // Google libraries and plugins within the gmaven repository.
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
-        gradlePluginPortal()
-    }
-}
-
-dependencyResolutionManagement {
-    repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
-        mavenCentral()
-    }
-}
+apply(from = "buildLogic/metaConfig/build-repositories.gradle.kts")

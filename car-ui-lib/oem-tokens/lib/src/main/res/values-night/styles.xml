@@ -45,6 +45,25 @@
         <item name="oemColorScrim">?attr/oemColorNeutralPalette80</item>
         <item name="oemColorOutlineVariant">?attr/oemColorNeutralVariantPalette30</item>
         <item name="oemColorSurfaceTint">?attr/oemColorPrimaryPalette80</item>
+        <item name="oemColorSurfaceDim">#0F1417</item>
+        <item name="oemColorSurfaceBright">#353A3D</item>
+        <item name="oemColorSurfaceContainer">#1C2024</item>
+        <item name="oemColorSurfaceContainerLow">?attr/oemColorNeutralPalette10</item>
+        <item name="oemColorSurfaceContainerLowest">#0A0F12</item>
+        <item name="oemColorSurfaceContainerHigh">#262B2E</item>
+        <item name="oemColorSurfaceContainerHighest">#313539</item>
+        <item name="oemColorBlue">#86A9FF</item>
+        <item name="oemColorOnBlue">#001945</item>
+        <item name="oemColorBlueContainer">#00419C</item>
+        <item name="oemColorOnBlueContainer">#D9E2FF</item>
+        <item name="oemColorGreen">#5BBF6B</item>
+        <item name="oemColorOnGreen">#002107</item>
+        <item name="oemColorGreenContainer">#00531D</item>
+        <item name="oemColorOnGreenContainer">#92F99D</item>
+        <item name="oemColorYellow">#EB9A00</item>
+        <item name="oemColorOnYellow">#2A1800</item>
+        <item name="oemColorYellowContainer">#643F00</item>
+        <item name="oemColorOnYellowContainer">#FFDDB6</item>
     </style>
 
 </resources>
