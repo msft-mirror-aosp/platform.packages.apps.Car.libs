@@ -17,6 +17,7 @@ package com.android.car.appcard.component
 
 import android.util.Log
 import com.android.car.appcard.component.interaction.OnClickListener
+import com.android.car.appcard.component.interaction.RoutingActivityIntent
 import com.android.car.appcard.internal.proto.Button.ButtonMessage
 
 /**
@@ -35,7 +36,7 @@ class Button private constructor(builder: Builder) : Component(builder) {
     private set
 
   /**
-   * @return an optional {@link Image}
+   * @return an optional [Image]
    */
   var image: Image?
     private set
@@ -44,6 +45,12 @@ class Button private constructor(builder: Builder) : Component(builder) {
    * @return [ButtonType]
    */
   var buttonType: ButtonType
+    private set
+
+  /**
+   * @return an optional [RoutingActivityIntent]
+   */
+  var intent: RoutingActivityIntent?
     private set
 
   /**
@@ -57,6 +64,7 @@ class Button private constructor(builder: Builder) : Component(builder) {
     image = builder.image
     buttonType = builder.buttonType
     onClickListener = builder.onClickListener
+    intent = builder.intent
   }
 
   /**
@@ -71,6 +79,10 @@ class Button private constructor(builder: Builder) : Component(builder) {
 
     image?.let {
       builder.setImage(it.toMessage())
+    }
+
+    intent?.let {
+      builder.setIntent(it.toMessage())
     }
 
     return builder
@@ -113,6 +125,7 @@ class Button private constructor(builder: Builder) : Component(builder) {
     text = component.text
     buttonType = component.buttonType
     onClickListener = component.onClickListener
+    intent = component.intent
 
     return true
   }
@@ -123,7 +136,8 @@ class Button private constructor(builder: Builder) : Component(builder) {
     if (other !is Button) return false
 
     return super.equals(other) && image == other.image && text == other.text &&
-      buttonType == other.buttonType && onClickListener == other.onClickListener
+      buttonType == other.buttonType && onClickListener == other.onClickListener &&
+      intent == other.intent
   }
 
   override fun hashCode(): Int {
@@ -133,6 +147,7 @@ class Button private constructor(builder: Builder) : Component(builder) {
     result = 31 * result + (onClickListener?.hashCode() ?: 0)
     result = 31 * result + (text?.hashCode() ?: 0)
     result = 31 * result + (image?.hashCode() ?: 0)
+    result = 31 * result + (intent?.hashCode() ?: 0)
     return result
   }
 
@@ -156,6 +171,7 @@ class Button private constructor(builder: Builder) : Component(builder) {
     internal var image: Image? = null
     internal var buttonType: ButtonType
     internal var onClickListener: OnClickListener?
+    internal var intent: RoutingActivityIntent? = null
 
     internal constructor(buttonMessage: ButtonMessage) : super(buttonMessage.componentId) {
       if (buttonMessage.hasText()) text = buttonMessage.text
@@ -179,6 +195,10 @@ class Button private constructor(builder: Builder) : Component(builder) {
       }
 
       onClickListener = null
+
+      if (buttonMessage.hasIntent()) {
+        intent = RoutingActivityIntent.fromMessage(buttonMessage.intent)
+      }
     }
 
     internal constructor(
@@ -190,6 +210,7 @@ class Button private constructor(builder: Builder) : Component(builder) {
       text = null
       image = null
       buttonType = type
+      intent = null
     }
 
     /**
@@ -213,6 +234,14 @@ class Button private constructor(builder: Builder) : Component(builder) {
       imageCheck(image)
 
       this.image = image
+      return this
+    }
+
+    /**
+     * Set [RoutingActivityIntent] for the button
+     */
+    fun setIntent(intent: RoutingActivityIntent): Builder {
+      this.intent = intent
       return this
     }
 

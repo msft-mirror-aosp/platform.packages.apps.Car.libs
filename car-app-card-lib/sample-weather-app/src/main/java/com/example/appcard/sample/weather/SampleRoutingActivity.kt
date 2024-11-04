@@ -13,26 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.example.appcard.sample.weather
 
-syntax = "proto3";
+import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+import android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS
+import androidx.appcompat.app.AppCompatActivity
 
-package com.android.car.appcard.protos;
-
-option java_package = "com.android.car.appcard.internal.proto";
-
-import "image.proto";
-import "intent.proto";
-
-message ButtonMessage {
-  optional string component_id = 1;
-  optional string text = 2;
-  optional ImageMessage image = 4;
-  optional ButtonType type = 5;
-  optional IntentMessage intent = 6;
-}
-
-enum ButtonType {
-  PRIMARY = 0;  // Default
-  SECONDARY = 1;
-  NO_BACKGROUND = 2;
+/** An sample routing activity that re-routes the intent sent from the app card host. */
+class SampleRoutingActivity : AppCompatActivity() {
+  override fun onStart() {
+    super.onStart()
+    val intent = Intent(ACTION_LOCATION_SOURCE_SETTINGS).apply {
+      setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+    }
+    startActivity(intent)
+    finish()
+  }
 }
