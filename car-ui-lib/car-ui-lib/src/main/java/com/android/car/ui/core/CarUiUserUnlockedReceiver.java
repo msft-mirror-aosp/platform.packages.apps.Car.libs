@@ -25,16 +25,19 @@ import androidx.annotation.NonNull;
  * This class is a {link @BroadcastReceiver} that initiates a task on user unlock.
  */
 public class CarUiUserUnlockedReceiver extends BroadcastReceiver {
-    private final Thread mBookTask;
+    private final Thread mUnlockTask;
 
     public CarUiUserUnlockedReceiver(@NonNull Thread thread) {
-        mBookTask = thread;
+        mUnlockTask = thread;
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (Intent.ACTION_USER_UNLOCKED.equals(intent.getAction())) {
-            mBookTask.start();
+        synchronized (this) {
+            if (Intent.ACTION_USER_UNLOCKED.equals(intent.getAction())
+                    && mUnlockTask.getState() == Thread.State.NEW) {
+                mUnlockTask.start();
+            }
             context.unregisterReceiver(this);
         }
     }
