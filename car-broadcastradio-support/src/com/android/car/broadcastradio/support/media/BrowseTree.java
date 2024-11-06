@@ -254,6 +254,7 @@ public class BrowseTree {
      */
     public void setProgramList(@Nullable ProgramList programList) {
         synchronized (mLock) {
+            boolean rootChanged = (mProgramList == null) != (programList == null);
             if (mProgramList != null) {
                 mProgramList.removeOnCompleteListener(mProgramListCompleteListener);
             }
@@ -261,7 +262,10 @@ public class BrowseTree {
             if (programList != null) {
                 mProgramList.addOnCompleteListener(mProgramListCompleteListener);
             }
-            mBrowserService.notifyChildrenChanged(NODE_ROOT);
+            if (rootChanged) {
+                mRootChildren = null;
+                mBrowserService.notifyChildrenChanged(NODE_ROOT);
+            }
         }
     }
 
@@ -322,7 +326,10 @@ public class BrowseTree {
             mFavorites = favorites;
             mFavoritesCache = null;
             mBrowserService.notifyChildrenChanged(NODE_FAVORITES);
-            if (rootChanged) mBrowserService.notifyChildrenChanged(NODE_ROOT);
+            if (rootChanged) {
+                mRootChildren = null;
+                mBrowserService.notifyChildrenChanged(NODE_ROOT);
+            }
         }
     }
 
