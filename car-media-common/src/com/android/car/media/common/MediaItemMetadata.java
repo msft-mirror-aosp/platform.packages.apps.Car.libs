@@ -284,17 +284,8 @@ public class MediaItemMetadata {
         if (extras == null) {
             return Collections.emptyList();
         }
-        List<String> extra = extras.getStringArrayList(KEY_TINTABLE_INDICATOR_ICON_URI_LIST);
-        if (extra == null) {
-            return Collections.emptyList();
-        }
-        ArrayList<Uri> result = new ArrayList<>(extra.size());
-        for (String value : extra) {
-            if (!TextUtils.isEmpty(value)) {
-                result.add(Uri.parse(value));
-            }
-        }
-        return result;
+        ArrayList<Uri> extra = extras.getParcelableArrayList(KEY_TINTABLE_INDICATOR_ICON_URI_LIST);
+        return (extra != null) ? extra : Collections.emptyList();
     }
 
     /** @return media item description */
