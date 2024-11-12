@@ -17,6 +17,10 @@ package com.android.car.oem.tokens;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import static junit.framework.Assert.assertEquals;
+
+import static org.junit.Assert.assertThrows;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.TypedValue;
@@ -90,8 +94,7 @@ public final class TokenTest {
         try (ActivityScenario<TokenTestActivity> scenario = ActivityScenario.launch(
                 TokenTestActivity.class)) {
             scenario.onActivity(activity -> {
-                Context oemContext = Token.createOemStyledContext(activity);
-                int colorStaticApi = Token.getColor(oemContext, R.attr.oemColorPrimary);
+                int colorStaticApi = Token.getColor(activity, R.attr.oemColorPrimary);
 
                 TypedValue tv = new TypedValue();
                 TypedArray attributes = activity.getTheme().obtainStyledAttributes(
@@ -117,6 +120,18 @@ public final class TokenTest {
                 attributes.getValue(R.styleable.OemTokens_oemColorPrimary, tv2);
 
                 assertThat(tv1.data).isEqualTo(tv2.data);
+            });
+        }
+    }
+
+    @Test
+    public void testColor_tokenInstallerNotRun_throwsException() {
+        try (ActivityScenario<NoTokenTestActivity> scenario = ActivityScenario.launch(
+                NoTokenTestActivity.class)) {
+            scenario.onActivity(activity -> {
+                Throwable exception = assertThrows(IllegalArgumentException.class, () ->
+                        Token.getColor(activity, R.attr.oemColorPrimary));
+                assertEquals("Context must be token compatible.", exception.getMessage());
             });
         }
     }

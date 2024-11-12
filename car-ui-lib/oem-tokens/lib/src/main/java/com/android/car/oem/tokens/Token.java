@@ -197,12 +197,13 @@ public class Token {
     }
 
     private static void checkContext(@NonNull Context context) {
-        if (context instanceof OemContextWrapper) {
-            return;
+        TypedArray attributes = context.getTheme().obtainStyledAttributes(
+                new int[]{ R.attr.oemColorPrimary});
+        if (attributes.getType(0) == (TypedValue.TYPE_NULL)) {
+            throw new IllegalArgumentException(
+                    "Context must be token compatible.");
         }
-
-        throw new IllegalArgumentException(
-                "Must use an OEM styled Context. Use Token#createOemStyledContext()");
+        attributes.recycle();
     }
 
     @NonNull
