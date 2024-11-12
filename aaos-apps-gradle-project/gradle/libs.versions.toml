@@ -15,6 +15,9 @@ protobufGradlePlugin = "0.9.4"
 robolectric = "4.12"
 
 [libraries]
+designcompose = { module = "com.android.designcompose:designcompose", version.ref = "designcompose" }
+designcompose-codegen = { module = "com.android.designcompose:codegen", version.ref = "designcompose" }
+
 dexmaker-mockito-inline = { module = "com.linkedin.dexmaker:dexmaker-mockito-inline", version.ref = "mockito" }
 dexmaker-mockito-inline-extended = { module = "com.linkedin.dexmaker:dexmaker-mockito-inline-extended", version.ref = "mockito" }
 protobuf-kotlin-lite = { module = "com.google.protobuf:protobuf-kotlin-lite", version.ref = "protobuf" }
