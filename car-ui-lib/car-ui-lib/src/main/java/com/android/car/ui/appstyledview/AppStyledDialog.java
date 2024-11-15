@@ -340,7 +340,7 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
                     boolean mIsImeShownWithResize;
                     final int mImeOverlapPx =
                             (int) CarUiUtils.dpToPixel(mContext.getResources(), IME_OVERLAP_DP);
-                    final int mSystemBarBottom = getSystemBarBottomHeight();
+                    int mSystemBarBottom;
                     int mImeHeight;
 
                     private boolean isImeAnimation(WindowInsetsAnimationCompat animation) {
@@ -367,6 +367,8 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
                         if (!isImeAnimation(animation)) {
                             return;
                         }
+
+                        mSystemBarBottom = getSystemBarBottomHeight();
 
                         window.setSoftInputMode(
                                 WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
