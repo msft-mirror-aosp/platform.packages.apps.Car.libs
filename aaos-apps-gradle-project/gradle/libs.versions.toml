@@ -2,7 +2,7 @@
 
 # SDK and tooling versions - Used in buildLogic plugins.
 # Android Studio can't tell that so it thinks they're unused
-compileSdk = "34"
+compileSdk = "35"
 buildToolsVersion = "35.0.0"
 
 androidGradlePlugin = "8.2.2"
