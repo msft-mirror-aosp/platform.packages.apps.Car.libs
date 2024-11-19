@@ -80,6 +80,7 @@ java_genrule {
     name: "car-app-card-lib-aar",
     srcs: [
         ":car-app-card-lib-source{.aar}",
+        "src/main/res/**/*",
     ],
     out: ["car-app-card-lib.aar"],
     tools: [
