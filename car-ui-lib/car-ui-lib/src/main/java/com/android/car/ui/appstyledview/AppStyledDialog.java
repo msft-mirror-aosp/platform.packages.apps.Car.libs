@@ -82,7 +82,6 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
     private WindowManager.LayoutParams mBaseLayoutParams;
     @AppStyledDialogController.SceneType
     private int mSceneType;
-    private boolean mRenderInDisplayCutout;
 
     public AppStyledDialog(@NonNull Context context) {
         super(context);
@@ -102,13 +101,8 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             mBaseLayoutParams = new WindowManager.LayoutParams();
             mBaseLayoutParams.copyFrom(window.getAttributes());
-            int types = WindowInsetsCompat.Type.systemBars();
-            if (mBaseLayoutParams.layoutInDisplayCutoutMode
-                    != WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS) {
-                types = types | WindowInsetsCompat.Type.displayCutout();
-            } else {
-                mRenderInDisplayCutout = true;
-            }
+            int types =
+                    WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout();
             mBaseLayoutParams.setFitInsetsTypes(types);
         } else {
             // #copyFrom() does not correctly copy params state in Android Q
@@ -153,10 +147,8 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
 
     @SuppressLint("NewApi")
     private float getVerticalInset(DisplayMetrics displayMetrics) {
-        int insetType = WindowInsetsCompat.Type.systemBars();
-        if (!mRenderInDisplayCutout) {
-            insetType = insetType | WindowInsetsCompat.Type.displayCutout();
-        }
+        int insetType =
+                WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout();
 
         // Inset API not supported before Android R. Fallback to approximation
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
@@ -188,10 +180,8 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
 
     @SuppressLint("NewApi")
     private float getHorizontalInset(DisplayMetrics displayMetrics) {
-        int insetType = WindowInsetsCompat.Type.systemBars();
-        if (!mRenderInDisplayCutout) {
-            insetType = insetType | WindowInsetsCompat.Type.displayCutout();
-        }
+        int insetType =
+                WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout();
 
         // Inset API not supported before Android R. Fallback to approximation
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
