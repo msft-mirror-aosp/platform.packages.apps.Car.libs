@@ -33,7 +33,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowManager;
-import android.widget.PopupWindow;
 
 import androidx.activity.OnBackPressedDispatcher;
 import androidx.activity.OnBackPressedDispatcherOwner;
@@ -84,7 +83,6 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
     @AppStyledDialogController.SceneType
     private int mSceneType;
     private boolean mRenderInDisplayCutout;
-    private PopupWindow mImeSizeCheckPopup;
 
     public AppStyledDialog(@NonNull Context context) {
         super(context);
@@ -483,17 +481,20 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
                         // when system bars are shown)
                         if (mIsImeShownWithResize) {
                             Rect r = new Rect();
-                            mImeSizeCheckPopup.getContentView().getRootView()
-                                    .getWindowVisibleDisplayFrame(r);
-                            int dialogHeight = getWindow().getAttributes().height;
-                            int visibleFrameHeight = r.height();
+                            Activity activity = CarUiUtils.getActivity(mContext);
+                            if (activity != null) {
+                                activity.getWindow().getDecorView().getRootView()
+                                        .getWindowVisibleDisplayFrame(r);
+                                int dialogHeight = getWindow().getAttributes().height;
+                                int visibleFrameHeight = r.height();
 
-                            if (dialogHeight < visibleFrameHeight) {
-                                mImeHeight = mImeHeight - mSystemBarBottom;
+                                if (dialogHeight < visibleFrameHeight) {
+                                    mImeHeight = mImeHeight - mSystemBarBottom;
 
-                                getWindow().getAttributes().height =
-                                        mStartHeight - calculateDialogResize();
-                                window.setAttributes(window.getAttributes());
+                                    getWindow().getAttributes().height =
+                                            mStartHeight - calculateDialogResize();
+                                    window.setAttributes(window.getAttributes());
+                                }
                             }
                         }
 
@@ -602,12 +603,6 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
         if (focusedView != null) {
             focusedView.clearFocus();
         }
-
-        DisplayMetrics displayMetrics =
-                CarUiUtils.getDeviceDisplayMetrics(mContext);
-        mImeSizeCheckPopup = new PopupWindow(0, displayMetrics.heightPixels);
-        mImeSizeCheckPopup.setContentView(new View(mContext));
-        mImeSizeCheckPopup.showAtLocation(getWindow().getDecorView(), Gravity.NO_GRAVITY, 0, 0);
     }
 
     @Override
