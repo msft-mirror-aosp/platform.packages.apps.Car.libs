@@ -16,15 +16,16 @@
 
 package com.android.car.telephony.calling;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 
 import com.android.car.telephony.common.CallDetail;
 
-import java.util.List;
-
 import dagger.assisted.Assisted;
 import dagger.assisted.AssistedFactory;
 import dagger.assisted.AssistedInject;
+
+import java.util.List;
 
 /**
  * Returns a list of {@link android.telecom.CallAudioState.CallAudioRoute}s for the primary ongoing
@@ -36,7 +37,7 @@ public class SupportedAudioRoutesLiveData extends MediatorLiveData<List<Integer>
 
     @AssistedInject
     public SupportedAudioRoutesLiveData(
-            @Assisted CallDetailLiveData primaryCallDetailLiveData,
+            @Assisted LiveData<CallDetail> primaryCallDetailLiveData,
             InCallServiceManager inCallServiceManager) {
         mInCallServiceManager = inCallServiceManager;
 
@@ -66,6 +67,6 @@ public class SupportedAudioRoutesLiveData extends MediatorLiveData<List<Integer>
     @AssistedFactory
     public interface Factory {
         /** Creates a {@link SupportedAudioRoutesLiveData} instance. */
-        SupportedAudioRoutesLiveData create(CallDetailLiveData primaryCallDetailLiveData);
+        SupportedAudioRoutesLiveData create(LiveData<CallDetail> primaryCallDetailLiveData);
     }
 }

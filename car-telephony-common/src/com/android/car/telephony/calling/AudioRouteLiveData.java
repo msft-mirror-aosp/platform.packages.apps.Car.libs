@@ -35,11 +35,11 @@ public class AudioRouteLiveData extends MediatorLiveData<Integer> {
     private static final String TAG = "CD.AudioRouteLiveData";
 
     private final InCallServiceManager mInCallServiceManager;
-    private final CallDetailLiveData mPrimaryCallDetailLiveData;
+    private final LiveData<CallDetail> mPrimaryCallDetailLiveData;
 
     @AssistedInject
     public AudioRouteLiveData(
-            @Assisted CallDetailLiveData primaryCallDetailLiveData,
+            @Assisted LiveData<CallDetail> primaryCallDetailLiveData,
             @Assisted LiveData<CallAudioState> callAudioStateLiveData,
             InCallServiceManager inCallServiceManager) {
         mInCallServiceManager = inCallServiceManager;
@@ -80,7 +80,7 @@ public class AudioRouteLiveData extends MediatorLiveData<Integer> {
     @AssistedFactory
     public interface Factory {
         /** Creates an {@link AudioRouteLiveData} instance. */
-        AudioRouteLiveData create(CallDetailLiveData primaryCallDetailLiveData,
+        AudioRouteLiveData create(LiveData<CallDetail> primaryCallDetailLiveData,
                                   LiveData<CallAudioState> callAudioStateLiveData);
     }
 }
