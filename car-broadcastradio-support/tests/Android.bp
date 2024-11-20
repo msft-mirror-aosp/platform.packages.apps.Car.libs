@@ -28,7 +28,7 @@ android_test {
         "truth",
         "mockito-target-extended",
     ],
-    libs: ["android.test.base"],
+    libs: ["android.test.base.stubs.system"],
     test_suites: [
         "general-tests",
         "automotive-general-tests",
@@ -40,5 +40,5 @@ android_test {
     ],
 
     min_sdk_version: "33",
-    target_sdk_version: "33",
+    target_sdk_version: "34",
 }

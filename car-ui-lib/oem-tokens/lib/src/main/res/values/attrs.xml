@@ -52,6 +52,29 @@
         <attr name="oemColorScrim" format="color" />
         <attr name="oemColorOutlineVariant" format="color" />
         <attr name="oemColorSurfaceTint" format="color" />
+        <attr name="oemColorSurfaceDim" format="color" />
+        <attr name="oemColorSurfaceBright" format="color" />
+        <attr name="oemColorSurfaceContainer" format="color" />
+        <attr name="oemColorSurfaceContainerLow" format="color" />
+        <attr name="oemColorSurfaceContainerLowest" format="color" />
+        <attr name="oemColorSurfaceContainerHigh" format="color" />
+        <attr name="oemColorSurfaceContainerHighest" format="color" />
+        <attr name="oemColorShadow" format="color" />
+
+        <attr name="oemColorBlue" format="color" />
+        <attr name="oemColorOnBlue" format="color" />
+        <attr name="oemColorBlueContainer" format="color" />
+        <attr name="oemColorOnBlueContainer" format="color" />
+
+        <attr name="oemColorGreen" format="color" />
+        <attr name="oemColorOnGreen" format="color" />
+        <attr name="oemColorGreenContainer" format="color" />
+        <attr name="oemColorOnGreenContainer" format="color" />
+
+        <attr name="oemColorYellow" format="color" />
+        <attr name="oemColorOnYellow" format="color" />
+        <attr name="oemColorYellowContainer" format="color" />
+        <attr name="oemColorOnYellowContainer" format="color" />
 
         <attr name="oemColorPrimaryPalette100" format="color" />
         <attr name="oemColorPrimaryPalette99" format="color" />

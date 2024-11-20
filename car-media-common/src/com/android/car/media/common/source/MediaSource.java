@@ -18,6 +18,8 @@ package com.android.car.media.common.source;
 
 import static android.car.media.CarMediaIntents.EXTRA_MEDIA_COMPONENT;
 
+import android.app.ActivityOptions;
+import android.app.PendingIntent;
 import android.car.Car;
 import android.car.media.CarMediaIntents;
 import android.content.ComponentName;
@@ -30,6 +32,7 @@ import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.service.media.MediaBrowserService;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -356,6 +359,46 @@ public class MediaSource {
     }
 
     /**
+     * Launches the activity associated with the MediaSource.
+     *
+     * If this is a MediaController based MediaSource with a defined activity, that PendingIntent
+     * will be used. Otherwise the intent returned from getIntent() will be used.
+     */
+    public void launchActivity(Context context, ActivityOptions activityOptions) {
+        PendingIntent pendingIntent = getPendingIntent();
+        if (pendingIntent != null) {
+            try {
+                Log.i(TAG, "Launching PendingIntent " + pendingIntent);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    pendingIntent.send(activityOptions.toBundle());
+                } else {
+                    pendingIntent.send();
+                }
+            } catch (PendingIntent.CanceledException e) {
+                Log.e(TAG, "Exception trying to launch PendingIntent " + e);
+            }
+        } else {
+            Intent intent = getIntent();
+            if (intent != null) {
+                Log.i(TAG, "Launching intent " + intent);
+                context.startActivity(getIntent(), activityOptions.toBundle());
+            }
+        }
+    }
+
+    /**
+     *  Returns the PendingIntent to open a media controller MediaSource, or null if not available
+     */
+    @Nullable
+    private PendingIntent getPendingIntent() {
+        // Only return PendingIntent from media controllers that define it.
+        if (mBrowseService == null && mMediaController != null) {
+            return mMediaController.getSessionActivity();
+        }
+        return null;
+    }
+
+    /**
      * Loads a given ImageRef depending on the type of MediaSource. For AAOS audio apps with an MBS,
      * prevent or flag remote uris depending on the system configuration. For other MediaSources,
      * allow the loading of remote uris.
@@ -370,14 +413,22 @@ public class MediaSource {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MediaSource that = (MediaSource) o;
-        if (mBrowseService != null) {
+        if (mBrowseService != null || that.mBrowseService != null) {
+            // If at least one browse service is not null, compare them
             return Objects.equals(mBrowseService, that.mBrowseService);
-        } else if (that.mBrowseService == null && mMediaController != null) {
-            return Objects.equals(mMediaController, that.mMediaController);
-        } else if (that.mBrowseService == null && that.mMediaController == null) {
-            return Objects.equals(mPackageName, that.mPackageName);
-        } else {
+        } else if (mMediaController != null && that.mMediaController != null
+                && (mMediaController.getSessionToken() != null
+                || that.mMediaController.getSessionToken() != null)) {
+            // At least one session token is not null, compare them
+            return Objects.equals(mMediaController.getSessionToken(),
+                    that.mMediaController.getSessionToken());
+        } else if (mMediaController == null ^ that.mMediaController == null) {
+            // If there is only one not null media controller return false
             return false;
+        } else {
+            // Both MediaSources either have null browse services and media controllers, or both
+            // have media controllers with null session tokens, compare package names
+            return Objects.equals(mPackageName, that.mPackageName);
         }
     }
 

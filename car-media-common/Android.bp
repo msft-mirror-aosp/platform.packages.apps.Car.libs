@@ -49,7 +49,7 @@ android_library {
     libs: ["android.car-system-stubs"],
 
     min_sdk_version: "30", // Media requires apis that became public in R.
-    target_sdk_version: "31",
+    target_sdk_version: "34",
     sdk_version: "current",
 }
 

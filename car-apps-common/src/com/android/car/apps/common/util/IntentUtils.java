@@ -16,7 +16,9 @@
 
 package com.android.car.apps.common.util;
 
+import android.app.ActivityOptions;
 import android.app.PendingIntent;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -24,13 +26,6 @@ import androidx.annotation.NonNull;
 /** Utility class for methods and constants related to intents */
 public class IntentUtils {
     private static final String TAG = "IntentUtils";
-
-    /**
-     *  Intent extra for specifying whether MediaBlockingActivity should dismiss when the car
-     *  becomes parked. Passed value should be either true of false.
-     */
-    public static final String EXTRA_MEDIA_BLOCKING_ACTIVITY_DISMISS_ON_PARK =
-            "MEDIA_BLOCKING_ACTIVITY_DISMISS_ON_PARK";
 
     /**
      *  Intent extra for specifying BlockingActivity's exit button visibility. Passed value should
@@ -45,7 +40,14 @@ public class IntentUtils {
     /** Sends the intent and catches any {@link PendingIntent.CanceledException}. */
     public static void sendIntent(@NonNull PendingIntent intent) {
         try {
-            intent.send();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                ActivityOptions options = ActivityOptions.makeBasic();
+                options.setPendingIntentBackgroundActivityStartMode(
+                        ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED);
+                intent.send(options.toBundle());
+            } else {
+                intent.send();
+            }
         } catch (PendingIntent.CanceledException e) {
             if (Log.isLoggable(TAG, Log.ERROR)) {
                 Log.e(TAG, "Pending intent canceled");

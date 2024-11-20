@@ -18,19 +18,15 @@
 
 buildscript {
     gradle.ext.aaosLatestSDK = 34
-    gradle.ext.aaosTargetSDK = 33
 
     gradle.ext.repoRootPath = rootDir.parentFile.parentFile.parentFile.parentFile.parent
     gradle.ext.lib_car_system_stubs = gradle.ext.repoRootPath + "/prebuilts/sdk/" + gradle.ext.aaosLatestSDK + "/system/android.car-system-stubs.jar"
     gradle.ext.lib_system_stubs = gradle.ext.repoRootPath + "/prebuilts/sdk/" + gradle.ext.aaosLatestSDK + "/system/android.jar"
-    gradle.ext.aaosCertPath = gradle.ext.repoRootPath + "/packages/apps/Car/libs/certs/com_android_car_apps_test.jks"
+    gradle.ext.unbundledCertPath = gradle.ext.repoRootPath + "/packages/apps/Car/libs/certs/com_android_car_apps_test.jks"
     gradle.ext.chassisCertPath = gradle.ext.repoRootPath + "/vendor/auto/embedded/prebuilts/car-ui-lib/chassis_upload_key.jks"
-    def googleCertPath = gradle.ext.repoRootPath + "/vendor/google/certs/devkeys/platform.keystore"
-    if (file(googleCertPath).exists()) {
-        gradle.ext.platformCertPath = googleCertPath
-    } else {
-        gradle.ext.platformCertPath = gradle.ext.repoRootPath + "/packages/apps/Car/libs/certs/platform.keystore"
-    }
+
+    gradle.ext.platformGoogleCertPath = gradle.ext.repoRootPath + "/vendor/google/certs/devkeys/platform.keystore"
+    gradle.ext.platformAospCertPath = gradle.ext.repoRootPath + "/packages/apps/Car/libs/certs/platform.keystore"
 
     gradle.ext.platformSdkVersion = "34" // Change this to the most recent android API level.
 
@@ -59,6 +55,7 @@ buildscript {
 
 plugins {
     alias(libs.plugins.protobuf) apply false
+    id("aaosApps.buildLogic") apply false
 }
 
 allprojects {
@@ -69,14 +66,8 @@ allprojects {
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
     }
 
-    // Send all the build files to the out folder under the root of the repo init.
-    // Gradle creates that folder if it doesn't exist.
-    // Keep in sync with ./copy_gradle_output.sh
-    ext.buildOutputPath = gradle.ext.repoRootPath + "/out/aaos-apps-gradle-build/"
-    buildDir = new File(project.parent == null ? ext.buildOutputPath :
-            project.parent.buildDir.path + "/" + project.name)
-
     // Re-exports for Kotlin build scripts
     ext.aaosLatestSDK = gradle.ext.aaosLatestSDK
     ext.lib_car_system_stubs = gradle.ext.lib_car_system_stubs
+    ext.lib_system_stubs = gradle.ext.lib_system_stubs
 }

@@ -204,12 +204,14 @@ REGENERATE USING packages/apps/Car/tests/tools/rro/generate-overlayable.py
       <item type="integer" name="analytics_send_batch_size"/>
       <item type="integer" name="default_logoSize"/>
       <item type="integer" name="max_custom_actions"/>
+      <item type="integer" name="max_indicator_icons_per_media_item"/>
       <item type="integer" name="media_items_bitmap_max_size_px"/>
       <item type="integer" name="new_album_art_fade_in_duration"/>
       <item type="integer" name="num_app_selector_columns"/>
       <item type="integer" name="playback_subtitle_text_max_lines"/>
       <item type="integer" name="playback_title_text_max_lines"/>
       <item type="integer" name="widget_error_text_max_lines"/>
+      <item type="layout" name="indicator_icon"/>
       <item type="layout" name="minimized_content_format"/>
       <item type="layout" name="minimized_play_pause_stop_button_layout"/>
       <item type="layout" name="minimized_playback_control_bar"/>
@@ -231,6 +233,7 @@ REGENERATE USING packages/apps/Car/tests/tools/rro/generate-overlayable.py
       <item type="string" name="launcher_intent"/>
       <item type="string" name="launcher_popup_intent"/>
       <item type="string" name="metadata_default_title"/>
+      <item type="string" name="open_action_for_app_title"/>
       <item type="style" name="MinimizedContentFormat"/>
       <item type="style" name="PlaybackSubtitleStyle"/>
       <item type="style" name="PlaybackTitleStyle"/>

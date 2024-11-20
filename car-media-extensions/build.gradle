@@ -18,16 +18,16 @@
 plugins {
     id 'com.android.library'
     id 'buildSrc.local-publish'
+    id 'aaosApps.buildLogic'
     id 'buildSrc.jdk.jdk8'
 }
 
 android {
-    compileSdkVersion gradle.ext.aaosLatestSDK
     namespace "com.android.car.media.extensions"
 
     defaultConfig {
         minSdkVersion 28
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

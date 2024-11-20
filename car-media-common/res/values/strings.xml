@@ -19,6 +19,8 @@
     <string name="album_art">Album Art</string>
     <!-- Default title of current track's metadata. [CHAR LIMIT=50] -->
     <string name="metadata_default_title">No Title</string>
+    <!-- Text for View that opens an application on tap [CHAR LIMIT=50] -->
+    <string name="open_action_for_app_title">Open %1$s</string>
 
     <!-- Default error message [CHAR LIMIT=100] -->
     <string name="default_error_message">Something’s wrong. Try later.</string>

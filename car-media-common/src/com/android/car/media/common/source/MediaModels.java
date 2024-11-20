@@ -69,8 +69,8 @@ public class MediaModels {
      */
     @Deprecated
     public MediaModels(Context context) {
-        MediaSessionHelper helper = MediaSessionHelper.getInstance(context);
-        LiveData<MediaSource> srcData = helper.getMediaSource();
+        mMediaSessionHelper = MediaSessionHelper.getInstance(context);
+        LiveData<MediaSource> srcData = mMediaSessionHelper.getMediaSource();
         mMediaSourceViewModel = new MediaSourceViewModel(context, srcData);
         LiveData<BrowsingState> browseState = mMediaSourceViewModel.getBrowsingState();
         String debugId = "ActiveSource";
@@ -104,6 +104,11 @@ public class MediaModels {
     /** Returns the {@link PlaybackViewModel}. */
     public PlaybackViewModel getPlaybackViewModel() {
         return mPlaybackViewModel;
+    }
+
+    /** Returns the {@link MediaSessionHelper}. */
+    public MediaSessionHelper getMediaSessionHelper() {
+        return mMediaSessionHelper;
     }
 
     /** Clears the models. */

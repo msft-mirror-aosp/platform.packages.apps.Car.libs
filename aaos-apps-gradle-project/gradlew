@@ -117,6 +117,37 @@ esac
 
 CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
 
+# --------- aosp specific code needed for java. ------------------
+
+PREBUILTS_DIR="${APP_HOME}/../../../../../prebuilts"
+
+# Pick the correct JDK for this OS.
+if [ $darwin = "true" ]; then
+    plat="darwin"
+else
+    plat="linux"
+fi
+
+platform_suffix="x86"
+case "$(arch)" in
+  arm64* )
+    platform_suffix="arm64"
+esac
+
+# override JAVA_HOME, because CI machines have it and it points to very old JDK
+export AOSP_JDK17="${PREBUILTS_DIR}/jdk/jdk17/${plat}-${platform_suffix}"
+export JAVA_HOME="${AOSP_JDK17}"
+# Warn developers if they try to build top level project without the full checkout
+[ ! -d "${JAVA_HOME}" ] && die "Failed to find: ${JAVA_HOME}
+
+Typically, this means either:
+1. Your repo manifest did not include the correct JDK
+2. You are using the repo checkout, but the last repo sync failed. Use repo status
+   to check for projects which are partially-synced, e.g. showing ***NO BRANCH***."
+
+echo "Launching Gradle using the JDK at $(realpath "${JAVA_HOME}" || true)"
+
+# --------------------------------------------------------------
 
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
@@ -200,7 +231,6 @@ if "$cygwin" || "$msys" ; then
         set -- "$@" "$arg"      # push replacement arg
     done
 fi
-
 
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'

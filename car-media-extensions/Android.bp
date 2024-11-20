@@ -30,7 +30,7 @@ android_library {
     srcs: ["src/**/*.java"],
     resource_dirs: ["res"],
     min_sdk_version: "30",
-    target_sdk_version: "31",
+    target_sdk_version: "34",
     sdk_version: "system_current",
     optimize: {
         enabled: false,
