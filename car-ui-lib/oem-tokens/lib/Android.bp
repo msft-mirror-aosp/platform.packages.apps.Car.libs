@@ -15,7 +15,7 @@
 android_library {
     name: "oem-token-lib-source",
 
-    min_sdk_version: "28",
+    min_sdk_version: "29",
     target_sdk_version: "current",
     sdk_version: "current",
     // sc-car only supports up to java 8.

@@ -110,15 +110,31 @@ public class Token {
         int oemStyleOverride = context.getResources().getIdentifier("OemStyle",
                 "style", Token.getTokenSharedLibraryName());
         if (oemStyleOverride == 0) {
-            return new OemContextWrapper(context, R.style.OemTokensBase);
+            if (isLightTheme(context)) {
+                return new OemContextWrapper(context, R.style.OemTokensBaseLight);
+            } else {
+                return new OemContextWrapper(context, R.style.OemTokensBaseDark);
+            }
         }
 
         OemContextWrapper oemContext = new OemContextWrapper(context, R.style.OemTokens);
+        if (isLightTheme(oemContext)) {
+            oemContext.getTheme().applyStyle(R.style.OemTokensLight, true);
+        } else {
+            oemContext.getTheme().applyStyle(R.style.OemTokensDark, true);
+        }
         oemContext.getTheme().applyStyle(oemStyleOverride, true);
 
         return oemContext;
     }
 
+    /** Returns true if the current system default attribute is lightTheme. */
+    static boolean isLightTheme(@NonNull Context context) {
+        TypedValue value = new TypedValue();
+        return context.getTheme().resolveAttribute(android.R.attr.isLightTheme,
+                value, true)
+                && value.data != 0;
+    }
     /**
      * Return the OEM provided corner radius corresponding to the attribute.
      * <p>
