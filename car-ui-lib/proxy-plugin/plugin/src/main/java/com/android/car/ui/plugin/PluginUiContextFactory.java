@@ -21,11 +21,13 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
 
 import com.chassis.car.ui.plugin.CarUiProxyLayoutInflaterFactory;
+import com.chassis.car.ui.plugin.R;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
@@ -72,6 +74,14 @@ public final class PluginUiContextFactory {
         return mRecentUiContext.get();
     }
 
+    /** Returns true if the current system default attribute is lightTheme. */
+    private static boolean isLightTheme(@NonNull Context context) {
+        TypedValue value = new TypedValue();
+        return context.getTheme().resolveAttribute(android.R.attr.isLightTheme,
+                value, true)
+                && value.data != 0;
+    }
+
     /**
      * This method tries to return a ui context for usage in the plugin that has the same
      * configuration as the given source ui context.
@@ -107,9 +117,23 @@ public final class PluginUiContextFactory {
         int oemStyleOverride = uiContext.getResources().getIdentifier("OemStyle",
                 "style", "com.android.oem.tokens");
         if (oemStyleOverride == 0) {
-            uiContext.getTheme().applyStyle(com.chassis.car.ui.plugin.R.style.OemTokensBase, true);
+            if (isLightTheme(uiContext)) {
+                uiContext.getTheme().applyStyle(
+                        R.style.OemTokensBaseLight, true);
+            } else {
+                uiContext.getTheme().applyStyle(
+                        R.style.OemTokensBaseDark, true);
+            }
         } else {
-            uiContext.getTheme().applyStyle(com.chassis.car.ui.plugin.R.style.OemTokens, true);
+            uiContext.getTheme().applyStyle(
+                    R.style.OemTokens, true);
+            if (isLightTheme(uiContext)) {
+                uiContext.getTheme().applyStyle(
+                        R.style.OemTokensLight, true);
+            } else {
+                uiContext.getTheme().applyStyle(
+                        R.style.OemTokensDark, true);
+            }
             uiContext.getTheme().applyStyle(oemStyleOverride, true);
         }
 

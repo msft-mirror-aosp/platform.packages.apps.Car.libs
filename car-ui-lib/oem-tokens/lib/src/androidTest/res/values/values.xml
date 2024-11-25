@@ -29,10 +29,16 @@
         <item name="oemColorOnTertiary">@android:color/holo_blue_dark</item>
         <item name="oemColorTertiaryContainer">@android:color/holo_blue_dark</item>
         <item name="oemColorOnTertiaryContainer">@android:color/holo_blue_dark</item>
+        <item name="android:isLightTheme">true</item>
+
     </style>
 
     <style name="TestTokenTheme.NoOverride">
         <item name="oemTokenOverrideEnabled">false</item>
+    </style>
+
+    <style name="TestTokenTheme.DarkTheme">
+        <item name="android:isLightTheme">false</item>
     </style>
 
     <bool name="enable_oem_tokens">true</bool>

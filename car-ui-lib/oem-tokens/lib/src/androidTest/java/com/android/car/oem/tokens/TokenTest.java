@@ -34,6 +34,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @RunWith(AndroidJUnit4.class)
 public final class TokenTest {
     @Before
@@ -71,6 +73,38 @@ public final class TokenTest {
                 a.recycle();
             });
         }
+    }
+
+    @Test
+    public void testLightDarkThemeTokenInstallerRun() {
+        AtomicInteger lightColor = new AtomicInteger();
+        AtomicInteger darkColor = new AtomicInteger();
+
+        try (ActivityScenario<TokenTestActivity> scenario = ActivityScenario.launch(
+                TokenTestActivity.class)) {
+            scenario.onActivity(activity -> {
+                TypedArray a = activity.getTheme().obtainStyledAttributes(
+                        new int[]{R.attr.oemColorSurface, android.R.attr.isLightTheme});
+                lightColor.set(a.getColor(0, -1));
+                assertThat(a.getBoolean(1, false)).isEqualTo(true);
+                a.recycle();
+            });
+        }
+
+        try (ActivityScenario<TokenDarkThemeTestActivity> scenario =
+                     ActivityScenario.launch(TokenDarkThemeTestActivity.class)) {
+            scenario.onActivity(activity -> {
+                TypedArray b = activity.getTheme().obtainStyledAttributes(
+                        new int[]{R.attr.oemColorSurface, android.R.attr.isLightTheme});
+                darkColor.set(b.getColor(0, -1));
+                assertThat(b.getBoolean(1, true)).isEqualTo(false);
+                b.recycle();
+            });
+        }
+
+        assertThat(lightColor.get()).isNotEqualTo(-1);
+        assertThat(darkColor.get()).isNotEqualTo(-1);
+        assertThat(lightColor.get()).isNotEqualTo(darkColor.get());
     }
 
     @Test
