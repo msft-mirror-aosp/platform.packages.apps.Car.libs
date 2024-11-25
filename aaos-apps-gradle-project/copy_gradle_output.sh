@@ -51,8 +51,6 @@ cp $GRADLE_OUTPUT_DIR/car-dialer-app/outputs/apk/production/release/car-dialer-a
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/platformAosp/release/car-media-app-platformAosp-release.apk $1/CarMediaApp_aosp_cert.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/platformGoogle/release/car-media-app-platformGoogle-release.apk $1/CarMediaApp.apk
-check_status $?
 cp $GRADLE_OUTPUT_DIR/car-messenger-app/outputs/apk/prod/release/car-messenger-app-prod-release.apk $1/CarMessengerApp.apk
 check_status $?
 cp $GRADLE_OUTPUT_DIR/PaintBooth/outputs/apk/unbundled/release/PaintBooth-unbundled-release.apk $1/PaintBooth.apk
@@ -67,23 +65,27 @@ cp $GRADLE_OUTPUT_DIR/test-media-app/automotive/outputs/apk/unbundled/release/au
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-radio-app/outputs/apk/unbundled/release/car-radio-app-unbundled-release.apk $1/CarRadioApp.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/car-bugreport-app/outputs/apk/platformGoogle/release/car-bugreport-app-platformGoogle-release.apk $1/CarBugReportApp.apk
-check_status $?
 cp $GRADLE_OUTPUT_DIR/car-bugreport-app/outputs/apk/platformAosp/release/car-bugreport-app-platformAosp-release.apk $1/CarBugReportApp_aosp_cert.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/car-app-card-sample-calendar-app/outputs/apk/platformGoogle/release/car-app-card-sample-calendar-app-platformGoogle-release.apk $1/car-app-card-sample-calendar-app-platform-release.apk
-check_status $?
-cp $GRADLE_OUTPUT_DIR/car-app-card-sample-media-app/outputs/apk/platformGoogle/release/car-app-card-sample-media-app-platformGoogle-release.apk $1/car-app-card-sample-media-app-platform-release.apk
-check_status $?
-cp $GRADLE_OUTPUT_DIR/car-app-card-sample-weather-app/outputs/apk/platformGoogle/release/car-app-card-sample-weather-app-platformGoogle-release.apk $1/car-app-card-sample-weather-app-platform-release.apk
-check_status $?
-cp $GRADLE_OUTPUT_DIR/car-app-card-host-sample-app/outputs/apk/platformGoogle/release/car-app-card-host-sample-app-platformGoogle-release.apk $1/car-app-card-host-sample-app-platform-release.apk
-check_status $?
-cp $GRADLE_OUTPUT_DIR/driver-ui/outputs/apk/default/release/driver-ui-default-release-unsigned.apk $1/DriverUI.apk
-check_status $?
-cp $GRADLE_OUTPUT_DIR/driver-ui/outputs/apk/platformAosp/release/driver-ui-platformAosp-release.apk $1/driver-ui-platform-release.apk
-check_status $?
 
+if [[ -n "${COPY_INTERNAL_ARTIFACTS+x}" ]]; then
+  cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/platformGoogle/release/car-media-app-platformGoogle-release.apk $1/CarMediaApp.apk
+  check_status $?
+  cp $GRADLE_OUTPUT_DIR/car-app-card-sample-calendar-app/outputs/apk/platformGoogle/release/car-app-card-sample-calendar-app-platformGoogle-release.apk $1/car-app-card-sample-calendar-app-platform-release.apk
+  check_status $?
+  cp $GRADLE_OUTPUT_DIR/car-app-card-sample-media-app/outputs/apk/platformGoogle/release/car-app-card-sample-media-app-platformGoogle-release.apk $1/car-app-card-sample-media-app-platform-release.apk
+  check_status $?
+  cp $GRADLE_OUTPUT_DIR/car-app-card-sample-weather-app/outputs/apk/platformGoogle/release/car-app-card-sample-weather-app-platformGoogle-release.apk $1/car-app-card-sample-weather-app-platform-release.apk
+  check_status $?
+  cp $GRADLE_OUTPUT_DIR/car-app-card-host-sample-app/outputs/apk/platformGoogle/release/car-app-card-host-sample-app-platformGoogle-release.apk $1/car-app-card-host-sample-app-platform-release.apk
+  check_status $?
+  cp $GRADLE_OUTPUT_DIR/car-bugreport-app/outputs/apk/platformGoogle/release/car-bugreport-app-platformGoogle-release.apk $1/CarBugReportApp.apk
+  check_status $?
+  cp $GRADLE_OUTPUT_DIR/driver-ui/outputs/apk/default/release/driver-ui-default-release-unsigned.apk $1/DriverUI.apk
+  check_status $?
+  cp $GRADLE_OUTPUT_DIR/driver-ui/outputs/apk/platformAosp/release/driver-ui-platformAosp-release.apk $1/driver-ui-platform-release.apk
+  check_status $?
+fi
 
 # AARs
 cp $GRADLE_OUTPUT_DIR/car-ui-lib/outputs/aar/car-ui-lib-release.aar $1/car-ui-lib.aar
@@ -136,15 +138,11 @@ cp $GRADLE_OUTPUT_DIR/car-apps-common/outputs/apk/androidTest/debug/car-apps-com
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-media-common/outputs/apk/androidTest/debug/car-media-common-debug-androidTest.apk $1/CarMediaCommonUnitTests.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/androidTest/platformGoogle/debug/car-media-app-platformGoogle-debug-androidTest.apk  $1/CarMediaUnitTests.apk
-check_status $?
 cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/androidTest/platformAosp/debug/car-media-app-platformAosp-debug-androidTest.apk  $1/CarMediaUnitTests_aosp_cert.apk
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-media-extensions/outputs/apk/androidTest/debug/car-media-extensions-debug-androidTest.apk $1/CarMediaExtensionsUnitTests.apk
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-broadcastradio-support/outputs/apk/androidTest/debug/car-broadcastradio-support-debug-androidTest.apk $1/CarBroadcastRadioSupportLibTests.apk
-check_status $?
-cp $GRADLE_OUTPUT_DIR/car-bugreport-app/outputs/apk/androidTest/platformGoogle/debug/car-bugreport-app-platformGoogle-debug-androidTest.apk $1/CarBugReportUnitTests.apk
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-bugreport-app/outputs/apk/androidTest/platformAosp/debug/car-bugreport-app-platformAosp-debug-androidTest.apk $1/CarBugReportUnitTests_aosp_cert.apk
 check_status $?
@@ -152,8 +150,15 @@ cp $GRADLE_OUTPUT_DIR/car-app-card-lib/outputs/apk/androidTest/debug/car-app-car
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-app-card-host-lib/outputs/apk/androidTest/debug/car-app-card-host-lib-debug-androidTest.apk $1/CarAppCardHostLibTests.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/driver-ui/outputs/apk/androidTest/default/debug/driver-ui-default-debug-androidTest.apk $1/DriverUITests.apk
-check_status $?
+
+if [[ -n "${COPY_INTERNAL_ARTIFACTS+x}" ]]; then
+  cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/androidTest/platformGoogle/debug/car-media-app-platformGoogle-debug-androidTest.apk  $1/CarMediaUnitTests.apk
+  check_status $?
+  cp $GRADLE_OUTPUT_DIR/car-bugreport-app/outputs/apk/androidTest/platformGoogle/debug/car-bugreport-app-platformGoogle-debug-androidTest.apk $1/CarBugReportUnitTests.apk
+  check_status $?
+  cp $GRADLE_OUTPUT_DIR/driver-ui/outputs/apk/androidTest/default/debug/driver-ui-default-debug-androidTest.apk $1/DriverUITests.apk
+  check_status $?
+fi
 
 # JaCoCo
 mkdir $GRADLE_OUTPUT_DIR/jacoco
@@ -188,14 +193,15 @@ mkdir $GRADLE_OUTPUT_DIR/jacoco/car-telephony-common-app
 check_status $?
 mkdir $GRADLE_OUTPUT_DIR/jacoco/car-messenger-common-app
 check_status $?
-mkdir $GRADLE_OUTPUT_DIR/jacoco/driverui-app
-check_status $?
+
+if [[ -n "${COPY_INTERNAL_ARTIFACTS+x}" ]]; then
+  mkdir $GRADLE_OUTPUT_DIR/jacoco/driverui-app
+  check_status $?
+fi
 
 $JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-calendar-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-calendar-app/intermediates/javac/unbundledDebug/classes .
 check_status $?
 $JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-messenger-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-messenger-app/intermediates/javac/fakeDebug/classes .
-check_status $?
-$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-media-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-media-app/intermediates/javac/platformGoogleDebug/classes .
 check_status $?
 $JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-dialer-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-dialer-app/intermediates/javac/emulatorDebug/classes .
 check_status $?
@@ -221,7 +227,13 @@ $JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-telephony-common-app/jacoc
 check_status $?
 $JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-messenger-common-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-messenger-common/intermediates/javac/debug/classes/com/android/car/messenger/common .
 check_status $?
+
+if [[ -n "${COPY_INTERNAL_ARTIFACTS+x}" ]]; then
+$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-media-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-media-app/intermediates/javac/platformGoogleDebug/classes .
+check_status $?
 $JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/driverui-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/driver-ui/intermediates/javac/defaultDebug/classes .
 check_status $?
+fi
+
 $JAVA_HOME/bin/jar cvfM $1/jacoco-report-classes-all.jar -C $GRADLE_OUTPUT_DIR/jacoco .
 check_status $?
