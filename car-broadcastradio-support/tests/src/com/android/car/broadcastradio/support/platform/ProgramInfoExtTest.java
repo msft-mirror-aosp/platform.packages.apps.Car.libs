@@ -185,6 +185,9 @@ public final class ProgramInfoExtTest {
         mExpect.withMessage("Album art in media display metadata")
                 .that(mediaDisplayMetadata.getBitmap(
                         MediaMetadataCompat.METADATA_KEY_ALBUM_ART)).isEqualTo(bitmapMock);
+        mExpect.withMessage("Media URI in media display metadata")
+                .that(mediaDisplayMetadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI))
+                .isEqualTo(ProgramSelectorExt.toUri(mFmInfo.getSelector()).toString());
     }
 
     @Test
@@ -194,13 +197,17 @@ public final class ProgramInfoExtTest {
 
         mExpect.withMessage("Media display title").that(mediaMetadata
                         .getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE))
-                .isEqualTo(ProgramInfoExt.getProgramName(mFmInfo, /* flags= */ 0));
+                .isEqualTo(ProgramSelectorExt.getDisplayName(mFmInfo.getSelector(),
+                        mFmInfo.getChannel()));
         mExpect.withMessage("Media title").that(mediaMetadata.getString(
                 MediaMetadataCompat.METADATA_KEY_TITLE)).isEqualTo(TITLE_VALUE);
         mExpect.withMessage("Media artist").that(mediaMetadata.getString(
                 MediaMetadataCompat.METADATA_KEY_ARTIST)).isEqualTo(ARTIST_VALUE);
         mExpect.withMessage("Media album").that(mediaMetadata.getString(
                 MediaMetadataCompat.METADATA_KEY_ALBUM)).isEqualTo(ALBUM_VALUE);
+        mExpect.withMessage("Media URI").that(mediaMetadata.getString(
+                MediaMetadataCompat.METADATA_KEY_MEDIA_URI))
+                .isEqualTo(ProgramSelectorExt.toUri(mFmInfo.getSelector()).toString());
     }
 
     @Test
