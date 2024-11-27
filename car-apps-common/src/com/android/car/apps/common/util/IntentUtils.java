@@ -16,7 +16,9 @@
 
 package com.android.car.apps.common.util;
 
+import android.app.ActivityOptions;
 import android.app.PendingIntent;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -38,7 +40,14 @@ public class IntentUtils {
     /** Sends the intent and catches any {@link PendingIntent.CanceledException}. */
     public static void sendIntent(@NonNull PendingIntent intent) {
         try {
-            intent.send();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                ActivityOptions options = ActivityOptions.makeBasic();
+                options.setPendingIntentBackgroundActivityStartMode(
+                        ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED);
+                intent.send(options.toBundle());
+            } else {
+                intent.send();
+            }
         } catch (PendingIntent.CanceledException e) {
             if (Log.isLoggable(TAG, Log.ERROR)) {
                 Log.e(TAG, "Pending intent canceled");
