@@ -35,7 +35,7 @@ public final class InCallServiceManager {
     private static final String EVENT_SCO_CONNECT = "com.android.bluetooth.hfpclient.SCO_CONNECT";
     private static final String EVENT_SCO_DISCONNECT =
             "com.android.bluetooth.hfpclient.SCO_DISCONNECT";
-    private static final String PROPERTY_IN_CALL_SERVICE="PROPERTY_IN_CALL_SERVICE";
+    public static final String PROPERTY_IN_CALL_SERVICE = "PROPERTY_IN_CALL_SERVICE";
 
     private InCallService mInCallService;
     private PropertyChangeSupport mPropertyChangeSupport;
