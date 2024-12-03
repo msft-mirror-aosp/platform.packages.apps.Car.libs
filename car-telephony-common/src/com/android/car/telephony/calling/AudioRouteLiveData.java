@@ -32,7 +32,7 @@ import dagger.assisted.AssistedInject;
  * Provides the current connecting audio route.
  */
 public class AudioRouteLiveData extends MediatorLiveData<Integer> {
-    private static final String TAG = "CD.AudioRouteLiveData";
+    private static final String TAG = "CTC.AudioRouteLiveData";
 
     private final InCallServiceManager mInCallServiceManager;
     private final LiveData<CallDetail> mPrimaryCallDetailLiveData;

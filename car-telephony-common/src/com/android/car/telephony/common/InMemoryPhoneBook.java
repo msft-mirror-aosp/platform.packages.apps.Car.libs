@@ -46,7 +46,7 @@ import java.util.Map;
  * they can be accessed more easily and quickly.
  */
 public class InMemoryPhoneBook implements Observer<List<Contact>> {
-    private static final String TAG = "CD.InMemoryPhoneBook";
+    private static final String TAG = "CTC.InMemoryPhoneBook";
     private static InMemoryPhoneBook sInMemoryPhoneBook;
 
     private final Context mContext;

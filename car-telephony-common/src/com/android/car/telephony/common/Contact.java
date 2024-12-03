@@ -39,7 +39,7 @@ import java.util.Locale;
  * Encapsulates data about a phone Contact entry. Typically loaded from the local Contact store.
  */
 public class Contact implements Parcelable, Comparable<Contact> {
-    private static final String TAG = "CD.Contact";
+    private static final String TAG = "CTC.Contact";
 
     /**
      * Column name for phonebook label column.

@@ -32,7 +32,7 @@ import androidx.lifecycle.LiveData;
  */
 public abstract class AsyncQueryLiveData<T> extends LiveData<T> {
 
-    private static final String TAG = "CD.AsyncQueryLiveData";
+    private static final String TAG = "CTC.AsyncQueryLiveData";
     private AsyncEntityLoader<T> mAsyncEntityLoader;
 
     public AsyncQueryLiveData(Context context, QueryParam.Provider provider) {

@@ -43,9 +43,9 @@ import com.android.car.telephony.common.TelecomUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 
-import javax.inject.Inject;
-
 import dagger.hilt.android.qualifiers.ApplicationContext;
+
+import javax.inject.Inject;
 
 /**
  * Provide a list of methods that can be used to present call in the in-call UIs such as in-call
@@ -55,7 +55,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
  * provide consistency among various in-call UIs.
  */
 public class InCallUtil {
-    private static final String TAG = "CD.InCallUtil";
+    private static final String TAG = "CTC.InCallUtil";
     private static final String CAR_APP_SERVICE_INTERFACE = "androidx.car.app.CarAppService";
     private static final String CAR_APP_ACTIVITY_INTERFACE =
             "androidx.car.app.activity.CarAppActivity";
