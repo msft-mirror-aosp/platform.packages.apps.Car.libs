@@ -24,7 +24,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
 
 import com.android.car.apps.common.log.L;
 
@@ -56,8 +55,8 @@ public class InCallModel implements SimpleInCallServiceImpl.ActiveCallListChange
     private final MutableLiveData<List<Call>> mSelfManagedCallListLiveData;
     private final MutableLiveData<CallAudioState> mCallAudioStateLiveData;
 
-    private final LiveData<Call> mPrimaryCallLiveData;
-    private final LiveData<Call> mSecondaryCallLiveData;
+    private final MutableLiveData<Call> mPrimaryCallLiveData;
+    private final MutableLiveData<Call> mSecondaryCallLiveData;
     private final MutableLiveData<List<Call>> mConferenceCallListLiveData;
 
     private final Comparator<Call> mCallComparator;
@@ -74,13 +73,10 @@ public class InCallModel implements SimpleInCallServiceImpl.ActiveCallListChange
         mSelfManagedCallListLiveData = new MutableLiveData<>();
         mConferenceCallListLiveData = new MutableLiveData<>();
         mCallAudioStateLiveData = new MutableLiveData<>();
+        mPrimaryCallLiveData = new MutableLiveData<>();
+        mSecondaryCallLiveData = new MutableLiveData<>();
 
         mCallComparator = callComparator;
-
-        mPrimaryCallLiveData = Transformations.map(mOngoingCallListLiveData,
-                callList -> callList.isEmpty() ? null : callList.get(0));
-        mSecondaryCallLiveData = Transformations.map(mOngoingCallListLiveData,
-                callList -> (callList != null && callList.size() > 1) ? callList.get(1) : null);
 
         mInCallServiceManager = inCallServiceManager;
         mInCallServiceManager.addObserver(this);
@@ -134,18 +130,23 @@ public class InCallModel implements SimpleInCallServiceImpl.ActiveCallListChange
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         L.d(TAG, "InCallService has updated.");
-        if (PROPERTY_IN_CALL_SERVICE.equals(evt.getPropertyName())
-                && mInCallServiceManager.getInCallService() != null) {
-            onInCallServiceConnected();
+        if (PROPERTY_IN_CALL_SERVICE.equals(evt.getPropertyName())) {
+            if (mInCallServiceManager.getInCallService() != null) {
+                onInCallServiceConnected();
+            } else {
+                modelCallList();
+            }
         }
     }
 
     /** Cleanup connected services on teardown. */
     public void tearDown() {
         mInCallServiceManager.removeObserver(this);
-        mInCallService.removeActiveCallListChangedCallback(this);
-        mInCallService.removeCallAudioStateChangedCallback(this);
-        mInCallService.removeCallStateChangedCallback(this);
+        if (mInCallService != null) {
+            mInCallService.removeActiveCallListChangedCallback(this);
+            mInCallService.removeCallAudioStateChangedCallback(this);
+            mInCallService.removeCallStateChangedCallback(this);
+        }
     }
 
     /**
@@ -174,12 +175,6 @@ public class InCallModel implements SimpleInCallServiceImpl.ActiveCallListChange
     private void recalculateOngoingCallList(List<Call> activeCallList) {
         L.d(TAG, "Recalculate ongoing call list");
 
-        if (activeCallList == null || activeCallList.isEmpty()) {
-            mOngoingCallListLiveData.setValue(Collections.emptyList());
-            mConferenceCallListLiveData.setValue(Collections.emptyList());
-            return;
-        }
-
         List<Call> conferenceList = new ArrayList<>();
         List<Call> ongoingCallList = new ArrayList<>();
         for (Call call : activeCallList) {
@@ -196,6 +191,8 @@ public class InCallModel implements SimpleInCallServiceImpl.ActiveCallListChange
         L.d(TAG, "ongoing(%d): %s", ongoingCallList.size(), ongoingCallList);
         mConferenceCallListLiveData.setValue(conferenceList);
         mOngoingCallListLiveData.setValue(ongoingCallList);
+        mPrimaryCallLiveData.setValue(ongoingCallList.isEmpty() ? null : ongoingCallList.get(0));
+        mSecondaryCallLiveData.setValue(ongoingCallList.size() > 1 ? ongoingCallList.get(1) : null);
     }
 
     @Nullable
