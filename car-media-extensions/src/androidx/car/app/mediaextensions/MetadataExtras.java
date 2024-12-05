@@ -149,7 +149,8 @@ public final class MetadataExtras {
      * downloaded and explicit icon uris to this extra's list. This way all these icons can use
      * the same drawing style.
      *
-     * <p>TYPE: ArrayList, list of Strings - with each uri pointing to local content
+     * <p>TYPE: ArrayList<Uri>, list of Uris - with each uri pointing to local content
+     * using either ContentResolver.SCHEME_CONTENT or ContentResolver.SCHEME_ANDROID_RESOURCE
      * (ie not on the web) that can be parsed into a android.graphics.drawable.Drawable</p>
      */
     public static final String KEY_TINTABLE_INDICATOR_ICON_URI_LIST =
