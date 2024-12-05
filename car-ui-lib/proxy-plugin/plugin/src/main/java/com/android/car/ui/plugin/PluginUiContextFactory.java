@@ -45,12 +45,19 @@ public final class PluginUiContextFactory {
      */
     private WeakReference<Context> mRecentUiContext = null;
     /**
+     * The most recently referenced app ui context.
+     */
+    private WeakReference<Context> mRecentAppUiContext = null;
+    /**
      * A map from app contexts to their corresponding plugin ui contexts.
      */
     private final Map<Context, Context> mAppToPluginContextMap = new WeakHashMap<>();
+    private final CarUiProxyLayoutInflaterFactory mCarUiProxyLayoutInflaterFactory;
 
-    public PluginUiContextFactory(@NonNull Context pluginContext) {
+    public PluginUiContextFactory(@NonNull Context pluginContext,
+            @NonNull CarUiProxyLayoutInflaterFactory carUiProxyLayoutInflaterFactory) {
         mPluginContext = pluginContext;
+        mCarUiProxyLayoutInflaterFactory = carUiProxyLayoutInflaterFactory;
     }
 
     /**
@@ -70,6 +77,21 @@ public final class PluginUiContextFactory {
                     "Method getRecentPluginUiContext cannot be called before getPluginUiContext");
         }
         return mRecentUiContext.get();
+    }
+
+    /**
+     * Returns the most recently referenced app ui context from {@code getPluginContext}. This is
+     * used by CarUiProxyLayoutInflaterFactory to instantiate Rotary specific Views.
+     *
+     * @throws IllegalStateException if mRecentAppUiContext is not initialized
+     */
+    @NonNull
+    public Context getRecentAppUiContext() throws IllegalStateException {
+        if (mRecentAppUiContext == null) {
+            throw new IllegalStateException(
+                    "Method getRecentAppUiContext cannot be called before getPluginUiContext");
+        }
+        return mRecentAppUiContext.get();
     }
 
     /**
@@ -98,10 +120,11 @@ public final class PluginUiContextFactory {
         // layout files of the car-ui-lib static implementation
         LayoutInflater inflater = LayoutInflater.from(uiContext);
         if (inflater.getFactory2() == null) {
-            inflater.setFactory2(new CarUiProxyLayoutInflaterFactory());
+            inflater.setFactory2(mCarUiProxyLayoutInflaterFactory);
         }
         mAppToPluginContextMap.put(sourceContext, uiContext);
         mRecentUiContext = new WeakReference<>(uiContext);
+        mRecentAppUiContext = new WeakReference<>(sourceContext);
 
         // Add required theme attributes to support OEM Design Tokens
         int oemStyleOverride = uiContext.getResources().getIdentifier("OemStyle",
