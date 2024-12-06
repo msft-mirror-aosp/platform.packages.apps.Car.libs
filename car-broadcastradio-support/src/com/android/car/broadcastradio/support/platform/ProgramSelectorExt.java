@@ -373,7 +373,7 @@ public class ProgramSelectorExt {
         add.accept(ProgramSelector.IDENTIFIER_TYPE_DRMO_SERVICE_ID, "DRMO_SERVICE_ID");
         add.accept(ProgramSelector.IDENTIFIER_TYPE_DRMO_FREQUENCY, "DRMO_FREQUENCY");
         add.accept(ProgramSelector.IDENTIFIER_TYPE_SXM_SERVICE_ID, "SXM_SERVICE_ID");
-        add.accept(ProgramSelector.IDENTIFIER_TYPE_SXM_CHANNEL, "SXM_CHANNEL");
+        add.accept(ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT, "DAB_DMB_SID_EXT");
     }
 
     private static @Nullable String typeToUri(int identifierType) {
