@@ -20,19 +20,7 @@ package com.android.car.appcard.protos;
 
 option java_package = "com.android.car.appcard.internal.proto";
 
-import "image.proto";
-import "intent.proto";
-
-message ButtonMessage {
-  optional string component_id = 1;
-  optional string text = 2;
-  optional ImageMessage image = 4;
-  optional ButtonType type = 5;
-  optional IntentMessage intent = 6;
-}
-
-enum ButtonType {
-  PRIMARY = 0;  // Default
-  SECONDARY = 1;
-  NO_BACKGROUND = 2;
+message IntentMessage {
+  optional string class = 1;
+  optional bytes bundle = 2;
 }

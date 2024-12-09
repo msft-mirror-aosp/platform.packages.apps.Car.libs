@@ -16,7 +16,9 @@
 
 package com.example.appcard.samplehost
 
-import android.content.pm.PackageManager
+import android.content.Context
+import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -73,7 +75,7 @@ import com.android.car.appcard.host.ApplicationIdentifier
 /** Jetpack compose specific stateful representation of [ImageAppCard] */
 class ImageAppCardContainerState(
   appCardContainer: AppCardContainer,
-  private val packageManager: PackageManager,
+  private val context: Context,
   private val viewModel: HostViewModel,
 ) : AppCardContainerState {
   override var identifier: MutableState<ApplicationIdentifier> =
@@ -384,7 +386,7 @@ class ImageAppCardContainerState(
       msg = "createButton: $identifier + $appCardId + ${button.value.componentId}"
     )
 
-    val onClick = {
+    val onClick: () -> Unit = {
       viewModel.logIfDebuggable(
         TAG,
         msg = "clicked: $identifier + $appCardId + ${button.value.componentId}"
@@ -396,6 +398,16 @@ class ImageAppCardContainerState(
         button.value.componentId,
         MSG_INTERACTION_ON_CLICK
       )
+
+      button.value.intent?.let {
+        val packageName = identifier.value.packageName
+        val intent = Intent().apply {
+          setClassName(packageName, it.cls)
+          extras?.putAll(it.bundle)
+          setFlags(FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+      }
     }
 
     var colorFilter: ColorFilter? = null
@@ -601,7 +613,7 @@ class ImageAppCardContainerState(
 
   @Composable
   private fun GetAppIcon(packageName: String) {
-    packageManager?.getApplicationIcon(packageName)?.toBitmap()?.asImageBitmap()?.let {
+    context.packageManager?.getApplicationIcon(packageName)?.toBitmap()?.asImageBitmap()?.let {
       Image(
         bitmap = it,
         contentDescription = stringResource(R.string.app_icon_content_desc),
