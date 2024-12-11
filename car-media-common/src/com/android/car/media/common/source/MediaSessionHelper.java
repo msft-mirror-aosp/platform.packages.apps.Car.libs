@@ -429,7 +429,8 @@ public class MediaSessionHelper extends MediaController.Callback {
         ComponentName componentName = carMediaManager.getMediaSource(MEDIA_SOURCE_MODE_PLAYBACK);
         car.disconnect();
 
-        return componentName.flattenToString();
+        // ComponentName may be null b/355078140
+        return componentName == null ? "" : componentName.flattenToString();
     }
 
     /* Copy of PlaybackState.isActive() which is only available for minsdk >=S  */
