@@ -39,6 +39,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatViewInflater;
 
+import com.android.car.ui.plugin.PluginUiContextFactory;
+import com.android.car.ui.plugin.oemapis.FocusAreaOEMV1;
+import com.android.car.ui.plugin.oemapis.FocusParkingViewOEMV1;
+import com.android.car.ui.plugin.oemapis.Function;
 import com.android.car.ui.pluginsupport.PluginFactoryStub;
 import com.android.car.ui.preference.CarUiPreferenceViewStub;
 import com.android.car.ui.recyclerview.CarUiRecyclerView;
@@ -55,6 +59,24 @@ public class CarUiProxyLayoutInflaterFactory extends AppCompatViewInflater imple
     @NonNull
     private final PluginFactoryStub mFactoryStub = new PluginFactoryStub();
 
+    @Nullable
+    private PluginUiContextFactory mPluginUiContextFactory;
+    @Nullable
+    private Function<Context, FocusParkingViewOEMV1> mFocusParkingViewFactory;
+    @Nullable
+    private Function<Context, FocusAreaOEMV1> mFocusAreaFactory;
+
+    /**
+     * Sets factory classes for Rotary classes. They needs to be called using the app context;
+     */
+    public void setRotaryFactories(PluginUiContextFactory pluginUiContextFactory,
+            Function<Context, FocusParkingViewOEMV1> focusParkingViewFactory,
+            Function<Context, FocusAreaOEMV1> focusAreaFactory) {
+        mPluginUiContextFactory = pluginUiContextFactory;
+        mFocusParkingViewFactory = focusParkingViewFactory;
+        mFocusAreaFactory = focusAreaFactory;
+    }
+
     @Override
     @Nullable
     protected View createView(Context context, String name, AttributeSet attrs) {
@@ -70,6 +92,17 @@ public class CarUiProxyLayoutInflaterFactory extends AppCompatViewInflater imple
         if (CarUiPreferenceViewStub.class.getName().equals(name)) {
             return getCarUiPreferenceView(context, attrs);
         }
+        if ("com.android.car.ui.FocusParkingView".equals(name)
+                && mFocusParkingViewFactory != null && mPluginUiContextFactory != null) {
+            return ((FocusParkingViewOEMV1) mFocusParkingViewFactory
+                    .apply(mPluginUiContextFactory.getRecentAppUiContext())).getView();
+        }
+        if ("com.android.car.ui.FocusArea".equals(name)
+                && mFocusAreaFactory != null && mPluginUiContextFactory != null) {
+            return ((FocusAreaOEMV1) mFocusAreaFactory
+                    .apply(mPluginUiContextFactory.getRecentAppUiContext())).getView();
+        }
+
         return null;
     }
 
