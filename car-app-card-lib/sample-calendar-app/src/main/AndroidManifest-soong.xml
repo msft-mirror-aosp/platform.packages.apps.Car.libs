@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2024 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<manifest
+    package="com.example.appcard.sampleapplication"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:icon="@drawable/baseline_space_dashboard_24"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AppCardSampleApplication"
+        android:roundIcon="@drawable/baseline_space_dashboard_24">
+
+        <!-- App Card Content Provider that is required to communicate
+             relevant App Cards with the system
+
+             android.car.permission.BIND_APP_CARD_PROVIDER is an essential permission that will
+             only allow the system to communicate with the AppCardContentProvider
+
+             The content provider must also be exported and enabled -->
+        <provider android:name=".SimpleAppCardContentProvider"
+            android:authorities="com.example.appcard.sampleapplication"
+            android:permission="android.car.permission.BIND_APP_CARD_PROVIDER"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <!-- This intent filter will allow the system to find and
+                connect with the application's AppCardContentProvider -->
+                <action android:name="com.android.car.appcard.APP_CARD_PROVIDER" />
+            </intent-filter>
+        </provider>
+    </application>
+
+
+</manifest>

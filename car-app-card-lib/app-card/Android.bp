@@ -17,6 +17,9 @@ car_app_card_lib_static_libs = [
     "androidx.annotation_annotation",
     "androidx.legacy_legacy-support-v4",
 
+    // protobuf
+    "libprotobuf-java-lite",
+
     // Kotlin
     "kotlin-stdlib",
     "kotlinx-coroutines-android",
