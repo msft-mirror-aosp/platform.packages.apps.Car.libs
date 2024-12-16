@@ -461,7 +461,11 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
 
                     @Override
                     public void onEnd(@NonNull WindowInsetsAnimationCompat animation) {
-                        if (!mIsImeShownWithResize) {
+                        boolean isSystemBarAnimation =
+                                (animation.getTypeMask() & WindowInsetsCompat.Type.systemBars())
+                                        != 0;
+
+                        if (!mIsImeShownWithResize || isSystemBarAnimation) {
                             updateAttributes();
                             copyWindowInsets();
                         }
