@@ -274,7 +274,7 @@ class WeatherAppCardProvider(
     logIfDebuggable("URI Paths: ${uri.pathSegments}")
     val dayTime = isDaylight ?: (uri.pathSegments[2] == "day")
     logIfDebuggable("isDaylight: $dayTime")
-    val code = uri.pathSegments[3]
+    val code = uri.pathSegments[3].split(',')[0]
     val resId = IconUriUtility.getRes(code, dayTime)
     return resToBitmap(resId, imageSize.width, imageSize.height)
   }
