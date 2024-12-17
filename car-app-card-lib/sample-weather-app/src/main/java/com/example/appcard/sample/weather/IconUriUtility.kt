@@ -139,6 +139,11 @@ class IconUriUtility {
           R.drawable.ic_sleet
         }
 
+        "snow_sleet" -> {
+          logIfDebuggable("$code: Snow/sleet")
+          R.drawable.ic_sleet
+        }
+
         "fzra" -> {
           logIfDebuggable("$code: Freezing rain")
           R.drawable.ic_rainy_snow
