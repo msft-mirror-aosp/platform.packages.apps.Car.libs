@@ -420,7 +420,7 @@ public class ProgramSelectorExt {
         if (valUri == null) return null;
         try {
             if (valUri.startsWith(URI_HEX_PREFIX)) {
-                return Long.parseLong(valUri.substring(URI_HEX_PREFIX.length()), 16);
+                return Long.parseUnsignedLong(valUri.substring(URI_HEX_PREFIX.length()), 16);
             } else {
                 return Long.parseLong(valUri, 10);
             }
