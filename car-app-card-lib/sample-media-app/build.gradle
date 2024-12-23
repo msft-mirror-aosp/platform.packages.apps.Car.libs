@@ -64,8 +64,8 @@ android {
 dependencies {
     implementation files(gradle.ext.lib_car_system_stubs)
 
-    implementation 'androidx.annotation:annotation:1.7.1'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation libs.androidx.annotation
+    implementation libs.androidx.appcompat
 
     implementation project(":car-app-card-lib")
     implementation project(":car-apps-common")
