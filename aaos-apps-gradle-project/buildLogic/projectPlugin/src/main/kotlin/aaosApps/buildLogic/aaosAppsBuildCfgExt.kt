@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-plugins {
-    `kotlin-dsl`
-}
+package aaosApps.buildLogic
 
-dependencies {
-    implementation(libs.android.gradlePlugin)
-    implementation(libs.kotlin.gradlePlugin)
+import org.gradle.api.provider.Property
+
+interface aaosAppsBuildCfgExt {
+    val jdkToolchain: Property<Int>
 }

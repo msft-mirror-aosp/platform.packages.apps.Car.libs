@@ -16,7 +16,6 @@
 plugins {
     id 'com.android.library'
     id 'aaosApps.buildLogic'
-    id 'buildSrc.jdk.jdk8'
 }
 
 android {
@@ -44,6 +43,10 @@ android {
 
     testOptions {
         animationsDisabled = true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     project.gradle.taskGraph.whenReady {

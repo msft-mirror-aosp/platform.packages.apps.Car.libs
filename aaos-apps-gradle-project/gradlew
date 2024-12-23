@@ -134,8 +134,9 @@ case "$(arch)" in
     platform_suffix="arm64"
 esac
 
-# override JAVA_HOME, because CI machines have it and it points to very old JDK
+export AOSP_JDK17="${PREBUILTS_DIR}/jdk/jdk17/${plat}-${platform_suffix}"
 export AOSP_JDK21="${PREBUILTS_DIR}/jdk/jdk21/${plat}-${platform_suffix}"
+# override JAVA_HOME, because CI machines have it and it points to very old JDK
 export JAVA_HOME="${AOSP_JDK21}"
 # Warn developers if they try to build top level project without the full checkout
 [ ! -d "${JAVA_HOME}" ] && die "Failed to find: ${JAVA_HOME}

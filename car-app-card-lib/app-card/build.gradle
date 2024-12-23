@@ -17,9 +17,8 @@
 plugins {
     id "org.jetbrains.kotlin.android"
     id 'com.android.library'
-    alias(libs.plugins.protobuf)
+    id "com.google.protobuf"
     id 'aaosApps.buildLogic'
-    id 'buildSrc.jdk.jdk8'
 }
 
 android {

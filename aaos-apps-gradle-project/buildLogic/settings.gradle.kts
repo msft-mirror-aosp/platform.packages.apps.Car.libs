@@ -75,8 +75,6 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             from(files("../gradle/libs.versions.toml"))
-            // Let's use the latest Kotlin version here
-            version("kotlin", "2.0.20")
         }
     }
 }

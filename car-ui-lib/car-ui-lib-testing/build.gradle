@@ -19,7 +19,6 @@
 plugins {
     id 'com.android.library'
     id 'aaosApps.buildLogic'
-    id 'buildSrc.jdk.jdk8'
 }
 
 android {
