@@ -292,9 +292,8 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
         int startMargin = (displayWidth - horizontalInset - params.width) / 2;
 
         if (isLandscape && startMargin >= startMarginThresholdPx) {
-            params.gravity = Gravity.TOP | Gravity.START;
+            params.gravity = Gravity.CENTER_VERTICAL | Gravity.START;
             params.x = startMarginThresholdPx;
-            params.y = (displayHeight - verticalInset - params.height) / 2;
         } else {
             params.gravity = Gravity.CENTER;
         }
