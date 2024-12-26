@@ -315,6 +315,7 @@ public class ControlBar extends RelativeLayout implements ExpandableControlBar {
             }
         }
 
+        int numExtraRowsInUseBefore = mNumExtraRowsInUse;
         mNumExtraRowsInUse = lastUsedIndex / mNumColumns;
         final int lastIndex = lastUsedIndex;
 
@@ -338,6 +339,19 @@ public class ControlBar extends RelativeLayout implements ExpandableControlBar {
                     }
                 }
             });
+        }
+
+        // mRowsContainer's children are in reverse order (last row is at index 0)
+        // When changing source (b/381304903), when the number of extra rows is less than before,
+        // all rows except the main row should be hidden. When the number of rows is greater than
+        // before, only the main row should be set visible
+        if (numExtraRowsInUseBefore > mNumExtraRowsInUse) {
+            for (int i = 0; i < mRowsContainer.getChildCount() - 1; i++) {
+                mRowsContainer.getChildAt(i).setVisibility(View.GONE);
+            }
+        } else if (numExtraRowsInUseBefore < mNumExtraRowsInUse) {
+            mRowsContainer.getChildAt(mRowsContainer.getChildCount() - 1)
+                    .setVisibility(View.VISIBLE);
         }
     }
 
