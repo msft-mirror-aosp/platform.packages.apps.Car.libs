@@ -125,7 +125,7 @@ class FocusAreaHelper {
     private boolean mRtl;
 
     /** The ID of the view specified in {@link #mFocusArea}'s {@code app:defaultFocus}. */
-    private int mDefaultFocusId;
+    private int mDefaultFocusId = View.NO_ID;
     /** The view specified in {@link #mFocusArea}'s {@code app:defaultFocus}. */
     @Nullable
     private View mDefaultFocusView;
