@@ -20,6 +20,7 @@ import static android.util.TypedValue.TYPE_ATTRIBUTE;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.SharedLibraryInfo;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
@@ -130,8 +131,12 @@ public class Token {
 
     /** Returns true if the current system default attribute is lightTheme. */
     static boolean isLightTheme(@NonNull Context context) {
+        Resources.Theme deviceDefaultTheme = context.getResources().newTheme();
+        deviceDefaultTheme.applyStyle(android.R.style.Theme_DeviceDefault_NoActionBar, true);
+
+
         TypedValue value = new TypedValue();
-        return context.getTheme().resolveAttribute(android.R.attr.isLightTheme,
+        return deviceDefaultTheme.resolveAttribute(android.R.attr.isLightTheme,
                 value, true)
                 && value.data != 0;
     }
