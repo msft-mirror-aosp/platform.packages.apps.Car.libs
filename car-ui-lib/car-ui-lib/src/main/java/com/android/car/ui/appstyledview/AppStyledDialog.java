@@ -40,6 +40,7 @@ import androidx.activity.ViewTreeOnBackPressedDispatcherOwner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
@@ -310,7 +311,18 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
 
         // Required inset API is unsupported. Fallback to resize behavior.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+            ViewCompat.setOnApplyWindowInsetsListener(window.getDecorView().getRootView(),
+                    new OnApplyWindowInsetsListener() {
+                        @NonNull
+                        @Override
+                        public WindowInsetsCompat onApplyWindowInsets(
+                                @NonNull View v, @NonNull WindowInsetsCompat insets) {
+                            updateAttributes();
+                            copyWindowInsets();
+                            return insets;
+                        }
+                    });
             return;
         } else {
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
