@@ -27,7 +27,6 @@ import android.car.drivingstate.CarUxRestrictions;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build.VERSION_CODES;
-import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.InputDevice;
@@ -686,25 +685,6 @@ public final class CarUiRecyclerViewImpl extends FrameLayout
         // This recyclerView is a rotary container if it's not a scrollable container.
         if (!rotaryScrollEnabled) {
             recyclerView.setContentDescription(ROTARY_CONTAINER);
-        }
-    }
-
-    @Override
-    public void requestLayout() {
-        super.requestLayout();
-
-        if (mIsInitialized) {
-            Parcelable recyclerViewState = null;
-            if (mRecyclerView.getLayoutManager() != null) {
-                recyclerViewState = mRecyclerView.getLayoutManager().onSaveInstanceState();
-            }
-            mRecyclerView.requestLayout();
-            if (mRecyclerView.getLayoutManager() != null && recyclerViewState != null) {
-                mRecyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
-            }
-        }
-        if (mScrollBar != null) {
-            mScrollBar.requestLayout();
         }
     }
 
