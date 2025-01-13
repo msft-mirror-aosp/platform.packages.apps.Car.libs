@@ -9,22 +9,26 @@ androidx-lifecycle = "2.9.0-alpha08"
 androidx-runner = "1.6.2"
 androidx-test = "1.6.1"
 composeBom = "2024.09.00"
+androidx-constraintlayout = "2.2.0"
 designcompose = "0.32.0"
 espressoCore = "3.6.1"
 guava = "33.3.1-android"
-hamcrest = "2.0"
+hamcrest = "2.2"
 kotlin = "1.9.21"
 ksp = "1.9.21-1.0.16"
 lifecycleCommon = "2.6.0"
 material3 = "1.2.0-alpha04"
+androidx-media = "1.7.0"
 mockito = "2.28.4"
 mockitoCore = "5.12.0"
 mockitoKotlin = "5.4.0"
 okhttp3-loggingInterceptor = "3.8.1"
+androidx-preference = "1.2.1"
 protobuf = "4.27.2"
 protobufGradlePlugin = "0.9.4"
 retrofit2 = "2.4.0"
 robolectric = "4.12"
+androidx-room = "2.6.1"
 rxandroid = "2.0.2"
 rxjava = "2.2.9"
 rxkotlin = "2.2.0"
@@ -35,6 +39,7 @@ android-car-ui-lib = { module = "com.android.car.ui:car-ui-lib", version.ref = "
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
+androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }
 androidx-core = { module = "androidx.core:core", version.ref = "androidx-core" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espressoCore" }
@@ -46,6 +51,10 @@ androidx-lifecycle-common-java8 = { module = "androidx.lifecycle:lifecycle-commo
 androidx-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-android = { module = "androidx.lifecycle:lifecycle-runtime-android", version.ref = "androidx-lifecycle" }
 androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+androidx-media = { module = "androidx.media:media", version.ref = "androidx-media" }
+androidx-preference = { module = "androidx.preference:preference", version.ref = "androidx-preference" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidx-room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx-room" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test" }
 androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidx-test" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-runner" }
