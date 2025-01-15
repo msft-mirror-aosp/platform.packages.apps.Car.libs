@@ -82,9 +82,6 @@ dependencies {
     implementation libs.protobuf.kotlin.lite
     implementation libs.androidx.lifecycle.runtime.android
 
-    // Workaround for b/300760566 and https://github.com/google/guava/issues/7385
-    implementation libs.guava
-
     androidTestImplementation libs.google.truth
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.test.runner

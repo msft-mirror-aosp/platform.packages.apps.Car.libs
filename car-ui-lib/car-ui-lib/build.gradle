@@ -94,9 +94,6 @@ dependencies {
     api 'androidx.asynclayoutinflater:asynclayoutinflater:1.0.0'
     implementation 'com.android.support:support-annotations:28.0.0'
 
-    // Workaround for b/300760566 and https://github.com/google/guava/issues/7385
-    implementation libs.guava
-
     androidTestImplementation project(':car-ui-lib-testing')
     androidTestImplementation 'org.hamcrest:hamcrest-library:1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
