@@ -185,12 +185,38 @@ android_library_import {
     static_libs: car_ui_lib_static_libs,
 }
 
-car_ui_lib_testing_support_static_libs = [
+soong_config_module_type {
+    name: "car_ui_lib_android_library",
+    module_type: "android_library",
+    config_namespace: "car_ui_lib",
+    variables: ["robolectric_version"],
+    properties: ["static_libs"],
+}
+
+soong_config_module_type {
+    name: "car_ui_lib_android_library_import",
+    module_type: "android_library_import",
+    config_namespace: "car_ui_lib",
+    variables: ["robolectric_version"],
+    properties: ["static_libs"],
+}
+
+soong_config_string_variable {
+    name: "robolectric_version",
+    values: ["legacy"],
+}
+
+car_ui_lib_testing_support_static_libs_legacy = [
     "car-ui-lib-source",
     "Robolectric_all-target_upstream",
 ]
 
-android_library {
+car_ui_lib_testing_support_static_libs = [
+    "car-ui-lib-source",
+    "Robolectric_all-target",
+]
+
+car_ui_lib_android_library {
     name: "car-ui-lib-testing-support-source",
 
     sdk_version: "current",
@@ -207,7 +233,16 @@ android_library {
         enabled: false,
     },
     libs: ["android.car-stubs"],
-    static_libs: car_ui_lib_testing_support_static_libs,
+    soong_config_variables: {
+        robolectric_version: {
+            legacy: {
+                static_libs: car_ui_lib_testing_support_static_libs_legacy,
+            },
+            conditions_default: {
+                static_libs: car_ui_lib_testing_support_static_libs,
+            },
+        },
+    }
 }
 
 java_genrule {
@@ -227,11 +262,20 @@ java_genrule {
     },
 }
 
-android_library_import {
+car_ui_lib_android_library_import {
     name: "car-ui-lib-testing-support-prebuilt",
     aars: [":car-ui-lib-testing-support-aar"],
     sdk_version: "current",
-    static_libs: car_ui_lib_testing_support_static_libs,
+        soong_config_variables: {
+        robolectric_version: {
+            legacy: {
+                static_libs: car_ui_lib_testing_support_static_libs_legacy,
+            },
+            conditions_default: {
+                static_libs: car_ui_lib_testing_support_static_libs,
+            },
+        },
+    }
 }
 
 android_library {
