@@ -39,7 +39,8 @@ class localPublishPlugin : Plugin<Project> {
                     repo.name = "local"
                     repo.url =
                         project.uri(
-                            project.rootProject.layout.buildDirectory.dir("unbundled_m2repo")
+                            // We want the m2repo to be at the base of the build output.
+                            project.rootProject.layout.buildDirectory.dir("../unbundled_m2repo")
                         )
                 }
             }
