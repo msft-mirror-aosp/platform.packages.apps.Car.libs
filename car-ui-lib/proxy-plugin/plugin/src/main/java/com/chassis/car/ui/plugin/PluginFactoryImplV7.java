@@ -61,21 +61,14 @@ import java.util.List;
 public class PluginFactoryImplV7 implements PluginFactoryOEMV7 {
     private final PluginUiContextFactory mPluginUiContextFactory;
 
-    @NonNull
-    private final CarUiProxyLayoutInflaterFactory mCarUiProxyLayoutInflaterFactory;
-
     public PluginFactoryImplV7(Context pluginContext) {
-        mCarUiProxyLayoutInflaterFactory = new CarUiProxyLayoutInflaterFactory();
-        mPluginUiContextFactory = new PluginUiContextFactory(pluginContext,
-                mCarUiProxyLayoutInflaterFactory);
+        mPluginUiContextFactory = new PluginUiContextFactory(pluginContext);
     }
 
     @Override
     public void setRotaryFactories(
             Function<Context, FocusParkingViewOEMV1> focusParkingViewFactory,
             Function<Context, FocusAreaOEMV1> focusAreaFactory) {
-        mCarUiProxyLayoutInflaterFactory.setRotaryFactories(
-                mPluginUiContextFactory, focusParkingViewFactory, focusAreaFactory);
     }
 
     @Nullable
