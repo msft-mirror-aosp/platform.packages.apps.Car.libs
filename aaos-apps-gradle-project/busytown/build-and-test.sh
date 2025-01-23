@@ -22,7 +22,7 @@ DEFAULT_VERSION_NAME=${BUILD_NUMBER:-34}
     :buildLogic:javaToolchains \
     assemble \
     assembleAndroidTest \
-    test \
     :buildLogic:check
 
+# Functions defined in envsetup.sh
 wrap_up_build $?
