@@ -40,6 +40,7 @@ android_library {
     min_sdk_version: "28", // P
     target_sdk_version: "31",
     sdk_version: "current",
+    // b/355695111: Remove this once we drop support for sc-car
     java_version: "1.8", // sc-car only supports up to java 8.
     static_libs: car_uxr_client_lib_static_libs,
 }
