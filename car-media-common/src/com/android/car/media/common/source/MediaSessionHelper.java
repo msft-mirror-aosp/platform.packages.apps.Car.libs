@@ -358,7 +358,9 @@ public class MediaSessionHelper extends MediaController.Callback {
     private void setInitialMediaSource() {
         List<MediaController> activeMediaControllers = new ArrayList<>();
         List<MediaController> activeOrPausedMediaControllers = new ArrayList<>();
-        parseMediaControllers(mMediaSessionManager.getActiveSessions(null),
+        List<MediaController> filteredControllers = getMediaControllersWithMediaNotifications(
+                mMediaSessionManager.getActiveSessions(null));
+        parseMediaControllers(filteredControllers,
                 activeMediaControllers, activeOrPausedMediaControllers);
         MediaSource savedMediaSource = null;
 
