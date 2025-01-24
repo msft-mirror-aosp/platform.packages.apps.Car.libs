@@ -23,7 +23,7 @@ android {
     testNamespace "com.android.car.broadcastradio.tests"
 
     defaultConfig {
-        minSdkVersion 33
+        minSdkVersion 28
         targetSdkVersion 34
         versionCode 1
         versionName "1.0"
