@@ -23,6 +23,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.DeadObjectException
+import android.util.Log
 import com.android.car.appcard.AppCardContentProvider
 import com.android.car.appcard.AppCardMessageConstants.MSG_APP_CARD_COMPONENT_UPDATE
 import com.android.car.appcard.AppCardMessageConstants.MSG_CLOSE_PROVIDER
@@ -190,11 +191,8 @@ internal class ContentProviderBroker(
       if (e is DeadObjectException) {
         isAlive = false
       }
-      throw ContentProviderBrokerException(
-        msg,
-        errorId,
-        e
-      )
+      // TODO(b/391836448 ): Handle/Throw ContentProviderBrokerException without freezing Cluster.
+      Log.e(TAG, e.message ?: "sendMessageInternal failed with an exception")
     }
   }
 
