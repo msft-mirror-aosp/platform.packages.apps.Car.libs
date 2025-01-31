@@ -33,7 +33,11 @@ import androidx.annotation.Nullable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -70,6 +74,50 @@ public class ProgramInfoExt {
         RadioMetadata.METADATA_KEY_DAB_ENSEMBLE_NAME,
         RadioMetadata.METADATA_KEY_RDS_PS,
     };
+
+    private static final Map<String, String> RADIO_TO_MEDIA_METADATA_STRING_TYPE =
+            new HashMap<>(13);
+    private static final List<String> RADIO_METADATA_INT_TYPE =
+            new ArrayList<>(3);
+    private static final Map<String, String> RADIO_TO_MEDIA_METADATA_BITMAP_TYPE =
+            new HashMap<>(2);
+    static {
+        RADIO_TO_MEDIA_METADATA_STRING_TYPE.put(RadioMetadata.METADATA_KEY_TITLE,
+                MediaMetadataCompat.METADATA_KEY_TITLE);
+        RADIO_TO_MEDIA_METADATA_STRING_TYPE.put(RadioMetadata.METADATA_KEY_ARTIST,
+                MediaMetadataCompat.METADATA_KEY_ARTIST);
+        RADIO_TO_MEDIA_METADATA_STRING_TYPE.put(RadioMetadata.METADATA_KEY_ALBUM,
+                MediaMetadataCompat.METADATA_KEY_ALBUM);
+        RADIO_TO_MEDIA_METADATA_STRING_TYPE.put(RadioMetadata.METADATA_KEY_GENRE,
+                MediaMetadataCompat.METADATA_KEY_GENRE);
+        RADIO_TO_MEDIA_METADATA_STRING_TYPE.put(RadioMetadata.METADATA_KEY_RDS_PS,
+                RadioMetadata.METADATA_KEY_RDS_PS);
+        RADIO_TO_MEDIA_METADATA_STRING_TYPE.put(RadioMetadata.METADATA_KEY_RDS_RT,
+                RadioMetadata.METADATA_KEY_RDS_RT);
+        RADIO_TO_MEDIA_METADATA_STRING_TYPE.put(RadioMetadata.METADATA_KEY_PROGRAM_NAME,
+                RadioMetadata.METADATA_KEY_PROGRAM_NAME);
+        RADIO_TO_MEDIA_METADATA_STRING_TYPE.put(RadioMetadata.METADATA_KEY_DAB_ENSEMBLE_NAME,
+                RadioMetadata.METADATA_KEY_DAB_ENSEMBLE_NAME);
+        RADIO_TO_MEDIA_METADATA_STRING_TYPE.put(RadioMetadata.METADATA_KEY_DAB_ENSEMBLE_NAME_SHORT,
+                RadioMetadata.METADATA_KEY_DAB_ENSEMBLE_NAME_SHORT);
+        RADIO_TO_MEDIA_METADATA_STRING_TYPE.put(RadioMetadata.METADATA_KEY_DAB_SERVICE_NAME,
+                RadioMetadata.METADATA_KEY_DAB_SERVICE_NAME);
+        RADIO_TO_MEDIA_METADATA_STRING_TYPE.put(RadioMetadata.METADATA_KEY_DAB_SERVICE_NAME_SHORT,
+                RadioMetadata.METADATA_KEY_DAB_SERVICE_NAME_SHORT);
+        RADIO_TO_MEDIA_METADATA_STRING_TYPE.put(RadioMetadata.METADATA_KEY_DAB_COMPONENT_NAME,
+                RadioMetadata.METADATA_KEY_DAB_COMPONENT_NAME);
+        RADIO_TO_MEDIA_METADATA_STRING_TYPE.put(RadioMetadata.METADATA_KEY_DAB_COMPONENT_NAME_SHORT,
+                RadioMetadata.METADATA_KEY_DAB_COMPONENT_NAME_SHORT);
+
+        RADIO_METADATA_INT_TYPE.add(RadioMetadata.METADATA_KEY_RDS_PI);
+        RADIO_METADATA_INT_TYPE.add(RadioMetadata.METADATA_KEY_RDS_PTY);
+        RADIO_METADATA_INT_TYPE.add(RadioMetadata.METADATA_KEY_RBDS_PTY);
+
+        RADIO_TO_MEDIA_METADATA_BITMAP_TYPE.put(RadioMetadata.METADATA_KEY_ART,
+                MediaMetadataCompat.METADATA_KEY_ALBUM_ART);
+        RADIO_TO_MEDIA_METADATA_BITMAP_TYPE.put(RadioMetadata.METADATA_KEY_ICON,
+                MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON);
+    }
 
     /**
      * Returns program name suitable to display.
@@ -219,74 +267,51 @@ public class ProgramInfoExt {
             return;
         }
 
-        putIntMetadata(bld, meta, RadioMetadata.METADATA_KEY_RDS_PI,
-                RadioMetadata.METADATA_KEY_RDS_PI);
-        putIntMetadata(bld, meta, RadioMetadata.METADATA_KEY_RDS_PTY,
-                RadioMetadata.METADATA_KEY_RDS_PTY);
-        putIntMetadata(bld, meta, RadioMetadata.METADATA_KEY_RBDS_PTY,
-                RadioMetadata.METADATA_KEY_RBDS_PTY);
-        putStringMetadata(bld, meta, RadioMetadata.METADATA_KEY_TITLE,
-                MediaMetadataCompat.METADATA_KEY_TITLE);
-        putStringMetadata(bld, meta, RadioMetadata.METADATA_KEY_ARTIST,
-                MediaMetadataCompat.METADATA_KEY_ARTIST);
-        putStringMetadata(bld, meta, RadioMetadata.METADATA_KEY_ALBUM,
-                MediaMetadataCompat.METADATA_KEY_ALBUM);
-        putStringMetadata(bld, meta, RadioMetadata.METADATA_KEY_GENRE,
-                MediaMetadataCompat.METADATA_KEY_GENRE);
-        putStringMetadata(bld, meta, RadioMetadata.METADATA_KEY_RDS_PS,
-                RadioMetadata.METADATA_KEY_RDS_PS);
-        putStringMetadata(bld, meta, RadioMetadata.METADATA_KEY_RDS_RT,
-                RadioMetadata.METADATA_KEY_RDS_RT);
-        putStringMetadata(bld, meta, RadioMetadata.METADATA_KEY_PROGRAM_NAME,
-                RadioMetadata.METADATA_KEY_PROGRAM_NAME);
-        putStringMetadata(bld, meta, RadioMetadata.METADATA_KEY_DAB_ENSEMBLE_NAME,
-                RadioMetadata.METADATA_KEY_DAB_ENSEMBLE_NAME);
-        putStringMetadata(bld, meta, RadioMetadata.METADATA_KEY_DAB_ENSEMBLE_NAME_SHORT,
-                RadioMetadata.METADATA_KEY_DAB_ENSEMBLE_NAME_SHORT);
-        putStringMetadata(bld, meta, RadioMetadata.METADATA_KEY_DAB_SERVICE_NAME,
-                RadioMetadata.METADATA_KEY_DAB_SERVICE_NAME);
-        putStringMetadata(bld, meta, RadioMetadata.METADATA_KEY_DAB_SERVICE_NAME_SHORT,
-                RadioMetadata.METADATA_KEY_DAB_SERVICE_NAME_SHORT);
-        putStringMetadata(bld, meta, RadioMetadata.METADATA_KEY_DAB_COMPONENT_NAME,
-                RadioMetadata.METADATA_KEY_DAB_COMPONENT_NAME);
-        putStringMetadata(bld, meta, RadioMetadata.METADATA_KEY_DAB_COMPONENT_NAME_SHORT,
-                RadioMetadata.METADATA_KEY_DAB_COMPONENT_NAME_SHORT);
-        putBitmapMetadata(bld, imageResolver, meta, RadioMetadata.METADATA_KEY_ART,
-                MediaMetadataCompat.METADATA_KEY_ALBUM_ART);
-        putBitmapMetadata(bld, imageResolver, meta, RadioMetadata.METADATA_KEY_ICON,
-                MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON);
+        for (int i = 0; i < RADIO_METADATA_INT_TYPE.size(); i++) {
+            String intTypeKey = RADIO_METADATA_INT_TYPE.get(i);
+            putIntMetadata(bld, meta, intTypeKey, intTypeKey);
+        }
+        for (Map.Entry<String, String> entry : RADIO_TO_MEDIA_METADATA_STRING_TYPE.entrySet()) {
+            putStringMetadata(bld, meta, entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<String, String> entry : RADIO_TO_MEDIA_METADATA_BITMAP_TYPE.entrySet()) {
+            putBitmapMetadata(bld, imageResolver, meta, entry.getKey(), entry.getValue());
+        }
     }
 
     private static void putStringMetadata(MediaMetadataCompat.Builder bld,
                                           RadioMetadata radioMetadata, String radioMetadataKey,
                                           String metadataKey) {
         String value = radioMetadata.getString(radioMetadataKey);
-        if (value != null) {
-            bld.putString(metadataKey, value);
+        if (value == null) {
+            return;
         }
+        bld.putString(metadataKey, value);
     }
 
     private static void putIntMetadata(MediaMetadataCompat.Builder bld,
                                        RadioMetadata radioMetadata, String radioMetadataKey,
                                        String metadataKey) {
         int value = radioMetadata.getInt(radioMetadataKey);
-        if (value != 0) {
-            bld.putLong(metadataKey, value);
+        if (value == 0) {
+            return;
         }
+        bld.putLong(metadataKey, value);
     }
 
     private static void putBitmapMetadata(MediaMetadataCompat.Builder bld,
                                           @Nullable ImageResolver imageResolver,
                                           RadioMetadata meta, String radioMetadataKey,
                                           String metadataKey) {
-        long albumArtId = RadioMetadataExt.getGlobalBitmapId(meta, radioMetadataKey);
-        if (albumArtId == 0 || imageResolver == null) {
+        long imageId = RadioMetadataExt.getGlobalBitmapId(meta, radioMetadataKey);
+        if (imageId == 0 || imageResolver == null) {
             return;
         }
-        Bitmap bm = imageResolver.resolve(albumArtId);
-        if (bm != null) {
-            bld.putBitmap(metadataKey, bm);
+        Bitmap bm = imageResolver.resolve(imageId);
+        if (bm == null) {
+            return;
         }
+        bld.putBitmap(metadataKey, bm);
     }
     public static class ProgramInfoComparator implements Comparator<RadioManager.ProgramInfo> {
         @Override
@@ -295,5 +320,31 @@ public class ProgramInfoExt {
                     new ProgramSelectorExt.ProgramSelectorComparator();
             return selectorComparator.compare(info1.getSelector(), info2.getSelector());
         }
+    }
+
+    /**
+     * Compares if two {@link MediaMetadataCompat} objects contains the same string and integer
+     * type radio metadata values.
+     */
+    public static boolean containsSameRadioMetadata(@NonNull MediaMetadataCompat metadata1,
+                                                    @NonNull MediaMetadataCompat metadata2) {
+        if (Objects.equals(metadata1, metadata2)) {
+            return true;
+        }
+        for (int i = 0; i < RADIO_METADATA_INT_TYPE.size(); i++) {
+            String intTypeKey = RADIO_METADATA_INT_TYPE.get(i);
+            if (Objects.equals(metadata1.getLong(intTypeKey), metadata2.getLong(intTypeKey))) {
+                continue;
+            }
+            return false;
+        }
+        for (String metadataKey : RADIO_TO_MEDIA_METADATA_STRING_TYPE.values()) {
+            if (Objects.equals(metadata1.getString(metadataKey),
+                    metadata2.getString(metadataKey))) {
+                continue;
+            }
+            return false;
+        }
+        return true;
     }
 }
