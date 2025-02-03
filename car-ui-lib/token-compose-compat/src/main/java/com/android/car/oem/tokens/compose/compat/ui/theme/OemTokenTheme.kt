@@ -32,8 +32,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.android.car.oem.tokens.R
 import com.android.car.oem.tokens.Token
-import com.android.car.oem.tokens.compose.compat.R
 
 @Composable
 fun oemColorScheme(oemContext: Context): ColorScheme {

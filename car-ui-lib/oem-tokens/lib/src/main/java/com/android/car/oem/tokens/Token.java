@@ -20,6 +20,7 @@ import static android.util.TypedValue.TYPE_ATTRIBUTE;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.SharedLibraryInfo;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
@@ -33,7 +34,9 @@ import androidx.annotation.StyleRes;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.content.ContextCompat;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Public interface for general CarUi static functions.
@@ -110,13 +113,36 @@ public class Token {
         int oemStyleOverride = context.getResources().getIdentifier("OemStyle",
                 "style", Token.getTokenSharedLibraryName());
         if (oemStyleOverride == 0) {
-            return new OemContextWrapper(context, R.style.OemTokensBase);
+            if (isLightTheme(context)) {
+                return new OemContextWrapper(context, R.style.OemTokensBaseLight);
+            } else {
+                return new OemContextWrapper(context, R.style.OemTokensBaseDark);
+            }
         }
 
         OemContextWrapper oemContext = new OemContextWrapper(context, R.style.OemTokens);
+        if (isLightTheme(oemContext)) {
+            oemContext.getTheme().applyStyle(R.style.OemTokensLight, true);
+        } else {
+            oemContext.getTheme().applyStyle(R.style.OemTokensDark, true);
+        }
         oemContext.getTheme().applyStyle(oemStyleOverride, true);
 
         return oemContext;
+    }
+
+    /**
+     * Returns true if the current system default attribute is lightTheme.
+     */
+    static boolean isLightTheme(@NonNull Context context) {
+        Resources.Theme deviceDefaultTheme = context.getResources().newTheme();
+        deviceDefaultTheme.applyStyle(android.R.style.Theme_DeviceDefault_NoActionBar, true);
+
+
+        TypedValue value = new TypedValue();
+        return deviceDefaultTheme.resolveAttribute(android.R.attr.isLightTheme,
+                value, true)
+                && value.data != 0;
     }
 
     /**
@@ -165,6 +191,32 @@ public class Token {
     }
 
     /**
+     * Return a hashcode for OEM styling of token values meant to be used to determine when OEM
+     * styling has changed.
+     */
+    public static int oemStyleHashCode(@NonNull Context context) {
+        context = Token.createOemStyledContext(context.getApplicationContext());
+
+        int oemStyleOverride = context.getResources().getIdentifier("OemStyle",
+                "style", Token.getTokenSharedLibraryName());
+
+        if (oemStyleOverride == 0) {
+            return Objects.hash("0");
+        }
+
+        TypedArray attributes =
+                context.obtainStyledAttributes(R.style.OemTokens, R.styleable.OemTokens);
+        int[] data = new int[attributes.length()];
+        for (int i = 0; i < attributes.length(); i++) {
+            TypedValue value = new TypedValue();
+            attributes.getValue(i, value);
+            data[i] = value.data;
+        }
+
+        return Arrays.hashCode(data);
+    }
+
+    /**
      * Return {@code true} if there is an available OEM provided value for the design token that
      * corresponds to the attribute.
      */
@@ -183,8 +235,8 @@ public class Token {
             libAttributes.recycle();
             return false;
         }
-        libAttributes.getValue(0, tv);
 
+        libAttributes.getValue(0, tv);
         int[] attrs = new int[]{tv.data};
 
         TypedArray sharedLibAttributes = context.obtainStyledAttributes(oemStyleOverride, attrs);
@@ -197,12 +249,13 @@ public class Token {
     }
 
     private static void checkContext(@NonNull Context context) {
-        if (context instanceof OemContextWrapper) {
-            return;
+        TypedArray attributes = context.getTheme().obtainStyledAttributes(
+                new int[]{R.attr.oemColorPrimary});
+        if (attributes.getType(0) == (TypedValue.TYPE_NULL)) {
+            throw new IllegalArgumentException(
+                    "Context must be token compatible.");
         }
-
-        throw new IllegalArgumentException(
-                "Must use an OEM styled Context. Use Token#createOemStyledContext()");
+        attributes.recycle();
     }
 
     @NonNull

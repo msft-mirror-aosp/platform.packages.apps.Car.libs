@@ -36,15 +36,15 @@
         android:id="@+id/car_ui_focus_area"
         android:layout_width="match_parent"
         android:layout_height="@dimen/car_ui_toolbar_first_row_height"
+        android:gravity="center_vertical"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent">
         <FrameLayout
             android:id="@+id/car_ui_app_styled_view_nav_icon_container"
-            android:layout_marginVertical="10dp"
             android:layout_marginHorizontal="18dp"
             android:background="@drawable/car_ui_app_styled_view_ripple"
-            android:layout_width="@dimen/car_ui_toolbar_margin"
-            android:layout_height="match_parent"
+            android:layout_width="76dp"
+            android:layout_height="76dp"
             app:layout_constraintHorizontal_bias="0.0">
             <ImageView
                 android:id="@+id/car_ui_app_styled_view_icon_close"

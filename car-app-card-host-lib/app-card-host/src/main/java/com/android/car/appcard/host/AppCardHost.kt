@@ -878,7 +878,7 @@ class AppCardHost internal constructor(
     return try {
       val flags = PackageManager.GET_PROVIDERS or PackageManager.MATCH_DISABLED_COMPONENTS
       val packageInfo = packageManager.getPackageInfo(pkgName, flags)
-      packageInfo.providers
+      packageInfo.providers ?: arrayOf()
     } catch (e: PackageManager.NameNotFoundException) {
       arrayOf()
     }

@@ -44,8 +44,8 @@ android_library {
     sdk_version: "current",
     min_sdk_version: "28",
     target_sdk_version: "current",
-    // sc-car only supports up to java 8.
-    java_version: "1.8",
+    // b/355695111: Remove this once we drop support for sc-car
+    java_version: "1.8", // sc-car only supports up to java 8.
 
     manifest: "src/main/AndroidManifest.xml",
     srcs: ["src/main/java/**/*.java"],
@@ -72,8 +72,8 @@ android_library {
     sdk_version: "current",
     min_sdk_version: "28",
     target_sdk_version: "current",
-    // sc-car only supports up to java 8.
-    java_version: "1.8",
+    // b/355695111: Remove this once we drop support for sc-car
+    java_version: "1.8", // sc-car only supports up to java 8.
 
     manifest: "src/main/AndroidManifest.xml",
     srcs: ["src/main/java/**/*.java"],
@@ -100,8 +100,8 @@ android_test {
     sdk_version: "current",
     min_sdk_version: "28",
     target_sdk_version: "current",
-    // sc-car only supports up to java 8.
-    java_version: "1.8",
+    // b/355695111: Remove this once we drop support for sc-car
+    java_version: "1.8", // sc-car only supports up to java 8.
 
     // CERTIFICATE is defined in car-ui-lib build file.
     certificate: CERTIFICATE,

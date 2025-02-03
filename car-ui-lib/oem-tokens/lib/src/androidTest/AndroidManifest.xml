@@ -24,6 +24,9 @@
         <activity
             android:name="com.android.car.oem.tokens.TokenTestNoOverrideActivity"
             android:theme="@style/TestTokenTheme.NoOverride" />
+        <activity
+                android:name="com.android.car.oem.tokens.TokenDarkThemeTestActivity"
+                android:theme="@style/TestTokenTheme.DarkTheme" />
         <activity android:name="com.android.car.oem.tokens.NoTokenTestActivity" />
         <uses-library android:name="com.android.oem.tokens" android:required="false" />
         <uses-library android:name="android.test.runner" />

@@ -32,7 +32,7 @@ import com.android.car.apps.common.log.L;
  * Encapsulates data about an address entry. Typically loaded from the local Address store.
  */
 public class PostalAddress implements Parcelable {
-    private static final String TAG = "CD.PostalAddress";
+    private static final String TAG = "CTC.PostalAddress";
 
     /**
      * The formatted address.

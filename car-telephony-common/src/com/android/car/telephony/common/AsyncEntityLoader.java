@@ -52,7 +52,7 @@ public class AsyncEntityLoader<T> extends AsyncTaskLoader<T> {
         T convertToEntity(Cursor cursor);
     }
 
-    private static final String TAG = "CD.AsyncEntityLoader";
+    private static final String TAG = "CTC.AsyncEntityLoader";
 
     private final Context mContext;
     private final ContentResolver mContentResolver;

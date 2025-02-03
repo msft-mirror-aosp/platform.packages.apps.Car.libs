@@ -16,7 +16,7 @@ setup_build_environment() {
 
     # Disable the build daemon
     # Either set Gradle opts or prepend to it with a comma (separator) if it exists
-    GRADLE_OPTS="-Dorg.gradle.daemon=false${GRADLE_OPTS:+,${GRADLE_OPTS}}"
+    GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.java.installations.auto-detect=false ${GRADLE_OPTS:+,${GRADLE_OPTS}}"
 
     # Export everything we need
     export ANDROID_HOME

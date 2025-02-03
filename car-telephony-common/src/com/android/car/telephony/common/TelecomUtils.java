@@ -64,7 +64,7 @@ import java.util.concurrent.CompletableFuture;
  * Helper methods.
  */
 public class TelecomUtils {
-    private static final String TAG = "CD.TelecomUtils";
+    private static final String TAG = "CTC.TelecomUtils";
     private static final int PII_STRING_LENGTH = 4;
     private static final String COUNTRY_US = "US";
     /**
