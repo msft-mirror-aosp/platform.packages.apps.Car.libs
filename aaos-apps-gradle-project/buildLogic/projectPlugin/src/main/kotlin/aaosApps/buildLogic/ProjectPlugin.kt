@@ -41,6 +41,17 @@ class ProjectPlugin : Plugin<Project> {
                     project.findProperty("aaosApps.buildCfg.compileSdk")!!.toString().toInt()
                 buildToolsVersion =
                     project.findProperty("aaosApps.buildCfg.buildToolsVersion")!!.toString()
+
+
+                // For apps/libs doing NDK builds
+                ndkVersion = project.findProperty("aaosApps.buildCfg.ndkVersion")!!.toString()
+                // The default location for the native build directory is relative to the module, which
+                // mucks up the git staging. We need to move it out of the module, but it can't be within
+                // the build directory, so the below line creates a cmake-build-staging directory in the same directory
+                // that holds the rest of the build directories (out/aaos-apps-gradle-build)
+                externalNativeBuild.cmake.buildStagingDirectory =
+                    project.rootProject.layout.buildDirectory.dir("../cmake-build-staging/${project.name}")
+                        .get().asFile
             }
         }
     }
