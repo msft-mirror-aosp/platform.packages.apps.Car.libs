@@ -71,7 +71,11 @@ val projects =
         ":test-media-app:mobile" to "../../tests/TestMediaApp/mobile",
         ":test-rotary-ime" to "../../tests/RotaryIME",
         ":test-rotary-playground" to "../../tests/RotaryPlayground",
-        ":driver-ui" to "../../DriverUI"
+        ":driver-ui" to "../../DriverUI",
+        ":car-dashcam-app" to "../../Dashcam/dashcam-app",
+        ":car-dashcam-service" to "../../Dashcam/dashcam-service",
+        ":car-dashcam-manager" to "../../Dashcam/dashcam-manager",
+        ":m3u8lib" to "../../Dashcam/m3u8lib"
     )
 
 // Initialize each Gradle subproject
