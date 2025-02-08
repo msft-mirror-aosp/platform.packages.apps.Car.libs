@@ -42,31 +42,16 @@ class ProjectPlugin : Plugin<Project> {
                 buildToolsVersion =
                     project.findProperty("aaosApps.buildCfg.buildToolsVersion")!!.toString()
 
+
                 // For apps/libs doing NDK builds
                 ndkVersion = project.findProperty("aaosApps.buildCfg.ndkVersion")!!.toString()
-
-                // We currently only have the Linux build of the NDK checked in to prebuilts.
-                // Other OS's will have to have Android Studio download it.
-                if (System.getProperty("os.name").lowercase().contains("linux")) {
-                    // Need to get the repository root path into the project plugin, just doing a
-                    // relative path for now.
-                    ndkPath =
-                        project.rootProject.layout.projectDirectory
-                            .dir("../../../../../prebuilts/fullsdk-linux/ndk")
-                            .asFile
-                            .canonicalPath
-                }
-
-                // The default location for the native build directory is relative to the module,
-                // which mucks up the git staging. We need to move it out of the module, but it
-                // can't be within the build directory, so the below line creates a
-                // cmake-build-staging directory in the same directory that holds the rest of the
-                // build directories (out/aaos-apps-gradle-build)
+                // The default location for the native build directory is relative to the module, which
+                // mucks up the git staging. We need to move it out of the module, but it can't be within
+                // the build directory, so the below line creates a cmake-build-staging directory in the same directory
+                // that holds the rest of the build directories (out/aaos-apps-gradle-build)
                 externalNativeBuild.cmake.buildStagingDirectory =
-                    project.rootProject.layout.buildDirectory
-                        .dir("../cmake-build-staging/${project.name}")
-                        .get()
-                        .asFile
+                    project.rootProject.layout.buildDirectory.dir("../cmake-build-staging/${project.name}")
+                        .get().asFile
             }
         }
     }
