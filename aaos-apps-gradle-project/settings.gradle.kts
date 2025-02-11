@@ -47,7 +47,6 @@ val projects =
         ":car-messenger-common:model" to "../car-messenger-common/model",
         ":car-rotary-lib" to "../car-ui-lib/car-rotary-lib",
         ":car-telephony-common" to "../car-telephony-common",
-        ":car-testing-common" to "../car-testing-common",
         ":car-ui-lib" to "../car-ui-lib/car-ui-lib",
         ":car-ui-lib-testing" to "../car-ui-lib/car-ui-lib-testing",
         ":car-uxr-client-lib" to "../car-uxr-client-lib",

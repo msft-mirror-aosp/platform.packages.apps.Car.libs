@@ -26,10 +26,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.android.car.apps.common.testutils.CaptureObserver;
+import com.android.car.apps.common.testutils.InstantTaskExecutorRule;
+import com.android.car.apps.common.testutils.TestLifecycleOwner;
 import com.android.car.apps.common.util.LiveDataFunctions;
-import com.android.car.testing.common.CaptureObserver;
-import com.android.car.testing.common.InstantTaskExecutorRule;
-import com.android.car.testing.common.TestLifecycleOwner;
 
 import org.junit.Rule;
 import org.junit.Test;
