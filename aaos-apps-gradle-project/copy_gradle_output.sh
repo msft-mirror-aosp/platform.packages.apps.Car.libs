@@ -47,10 +47,13 @@ GRADLE_OUTPUT_DIR="$ROOT_DIR/out/aaos-apps-gradle-build"
 # APKs
 cp $GRADLE_OUTPUT_DIR/car-calendar-app/outputs/apk/unbundled/release/car-calendar-app-unbundled-release.apk $1/CarCalendarApp.apk
 check_status $?
-cp $GRADLE_OUTPUT_DIR/car-dashcam-app/outputs/apk/production/release/car-dashcam-app-production-release.apk $1/CarDashcamApp.apk
-check_status $?
-cp $GRADLE_OUTPUT_DIR/car-dashcam-service/outputs/apk/production/release/car-dashcam-service-production-release.apk $1/CarDashcamService.apk
-check_status $?
+
+# b/395922162 - cannot build Dashcam on Buildbot
+# cp $GRADLE_OUTPUT_DIR/car-dashcam-app/outputs/apk/production/release/car-dashcam-app-production-release.apk $1/CarDashcamApp.apk
+# check_status $?
+# cp $GRADLE_OUTPUT_DIR/car-dashcam-service/outputs/apk/production/release/car-dashcam-service-production-release.apk $1/CarDashcamService.apk
+# check_status $?
+
 cp $GRADLE_OUTPUT_DIR/car-dialer-app/outputs/apk/production/release/car-dialer-app-production-release.apk $1/CarDialerApp.apk
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-media-app/outputs/apk/platformAosp/release/car-media-app-platformAosp-release.apk $1/CarMediaApp_aosp_cert.apk
@@ -173,10 +176,13 @@ mkdir $GRADLE_OUTPUT_DIR/jacoco/car-messenger-app
 check_status $?
 mkdir $GRADLE_OUTPUT_DIR/jacoco/car-media-app
 check_status $?
-mkdir $GRADLE_OUTPUT_DIR/jacoco/car-dashcam-app
-check_status $?
-mkdir $GRADLE_OUTPUT_DIR/jacoco/car-dashcam-service
-check_status $?
+
+# b/395922162 - cannot build Dashcam on Buildbot
+# mkdir $GRADLE_OUTPUT_DIR/jacoco/car-dashcam-app
+# check_status $?
+# mkdir $GRADLE_OUTPUT_DIR/jacoco/car-dashcam-service
+# check_status $?
+
 mkdir $GRADLE_OUTPUT_DIR/jacoco/car-dialer-app
 check_status $?
 mkdir $GRADLE_OUTPUT_DIR/jacoco/car-caruilib-app
