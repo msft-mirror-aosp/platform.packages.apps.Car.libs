@@ -29,9 +29,9 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.android.car.apps.common.testutils.CaptureObserver;
-import com.android.car.apps.common.testutils.InstantTaskExecutorRule;
-import com.android.car.apps.common.testutils.TestLifecycleOwner;
+import com.android.car.testing.common.CaptureObserver;
+import com.android.car.testing.common.InstantTaskExecutorRule;
+import com.android.car.testing.common.TestLifecycleOwner;
 
 import org.junit.Before;
 import org.junit.Rule;
