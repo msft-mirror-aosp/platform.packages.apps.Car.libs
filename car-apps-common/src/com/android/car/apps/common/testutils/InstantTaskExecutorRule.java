@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.car.testing.common;
+package com.android.car.apps.common.testutils;
 
 import androidx.arch.core.executor.ArchTaskExecutor;
 import androidx.arch.core.executor.TaskExecutor;

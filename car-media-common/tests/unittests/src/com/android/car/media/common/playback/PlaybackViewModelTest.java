@@ -39,13 +39,13 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.android.car.apps.common.testutils.CaptureObserver;
+import com.android.car.apps.common.testutils.InstantTaskExecutorRule;
+import com.android.car.apps.common.testutils.TestLifecycleOwner;
 import com.android.car.media.common.MediaItemMetadata;
 import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
 import com.android.car.media.common.source.MediaBrowserConnector.ConnectionStatus;
 import com.android.car.media.common.source.MediaSource;
-import com.android.car.testing.common.CaptureObserver;
-import com.android.car.testing.common.InstantTaskExecutorRule;
-import com.android.car.testing.common.TestLifecycleOwner;
 
 import org.junit.Before;
 import org.junit.Rule;
