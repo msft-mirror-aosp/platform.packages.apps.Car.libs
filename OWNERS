@@ -4,6 +4,9 @@
 stenning@google.com
 farivar@google.com
 
+# For Gradle-related and upload config changes
+per-file *.gradle, *.gradle.kts, PREUPLOAD.cfg, aaos-apps-gradle-project/** = froeht@google.com
+
 # TLMs
 johnchoi@google.com
 nicksauer@google.com
