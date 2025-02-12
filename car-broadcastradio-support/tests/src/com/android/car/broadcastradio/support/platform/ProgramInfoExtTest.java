@@ -218,6 +218,16 @@ public final class ProgramInfoExtTest {
     }
 
     @Test
+    public void containsSameRadioMetadata_withNullMetadata() {
+        MediaMetadataCompat mediaMetadata1 = ProgramInfoExt.toMediaMetadata(mFmInfo,
+                /* isFavorite= */ true, /* imageResolver= */ null);
+
+        mExpect.withMessage("Null media metadata")
+                .that(ProgramInfoExt.containsSameRadioMetadata(mediaMetadata1,
+                        /* metadata2= */ null)).isFalse();
+    }
+
+    @Test
     public void containsSameRadioMetadata_withDifferentIntTypeMetadata() {
         RadioMetadata radioMetadata2 = new RadioMetadata.Builder()
                 .putString(RadioMetadata.METADATA_KEY_RDS_PS, RDS_VALUE + 2)

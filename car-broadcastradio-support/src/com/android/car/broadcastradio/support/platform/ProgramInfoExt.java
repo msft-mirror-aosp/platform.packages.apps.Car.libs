@@ -326,10 +326,13 @@ public class ProgramInfoExt {
      * Compares if two {@link MediaMetadataCompat} objects contains the same string and integer
      * type radio metadata values.
      */
-    public static boolean containsSameRadioMetadata(@NonNull MediaMetadataCompat metadata1,
-                                                    @NonNull MediaMetadataCompat metadata2) {
+    public static boolean containsSameRadioMetadata(@Nullable MediaMetadataCompat metadata1,
+                                                    @Nullable MediaMetadataCompat metadata2) {
         if (Objects.equals(metadata1, metadata2)) {
             return true;
+        }
+        if (metadata1 == null || metadata2 == null) {
+            return false;
         }
         for (int i = 0; i < RADIO_METADATA_INT_TYPE.size(); i++) {
             String intTypeKey = RADIO_METADATA_INT_TYPE.get(i);
