@@ -18,13 +18,9 @@ rootProject.name = "AAOS Apps"
 
 apply(from = "buildLogic/metaConfig/plugin-repositories.gradle.kts")
 
-pluginManagement {
-    includeBuild("buildLogic")
-}
+pluginManagement { includeBuild("buildLogic") }
 
-plugins {
-    id("aaosApps.buildLogic.settings")
-}
+plugins { id("aaosApps.buildLogic.settings") }
 
 /**
  * List of Unbundled projects and their corresponding relative paths. This is used to configure the
@@ -71,13 +67,29 @@ val projects =
         ":test-media-app:mobile" to "../../tests/TestMediaApp/mobile",
         ":test-rotary-ime" to "../../tests/RotaryIME",
         ":test-rotary-playground" to "../../tests/RotaryPlayground",
-        ":driver-ui" to "../../DriverUI"
+        ":driver-ui" to "../../DriverUI",
+    )
+
+val dashCamProjects =
+    listOf(
+        ":car-dashcam-app" to "../../Dashcam/dashcam-app",
+        ":car-dashcam-service" to "../../Dashcam/dashcam-service",
+        ":car-dashcam-manager" to "../../Dashcam/dashcam-manager",
+        ":m3u8lib" to "../../Dashcam/m3u8lib",
     )
 
 // Initialize each Gradle subproject
 projects.forEach { (projectName, projectDir) ->
     include(projectName)
     project(projectName).projectDir = File(projectDir)
+}
+
+if (System.getenv("BUSYTOWN_BUILD") != "true") {
+    // b/395922161 - Initialize the dashcam subprojects as long as we aren't running under Busytown
+    dashCamProjects.forEach { (projectName, projectDir) ->
+        include(projectName)
+        project(projectName).projectDir = File(projectDir)
+    }
 }
 
 apply(from = "buildLogic/metaConfig/build-repositories.gradle.kts")

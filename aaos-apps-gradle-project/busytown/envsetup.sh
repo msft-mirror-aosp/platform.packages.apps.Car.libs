@@ -22,6 +22,7 @@ setup_build_environment() {
     export ANDROID_HOME
     export GRADLE_PROJ_DIR
     export GRADLE_OPTS
+    export BUSYTOWN_BUILD=true
 
     echo "Starting $0 at $(date)"
 
