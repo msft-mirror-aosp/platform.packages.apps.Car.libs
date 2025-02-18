@@ -228,6 +228,37 @@ public final class ProgramInfoExtTest {
     }
 
     @Test
+    public void containsSameRadioMetadata_withDifferentFavoriteValue() {
+        MediaMetadataCompat mediaMetadata1 = ProgramInfoExt.toMediaMetadata(mFmInfo,
+                /* isFavorite= */ true, /* imageResolver= */ null);
+        MediaMetadataCompat mediaMetadata2 = ProgramInfoExt.toMediaMetadata(mFmInfo,
+                /* isFavorite= */ false, /* imageResolver= */ null);
+
+        mExpect.withMessage("Media metadata with different favorite metadata")
+                .that(ProgramInfoExt.containsSameRadioMetadata(mediaMetadata1,
+                        mediaMetadata2)).isFalse();
+    }
+
+    @Test
+    public void containsSameRadioMetadata_withDifferentUriValue() {
+        ProgramSelector.Identifier fmIdentifier2 = new ProgramSelector.Identifier(
+                ProgramSelector.IDENTIFIER_TYPE_AMFM_FREQUENCY, FM_FREQUENCY + 200);
+        ProgramSelector fmSelector2 = new ProgramSelector(ProgramSelector.PROGRAM_TYPE_FM,
+                fmIdentifier2, /* secondaryIds= */ null, /* vendorIds= */ null);
+        RadioManager.ProgramInfo fmInfo2 = getMockProgramInfo(fmSelector2, fmIdentifier2,
+                fmIdentifier2, /* relatedContents= */ null, /* infoFlags= */ 0,
+                /* signalQuality= */ 1, RADIO_METADATA, /* vendorInfo= */ null);
+        MediaMetadataCompat mediaMetadata1 = ProgramInfoExt.toMediaMetadata(mFmInfo,
+                /* isFavorite= */ false, /* imageResolver= */ null);
+        MediaMetadataCompat mediaMetadata2 = ProgramInfoExt.toMediaMetadata(fmInfo2,
+                /* isFavorite= */ false, /* imageResolver= */ null);
+
+        mExpect.withMessage("Media metadata with different uri metadata")
+                .that(ProgramInfoExt.containsSameRadioMetadata(mediaMetadata1,
+                        mediaMetadata2)).isFalse();
+    }
+
+    @Test
     public void containsSameRadioMetadata_withDifferentIntTypeMetadata() {
         RadioMetadata radioMetadata2 = new RadioMetadata.Builder()
                 .putString(RadioMetadata.METADATA_KEY_RDS_PS, RDS_VALUE + 2)
