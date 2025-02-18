@@ -31,7 +31,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -75,9 +74,9 @@ public final class ProgramInfoExtTest {
             .putInt(RadioMetadata.METADATA_KEY_ART, ART_VALUE).build();
     private static final RadioMetadata EMPTY_RADIO_METADATA = new RadioMetadata.Builder().build();
 
-    @Mock private RadioManager.ProgramInfo mFmInfo;
-    @Mock private RadioManager.ProgramInfo mFmInfoWithEmptyMetadata;
-    @Mock private RadioManager.ProgramInfo mDabInfoWithEmptyMetadata;
+    private RadioManager.ProgramInfo mFmInfo;
+    private RadioManager.ProgramInfo mFmInfoWithEmptyMetadata;
+    private RadioManager.ProgramInfo mDabInfoWithEmptyMetadata;
 
     private static final Comparator<ProgramSelector> SELECTOR_COMPARATOR =
             new ProgramSelectorExt.ProgramSelectorComparator();
@@ -91,16 +90,13 @@ public final class ProgramInfoExtTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        setUpMockProgramInfo(mFmInfo,
-                FM_SELECTOR, FM_IDENTIFIER, FM_IDENTIFIER, /* relatedContents= */ null,
-                /* infoFlags= */ 0, /* signalQuality= */ 1, RADIO_METADATA,
-                /* vendorInfo= */ null);
-        setUpMockProgramInfo(mFmInfoWithEmptyMetadata,
-                FM_SELECTOR, FM_IDENTIFIER, FM_IDENTIFIER,
+        mFmInfo = getMockProgramInfo(FM_SELECTOR, FM_IDENTIFIER, FM_IDENTIFIER,
+                /* relatedContents= */ null, /* infoFlags= */ 0, /* signalQuality= */ 1,
+                RADIO_METADATA, /* vendorInfo= */ null);
+        mFmInfoWithEmptyMetadata = getMockProgramInfo(FM_SELECTOR, FM_IDENTIFIER, FM_IDENTIFIER,
                 /* relatedContents= */ null, /* infoFlags= */ 0, /* signalQuality= */ 1,
                 EMPTY_RADIO_METADATA, /* vendorInfo= */ null);
-        setUpMockProgramInfo(mDabInfoWithEmptyMetadata,
-                DAB_SELECTOR, DAB_DMB_SID_EXT_IDENTIFIER,
+        mDabInfoWithEmptyMetadata = getMockProgramInfo(DAB_SELECTOR, DAB_DMB_SID_EXT_IDENTIFIER,
                 DAB_FREQUENCY_IDENTIFIER, /* relatedContents= */ null, /* infoFlags= */ 0,
                 /* signalQuality= */ 1, EMPTY_RADIO_METADATA, /* vendorInfo= */ null);
     }
@@ -150,11 +146,9 @@ public final class ProgramInfoExtTest {
 
     @Test
     public void getMetadata_withNullMetadata() {
-        RadioManager.ProgramInfo infoWithNullMetadata = mock(RadioManager.ProgramInfo.class);
-        setUpMockProgramInfo(infoWithNullMetadata,
-                FM_SELECTOR, FM_IDENTIFIER, FM_IDENTIFIER, /* relatedContents= */ null,
-                /* infoFlags= */ 0, /* signalQuality= */ 1, /* metadata= */ null,
-                /* vendorInfo= */ null);
+        RadioManager.ProgramInfo infoWithNullMetadata = getMockProgramInfo(FM_SELECTOR,
+                FM_IDENTIFIER, FM_IDENTIFIER, /* relatedContents= */ null, /* infoFlags= */ 0,
+                /* signalQuality= */ 1, /* metadata= */ null, /* vendorInfo= */ null);
 
         mExpect.withMessage("FM radio metadata with null metadata")
                 .that(ProgramInfoExt.getMetadata(infoWithNullMetadata))
@@ -185,6 +179,9 @@ public final class ProgramInfoExtTest {
         mExpect.withMessage("Album art in media display metadata")
                 .that(mediaDisplayMetadata.getBitmap(
                         MediaMetadataCompat.METADATA_KEY_ALBUM_ART)).isEqualTo(bitmapMock);
+        mExpect.withMessage("Media URI in media display metadata")
+                .that(mediaDisplayMetadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI))
+                .isEqualTo(ProgramSelectorExt.toUri(mFmInfo.getSelector()).toString());
     }
 
     @Test
@@ -194,22 +191,25 @@ public final class ProgramInfoExtTest {
 
         mExpect.withMessage("Media display title").that(mediaMetadata
                         .getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE))
-                .isEqualTo(ProgramInfoExt.getProgramName(mFmInfo, /* flags= */ 0));
+                .isEqualTo(ProgramSelectorExt.getDisplayName(mFmInfo.getSelector(),
+                        mFmInfo.getChannel()));
         mExpect.withMessage("Media title").that(mediaMetadata.getString(
                 MediaMetadataCompat.METADATA_KEY_TITLE)).isEqualTo(TITLE_VALUE);
         mExpect.withMessage("Media artist").that(mediaMetadata.getString(
                 MediaMetadataCompat.METADATA_KEY_ARTIST)).isEqualTo(ARTIST_VALUE);
         mExpect.withMessage("Media album").that(mediaMetadata.getString(
                 MediaMetadataCompat.METADATA_KEY_ALBUM)).isEqualTo(ALBUM_VALUE);
+        mExpect.withMessage("Media URI").that(mediaMetadata.getString(
+                MediaMetadataCompat.METADATA_KEY_MEDIA_URI))
+                .isEqualTo(ProgramSelectorExt.toUri(mFmInfo.getSelector()).toString());
     }
 
     @Test
     public void compare_withSelectorsOfDifferentTypes() {
         ProgramSelector fmSel2 = ProgramSelectorExt.createAmFmSelector(FM_FREQUENCY + 200);
-        RadioManager.ProgramInfo fmInfo2 = mock(RadioManager.ProgramInfo.class);
-        setUpMockProgramInfo(fmInfo2, fmSel2,
-                fmSel2.getPrimaryId(), fmSel2.getPrimaryId(), /* relatedContents= */ null,
-                /* infoFlags= */ 1, /* signalQuality= */ 0, new RadioMetadata.Builder().build(),
+        RadioManager.ProgramInfo fmInfo2 = getMockProgramInfo(fmSel2, fmSel2.getPrimaryId(),
+                fmSel2.getPrimaryId(), /* relatedContents= */ null, /* infoFlags= */ 1,
+                /* signalQuality= */ 0, new RadioMetadata.Builder().build(),
                 /* vendorInfo= */ null);
         int expectedResult = SELECTOR_COMPARATOR.compare(fmSel2, FM_SELECTOR);
 
@@ -217,9 +217,65 @@ public final class ProgramInfoExtTest {
                 .that(PROGRAM_INFO_COMPARATOR.compare(fmInfo2, mFmInfo)).isEqualTo(expectedResult);
     }
 
+    @Test
+    public void containsSameRadioMetadata_withDifferentIntTypeMetadata() {
+        RadioMetadata radioMetadata2 = new RadioMetadata.Builder()
+                .putString(RadioMetadata.METADATA_KEY_RDS_PS, RDS_VALUE + 2)
+                .putString(RadioMetadata.METADATA_KEY_PROGRAM_NAME, PROGRAM_NAME_VALUE)
+                .putString(RadioMetadata.METADATA_KEY_TITLE, TITLE_VALUE)
+                .putString(RadioMetadata.METADATA_KEY_ARTIST, ARTIST_VALUE)
+                .putString(RadioMetadata.METADATA_KEY_ALBUM, ALBUM_VALUE)
+                .putInt(RadioMetadata.METADATA_KEY_ART, ART_VALUE).build();
+        RadioManager.ProgramInfo fmInfo2 = getMockProgramInfo(FM_SELECTOR, FM_IDENTIFIER,
+                FM_IDENTIFIER, /* relatedContents= */ null, /* infoFlags= */ 0,
+                /* signalQuality= */ 1, radioMetadata2, /* vendorInfo= */ null);
+        MediaMetadataCompat mediaMetadata1 = ProgramInfoExt.toMediaMetadata(mFmInfo,
+                /* isFavorite= */ true, /* imageResolver= */ null);
+        MediaMetadataCompat mediaMetadata2 = ProgramInfoExt.toMediaMetadata(fmInfo2,
+                /* isFavorite= */ true, /* imageResolver= */ null);
+
+        mExpect.withMessage("Media metadata with different string-type radio metadata")
+                .that(ProgramInfoExt.containsSameRadioMetadata(mediaMetadata1,
+                        mediaMetadata2)).isFalse();
+    }
+
+    @Test
+    public void containsSameRadioMetadata_withDifferentStringTypeMetadata() {
+        RadioMetadata radioMetadata2 = new RadioMetadata.Builder()
+                .putString(RadioMetadata.METADATA_KEY_RDS_PS, RDS_VALUE)
+                .putString(RadioMetadata.METADATA_KEY_PROGRAM_NAME, PROGRAM_NAME_VALUE)
+                .putString(RadioMetadata.METADATA_KEY_ALBUM, ALBUM_VALUE)
+                .putInt(RadioMetadata.METADATA_KEY_ART, ART_VALUE).build();
+        RadioManager.ProgramInfo fmInfo2 = getMockProgramInfo(FM_SELECTOR, FM_IDENTIFIER,
+                FM_IDENTIFIER, /* relatedContents= */ null, /* infoFlags= */ 0,
+                /* signalQuality= */ 1, radioMetadata2, /* vendorInfo= */ null);
+        MediaMetadataCompat mediaMetadata1 = ProgramInfoExt.toMediaMetadata(mFmInfo,
+                /* isFavorite= */ true, /* imageResolver= */ null);
+        MediaMetadataCompat mediaMetadata2 = ProgramInfoExt.toMediaMetadata(fmInfo2,
+                /* isFavorite= */ true, /* imageResolver= */ null);
+
+        mExpect.withMessage("Media metadata with different string-type radio metadata")
+                .that(ProgramInfoExt.containsSameRadioMetadata(mediaMetadata1,
+                        mediaMetadata2)).isFalse();
+    }
+
+    @Test
+    public void containsSameRadioMetadata_withSameMetadata() {
+        RadioManager.ProgramInfo fmInfo2 = getMockProgramInfo(FM_SELECTOR, FM_IDENTIFIER,
+                FM_IDENTIFIER, /* relatedContents= */ null, /* infoFlags= */ 0,
+                /* signalQuality= */ 1, RADIO_METADATA, /* vendorInfo= */ null);
+        MediaMetadataCompat mediaMetadata1 = ProgramInfoExt.toMediaMetadata(mFmInfo,
+                /* isFavorite= */ true, /* imageResolver= */ null);
+        MediaMetadataCompat mediaMetadata2 = ProgramInfoExt.toMediaMetadata(fmInfo2,
+                /* isFavorite= */ true, /* imageResolver= */ null);
+
+        mExpect.withMessage("Media metadata with different string-type radio metadata")
+                .that(ProgramInfoExt.containsSameRadioMetadata(mediaMetadata1,
+                        mediaMetadata2)).isTrue();
+    }
+
     /** {@link RadioManager.ProgramInfo} has system hidden constructor. Use mocks instead. */
-    private void setUpMockProgramInfo(
-            RadioManager.ProgramInfo mockInfo,
+    private RadioManager.ProgramInfo getMockProgramInfo(
             ProgramSelector programSelector,
             ProgramSelector.Identifier logicallyTunedTo,
             ProgramSelector.Identifier physicallyTunedTo,
@@ -228,6 +284,7 @@ public final class ProgramInfoExtTest {
             int signalQuality,
             RadioMetadata metadata,
             Map<String, String> vendorInfo) {
+        RadioManager.ProgramInfo mockInfo = mock(RadioManager.ProgramInfo.class);
         when(mockInfo.getSelector()).thenReturn(programSelector);
         when(mockInfo.getLogicallyTunedTo()).thenReturn(logicallyTunedTo);
         when(mockInfo.getPhysicallyTunedTo()).thenReturn(physicallyTunedTo);
@@ -246,5 +303,6 @@ public final class ProgramInfoExtTest {
         // when(mockInfo.isSignalAcquired()).thenReturn((infoFlags & 64) != 0);
         // when(mockInfo.isHdSisAvailable()).thenReturn((infoFlags & 128) != 0);
         // when(mockInfo.isHdAudioAvailable()).thenReturn((infoFlags & 256) != 0);
+        return mockInfo;
     }
 }

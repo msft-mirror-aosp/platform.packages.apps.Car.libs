@@ -20,6 +20,7 @@ import android.hardware.radio.ProgramSelector;
 import android.hardware.radio.ProgramSelector.Identifier;
 import android.hardware.radio.RadioManager;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.IntDef;
@@ -272,9 +273,10 @@ public class ProgramSelectorExt {
                 == ProgramSelector.IDENTIFIER_TYPE_HD_STATION_ID_EXT) {
             return IdentifierExt.asHdPrimary(selector.getPrimaryId()).getFrequency();
         } else if (selector.getPrimaryId().getType()
-                == ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT
-                || selector.getPrimaryId().getType()
-                == ProgramSelector.IDENTIFIER_TYPE_DAB_SID_EXT) {
+                == ProgramSelector.IDENTIFIER_TYPE_DAB_SID_EXT
+                || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+                && selector.getPrimaryId().getType()
+                == ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT)) {
             try {
                 return (int) selector.getFirstId(ProgramSelector.IDENTIFIER_TYPE_DAB_FREQUENCY);
             } catch (IllegalArgumentException e) {
@@ -343,11 +345,23 @@ public class ProgramSelectorExt {
 
         if (noProgramTypeFallback) return null;
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            switch (sel.getPrimaryId().getType()) {
+                case ProgramSelector.IDENTIFIER_TYPE_SXM_SERVICE_ID:
+                    return "SXM";
+                case ProgramSelector.IDENTIFIER_TYPE_DAB_SID_EXT:
+                case ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT:
+                    return "DAB";
+                case ProgramSelector.IDENTIFIER_TYPE_DRMO_SERVICE_ID:
+                    return "DRMO";
+                default:
+                    return null;
+            }
+        }
         switch (sel.getPrimaryId().getType()) {
             case ProgramSelector.IDENTIFIER_TYPE_SXM_SERVICE_ID:
                 return "SXM";
             case ProgramSelector.IDENTIFIER_TYPE_DAB_SID_EXT:
-            case ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT:
                 return "DAB";
             case ProgramSelector.IDENTIFIER_TYPE_DRMO_SERVICE_ID:
                 return "DRMO";
@@ -373,7 +387,9 @@ public class ProgramSelectorExt {
         add.accept(ProgramSelector.IDENTIFIER_TYPE_DRMO_SERVICE_ID, "DRMO_SERVICE_ID");
         add.accept(ProgramSelector.IDENTIFIER_TYPE_DRMO_FREQUENCY, "DRMO_FREQUENCY");
         add.accept(ProgramSelector.IDENTIFIER_TYPE_SXM_SERVICE_ID, "SXM_SERVICE_ID");
-        add.accept(ProgramSelector.IDENTIFIER_TYPE_SXM_CHANNEL, "SXM_CHANNEL");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            add.accept(ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT, "DAB_DMB_SID_EXT");
+        }
     }
 
     private static @Nullable String typeToUri(int identifierType) {
@@ -420,7 +436,7 @@ public class ProgramSelectorExt {
         if (valUri == null) return null;
         try {
             if (valUri.startsWith(URI_HEX_PREFIX)) {
-                return Long.parseLong(valUri.substring(URI_HEX_PREFIX.length()), 16);
+                return Long.parseUnsignedLong(valUri.substring(URI_HEX_PREFIX.length()), 16);
             } else {
                 return Long.parseLong(valUri, 10);
             }
@@ -554,7 +570,8 @@ public class ProgramSelectorExt {
          * @return {@link DabPrimary} object if the identifier is DAB-type, {@code null} otherwise
          */
         public static @Nullable DabPrimary asDabPrimary(@NonNull Identifier id) {
-            if (id.getType() == ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+                    && id.getType() == ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT) {
                 return new DabPrimary(id.getValue());
             }
             return null;
@@ -620,7 +637,8 @@ public class ProgramSelectorExt {
                     return subchannel1 > subchannel2 ? 1 : -1;
                 }
                 return selector1.getPrimaryId().getType() - selector2.getPrimaryId().getType();
-            } else if (type1 == ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+                    && type1 == ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT
                     && type2 == ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT) {
                 if (frequency1 != frequency2) {
                     return frequency1 > frequency2 ? 1 : -1;

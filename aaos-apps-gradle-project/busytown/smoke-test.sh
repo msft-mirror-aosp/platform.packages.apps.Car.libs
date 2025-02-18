@@ -15,4 +15,5 @@ setup_build_environment
     :car-ui-lib:assembleDebugAndroidTest \
     :car-ui-lib:testDebug
 
+# Functions defined in envsetup.sh
 wrap_up_build $?

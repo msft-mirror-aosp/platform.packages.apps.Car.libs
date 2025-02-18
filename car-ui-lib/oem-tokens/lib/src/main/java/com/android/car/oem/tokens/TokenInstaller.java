@@ -98,7 +98,11 @@ public class TokenInstaller extends ContentProvider {
                         }
 
                         Log.i(TAG, "Setting OEM token default values");
-                        activity.getTheme().applyStyle(R.style.OemTokensBase, true);
+                        if (Token.isLightTheme(activity)) {
+                            activity.getTheme().applyStyle(R.style.OemTokensBaseLight, true);
+                        } else {
+                            activity.getTheme().applyStyle(R.style.OemTokensBaseDark, true);
+                        }
 
                         int useOemTokenId = activity.getResources().getIdentifier(
                                 "enable_oem_tokens",
@@ -111,6 +115,11 @@ public class TokenInstaller extends ContentProvider {
                                 activity.getPackageManager())) {
                             Log.i(TAG, "Setting shared lib OEM token default values");
                             activity.getTheme().applyStyle(R.style.OemTokens, true);
+                            if (Token.isLightTheme(activity)) {
+                                activity.getTheme().applyStyle(R.style.OemTokensLight, true);
+                            } else {
+                                activity.getTheme().applyStyle(R.style.OemTokensDark, true);
+                            }
                             int oemStyleOverride = activity.getResources().getIdentifier("OemStyle",
                                     "style", Token.getTokenSharedLibraryName());
                             if (oemStyleOverride == 0) {

@@ -17,6 +17,10 @@ package com.android.car.oem.tokens;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import static junit.framework.Assert.assertEquals;
+
+import static org.junit.Assert.assertThrows;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.TypedValue;
@@ -29,6 +33,8 @@ import com.android.car.oem.tokens.test.R;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RunWith(AndroidJUnit4.class)
 public final class TokenTest {
@@ -70,6 +76,38 @@ public final class TokenTest {
     }
 
     @Test
+    public void testLightDarkThemeTokenInstallerRun() {
+        AtomicInteger lightColor = new AtomicInteger();
+        AtomicInteger darkColor = new AtomicInteger();
+
+        try (ActivityScenario<TokenTestActivity> scenario = ActivityScenario.launch(
+                TokenTestActivity.class)) {
+            scenario.onActivity(activity -> {
+                TypedArray a = activity.getTheme().obtainStyledAttributes(
+                        new int[]{R.attr.oemColorSurface, android.R.attr.isLightTheme});
+                lightColor.set(a.getColor(0, -1));
+                assertThat(a.getBoolean(1, false)).isEqualTo(true);
+                a.recycle();
+            });
+        }
+
+        try (ActivityScenario<TokenDarkThemeTestActivity> scenario =
+                     ActivityScenario.launch(TokenDarkThemeTestActivity.class)) {
+            scenario.onActivity(activity -> {
+                TypedArray b = activity.getTheme().obtainStyledAttributes(
+                        new int[]{R.attr.oemColorSurface, android.R.attr.isLightTheme});
+                darkColor.set(b.getColor(0, -1));
+                assertThat(b.getBoolean(1, true)).isEqualTo(false);
+                b.recycle();
+            });
+        }
+
+        assertThat(lightColor.get()).isNotEqualTo(-1);
+        assertThat(darkColor.get()).isNotEqualTo(-1);
+        assertThat(lightColor.get()).isNotEqualTo(darkColor.get());
+    }
+
+    @Test
     public void testTokenInstallerRunNoOverride() {
         try (ActivityScenario<TokenTestNoOverrideActivity> scenario = ActivityScenario.launch(
                 TokenTestNoOverrideActivity.class)) {
@@ -90,8 +128,7 @@ public final class TokenTest {
         try (ActivityScenario<TokenTestActivity> scenario = ActivityScenario.launch(
                 TokenTestActivity.class)) {
             scenario.onActivity(activity -> {
-                Context oemContext = Token.createOemStyledContext(activity);
-                int colorStaticApi = Token.getColor(oemContext, R.attr.oemColorPrimary);
+                int colorStaticApi = Token.getColor(activity, R.attr.oemColorPrimary);
 
                 TypedValue tv = new TypedValue();
                 TypedArray attributes = activity.getTheme().obtainStyledAttributes(
@@ -117,6 +154,18 @@ public final class TokenTest {
                 attributes.getValue(R.styleable.OemTokens_oemColorPrimary, tv2);
 
                 assertThat(tv1.data).isEqualTo(tv2.data);
+            });
+        }
+    }
+
+    @Test
+    public void testColor_tokenInstallerNotRun_throwsException() {
+        try (ActivityScenario<NoTokenTestActivity> scenario = ActivityScenario.launch(
+                NoTokenTestActivity.class)) {
+            scenario.onActivity(activity -> {
+                Throwable exception = assertThrows(IllegalArgumentException.class, () ->
+                        Token.getColor(activity, R.attr.oemColorPrimary));
+                assertEquals("Context must be token compatible.", exception.getMessage());
             });
         }
     }

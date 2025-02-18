@@ -34,6 +34,10 @@
         android:theme="@style/Theme.AppCardSampleApplication"
         android:roundIcon="@drawable/ic_icon">
 
+        <!-- An activity launched through RoutingActivityIntent must be declared in manifest -->
+        <activity
+            android:name=".SampleRoutingActivity" />
+
         <!-- App Card Content Provider that is required to communicate
              relevant App Cards with the system
 

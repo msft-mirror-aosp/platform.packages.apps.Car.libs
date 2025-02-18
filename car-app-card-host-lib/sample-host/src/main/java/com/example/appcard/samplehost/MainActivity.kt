@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
 
     viewModel = ViewModelProvider(owner = this)[HostViewModel::class.java]
-    stateFactory = AppCardContainerStateFactory(applicationContext.packageManager, viewModel)
+    stateFactory = AppCardContainerStateFactory(applicationContext, viewModel)
     viewModel.setStateFactory(stateFactory)
 
     /** Create [AppCardHost] */

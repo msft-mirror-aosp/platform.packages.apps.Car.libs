@@ -17,6 +17,9 @@ car_app_card_lib_static_libs = [
     "androidx.annotation_annotation",
     "androidx.legacy_legacy-support-v4",
 
+    // protobuf
+    "libprotobuf-java-lite",
+
     // Kotlin
     "kotlin-stdlib",
     "kotlinx-coroutines-android",
@@ -27,6 +30,8 @@ android_library {
     min_sdk_version: "31",
     target_sdk_version: "34",
     sdk_version: "current",
+        // b/355695111: Remove this once we drop support for sc-car
+    java_version: "1.8", // sc-car only supports up to java 8.
     manifest: "src/main/AndroidManifest.xml",
     proto: {
         type: "lite",
@@ -80,6 +85,7 @@ java_genrule {
     name: "car-app-card-lib-aar",
     srcs: [
         ":car-app-card-lib-source{.aar}",
+        "src/main/res/**/*",
     ],
     out: ["car-app-card-lib.aar"],
     tools: [

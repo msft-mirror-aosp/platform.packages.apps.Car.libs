@@ -358,7 +358,9 @@ public class MediaSessionHelper extends MediaController.Callback {
     private void setInitialMediaSource() {
         List<MediaController> activeMediaControllers = new ArrayList<>();
         List<MediaController> activeOrPausedMediaControllers = new ArrayList<>();
-        parseMediaControllers(mMediaSessionManager.getActiveSessions(null),
+        List<MediaController> filteredControllers = getMediaControllersWithMediaNotifications(
+                mMediaSessionManager.getActiveSessions(null));
+        parseMediaControllers(filteredControllers,
                 activeMediaControllers, activeOrPausedMediaControllers);
         MediaSource savedMediaSource = null;
 
@@ -429,7 +431,8 @@ public class MediaSessionHelper extends MediaController.Callback {
         ComponentName componentName = carMediaManager.getMediaSource(MEDIA_SOURCE_MODE_PLAYBACK);
         car.disconnect();
 
-        return componentName.flattenToString();
+        // ComponentName may be null b/355078140
+        return componentName == null ? "" : componentName.flattenToString();
     }
 
     /* Copy of PlaybackState.isActive() which is only available for minsdk >=S  */

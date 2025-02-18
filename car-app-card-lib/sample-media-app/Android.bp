@@ -20,7 +20,7 @@ android_app {
     privileged: true,
 // TODO(338455570): re-enable priv-app permissions for car-apps-dev
 //    required: ["allowed_privapp_com.example.appcard.sample.media"],
-    manifest: "src/main/AndroidManifest.xml",
+    manifest: "src/main/AndroidManifest-soong.xml",
     proto: {
         type: "lite",
     },

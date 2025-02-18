@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  * records.
  */
 public class PhoneCallLog {
-    private static final String TAG = "CD.PhoneCallLog";
+    private static final String TAG = "CTC.PhoneCallLog";
 
     @IntDef({TimeRange.TODAY, TimeRange.YESTERDAY, TimeRange.OLDER})
     public @interface TimeRange {

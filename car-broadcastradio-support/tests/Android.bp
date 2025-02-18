@@ -39,6 +39,6 @@ android_test {
         "libstaticjvmtiagent",
     ],
 
-    min_sdk_version: "33",
+    min_sdk_version: "34",
     target_sdk_version: "34",
 }

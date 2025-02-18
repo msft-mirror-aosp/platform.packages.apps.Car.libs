@@ -111,6 +111,12 @@ public class BrowseTree {
             "android.media.extra.EXTRA_BCRADIO_BAND_NAME_EN";
 
     /**
+     * Key for radio metadata parcelable in extra
+     */
+    public static final String EXTRA_BCRADIO_METADATA =
+            "android.media.extra.EXTRA_BCRADIO_METADATA";
+
+    /**
      * General play intent action.
      *
      * MediaBrowserService of the radio app must handle this command to perform general
@@ -168,14 +174,15 @@ public class BrowseTree {
 
     private static MediaItem createChild(
             MediaDescriptionCompat.Builder descBuilder, String mediaId, String title,
-            ProgramSelector sel, Bitmap icon) {
-        MediaDescriptionCompat desc = descBuilder
-                .setMediaId(mediaId)
+            ProgramSelector sel, Bitmap icon, @Nullable Bundle extras) {
+        descBuilder.setMediaId(mediaId)
                 .setMediaUri(ProgramSelectorExt.toUri(sel))
                 .setTitle(title)
-                .setIconBitmap(icon)
-                .build();
-        return new MediaItem(desc, MediaItem.FLAG_PLAYABLE);
+                .setIconBitmap(icon);
+        if (extras != null) {
+            descBuilder.setExtras(extras);
+        }
+        return new MediaItem(descBuilder.build(), MediaItem.FLAG_PLAYABLE);
     }
 
     private static MediaItem createFolder(
@@ -254,6 +261,7 @@ public class BrowseTree {
      */
     public void setProgramList(@Nullable ProgramList programList) {
         synchronized (mLock) {
+            boolean rootChanged = (mProgramList == null) != (programList == null);
             if (mProgramList != null) {
                 mProgramList.removeOnCompleteListener(mProgramListCompleteListener);
             }
@@ -261,7 +269,10 @@ public class BrowseTree {
             if (programList != null) {
                 mProgramList.addOnCompleteListener(mProgramListCompleteListener);
             }
-            mBrowserService.notifyChildrenChanged(NODE_ROOT);
+            if (rootChanged) {
+                mRootChildren = null;
+                mBrowserService.notifyChildrenChanged(NODE_ROOT);
+            }
         }
     }
 
@@ -290,8 +301,19 @@ public class BrowseTree {
                     if (id != 0) icon = mImageResolver.resolve(id);
                 }
 
-                mProgramListCache.add(createChild(dbld, mediaId,
-                        ProgramInfoExt.getProgramName(program, 0), program.getSelector(), icon));
+                if (meta != null) {
+                    Bundle extras = new Bundle();
+                    extras.putParcelable(EXTRA_BCRADIO_METADATA, program.getMetadata());
+                    mProgramListCache.add(createChild(dbld, mediaId,
+                            ProgramInfoExt.getProgramName(program, 0), program.getSelector(), icon,
+                            extras));
+                } else {
+                    mProgramListCache.add(createChild(dbld, mediaId,
+                            ProgramInfoExt.getProgramName(program, 0), program.getSelector(), icon,
+                            /* extra= */ null));
+                }
+
+
             }
 
             if (mProgramListCache.size() == 0) {
@@ -322,7 +344,10 @@ public class BrowseTree {
             mFavorites = favorites;
             mFavoritesCache = null;
             mBrowserService.notifyChildrenChanged(NODE_FAVORITES);
-            if (rootChanged) mBrowserService.notifyChildrenChanged(NODE_ROOT);
+            if (rootChanged) {
+                mRootChildren = null;
+                mBrowserService.notifyChildrenChanged(NODE_ROOT);
+            }
         }
     }
 
@@ -338,7 +363,8 @@ public class BrowseTree {
                 ProgramSelector sel = fav.getSelector();
                 String mediaId = selectorToMediaId(sel);
                 mProgramSelectors.putIfAbsent(mediaId, sel);  // prefer program list entries
-                mFavoritesCache.add(createChild(dbld, mediaId, fav.getName(), sel, fav.getIcon()));
+                mFavoritesCache.add(createChild(dbld, mediaId, fav.getName(), sel, fav.getIcon(),
+                        /* extras= */ null));
             }
 
             return mFavoritesCache;
@@ -431,7 +457,8 @@ public class BrowseTree {
                     for (int ch = lowerLimit; ch <= upperLimit; ch += spacing) {
                         ProgramSelector sel = ProgramSelectorExt.createAmFmSelector(ch);
                         mChannels.add(createChild(dbld, NODEPREFIX_AMFMCHANNEL + ch,
-                                ProgramSelectorExt.getDisplayName(sel, 0), sel, null));
+                                ProgramSelectorExt.getDisplayName(sel, 0), sel, /* icon= */ null,
+                                /* extra= */ null));
                     }
                 }
 
@@ -466,7 +493,29 @@ public class BrowseTree {
 
     private static @NonNull String selectorToMediaId(@NonNull ProgramSelector sel) {
         ProgramSelector.Identifier id = sel.getPrimaryId();
-        return NODEPREFIX_PROGRAM + id.getType() + '/' + id.getValue();
+        String mediaId = NODEPREFIX_PROGRAM + id.getType() + '/' + id.getValue();
+        if (id.getType() == ProgramSelector.IDENTIFIER_TYPE_DAB_SID_EXT
+                || id.getType() == ProgramSelector.IDENTIFIER_TYPE_DAB_DMB_SID_EXT) {
+            ProgramSelector.Identifier[] seondaryIds = sel.getSecondaryIds();
+            ProgramSelector.Identifier ensembleId = null;
+            ProgramSelector.Identifier frequencyId = null;
+            for (ProgramSelector.Identifier secondaryId : seondaryIds) {
+                if (secondaryId.getType() == ProgramSelector.IDENTIFIER_TYPE_DAB_ENSEMBLE
+                        && ensembleId == null) {
+                    ensembleId = secondaryId;
+                } else if (secondaryId.getType() == ProgramSelector.IDENTIFIER_TYPE_DAB_FREQUENCY
+                        && frequencyId == null) {
+                    frequencyId = secondaryId;
+                }
+            }
+            if (ensembleId != null) {
+                mediaId += ';' + ensembleId.getType() + '/' + ensembleId.getValue();
+            }
+            if (frequencyId != null) {
+                mediaId += ';' + frequencyId.getType() + '/' + frequencyId.getValue();
+            }
+        }
+        return mediaId;
     }
 
     /**

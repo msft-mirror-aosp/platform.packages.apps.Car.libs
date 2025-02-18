@@ -59,8 +59,8 @@ android_library {
     sdk_version: "current",
     min_sdk_version: "28",
     target_sdk_version: "current",
-    // sc-car only supports up to java 8.
-    java_version: "1.8",
+    // b/355695111: Remove this once we drop support for sc-car
+    java_version: "1.8", // sc-car only supports up to java 8.
 
     manifest: "car-ui-lib/src/main/AndroidManifest.xml",
     srcs: [
@@ -120,8 +120,8 @@ android_library {
     sdk_version: "current",
     min_sdk_version: "28",
     target_sdk_version: "current",
-    // sc-car only supports up to java 8.
-    java_version: "1.8",
+    // b/355695111: Remove this once we drop support for sc-car
+    java_version: "1.8", // sc-car only supports up to java 8.
 
     manifest: "car-ui-lib/src/main/AndroidManifest.xml",
     srcs: [
@@ -185,19 +185,45 @@ android_library_import {
     static_libs: car_ui_lib_static_libs,
 }
 
-car_ui_lib_testing_support_static_libs = [
+soong_config_module_type {
+    name: "car_ui_lib_android_library",
+    module_type: "android_library",
+    config_namespace: "car_ui_lib",
+    variables: ["robolectric_version"],
+    properties: ["static_libs"],
+}
+
+soong_config_module_type {
+    name: "car_ui_lib_android_library_import",
+    module_type: "android_library_import",
+    config_namespace: "car_ui_lib",
+    variables: ["robolectric_version"],
+    properties: ["static_libs"],
+}
+
+soong_config_string_variable {
+    name: "robolectric_version",
+    values: ["legacy"],
+}
+
+car_ui_lib_testing_support_static_libs_legacy = [
     "car-ui-lib-source",
     "Robolectric_all-target_upstream",
 ]
 
-android_library {
+car_ui_lib_testing_support_static_libs = [
+    "car-ui-lib-source",
+    "Robolectric_all-target",
+]
+
+car_ui_lib_android_library {
     name: "car-ui-lib-testing-support-source",
 
     sdk_version: "current",
     min_sdk_version: "28",
     target_sdk_version: "current",
-    // sc-car only supports up to java 8.
-    java_version: "1.8",
+    // b/355695111: Remove this once we drop support for sc-car
+    java_version: "1.8", // sc-car only supports up to java 8.
 
     manifest: "car-ui-lib/src/main/AndroidManifest.xml",
     srcs: [
@@ -207,7 +233,16 @@ android_library {
         enabled: false,
     },
     libs: ["android.car-stubs"],
-    static_libs: car_ui_lib_testing_support_static_libs,
+    soong_config_variables: {
+        robolectric_version: {
+            legacy: {
+                static_libs: car_ui_lib_testing_support_static_libs_legacy,
+            },
+            conditions_default: {
+                static_libs: car_ui_lib_testing_support_static_libs,
+            },
+        },
+    }
 }
 
 java_genrule {
@@ -227,11 +262,20 @@ java_genrule {
     },
 }
 
-android_library_import {
+car_ui_lib_android_library_import {
     name: "car-ui-lib-testing-support-prebuilt",
     aars: [":car-ui-lib-testing-support-aar"],
     sdk_version: "current",
-    static_libs: car_ui_lib_testing_support_static_libs,
+        soong_config_variables: {
+        robolectric_version: {
+            legacy: {
+                static_libs: car_ui_lib_testing_support_static_libs_legacy,
+            },
+            conditions_default: {
+                static_libs: car_ui_lib_testing_support_static_libs,
+            },
+        },
+    }
 }
 
 android_library {
@@ -240,8 +284,8 @@ android_library {
     sdk_version: "current",
     min_sdk_version: "28",
     target_sdk_version: "current",
-    // sc-car only supports up to java 8.
-    java_version: "1.8",
+    // b/355695111: Remove this once we drop support for sc-car
+    java_version: "1.8", // sc-car only supports up to java 8.
 
     manifest: "car-ui-lib-testing/src/main/AndroidManifest.xml",
     srcs: [

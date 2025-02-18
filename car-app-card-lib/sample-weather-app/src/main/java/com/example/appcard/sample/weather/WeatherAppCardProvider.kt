@@ -36,8 +36,11 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.getSystemService
 import com.android.car.appcard.AppCardContext
 import com.android.car.appcard.ImageAppCard
+import com.android.car.appcard.component.Button
 import com.android.car.appcard.component.Header
 import com.android.car.appcard.component.Image
+import com.android.car.appcard.component.interaction.OnClickListener
+import com.android.car.appcard.component.interaction.RoutingActivityIntent
 import com.example.appcard.sample.weather.model.ForecastResponse
 import com.example.appcard.sample.weather.model.Period
 import com.example.appcard.sample.weather.model.PointsResponse
@@ -46,13 +49,6 @@ import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import java.io.IOException
-import java.util.Timer
-import java.util.TimerTask
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.floor
-import kotlin.math.pow
-import kotlin.math.roundToInt
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.OkHttpClient
@@ -62,6 +58,13 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
+import java.util.Timer
+import java.util.TimerTask
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.floor
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 class WeatherAppCardProvider(
   val context: Context,
@@ -271,7 +274,7 @@ class WeatherAppCardProvider(
     logIfDebuggable("URI Paths: ${uri.pathSegments}")
     val dayTime = isDaylight ?: (uri.pathSegments[2] == "day")
     logIfDebuggable("isDaylight: $dayTime")
-    val code = uri.pathSegments[3]
+    val code = uri.pathSegments[3].split(',')[0]
     val resId = IconUriUtility.getRes(code, dayTime)
     return resToBitmap(resId, imageSize.width, imageSize.height)
   }
@@ -322,20 +325,38 @@ class WeatherAppCardProvider(
   }
 
   private fun getGrantPermissionAppCard(): ImageAppCard {
-    val imageSize =
-      latestAppCardContext.imageAppCardContext.getMaxImageSize(ImageAppCard::class.java)
-    return ImageAppCard.newBuilder(id)
+    val builder = ImageAppCard.newBuilder(id)
       .setHeader(getHeader())
       .setPrimaryText(ERROR_PRIMARY)
       .setSecondaryText(LOCATION_PERMISSION_SECONDARY)
-      .setImage(
+
+    if (latestAppCardContext.isInteractable) {
+      builder.addButton(
+        Button.newBuilder(
+          SETTINGS_BUTTON_ID,
+          Button.ButtonType.PRIMARY,
+          object : OnClickListener {
+            override fun onClick() {
+              //no-op
+            }
+          }
+        )
+          .setText(SETTINGS_BUTTON_TEXT)
+          .setIntent(RoutingActivityIntent.newBuilder(ROUTING_ACTIVITY_NAME).build())
+          .build()
+      )
+    } else {
+      val imageSize =
+        latestAppCardContext.imageAppCardContext.getMaxImageSize(ImageAppCard::class.java)
+      builder.setImage(
         Image.newBuilder(IMAGE_ID)
           .setContentScale(Image.ContentScale.FILL_BOUNDS)
           .setColorFilter(Image.ColorFilter.TINT)
           .setImageData(resToBitmap(R.drawable.ic_location_off, imageSize.width, imageSize.height))
           .build()
       )
-      .build()
+    }
+    return builder.build()
   }
 
   private fun getOkHttpClient(): OkHttpClient {
@@ -471,6 +492,7 @@ class WeatherAppCardProvider(
     private const val MINUTE_IN_MS = 60000L
     private const val HEADER_ID = "HEADER_ID"
     private const val IMAGE_ID = "IMAGE_ID"
+    private const val SETTINGS_BUTTON_ID = "SETTINGS_BUTTON_ID"
     private const val HEADER_IMAGE_ID = "HEADER_IMAGE_ID"
     private const val ERROR_PERIODS = "Forecast periods not found"
     private const val ERROR_FIRST_PERIOD = "First period not found"
@@ -483,6 +505,9 @@ class WeatherAppCardProvider(
     private const val LOADING_PRIMARY = "Loading..."
     private const val LOADING_SECONDARY = ""
     private const val WEATHER_HEADER = "Weather"
+    private const val SETTINGS_BUTTON_TEXT = "Open Settings"
+    private const val ROUTING_ACTIVITY_NAME =
+      "com.example.appcard.sample.weather.SampleRoutingActivity"
     private const val TEMP_RISING = "rising"
     private const val TEMP_RISING_ICON = "↑"
     private const val TEMP_FALLING_ICON = "↓"

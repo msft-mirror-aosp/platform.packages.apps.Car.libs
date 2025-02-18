@@ -127,7 +127,7 @@
         <item name="oemShapeCornerFull">1000dp</item>
     </style>
 
-    <style name="OemTokensBase" parent="OemTokensParent">
+    <style name="OemTokensBaseLight" parent="OemTokensParent">
         <item name="oemColorPrimary">?attr/oemColorPrimaryPalette40</item>
         <item name="oemColorOnPrimary">?attr/oemColorPrimaryPalette100</item>
         <item name="oemColorPrimaryContainer">?attr/oemColorPrimaryPalette90</item>
@@ -176,6 +176,57 @@
         <item name="oemColorOnYellow">@color/oem_color_on_yellow</item>
         <item name="oemColorYellowContainer">@color/oem_color_yellow_container</item>
         <item name="oemColorOnYellowContainer">@color/oem_color_on_yellow_container</item>
+    </style>
+
+    <style name="OemTokensBaseDark" parent="OemTokensParent">
+        <item name="oemColorPrimary">?attr/oemColorPrimaryPalette80</item>
+        <item name="oemColorOnPrimary">?attr/oemColorPrimaryPalette20</item>
+        <item name="oemColorPrimaryContainer">?attr/oemColorPrimaryPalette30</item>
+        <item name="oemColorOnPrimaryContainer">?attr/oemColorPrimaryPalette90</item>
+        <item name="oemColorSecondary">?attr/oemColorSecondaryPalette80</item>
+        <item name="oemColorOnSecondary">?attr/oemColorSecondaryPalette20</item>
+        <item name="oemColorSecondaryContainer">?attr/oemColorSecondaryPalette30</item>
+        <item name="oemColorOnSecondaryContainer">?attr/oemColorSecondaryPalette90</item>
+        <item name="oemColorTertiary">?attr/oemColorTertiaryPalette80</item>
+        <item name="oemColorOnTertiary">?attr/oemColorTertiaryPalette20</item>
+        <item name="oemColorTertiaryContainer">?attr/oemColorTertiaryPalette30</item>
+        <item name="oemColorOnTertiaryContainer">?attr/oemColorTertiaryPalette90</item>
+        <item name="oemColorError">?attr/oemColorErrorPalette80</item>
+        <item name="oemColorOnError">?attr/oemColorErrorPalette20</item>
+        <item name="oemColorErrorContainer">?attr/oemColorErrorPalette30</item>
+        <item name="oemColorOnErrorContainer">?attr/oemColorErrorPalette90</item>
+        <item name="oemColorBackground">?attr/oemColorNeutralPalette10</item>
+        <item name="oemColorOnBackground">?attr/oemColorNeutralPalette90</item>
+        <item name="oemColorSurface">?attr/oemColorNeutralPalette10</item>
+        <item name="oemColorOnSurface">?attr/oemColorNeutralPalette80</item>
+        <item name="oemColorSurfaceVariant">?attr/oemColorNeutralVariantPalette30</item>
+        <item name="oemColorOnSurfaceVariant">?attr/oemColorNeutralVariantPalette80</item>
+        <item name="oemColorSurfaceInverse">?attr/oemColorNeutralVariantPalette80</item>
+        <item name="oemColorOnSurfaceInverse">?attr/oemColorNeutralVariantPalette10</item>
+        <item name="oemColorPrimaryInverse">?attr/oemColorPrimaryPalette40</item>
+        <item name="oemColorOutline">?attr/oemColorNeutralVariantPalette60</item>
+        <item name="oemColorScrim">?attr/oemColorNeutralPalette80</item>
+        <item name="oemColorOutlineVariant">?attr/oemColorNeutralVariantPalette30</item>
+        <item name="oemColorSurfaceTint">?attr/oemColorPrimaryPalette80</item>
+        <item name="oemColorSurfaceDim">#0F1417</item>
+        <item name="oemColorSurfaceBright">#353A3D</item>
+        <item name="oemColorSurfaceContainer">#1C2024</item>
+        <item name="oemColorSurfaceContainerLow">?attr/oemColorNeutralPalette10</item>
+        <item name="oemColorSurfaceContainerLowest">#0A0F12</item>
+        <item name="oemColorSurfaceContainerHigh">#262B2E</item>
+        <item name="oemColorSurfaceContainerHighest">#313539</item>
+        <item name="oemColorBlue">#86A9FF</item>
+        <item name="oemColorOnBlue">#001945</item>
+        <item name="oemColorBlueContainer">#00419C</item>
+        <item name="oemColorOnBlueContainer">#D9E2FF</item>
+        <item name="oemColorGreen">#5BBF6B</item>
+        <item name="oemColorOnGreen">#002107</item>
+        <item name="oemColorGreenContainer">#00531D</item>
+        <item name="oemColorOnGreenContainer">#92F99D</item>
+        <item name="oemColorYellow">#EB9A00</item>
+        <item name="oemColorOnYellow">#2A1800</item>
+        <item name="oemColorYellowContainer">#643F00</item>
+        <item name="oemColorOnYellowContainer">#FFDDB6</item>
     </style>
 
     <style name="OemTokens">
@@ -312,55 +363,6 @@
         <item name="oemColorNeutralVariantPalette10">?com.android.oem.tokens:attr/colorNeutralVariantPalette10</item>
         <item name="oemColorNeutralVariantPalette0">?com.android.oem.tokens:attr/colorNeutralVariantPalette0</item>
 
-        <item name="com.android.oem.tokens:colorPrimary">?attr/oemColorPrimaryPalette80</item>
-        <item name="com.android.oem.tokens:colorOnPrimary">?attr/oemColorPrimaryPalette20</item>
-        <item name="com.android.oem.tokens:colorPrimaryContainer">?attr/oemColorPrimaryPalette30</item>
-        <item name="com.android.oem.tokens:colorOnPrimaryContainer">?attr/oemColorPrimaryPalette90</item>
-        <item name="com.android.oem.tokens:colorSecondary">?attr/oemColorSecondaryPalette80</item>
-        <item name="com.android.oem.tokens:colorOnSecondary">?attr/oemColorSecondaryPalette20</item>
-        <item name="com.android.oem.tokens:colorSecondaryContainer">?attr/oemColorSecondaryPalette30</item>
-        <item name="com.android.oem.tokens:colorOnSecondaryContainer">?attr/oemColorSecondaryPalette90</item>
-        <item name="com.android.oem.tokens:colorTertiary">?attr/oemColorTertiaryPalette80</item>
-        <item name="com.android.oem.tokens:colorOnTertiary">?attr/oemColorTertiaryPalette20</item>
-        <item name="com.android.oem.tokens:colorTertiaryContainer">?attr/oemColorTertiaryPalette30</item>
-        <item name="com.android.oem.tokens:colorOnTertiaryContainer">?attr/oemColorTertiaryPalette90</item>
-        <item name="com.android.oem.tokens:colorError">?attr/oemColorErrorPalette80</item>
-        <item name="com.android.oem.tokens:colorOnError">?attr/oemColorErrorPalette20</item>
-        <item name="com.android.oem.tokens:colorErrorContainer">?attr/oemColorErrorPalette30</item>
-        <item name="com.android.oem.tokens:colorOnErrorContainer">?attr/oemColorErrorPalette90</item>
-        <item name="com.android.oem.tokens:colorBackground">?attr/oemColorNeutralPalette10</item>
-        <item name="com.android.oem.tokens:colorOnBackground">?attr/oemColorNeutralPalette90</item>
-        <item name="com.android.oem.tokens:colorSurface">?attr/oemColorNeutralPalette10</item>
-        <item name="com.android.oem.tokens:colorOnSurface">?attr/oemColorNeutralPalette80</item>
-        <item name="com.android.oem.tokens:colorSurfaceVariant">?attr/oemColorNeutralVariantPalette30</item>
-        <item name="com.android.oem.tokens:colorOnSurfaceVariant">?attr/oemColorNeutralVariantPalette80</item>
-        <item name="com.android.oem.tokens:colorOutline">?attr/oemColorNeutralVariantPalette60</item>
-        <item name="com.android.oem.tokens:colorSurfaceInverse">?attr/oemColorNeutralPalette80</item>
-        <item name="com.android.oem.tokens:colorOnSurfaceInverse">?attr/oemColorNeutralPalette10</item>
-        <item name="com.android.oem.tokens:colorPrimaryInverse">?attr/oemColorPrimaryPalette40</item>
-        <item name="com.android.oem.tokens:colorScrim">?attr/oemColorNeutralPalette80</item>
-        <item name="com.android.oem.tokens:colorOutlineVariant">?attr/oemColorNeutralVariantPalette30</item>
-        <item name="com.android.oem.tokens:colorSurfaceTint">?attr/oemColorPrimaryPalette80</item>
-        <item name="com.android.oem.tokens:colorSurfaceDim">@color/oem_color_surface_dim</item>
-        <item name="com.android.oem.tokens:colorSurfaceBright">@color/oem_color_surface_bright</item>
-        <item name="com.android.oem.tokens:colorSurfaceContainer">@color/oem_color_surface_container</item>
-        <item name="com.android.oem.tokens:colorSurfaceContainerLow">@color/oem_color_surface_container_low</item>
-        <item name="com.android.oem.tokens:colorSurfaceContainerLowest">@color/oem_color_surface_container_lowest</item>
-        <item name="com.android.oem.tokens:colorSurfaceContainerHigh">@color/oem_color_surface_container_high</item>
-        <item name="com.android.oem.tokens:colorSurfaceContainerHighest">@color/oem_color_surface_container_highest</item>
-        <item name="com.android.oem.tokens:colorBlue">@color/oem_color_blue</item>
-        <item name="com.android.oem.tokens:colorOnBlue">@color/oem_color_on_blue</item>
-        <item name="com.android.oem.tokens:colorBlueContainer">@color/oem_color_blue_container</item>
-        <item name="com.android.oem.tokens:colorOnBlueContainer">@color/oem_color_on_blue_container</item>
-        <item name="com.android.oem.tokens:colorGreen">@color/oem_color_green</item>
-        <item name="com.android.oem.tokens:colorOnGreen">@color/oem_color_on_green</item>
-        <item name="com.android.oem.tokens:colorGreenContainer">@color/oem_color_green_container</item>
-        <item name="com.android.oem.tokens:colorOnGreenContainer">@color/oem_color_on_green_container</item>
-        <item name="com.android.oem.tokens:colorYellow">@color/oem_color_yellow</item>
-        <item name="com.android.oem.tokens:colorOnYellow">@color/oem_color_on_yellow</item>
-        <item name="com.android.oem.tokens:colorYellowContainer">@color/oem_color_yellow_container</item>
-        <item name="com.android.oem.tokens:colorOnYellowContainer">@color/oem_color_on_yellow_container</item>
-
         <item name="com.android.oem.tokens:colorPrimaryPalette100">@color/oem_default_color_primary_palette_100</item>
         <item name="com.android.oem.tokens:colorPrimaryPalette99">@color/oem_default_color_primary_palette_99</item>
         <item name="com.android.oem.tokens:colorPrimaryPalette95">@color/oem_default_color_primary_palette_95</item>
@@ -495,6 +497,108 @@
         <item name="com.android.oem.tokens:shapeCornerFull">1000dp</item>
     </style>
 
+    <style name="OemTokensLight">
+        <item name="com.android.oem.tokens:colorPrimary">?attr/com.android.oem.tokens:colorPrimaryPalette40</item>
+        <item name="com.android.oem.tokens:colorOnPrimary">?attr/com.android.oem.tokens:colorPrimaryPalette100</item>
+        <item name="com.android.oem.tokens:colorPrimaryContainer">?attr/com.android.oem.tokens:colorPrimaryPalette90</item>
+        <item name="com.android.oem.tokens:colorOnPrimaryContainer">?attr/com.android.oem.tokens:colorPrimaryPalette10</item>
+        <item name="com.android.oem.tokens:colorSecondary">?attr/com.android.oem.tokens:colorSecondaryPalette40</item>
+        <item name="com.android.oem.tokens:colorOnSecondary">?attr/com.android.oem.tokens:colorSecondaryPalette100</item>
+        <item name="com.android.oem.tokens:colorSecondaryContainer">?attr/com.android.oem.tokens:colorSecondaryPalette90</item>
+        <item name="com.android.oem.tokens:colorOnSecondaryContainer">?attr/com.android.oem.tokens:colorSecondaryPalette10</item>
+        <item name="com.android.oem.tokens:colorTertiary">?attr/com.android.oem.tokens:colorTertiaryPalette40</item>
+        <item name="com.android.oem.tokens:colorOnTertiary">?attr/com.android.oem.tokens:colorTertiaryPalette100</item>
+        <item name="com.android.oem.tokens:colorTertiaryContainer">?attr/com.android.oem.tokens:colorTertiaryPalette90</item>
+        <item name="com.android.oem.tokens:colorOnTertiaryContainer">?attr/com.android.oem.tokens:colorTertiaryPalette10</item>
+        <item name="com.android.oem.tokens:colorError">?attr/com.android.oem.tokens:colorErrorPalette40</item>
+        <item name="com.android.oem.tokens:colorOnError">?attr/com.android.oem.tokens:colorErrorPalette100</item>
+        <item name="com.android.oem.tokens:colorErrorContainer">?attr/com.android.oem.tokens:colorErrorPalette90</item>
+        <item name="com.android.oem.tokens:colorOnErrorContainer">?attr/com.android.oem.tokens:colorErrorPalette10</item>
+        <item name="com.android.oem.tokens:colorBackground">?attr/com.android.oem.tokens:colorNeutralPalette99</item>
+        <item name="com.android.oem.tokens:colorOnBackground">?attr/com.android.oem.tokens:colorNeutralPalette10</item>
+        <item name="com.android.oem.tokens:colorSurface">?attr/com.android.oem.tokens:colorNeutralPalette99</item>
+        <item name="com.android.oem.tokens:colorOnSurface">?attr/com.android.oem.tokens:colorNeutralPalette10</item>
+        <item name="com.android.oem.tokens:colorSurfaceVariant">?attr/com.android.oem.tokens:colorNeutralVariantPalette90</item>
+        <item name="com.android.oem.tokens:colorOnSurfaceVariant">?attr/com.android.oem.tokens:colorNeutralVariantPalette30</item>
+        <item name="com.android.oem.tokens:colorSurfaceInverse">?attr/com.android.oem.tokens:colorNeutralVariantPalette10</item>
+        <item name="com.android.oem.tokens:colorOnSurfaceInverse">?attr/com.android.oem.tokens:colorNeutralVariantPalette99</item>
+        <item name="com.android.oem.tokens:colorPrimaryInverse">?attr/com.android.oem.tokens:colorPrimaryPalette80</item>
+        <item name="com.android.oem.tokens:colorOutline">?attr/com.android.oem.tokens:colorNeutralVariantPalette50</item>
+        <item name="com.android.oem.tokens:colorScrim">?attr/com.android.oem.tokens:colorNeutralPalette10</item>
+        <item name="com.android.oem.tokens:colorOutlineVariant">?attr/com.android.oem.tokens:colorNeutralVariantPalette90</item>
+        <item name="com.android.oem.tokens:colorSurfaceTint">?attr/com.android.oem.tokens:colorPrimaryPalette10</item>
+        <item name="com.android.oem.tokens:colorSurfaceDim">@color/oem_color_surface_dim</item>
+        <item name="com.android.oem.tokens:colorSurfaceBright">@color/oem_color_surface_bright</item>
+        <item name="com.android.oem.tokens:colorSurfaceContainer">@color/oem_color_surface_container</item>
+        <item name="com.android.oem.tokens:colorSurfaceContainerLow">@color/oem_color_surface_container_low</item>
+        <item name="com.android.oem.tokens:colorSurfaceContainerLowest">@color/oem_color_surface_container_lowest</item>
+        <item name="com.android.oem.tokens:colorSurfaceContainerHigh">@color/oem_color_surface_container_high</item>
+        <item name="com.android.oem.tokens:colorSurfaceContainerHighest">@color/oem_color_surface_container_highest</item>
+        <item name="com.android.oem.tokens:colorBlue">@color/oem_color_blue</item>
+        <item name="com.android.oem.tokens:colorOnBlue">@color/oem_color_on_blue</item>
+        <item name="com.android.oem.tokens:colorBlueContainer">@color/oem_color_blue_container</item>
+        <item name="com.android.oem.tokens:colorOnBlueContainer">@color/oem_color_on_blue_container</item>
+        <item name="com.android.oem.tokens:colorGreen">@color/oem_color_green</item>
+        <item name="com.android.oem.tokens:colorOnGreen">@color/oem_color_on_green</item>
+        <item name="com.android.oem.tokens:colorGreenContainer">@color/oem_color_green_container</item>
+        <item name="com.android.oem.tokens:colorOnGreenContainer">@color/oem_color_on_green_container</item>
+        <item name="com.android.oem.tokens:colorYellow">@color/oem_color_yellow</item>
+        <item name="com.android.oem.tokens:colorOnYellow">@color/oem_color_on_yellow</item>
+        <item name="com.android.oem.tokens:colorYellowContainer">@color/oem_color_yellow_container</item>
+        <item name="com.android.oem.tokens:colorOnYellowContainer">@color/oem_color_on_yellow_container</item>
+    </style>
+
+    <style name="OemTokensDark">
+        <item name="com.android.oem.tokens:colorPrimary">?attr/com.android.oem.tokens:colorPrimaryPalette80</item>
+        <item name="com.android.oem.tokens:colorOnPrimary">?attr/com.android.oem.tokens:colorPrimaryPalette20</item>
+        <item name="com.android.oem.tokens:colorPrimaryContainer">?attr/com.android.oem.tokens:colorPrimaryPalette30</item>
+        <item name="com.android.oem.tokens:colorOnPrimaryContainer">?attr/com.android.oem.tokens:colorPrimaryPalette90</item>
+        <item name="com.android.oem.tokens:colorSecondary">?attr/com.android.oem.tokens:colorSecondaryPalette80</item>
+        <item name="com.android.oem.tokens:colorOnSecondary">?attr/com.android.oem.tokens:colorSecondaryPalette20</item>
+        <item name="com.android.oem.tokens:colorSecondaryContainer">?attr/com.android.oem.tokens:colorSecondaryPalette30</item>
+        <item name="com.android.oem.tokens:colorOnSecondaryContainer">?attr/com.android.oem.tokens:colorSecondaryPalette90</item>
+        <item name="com.android.oem.tokens:colorTertiary">?attr/com.android.oem.tokens:colorTertiaryPalette80</item>
+        <item name="com.android.oem.tokens:colorOnTertiary">?attr/com.android.oem.tokens:colorTertiaryPalette20</item>
+        <item name="com.android.oem.tokens:colorTertiaryContainer">?attr/com.android.oem.tokens:colorTertiaryPalette30</item>
+        <item name="com.android.oem.tokens:colorOnTertiaryContainer">?attr/com.android.oem.tokens:colorTertiaryPalette90</item>
+        <item name="com.android.oem.tokens:colorError">?attr/com.android.oem.tokens:colorErrorPalette80</item>
+        <item name="com.android.oem.tokens:colorOnError">?attr/com.android.oem.tokens:colorErrorPalette20</item>
+        <item name="com.android.oem.tokens:colorErrorContainer">?attr/com.android.oem.tokens:colorErrorPalette30</item>
+        <item name="com.android.oem.tokens:colorOnErrorContainer">?attr/com.android.oem.tokens:colorErrorPalette90</item>
+        <item name="com.android.oem.tokens:colorBackground">?attr/com.android.oem.tokens:colorNeutralPalette10</item>
+        <item name="com.android.oem.tokens:colorOnBackground">?attr/com.android.oem.tokens:colorNeutralPalette90</item>
+        <item name="com.android.oem.tokens:colorSurface">?attr/com.android.oem.tokens:colorNeutralPalette10</item>
+        <item name="com.android.oem.tokens:colorOnSurface">?attr/com.android.oem.tokens:colorNeutralPalette80</item>
+        <item name="com.android.oem.tokens:colorSurfaceVariant">?attr/com.android.oem.tokens:colorNeutralVariantPalette30</item>
+        <item name="com.android.oem.tokens:colorOnSurfaceVariant">?attr/com.android.oem.tokens:colorNeutralVariantPalette80</item>
+        <item name="com.android.oem.tokens:colorSurfaceInverse">?attr/com.android.oem.tokens:colorNeutralVariantPalette80</item>
+        <item name="com.android.oem.tokens:colorOnSurfaceInverse">?attr/com.android.oem.tokens:colorNeutralVariantPalette10</item>
+        <item name="com.android.oem.tokens:colorPrimaryInverse">?attr/com.android.oem.tokens:colorPrimaryPalette40</item>
+        <item name="com.android.oem.tokens:colorOutline">?attr/com.android.oem.tokens:colorNeutralVariantPalette60</item>
+        <item name="com.android.oem.tokens:colorScrim">?attr/com.android.oem.tokens:colorNeutralPalette80</item>
+        <item name="com.android.oem.tokens:colorOutlineVariant">?attr/com.android.oem.tokens:colorNeutralVariantPalette30</item>
+        <item name="com.android.oem.tokens:colorSurfaceTint">?attr/com.android.oem.tokens:colorPrimaryPalette80</item>
+        <item name="com.android.oem.tokens:colorSurfaceDim">#0F1417</item>
+        <item name="com.android.oem.tokens:colorSurfaceBright">#353A3D</item>
+        <item name="com.android.oem.tokens:colorSurfaceContainer">#1C2024</item>
+        <item name="com.android.oem.tokens:colorSurfaceContainerLow">?attr/com.android.oem.tokens:colorNeutralPalette10</item>
+        <item name="com.android.oem.tokens:colorSurfaceContainerLowest">#0A0F12</item>
+        <item name="com.android.oem.tokens:colorSurfaceContainerHigh">#262B2E</item>
+        <item name="com.android.oem.tokens:colorSurfaceContainerHighest">#313539</item>
+        <item name="com.android.oem.tokens:colorBlue">#86A9FF</item>
+        <item name="com.android.oem.tokens:colorOnBlue">#001945</item>
+        <item name="com.android.oem.tokens:colorBlueContainer">#00419C</item>
+        <item name="com.android.oem.tokens:colorOnBlueContainer">#D9E2FF</item>
+        <item name="com.android.oem.tokens:colorGreen">#5BBF6B</item>
+        <item name="com.android.oem.tokens:colorOnGreen">#002107</item>
+        <item name="com.android.oem.tokens:colorGreenContainer">#00531D</item>
+        <item name="com.android.oem.tokens:colorOnGreenContainer">#92F99D</item>
+        <item name="com.android.oem.tokens:colorYellow">#EB9A00</item>
+        <item name="com.android.oem.tokens:colorOnYellow">#2A1800</item>
+        <item name="com.android.oem.tokens:colorYellowContainer">#643F00</item>
+        <item name="com.android.oem.tokens:colorOnYellowContainer">#FFDDB6</item>
+    </style>
+
     <style name="BaseTextAppearance">
         <item name="android:textColor">?oemColorOnBackground</item>
         <item name="android:textColorHighlight">?android:textColorHighlight</item>
@@ -573,5 +677,6 @@
     <style name="TextAppearance.Body.Small">
         <item name="android:textSize">24sp</item>
     </style>
+
 </resources>
 
