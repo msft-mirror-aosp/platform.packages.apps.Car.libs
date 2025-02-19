@@ -16,11 +16,40 @@
 
 rootProject.name = "AAOS Apps"
 
-apply(from = "buildLogic/metaConfig/plugin-repositories.gradle.kts")
+pluginManagement {
+    includeBuild("buildLogic")
 
-pluginManagement { includeBuild("buildLogic") }
+    repositories {
+        // Only check the google repository for these groups
+        // This makes dependency resolution much faster by telling Gradle that it'll only find
+        // Google libraries and plugins within the gmaven repository.
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        mavenCentral()
+    }
+}
 
 plugins { id("aaosApps.buildLogic.settings") }
+
+dependencyResolutionManagement {
+    // Fail the build if any project tries to declare it's own repositories
+    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
+    repositories {
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        mavenCentral()
+    }
+}
 
 /**
  * List of Unbundled projects and their corresponding relative paths. This is used to configure the
@@ -92,4 +121,5 @@ if (System.getenv("BUSYTOWN_BUILD") != "true") {
     }
 }
 
-apply(from = "buildLogic/metaConfig/build-repositories.gradle.kts")
+
+
