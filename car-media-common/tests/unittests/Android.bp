@@ -62,6 +62,7 @@ android_test {
         "androidx.mediarouter_mediarouter",
         "android.car-system-stubs",
         "car-apps-common-prebuilt",
+        "car-testing-common-prebuilt",
         "car-media-common-prebuilt",
         "car-media-extensions-prebuilt",
         "mockito-target-extended-minus-junit4",
