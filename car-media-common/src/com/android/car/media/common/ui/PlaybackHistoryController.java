@@ -32,6 +32,7 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.DiffUtil;
@@ -122,6 +123,8 @@ public class PlaybackHistoryController {
         private TextView mAppTitleInactive;
         private ImageView mAppIconInactive;
         private ImageViewBinder<MediaItemMetadata.ArtworkRef> mAlbumArtBinder;
+        private PlaybackViewModel mPlaybackViewModel;
+        private Observer<MediaItemMetadata> mMediaMetadataObserver;
 
         HistoryItemViewHolder(View itemView) {
             super(itemView);
@@ -142,9 +145,14 @@ public class PlaybackHistoryController {
         void bindView(MediaSource mediaSource) {
             mMediaSource = mediaSource;
             MediaModels models = new MediaModels(mContext, mediaSource);
-            PlaybackViewModel playbackViewModel = models.getPlaybackViewModel();
-            playbackViewModel.getMetadata().observe(mLifecycleOwner, this::updateView);
-            setClickAction(playbackViewModel);
+            mPlaybackViewModel = models.getPlaybackViewModel();
+            mMediaMetadataObserver = this::updateView;
+            mPlaybackViewModel.getMetadata().observe(mLifecycleOwner, mMediaMetadataObserver);
+            setClickAction(mPlaybackViewModel);
+        }
+
+        void unbindView() {
+            mPlaybackViewModel.getMetadata().removeObserver(mMediaMetadataObserver);
         }
 
         private void updateView(MediaItemMetadata mediaItemMetadata) {
@@ -251,6 +259,12 @@ public class PlaybackHistoryController {
         protected void onBindViewHolderImpl(HistoryItemViewHolder holder, int position) {
             holder.bindView(mHistoryList.get(position));
         }
+
+        @Override
+        protected void onViewRecycledImpl(@NonNull HistoryItemViewHolder holder) {
+            holder.unbindView();
+        }
+
 
         @Override
         protected void onViewAttachedToWindowImpl(@NonNull HistoryItemViewHolder vh) {
