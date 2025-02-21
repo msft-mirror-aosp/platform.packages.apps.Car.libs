@@ -18,6 +18,7 @@
 
 <resources>
     <!-- Forward declaration for ids used by PlaybackCardController -->
+    <item type="id" name="metadata_loading_indicator" />
     <item type="id" name="title" />
     <item type="id" name="album_art" />
     <item type="id" name="artist" />

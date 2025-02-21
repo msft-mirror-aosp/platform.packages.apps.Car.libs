@@ -69,6 +69,7 @@ public class PlaybackCardController {
     protected final PlaybackCardViewModel mViewModel;
     protected final MediaItemsRepository mItemsRepository;
 
+    protected View mMetaDataLoadingIndicator = null;
     protected TextView mTitle = null;
     protected TextView mSubtitle = null;
     protected ImageView mAlbumCover = null;
@@ -167,6 +168,7 @@ public class PlaybackCardController {
 
     /** Find views by id and assign to class fields */
     private void getViewsFromWidget() {
+        mMetaDataLoadingIndicator = mView.findViewById(R.id.metadata_loading_indicator);
         mTitle = mView.findViewById(R.id.title);
         mAlbumCover = mView.findViewById(R.id.album_art);
         TextView subtitle = mView.findViewById(R.id.subtitle);
@@ -327,6 +329,7 @@ public class PlaybackCardController {
     /** Update views with {@link MediaItemMetadata} */
     protected void updateMetadata(MediaItemMetadata metadata) {
         if (metadata != null) {
+            ViewUtils.setVisible(mMetaDataLoadingIndicator, false);
             String defaultTitle = mView.getContext().getString(
                     R.string.metadata_default_title);
             updateTextViewAndVisibility(mTitle, metadata.getTitle(), defaultTitle);
@@ -337,6 +340,7 @@ public class PlaybackCardController {
             updateMetadataAlbumCoverArtworkRef(metadata.getArtworkKey());
             updateMetadataLogoWithUri(metadata);
         } else {
+            ViewUtils.setVisible(mMetaDataLoadingIndicator, true);
             ViewUtils.setVisible(mTitle, false);
             ViewUtils.setVisible(mSubtitle, false);
             ViewUtils.setVisible(mDescription, false);
