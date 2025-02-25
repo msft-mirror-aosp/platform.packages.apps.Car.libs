@@ -107,6 +107,8 @@ cp $GRADLE_OUTPUT_DIR/car-assist-lib/outputs/aar/car-assist-lib-release.aar $1/c
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-apps-common/outputs/aar/car-apps-common-release.aar $1/car-apps-common.aar
 check_status $?
+cp $GRADLE_OUTPUT_DIR/car-testing-common/outputs/aar/car-testing-common-release.aar $1/car-testing-common.aar
+check_status $?
 cp $GRADLE_OUTPUT_DIR/car-media-common/outputs/aar/car-media-common-release.aar $1/car-media-common.aar
 check_status $?
 cp $GRADLE_OUTPUT_DIR/car-media-extensions/outputs/aar/car-media-extensions-release.aar $1/car-media-extensions.aar
@@ -199,6 +201,8 @@ mkdir $GRADLE_OUTPUT_DIR/jacoco/oem-token-lib-app
 check_status $?
 mkdir $GRADLE_OUTPUT_DIR/jacoco/car-apps-common-app
 check_status $?
+mkdir $GRADLE_OUTPUT_DIR/jacoco/car-testing-common-app
+check_status $?
 mkdir $GRADLE_OUTPUT_DIR/jacoco/car-media-common-app
 check_status $?
 mkdir $GRADLE_OUTPUT_DIR/jacoco/car-oem-token-lib-app
@@ -232,6 +236,8 @@ check_status $?
 $JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-rotarylib-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-rotary-lib/intermediates/javac/debug/classes .
 check_status $?
 $JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-apps-common-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-apps-common/intermediates/javac/debug/classes/com/android/car/apps/common .
+check_status $?
+$JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-testing-common-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-testing-common/intermediates/javac/debug/classes/com/android/car/testing/common .
 check_status $?
 $JAVA_HOME/bin/jar cvfM $GRADLE_OUTPUT_DIR/jacoco/car-media-common-app/jacoco-report-classes.jar -C $GRADLE_OUTPUT_DIR/car-media-common/intermediates/javac/debug/classes/com/android/car/media/common .
 check_status $?

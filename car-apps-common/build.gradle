@@ -68,13 +68,10 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
-    implementation "junit:junit:4.12"
-
     implementation project(":car-ui-lib")
 
-    implementation 'androidx.test.ext:junit:1.1.4'
-
     //Test libs
+    testImplementation project(':car-testing-common')
     testImplementation 'org.hamcrest:hamcrest-library:1.3'
     testImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     testImplementation 'androidx.test.espresso:espresso-contrib:3.3.0'

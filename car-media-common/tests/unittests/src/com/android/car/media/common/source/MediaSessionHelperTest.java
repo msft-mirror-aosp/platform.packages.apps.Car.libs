@@ -37,9 +37,9 @@ import androidx.annotation.NonNull;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.android.car.apps.common.testutils.InstantTaskExecutorRule;
-import com.android.car.apps.common.testutils.TestLifecycleOwner;
 import com.android.car.media.common.MediaTestUtils;
+import com.android.car.testing.common.InstantTaskExecutorRule;
+import com.android.car.testing.common.TestLifecycleOwner;
 
 import org.junit.Before;
 import org.junit.Rule;

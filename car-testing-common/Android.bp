@@ -1,4 +1,4 @@
-// Copyright (C) 2019 The Android Open Source Project
+// Copyright (C) 2025 The Android Open Source Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,24 +18,17 @@ package {
     default_applicable_licenses: ["Android-Apache-2.0"],
 }
 
-car_apps_common_static_libs = [
+car_testing_common_static_libs = [
     "androidx.annotation_annotation",
-    "androidx.cardview_cardview",
-    "androidx.interpolator_interpolator",
     "androidx.lifecycle_lifecycle-common-java8",
     "androidx.lifecycle_lifecycle-extensions",
-    "androidx-constraintlayout_constraintlayout",
-    "androidx.recyclerview_recyclerview",
-    "androidx-constraintlayout_constraintlayout-solver",
-    "car-ui-lib",
+    "junit",
 ]
 
 android_library {
-    name: "car-apps-common-source",
+    name: "car-testing-common-source",
 
     srcs: ["src/**/*.java"],
-
-    resource_dirs: ["res"],
 
     optimize: {
         enabled: false,
@@ -46,32 +39,30 @@ android_library {
     sdk_version: "current",
     min_sdk_version: "28", // P
     target_sdk_version: "34",
-    // b/355695111: Remove this once we drop support for sc-car
-    java_version: "1.8", // sc-car only supports up to java 8.
-    static_libs: car_apps_common_static_libs,
+
+    static_libs: car_testing_common_static_libs,
 }
 
 java_genrule {
-    name: "car-apps-common-aar",
+    name: "car-testing-common-aar",
     srcs: [
-        ":car-apps-common-source{.aar}",
-        "res/**/*",
+        ":car-testing-common-source{.aar}",
     ],
-    out: ["car-apps-common.aar"],
+    out: ["car-testing-common.aar"],
     tools: [
         "make_slim_aar",
     ],
-    cmd: "dir=packages/apps/Car/libs/car-apps-common && " +
-        "$(location make_slim_aar) --classes-allowlist com/android/car/apps/common $(out) " +
-        "$(location :car-apps-common-source{.aar}) $$dir/res",
+    cmd: "dir=packages/apps/Car/libs/car-testing-common && " +
+        "$(location make_slim_aar) --classes-allowlist com/android/car/testing/common $(out) " +
+        "$(location :car-testing-common-source{.aar})",
     dist: {
-        targets: ["car-apps-common-aar",]
+        targets: ["car-testing-common-aar",]
     },
 }
 
 android_library_import {
-    name: "car-apps-common-prebuilt",
-    aars: [":car-apps-common-aar"],
+    name: "car-testing-common-prebuilt",
+    aars: [":car-testing-common-aar"],
     sdk_version: "current",
-    static_libs: car_apps_common_static_libs,
+    static_libs: car_testing_common_static_libs,
 }
