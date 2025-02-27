@@ -22,27 +22,21 @@ setup_build_environment() {
     export ANDROID_HOME
     export GRADLE_PROJ_DIR
     export GRADLE_OPTS
-    export BUSYTOWN_BUILD=true
 
     echo "Starting $0 at $(date)"
 
-    # In order for $ANDROID_HOME to be used we need to temporarily remove local.properties.
-    # It will be restored after the build is completed
+    # We must overwrite local.properties to specify the SDK and CMake directories.
+    # Back up the original local.properties file if it exists, it'll be restored
+    # after the build is complete.
     if [ -f "$GRADLE_PROJ_DIR/local.properties" ]; then
-        # Check to see if the file already points to the ANDROID_HOME that this build will use. If it does then leave it alone.
-        local_properties_android_home=$(grep "sdk.dir" "$GRADLE_PROJ_DIR/local.properties" | awk -F'=' '{print $2}')
-
-        if [[ "$local_properties_android_home" != "$ANDROID_HOME" ]]; then
-            # Rename local.properties to backup_local.properties
-            mv "$GRADLE_PROJ_DIR/local.properties" "$GRADLE_PROJ_DIR/backup_local.properties"
-            echo "local.properties renamed to backup_local.properties"
-        else
-            echo "local.properties already points to the correct ANDROID_HOME. Leaving it in place"
-        fi
-
+        mv "$GRADLE_PROJ_DIR/local.properties" "$GRADLE_PROJ_DIR/backup_local.properties"
+        echo "local.properties renamed to backup_local.properties"
     else
         echo "local.properties not found."
     fi
+
+    echo "sdk.dir=$ANDROID_HOME" >> "$GRADLE_PROJ_DIR/local.properties"
+    echo "cmake.dir=$ANDROID_HOME/native-build-tools" >> "$GRADLE_PROJ_DIR/local.properties"
 
     cd "$GRADLE_PROJ_DIR"
 

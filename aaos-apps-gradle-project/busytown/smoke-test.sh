@@ -9,11 +9,13 @@ setup_build_environment
 
 # Just a quick check to make sure that the build runs without errors
 # Picking `car-ui-lib` because it doesn't rely on much
+# and car-dashcam-service for the NDK build
 ./gradlew \
     :buildLogic:check \
     :car-ui-lib:assembleDebug \
     :car-ui-lib:assembleDebugAndroidTest \
-    :car-ui-lib:testDebug
+    :car-ui-lib:testDebug \
+    :car-dashcam-service:assembleDebug
 
 # Functions defined in envsetup.sh
 wrap_up_build $?
