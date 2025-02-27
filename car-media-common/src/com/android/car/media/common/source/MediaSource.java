@@ -370,6 +370,8 @@ public class MediaSource {
             try {
                 Log.i(TAG, "Launching PendingIntent " + pendingIntent);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    activityOptions.setPendingIntentBackgroundActivityStartMode(
+                            ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED);
                     pendingIntent.send(activityOptions.toBundle());
                 } else {
                     pendingIntent.send();
