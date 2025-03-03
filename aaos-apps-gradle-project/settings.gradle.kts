@@ -31,10 +31,14 @@ pluginManagement {
             }
         }
         mavenCentral()
+        gradlePluginPortal()
     }
 }
 
-plugins { id("aaosApps.buildLogic.settings") }
+plugins {
+    id("aaosApps.buildLogic.settings")
+    id("org.gradle.toolchains.foojay-resolver-convention").version("0.9.0")
+}
 
 dependencyResolutionManagement {
     // Fail the build if any project tries to declare it's own repositories
