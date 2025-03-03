@@ -98,10 +98,6 @@ val projects =
         ":test-rotary-ime" to "../../tests/RotaryIME",
         ":test-rotary-playground" to "../../tests/RotaryPlayground",
         ":driver-ui" to "../../DriverUI",
-    )
-
-val dashCamProjects =
-    listOf(
         ":car-dashcam-app" to "../../Dashcam/dashcam-app",
         ":car-dashcam-service" to "../../Dashcam/dashcam-service",
         ":car-dashcam-manager" to "../../Dashcam/dashcam-manager",
@@ -113,14 +109,3 @@ projects.forEach { (projectName, projectDir) ->
     include(projectName)
     project(projectName).projectDir = File(projectDir)
 }
-
-if (System.getenv("BUSYTOWN_BUILD") != "true") {
-    // b/395922161 - Initialize the dashcam subprojects as long as we aren't running under Busytown
-    dashCamProjects.forEach { (projectName, projectDir) ->
-        include(projectName)
-        project(projectName).projectDir = File(projectDir)
-    }
-}
-
-
-
