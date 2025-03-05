@@ -11,6 +11,7 @@ setup_build_environment
 # Picking `car-ui-lib` because it doesn't rely on much
 # and car-dashcam-service for the NDK build
 ./gradlew \
+    :buildLogic:javaToolchains \
     :buildLogic:check \
     :car-ui-lib:assembleDebug \
     :car-ui-lib:assembleDebugAndroidTest \

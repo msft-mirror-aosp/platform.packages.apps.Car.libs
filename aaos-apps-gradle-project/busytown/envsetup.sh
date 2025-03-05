@@ -10,18 +10,31 @@ setup_build_environment() {
 
     OS=linux
     if [[ $(uname) = "Darwin" ]]; then OS="darwin"; fi
+    ARCH="x86"
+    case "$(arch)" in
+      arm64* )
+        ARCH="arm64"
+    esac
 
     ANDROID_HOME="$ROOT_DIR/prebuilts/fullsdk-$OS"
     echo "Setting ANDROID_HOME to $ANDROID_HOME"
 
+    # Make the locations of the JDKs available to the build
+    AOSP_JDK17="$ROOT_DIR/prebuilts/jdk/jdk17/${OS}-${ARCH}"
+    AOSP_JDK21="$ROOT_DIR/prebuilts/jdk/jdk21/${OS}-${ARCH}"
+    JAVA_HOME="$AOSP_JDK21"
+
     # Disable the build daemon
     # Either set Gradle opts or prepend to it with a comma (separator) if it exists
-    GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.java.installations.auto-detect=false ${GRADLE_OPTS:+,${GRADLE_OPTS}}"
+    GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.java.installations.auto-detect=false -Dorg.gradle.java.installations.auto-download=false ${GRADLE_OPTS:+,${GRADLE_OPTS}}"
 
     # Export everything we need
     export ANDROID_HOME
     export GRADLE_PROJ_DIR
     export GRADLE_OPTS
+    export AOSP_JDK17
+    export AOSP_JDK21
+    export JAVA_HOME
 
     echo "Starting $0 at $(date)"
 
