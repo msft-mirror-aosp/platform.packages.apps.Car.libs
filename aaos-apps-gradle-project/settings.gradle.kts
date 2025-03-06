@@ -16,11 +16,44 @@
 
 rootProject.name = "AAOS Apps"
 
-apply(from = "buildLogic/metaConfig/plugin-repositories.gradle.kts")
+pluginManagement {
+    includeBuild("buildLogic")
 
-pluginManagement { includeBuild("buildLogic") }
+    repositories {
+        // Only check the google repository for these groups
+        // This makes dependency resolution much faster by telling Gradle that it'll only find
+        // Google libraries and plugins within the gmaven repository.
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
 
-plugins { id("aaosApps.buildLogic.settings") }
+plugins {
+    id("aaosApps.buildLogic.settings")
+    id("org.gradle.toolchains.foojay-resolver-convention").version("0.9.0")
+}
+
+dependencyResolutionManagement {
+    // Fail the build if any project tries to declare it's own repositories
+    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
+    repositories {
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        mavenCentral()
+    }
+}
 
 /**
  * List of Unbundled projects and their corresponding relative paths. This is used to configure the
@@ -43,6 +76,7 @@ val projects =
         ":car-messenger-common:model" to "../car-messenger-common/model",
         ":car-rotary-lib" to "../car-ui-lib/car-rotary-lib",
         ":car-telephony-common" to "../car-telephony-common",
+        ":car-testing-common" to "../car-testing-common",
         ":car-ui-lib" to "../car-ui-lib/car-ui-lib",
         ":car-ui-lib-testing" to "../car-ui-lib/car-ui-lib-testing",
         ":car-uxr-client-lib" to "../car-uxr-client-lib",
@@ -68,10 +102,6 @@ val projects =
         ":test-rotary-ime" to "../../tests/RotaryIME",
         ":test-rotary-playground" to "../../tests/RotaryPlayground",
         ":driver-ui" to "../../DriverUI",
-    )
-
-val dashCamProjects =
-    listOf(
         ":car-dashcam-app" to "../../Dashcam/dashcam-app",
         ":car-dashcam-service" to "../../Dashcam/dashcam-service",
         ":car-dashcam-manager" to "../../Dashcam/dashcam-manager",
@@ -83,13 +113,3 @@ projects.forEach { (projectName, projectDir) ->
     include(projectName)
     project(projectName).projectDir = File(projectDir)
 }
-
-if (System.getenv("BUSYTOWN_BUILD") != "true") {
-    // b/395922161 - Initialize the dashcam subprojects as long as we aren't running under Busytown
-    dashCamProjects.forEach { (projectName, projectDir) ->
-        include(projectName)
-        project(projectName).projectDir = File(projectDir)
-    }
-}
-
-apply(from = "buildLogic/metaConfig/build-repositories.gradle.kts")

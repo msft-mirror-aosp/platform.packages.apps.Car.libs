@@ -43,7 +43,6 @@ android {
 }
 
 dependencies {
-    runtimeOnly 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.annotation:annotation:1.2.0'
     implementation 'androidx.core:core:1.6.0'
     compileOnly files(gradle.ext.lib_car_system_stubs)

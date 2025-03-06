@@ -26,7 +26,49 @@
 
 rootProject.name = "buildLogic"
 
-apply(from = "metaConfig/plugin-repositories.gradle.kts")
+pluginManagement {
+    repositories {
+        // Only check the google repository for these groups
+        // This makes dependency resolution much faster by telling Gradle that it'll only find
+        // Google libraries and plugins within the gmaven repository.
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+
+dependencyResolutionManagement {
+    // Need to manually load the libs.versions.toml, since it's in the root project
+    versionCatalogs {
+        create("libs") {
+            from(files("../gradle/libs.versions.toml"))
+        }
+    }
+    // Fail the build if any project tries to declare it's own repositories
+    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
+    repositories {
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        mavenCentral()
+    }
+
+}
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention").version("0.9.0")
+}
 
 include("settingsPlugin")
 include("projectPlugin")
@@ -70,13 +112,3 @@ gradle.lifecycle.beforeProject {
     layout.buildDirectory.set(outDir.resolve("aaos-apps-gradle-build/buildLogic/$name"))
 }
 
-dependencyResolutionManagement {
-    // Need to manually load the libs.versions.toml, since it's in the root project
-    versionCatalogs {
-        create("libs") {
-            from(files("../gradle/libs.versions.toml"))
-        }
-    }
-}
-
-apply(from = "metaConfig/build-repositories.gradle.kts")

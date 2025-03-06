@@ -46,6 +46,7 @@ android_test {
         "androidx.lifecycle_lifecycle-common-java8",
         "androidx.lifecycle_lifecycle-extensions",
         "car-apps-common-prebuilt",
+        "car-testing-common-prebuilt",
         "platform-test-annotations",
         "mockito-target-inline-minus-junit4",
         "truth",

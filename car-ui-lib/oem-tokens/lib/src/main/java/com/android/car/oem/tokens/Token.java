@@ -16,6 +16,8 @@
 package com.android.car.oem.tokens;
 
 import static android.util.TypedValue.TYPE_ATTRIBUTE;
+import static android.util.TypedValue.TYPE_NULL;
+import static android.util.TypedValue.TYPE_REFERENCE;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -35,8 +37,8 @@ import androidx.annotation.VisibleForTesting;
 import androidx.core.content.ContextCompat;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Public interface for general CarUi static functions.
@@ -190,30 +192,69 @@ public class Token {
         return ContextCompat.getColor(context, tv.resourceId);
     }
 
+    private static HashMap<String, String> createTokenMap(@NonNull Context context) {
+        context = Token.createOemStyledContext(context.getApplicationContext());
+
+        HashMap<String, String> map = new HashMap<>();
+        int[] attrs = Arrays.stream(R.styleable.OemTokens).toArray();
+
+        for (int i : attrs) {
+            String id = context.getResources().getResourceEntryName(i);
+            TypedValue typedValue = getThemeTypedValue(context, i);
+            String value = getAttributeValue(context, typedValue);
+
+            map.put(id, value);
+        }
+
+        return map;
+    }
+
+    /**
+     * Return a mapping of current values for OEM Design tokens.
+     */
+    public static String dump(@NonNull Context context) {
+        return createTokenMap(context).toString();
+    }
+
     /**
      * Return a hashcode for OEM styling of token values meant to be used to determine when OEM
      * styling has changed.
      */
-    public static int oemStyleHashCode(@NonNull Context context) {
-        context = Token.createOemStyledContext(context.getApplicationContext());
+    public static int hashCode(@NonNull Context context) {
+        return createTokenMap(context).hashCode();
+    }
 
-        int oemStyleOverride = context.getResources().getIdentifier("OemStyle",
-                "style", Token.getTokenSharedLibraryName());
+    private static String getAttributeValue(Context context, TypedValue value) {
+        int valueType = value.type;
 
-        if (oemStyleOverride == 0) {
-            return Objects.hash("0");
+        if (valueType == TYPE_NULL) {
+            return "";
         }
 
-        TypedArray attributes =
-                context.obtainStyledAttributes(R.style.OemTokens, R.styleable.OemTokens);
-        int[] data = new int[attributes.length()];
-        for (int i = 0; i < attributes.length(); i++) {
-            TypedValue value = new TypedValue();
-            attributes.getValue(i, value);
-            data[i] = value.data;
+        // Text tokens map to textAppearance styles
+        if (valueType == TYPE_REFERENCE) {
+            int resId = value.data;
+            if (resId != 0) {
+                try {
+                    int[] attrs = new int[]{android.R.attr.textSize, android.R.attr.textColor};
+                    TypedArray array = context.obtainStyledAttributes(resId, attrs);
+
+                    float size = array.getDimension(0, 0f);
+                    TypedValue typedColor = new TypedValue();
+                    array.getValue(1, typedColor);
+                    String color = typedColor.coerceToString().toString();
+
+                    return String.format("Text size: %f Text color %s", size, color);
+                } catch (Exception e) {
+                    return String.valueOf(resId); // If not a simple resource name
+                }
+            } else {
+                return "Invalid reference";
+            }
         }
 
-        return Arrays.hashCode(data);
+        // Color and shape tokens can be coerced directly
+        return value.coerceToString().toString();
     }
 
     /**

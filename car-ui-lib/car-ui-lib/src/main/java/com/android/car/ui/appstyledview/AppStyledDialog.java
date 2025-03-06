@@ -131,8 +131,9 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
         }
 
         window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        updateAttributes();
+        copySystemUiVisibility();
         configureImeInsetFit();
+        updateAttributes();
 
         mLifecycleRegistry.setCurrentState(Lifecycle.State.CREATED);
     }
@@ -319,7 +320,6 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
                         public WindowInsetsCompat onApplyWindowInsets(
                                 @NonNull View v, @NonNull WindowInsetsCompat insets) {
                             updateAttributes();
-                            copyWindowInsets();
                             return insets;
                         }
                     });
@@ -478,7 +478,6 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
 
                         if (!mIsImeShownWithResize || isSystemBarAnimation) {
                             updateAttributes();
-                            copyWindowInsets();
                         }
 
                         // If dialog is resized it should always be larger than the visible rect.
@@ -526,8 +525,7 @@ public class AppStyledDialog extends Dialog implements LifecycleOwner, SavedStat
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
         copyWindowInsets();
-        copySystemUiVisibility();
-        updateAttributes();
+        getWindow().getDecorView().getRootView().post(() -> updateAttributes());
     }
 
     /**

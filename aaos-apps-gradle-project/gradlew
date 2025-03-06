@@ -86,8 +86,7 @@ done
 # shellcheck disable=SC2034
 APP_BASE_NAME=${0##*/}
 # Discard cd standard output in case $CDPATH is set (https://github.com/gradle/gradle/issues/25036)
-APP_HOME=$( cd -P "${APP_HOME:-./}" > /dev/null && printf '%s
-' "$PWD" ) || exit
+APP_HOME=$( cd -P "${APP_HOME:-./}" > /dev/null && printf '%s\n' "$PWD" ) || exit
 
 # Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD=maximum
@@ -117,38 +116,6 @@ esac
 
 CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
 
-# --------- aosp specific code needed for java. ------------------
-
-PREBUILTS_DIR="${APP_HOME}/../../../../../prebuilts"
-
-# Pick the correct JDK for this OS.
-if [ $darwin = "true" ]; then
-    plat="darwin"
-else
-    plat="linux"
-fi
-
-platform_suffix="x86"
-case "$(arch)" in
-  arm64* )
-    platform_suffix="arm64"
-esac
-
-export AOSP_JDK17="${PREBUILTS_DIR}/jdk/jdk17/${plat}-${platform_suffix}"
-export AOSP_JDK21="${PREBUILTS_DIR}/jdk/jdk21/${plat}-${platform_suffix}"
-# override JAVA_HOME, because CI machines have it and it points to very old JDK
-export JAVA_HOME="${AOSP_JDK21}"
-# Warn developers if they try to build top level project without the full checkout
-[ ! -d "${JAVA_HOME}" ] && die "Failed to find: ${JAVA_HOME}
-
-Typically, this means either:
-1. Your repo manifest did not include the correct JDK
-2. You are using the repo checkout, but the last repo sync failed. Use repo status
-   to check for projects which are partially-synced, e.g. showing ***NO BRANCH***."
-
-echo "Launching Gradle using the JDK at $(realpath "${JAVA_HOME}" || true)"
-
-# --------------------------------------------------------------
 
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
@@ -233,11 +200,12 @@ if "$cygwin" || "$msys" ; then
     done
 fi
 
+
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
 
 # Collect all arguments for the java command:
-#   * DEFAULT_JVM_OPTS, JAVA_OPTS, JAVA_OPTS, and optsEnvironmentVar are not allowed to contain shell fragments,
+#   * DEFAULT_JVM_OPTS, JAVA_OPTS, and optsEnvironmentVar are not allowed to contain shell fragments,
 #     and any embedded shellness will be escaped.
 #   * For example: A user cannot expect ${Hostname} to be expanded, as it is an environment variable and will be
 #     treated as '${Hostname}' itself on the command line.
