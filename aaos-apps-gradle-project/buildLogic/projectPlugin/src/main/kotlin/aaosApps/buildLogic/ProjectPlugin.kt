@@ -19,8 +19,11 @@ package aaosApps.buildLogic
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.gradle.api.AndroidBasePlugin
+import com.ncorti.ktfmt.gradle.KtfmtExtension
+import com.ncorti.ktfmt.gradle.KtfmtPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 
 class ProjectPlugin : Plugin<Project> {
 
@@ -35,6 +38,13 @@ class ProjectPlugin : Plugin<Project> {
         extension.jdkToolchain.convention(mappedToolChainVersionProvider)
 
         project.setJDK(extension)
+
+        // If the project has the Kotlin base plugin, apply the Ktfmt plugin and set it to
+        // kotlinLangStyle
+        project.plugins.withType(KotlinBasePlugin::class.java) {
+            project.plugins.apply(KtfmtPlugin::class.java)
+            project.extensions.getByType(KtfmtExtension::class.java).apply { kotlinLangStyle() }
+        }
 
         project.plugins.withType(AndroidBasePlugin::class.java) {
             project.extensions.getByType(CommonExtension::class.java).apply {

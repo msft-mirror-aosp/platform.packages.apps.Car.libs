@@ -18,3 +18,7 @@
 val check by tasks.registering {
     dependsOn(subprojects.map { it.tasks.named { name -> name == "check" } })
 }
+
+plugins {
+    alias(libs.plugins.kotlinJvm) apply false
+}
