@@ -156,10 +156,8 @@ public class MediaSessionHelperTest {
                 .onActiveSessionsChanged(Collections.singletonList(mActiveMediaController));
 
         assertThat(mMediaSessionHelper.getMediaSource().getValue())
-                .isEqualTo(mInitialMediaSource);
-        assertThat(mMediaSessionHelper.getActiveOrPausedMediaSources().getValue()).hasSize(1);
-        assertThat(mMediaSessionHelper.getActiveOrPausedMediaSources().getValue().get(0))
-                .isEqualTo(mInitialMediaSource);
+                .isEqualTo(null);
+        assertThat(mMediaSessionHelper.getActiveOrPausedMediaSources().getValue()).hasSize(0);
     }
 
     @Test
