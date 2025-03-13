@@ -426,10 +426,18 @@ public class MediaSessionHelper extends MediaController.Callback {
 
     private String getCarMediaServiceSession() {
         Car car = Car.createCar(mContext.get());
-        CarMediaManager carMediaManager =
+        ComponentName componentName = null;
+        if (car != null) {
+            CarMediaManager carMediaManager =
                     (CarMediaManager) car.getCarManager(Car.CAR_MEDIA_SERVICE);
-        ComponentName componentName = carMediaManager.getMediaSource(MEDIA_SOURCE_MODE_PLAYBACK);
-        car.disconnect();
+            try {
+                componentName = carMediaManager.getMediaSource(MEDIA_SOURCE_MODE_PLAYBACK);
+            } catch (SecurityException e) {
+                Log.e(TAG, "Unable to read CarMediaManager media source. Requires "
+                        + "android.permission.MEDIA_CONTENT_CONTROL " + e);
+            }
+            car.disconnect();
+        }
 
         // ComponentName may be null b/355078140
         return componentName == null ? "" : componentName.flattenToString();
