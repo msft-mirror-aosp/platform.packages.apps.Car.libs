@@ -20,6 +20,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.android.application'
     id 'aaosApps.buildLogic'
+    alias(libs.plugins.compose.compiler)
+
 }
 
 android {
@@ -75,10 +77,6 @@ android {
 
     buildFeatures {
         compose true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = composeCompilerVersion
     }
 }
 
