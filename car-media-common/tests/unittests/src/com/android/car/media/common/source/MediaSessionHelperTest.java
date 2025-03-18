@@ -19,7 +19,9 @@ package com.android.car.media.common.source;
 import static com.google.common.truth.Truth.assertThat;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +29,8 @@ import android.app.Notification;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.session.MediaController;
+import android.media.session.MediaController.TransportControls;
+import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
@@ -111,8 +115,9 @@ public class MediaSessionHelperTest {
     private MediaSessionHelper mMediaSessionHelper;
 
     @Before
-    public void setUp() {
-        mContext = ApplicationProvider.getApplicationContext();
+    public void setUp() throws PackageManager.NameNotFoundException {
+        mContext = spy(ApplicationProvider.getApplicationContext());
+        when(mContext.getPackageManager()).thenReturn(mPackageManager);
 
         Notification notification = new Notification();
         notification.extras = new Bundle();
@@ -137,6 +142,8 @@ public class MediaSessionHelperTest {
 
         when(mMediaSessionManager.getActiveSessions(isNull()))
                 .thenReturn(Collections.singletonList(mInitialMediaController));
+
+        when(mPackageManager.isPackageSuspended(anyString())).thenReturn(false);
 
         mInitialMediaSource =
                 MediaTestUtils.newFakeMediaSource(mPackageManager, mInitialMediaControllerCompat);
@@ -175,6 +182,30 @@ public class MediaSessionHelperTest {
                 .isEqualTo(mActiveMediaSource);
         assertThat(mMediaSessionHelper.getActiveOrPausedMediaSources().getValue().get(1))
                 .isEqualTo(mPausedMediaSource);
+    }
+
+    @Test
+    public void onActiveSessionsChanged_whenPrimarySourceIsSuspended_replacesMediaSource()
+            throws PackageManager.NameNotFoundException {
+        MediaSession mediaSession = new MediaSession(mContext, "tag");
+        MediaController mediaController =
+                new MediaController(mContext, mediaSession.getSessionToken());
+        TransportControls transportControls = mediaController.getTransportControls();
+        when(mMediaSessionManager.getActiveSessions(isNull()))
+                .thenReturn(Arrays.asList(mActiveMediaController,
+                        mPausedMediaController, mStoppedMediaController));
+        when(mActiveMediaController.getTransportControls()).thenReturn(transportControls);
+        initializeMediaSessionHelper(/* withValidSources= */ true);
+
+        // Ensures that the activeMediaController is suspended
+        when(mPackageManager.isPackageSuspended(ACTIVE_PACKAGE_NAME)).thenReturn(true);
+        mMediaSessionHelper.mActiveSessionsListener
+                .onActiveSessionsChanged(Arrays.asList(mActiveMediaController,
+                        mPausedMediaController, mStoppedMediaController));
+
+        assertThat(mMediaSessionHelper.getMediaSource().getValue())
+                .isEqualTo(mPausedMediaSource);
+        assertThat(mMediaSessionHelper.getActiveOrPausedMediaSources().getValue()).hasSize(1);
     }
 
     @Test
