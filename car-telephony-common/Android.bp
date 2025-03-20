@@ -47,8 +47,7 @@ android_library {
     sdk_version: "system_current",
     min_sdk_version: "31",
     target_sdk_version: "34",
-    // b/355695111: Remove this once we drop support for sc-car
-    java_version: "1.8", // sc-car only supports up to java 8.
+    java_version: "11", // tm-car only supports up to java 11.
 
     static_libs: car_telephony_common_static_libs,
     libs: ["android.car-system-stubs"],
