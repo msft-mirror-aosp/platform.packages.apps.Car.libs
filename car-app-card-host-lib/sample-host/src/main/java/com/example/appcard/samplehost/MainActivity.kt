@@ -44,113 +44,109 @@ import com.example.appcard.samplehost.ui.settings.Settings
 
 /** Main application activity */
 class MainActivity : AppCompatActivity() {
-  private lateinit var viewModel: HostViewModel
-  private lateinit var picker: Picker
-  private lateinit var settings: Settings
-  private lateinit var stateFactory: AppCardContainerStateFactory
-  private lateinit var appCardHost: AppCardHost
+    private lateinit var viewModel: HostViewModel
+    private lateinit var picker: Picker
+    private lateinit var settings: Settings
+    private lateinit var stateFactory: AppCardContainerStateFactory
+    private lateinit var appCardHost: AppCardHost
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    viewModel = ViewModelProvider(owner = this)[HostViewModel::class.java]
-    stateFactory = AppCardContainerStateFactory(applicationContext, viewModel)
-    viewModel.setStateFactory(stateFactory)
+        viewModel = ViewModelProvider(owner = this)[HostViewModel::class.java]
+        stateFactory = AppCardContainerStateFactory(applicationContext, viewModel)
+        viewModel.setStateFactory(stateFactory)
 
-    /** Create [AppCardHost] */
-    appCardHost = AppCardHost(
-      /** Provide [Context] for [AppCardHost] */
-      applicationContext,
+        /** Create [AppCardHost] */
+        appCardHost =
+            AppCardHost(
+                /** Provide [Context] for [AppCardHost] */
+                applicationContext,
 
-      /**
-       * Provide a rate at which [AppCardHost] will query [AppCardContentProvider]s
-       * for updates
-       */
-      AppCardContextState.UPDATE_RATE_MS,
+                /**
+                 * Provide a rate at which [AppCardHost] will query [AppCardContentProvider]s for
+                 * updates
+                 */
+                AppCardContextState.UPDATE_RATE_MS,
 
-      /**
-       * Provide a rate at which [AppCardContentProvider] can send [EnforceFastUpdateRate]
-       * [Component] updates
-       */
-      AppCardContextState.FAST_UPDATE_RATE_MS,
+                /**
+                 * Provide a rate at which [AppCardContentProvider] can send [EnforceFastUpdateRate]
+                 * [Component] updates
+                 */
+                AppCardContextState.FAST_UPDATE_RATE_MS,
 
-      /** Provide a executor that [AppCardListener] results are received on */
-      ContextCompat.getMainExecutor(applicationContext)
-    )
-    viewModel.setAppCardHost(appCardHost)
+                /** Provide a executor that [AppCardListener] results are received on */
+                ContextCompat.getMainExecutor(applicationContext),
+            )
+        viewModel.setAppCardHost(appCardHost)
 
-    picker = Picker(viewModel = viewModel)
-    settings = Settings(viewModel)
+        picker = Picker(viewModel = viewModel)
+        settings = Settings(viewModel)
 
-    refreshContent()
-  }
-
-  override fun onDestroy() {
-    super.onDestroy()
-
-    viewModel.onDestroy()
-  }
-
-  override fun onStart() {
-    super.onStart()
-
-    refreshContent()
-  }
-
-  override fun onStop() {
-    super.onStop()
-
-    viewModel.onStop()
-  }
-
-  private fun refreshContent() {
-    setContentView(
-      ComposeView(this).apply {
-        setContent {
-          refreshAppCards()
-          Main()
-        }
-      }
-    )
-  }
-
-  @Composable
-  private fun refreshAppCards() =
-    AppCardContextState.getState().toAppCardContext().let { viewModel.refresh(it) }
-
-  @Composable
-  private fun Main() {
-    OemTokenTheme {
-      Box(
-        modifier = Modifier
-          .fillMaxSize()
-          .background(MaterialTheme.colorScheme.background)
-      ) {
-        Row(
-          modifier = Modifier.fillMaxSize(),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically
-        ) {
-          Box(
-            modifier = Modifier.weight(floatResource(R.dimen.picker_box_weight)),
-          ) {
-            picker.CreatePickerFromAllAppCards()
-          }
-
-          VerticalDivider()
-
-          Box(
-            modifier = Modifier.weight(floatResource(R.dimen.settings_box_weight)),
-          ) {
-            settings.CreateSettings()
-          }
-        }
-      }
+        refreshContent()
     }
-  }
 
-  companion object {
+    override fun onDestroy() {
+        super.onDestroy()
+
+        viewModel.onDestroy()
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        refreshContent()
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        viewModel.onStop()
+    }
+
+    private fun refreshContent() {
+        setContentView(
+            ComposeView(this).apply {
+                setContent {
+                    refreshAppCards()
+                    Main()
+                }
+            }
+        )
+    }
+
     @Composable
-    private fun floatResource(resId: Int): Float = LocalContext.current.resources.getFloat(resId)
-  }
+    private fun refreshAppCards() =
+        AppCardContextState.getState().toAppCardContext().let { viewModel.refresh(it) }
+
+    @Composable
+    private fun Main() {
+        OemTokenTheme {
+            Box(
+                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box(modifier = Modifier.weight(floatResource(R.dimen.picker_box_weight))) {
+                        picker.CreatePickerFromAllAppCards()
+                    }
+
+                    VerticalDivider()
+
+                    Box(modifier = Modifier.weight(floatResource(R.dimen.settings_box_weight))) {
+                        settings.CreateSettings()
+                    }
+                }
+            }
+        }
+    }
+
+    companion object {
+        @Composable
+        private fun floatResource(resId: Int): Float =
+            LocalContext.current.resources.getFloat(resId)
+    }
 }

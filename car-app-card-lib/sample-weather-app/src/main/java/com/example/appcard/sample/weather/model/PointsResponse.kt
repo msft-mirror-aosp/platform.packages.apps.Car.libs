@@ -17,9 +17,9 @@
 package com.example.appcard.sample.weather.model
 
 data class PointsResponse(
-  val geometry: RelativeLocationGeometry? = null,
-  val id: String? = null,
-  val type: String? = null,
-  val context: List<String?>? = null,
-  val properties: PointsProperties? = null
+    val geometry: RelativeLocationGeometry? = null,
+    val id: String? = null,
+    val type: String? = null,
+    val context: List<String?>? = null,
+    val properties: PointsProperties? = null,
 )

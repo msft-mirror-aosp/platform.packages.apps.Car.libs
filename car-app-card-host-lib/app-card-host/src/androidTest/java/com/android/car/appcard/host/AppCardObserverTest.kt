@@ -29,95 +29,96 @@ import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class AppCardObserverTest {
-  private var observer: AppCardObserver? = null
-  private var actualAuthority: String? = null
-  private var actualId: String? = null
-  private var actualComponentId: String? = null
+    private var observer: AppCardObserver? = null
+    private var actualAuthority: String? = null
+    private var actualId: String? = null
+    private var actualComponentId: String? = null
 
-  private val callback = object : AppCardObserver.AppCardObserverCallback {
-    override fun handleAppCardAppComponentRequest(
-      authority: String,
-      id: String,
-      componentId: String
-    ) {
-      actualAuthority = authority
-      actualId = id
-      actualComponentId = componentId
+    private val callback =
+        object : AppCardObserver.AppCardObserverCallback {
+            override fun handleAppCardAppComponentRequest(
+                authority: String,
+                id: String,
+                componentId: String,
+            ) {
+                actualAuthority = authority
+                actualId = id
+                actualComponentId = componentId
+            }
+        }
+
+    private val handler: Handler =
+        mock<Handler> { it ->
+            doAnswer { inv -> (inv.arguments[0] as Runnable).run() }
+                .whenever(it)
+                .post(any<Runnable>())
+        }
+
+    @Test
+    fun testOnChange_nullUri_callbackNotCalled() {
+        observer = AppCardObserver(handler, callback)
+
+        observer?.onChange(false, null)
+
+        assertThat(actualAuthority).isNull()
     }
-  }
 
-  private val handler: Handler = mock<Handler> { it ->
-    doAnswer { inv ->
-      (inv.arguments[0] as Runnable).run()
-    }.whenever(it).post(any<Runnable>())
-  }
+    @Test
+    fun testOnChange_nullAuthority_callbackNotCalled() {
+        observer = AppCardObserver(handler, callback)
+        val uri = Uri.Builder().build()
 
-  @Test
-  fun testOnChange_nullUri_callbackNotCalled() {
-    observer = AppCardObserver(handler, callback)
+        observer?.onChange(false, uri)
 
-    observer?.onChange(false, null)
+        assertThat(actualAuthority).isNull()
+    }
 
-    assertThat(actualAuthority).isNull()
-  }
+    @Test
+    fun testOnChange_onePathSegment_callbackNotCalled() {
+        observer = AppCardObserver(handler, callback)
+        val uri = Uri.Builder().authority(TEST_AUTHORITY).appendPath(TEST_ID).build()
 
-  @Test
-  fun testOnChange_nullAuthority_callbackNotCalled() {
-    observer = AppCardObserver(handler, callback)
-    val uri = Uri.Builder().build()
+        observer?.onChange(false, uri)
 
-    observer?.onChange(false, uri)
+        assertThat(actualAuthority).isNull()
+    }
 
-    assertThat(actualAuthority).isNull()
-  }
+    @Test
+    fun testOnChange_threePathSegment_callbackNotCalled() {
+        observer = AppCardObserver(handler, callback)
+        val uri =
+            Uri.Builder()
+                .authority(TEST_AUTHORITY)
+                .appendPath(TEST_AUTHORITY)
+                .appendPath(TEST_ID)
+                .appendPath(TEST_COMPONENT_ID)
+                .build()
 
-  @Test
-  fun testOnChange_onePathSegment_callbackNotCalled() {
-    observer = AppCardObserver(handler, callback)
-    val uri = Uri.Builder()
-      .authority(TEST_AUTHORITY)
-      .appendPath(TEST_ID)
-      .build()
+        observer?.onChange(false, uri)
 
-    observer?.onChange(false, uri)
+        assertThat(actualAuthority).isNull()
+    }
 
-    assertThat(actualAuthority).isNull()
-  }
+    @Test
+    fun testOnChange_twoPathSegments_callbackCalled() {
+        observer = AppCardObserver(handler, callback)
+        val uri =
+            Uri.Builder()
+                .authority(TEST_AUTHORITY)
+                .appendPath(TEST_ID)
+                .appendPath(TEST_COMPONENT_ID)
+                .build()
 
-  @Test
-  fun testOnChange_threePathSegment_callbackNotCalled() {
-    observer = AppCardObserver(handler, callback)
-    val uri = Uri.Builder()
-      .authority(TEST_AUTHORITY)
-      .appendPath(TEST_AUTHORITY)
-      .appendPath(TEST_ID)
-      .appendPath(TEST_COMPONENT_ID)
-      .build()
+        observer?.onChange(false, uri)
 
-    observer?.onChange(false, uri)
+        assertThat(actualAuthority).isEqualTo(TEST_AUTHORITY)
+        assertThat(actualId).isEqualTo(TEST_ID)
+        assertThat(actualComponentId).isEqualTo(TEST_COMPONENT_ID)
+    }
 
-    assertThat(actualAuthority).isNull()
-  }
-
-  @Test
-  fun testOnChange_twoPathSegments_callbackCalled() {
-    observer = AppCardObserver(handler, callback)
-    val uri = Uri.Builder()
-      .authority(TEST_AUTHORITY)
-      .appendPath(TEST_ID)
-      .appendPath(TEST_COMPONENT_ID)
-      .build()
-
-    observer?.onChange(false, uri)
-
-    assertThat(actualAuthority).isEqualTo(TEST_AUTHORITY)
-    assertThat(actualId).isEqualTo(TEST_ID)
-    assertThat(actualComponentId).isEqualTo(TEST_COMPONENT_ID)
-  }
-
-  companion object {
-    private const val TEST_AUTHORITY = "TEST_AUTHORITY"
-    private const val TEST_ID = "TEST_ID"
-    private const val TEST_COMPONENT_ID = "TEST_COMPONENT_ID"
-  }
+    companion object {
+        private const val TEST_AUTHORITY = "TEST_AUTHORITY"
+        private const val TEST_ID = "TEST_ID"
+        private const val TEST_COMPONENT_ID = "TEST_COMPONENT_ID"
+    }
 }

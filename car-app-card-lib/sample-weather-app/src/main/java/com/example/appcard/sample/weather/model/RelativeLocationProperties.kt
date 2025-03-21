@@ -16,9 +16,9 @@
 
 package com.example.appcard.sample.weather.model
 
-data class RelativeLocationProperties (
-  val city: String? = null,
-  val state: String? = null,
-  val distance: DoubleUnitValue? = null,
-  val bearing: IntUnitValue? = null,
+data class RelativeLocationProperties(
+    val city: String? = null,
+    val state: String? = null,
+    val distance: DoubleUnitValue? = null,
+    val bearing: IntUnitValue? = null,
 )

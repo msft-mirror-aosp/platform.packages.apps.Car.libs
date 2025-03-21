@@ -26,108 +26,93 @@ import com.google.protobuf.ByteString
  * An interaction that tells the system to launch an activity in [AppCardContentProvider]'s package
  */
 class RoutingActivityIntent private constructor(builder: Builder) : ProtobufBytes {
-  /**
-   * @return this intent's class name
-   */
-  var cls: String
-    private set
+    /** @return this intent's class name */
+    var cls: String
+        private set
 
-  /**
-   * @return an optional [Bundle] which will be converted to the intent's extras
-   */
-  var bundle: Bundle?
-    private set
+    /** @return an optional [Bundle] which will be converted to the intent's extras */
+    var bundle: Bundle?
+        private set
 
-  init {
-    cls = builder.cls
-    bundle = builder.bundle
-  }
-
-  /**
-   * @return protobuf message
-   */
-  fun toMessage(): IntentMessage {
-    val builder = IntentMessage.newBuilder()
-
-    builder.setClass_(cls)
-
-    bundle?.let {
-      builder.setBundle(ByteString.copyFrom(ParcelableUtils.parcelableToBytes(it)))
+    init {
+        cls = builder.cls
+        bundle = builder.bundle
     }
 
-    return builder.build()
-  }
+    /** @return protobuf message */
+    fun toMessage(): IntentMessage {
+        val builder = IntentMessage.newBuilder()
 
-  override fun hashCode(): Int {
-    var result = cls.hashCode()
-    result = 31 * result + (bundle?.hashCode() ?: 0)
-    return result
-  }
+        builder.setClass_(cls)
 
-  /**
-   * @return protobuf byte array
-   */
-  override fun toByteArray(): ByteArray = toMessage().toByteArray()
+        bundle?.let {
+            builder.setBundle(ByteString.copyFrom(ParcelableUtils.parcelableToBytes(it)))
+        }
 
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other !is RoutingActivityIntent) return false
-
-    if (cls != other.cls) return false
-    if (bundle != other.bundle) return false
-
-    return true
-  }
-
-  /** A builder of [RoutingActivityIntent] */
-  class Builder {
-    internal var cls: String
-    internal var bundle: Bundle? = null
-
-    internal constructor(intentMessage: IntentMessage) {
-      cls = intentMessage.class_
-      if (intentMessage.hasBundle()) {
-        bundle = ParcelableUtils.bytesToParcelable(
-          intentMessage.bundle.toByteArray(),
-          Bundle.CREATOR
-        )
-      }
+        return builder.build()
     }
 
-    internal constructor(cls: String) {
-      this.cls = cls
-      bundle = null
+    override fun hashCode(): Int {
+        var result = cls.hashCode()
+        result = 31 * result + (bundle?.hashCode() ?: 0)
+        return result
     }
 
-    /**
-     * Set [Bundle] for the [RoutingActivityIntent]
-     *
-     * This bundle's contents must be serializable
-     */
-    fun setBundle(bundle: Bundle): Builder {
-      this.bundle = bundle
-      return this
+    /** @return protobuf byte array */
+    override fun toByteArray(): ByteArray = toMessage().toByteArray()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is RoutingActivityIntent) return false
+
+        if (cls != other.cls) return false
+        if (bundle != other.bundle) return false
+
+        return true
     }
 
-    /**
-     * @return [RoutingActivityIntent] built using this builder
-     */
-    fun build(): RoutingActivityIntent {
-      return RoutingActivityIntent(builder = this)
+    /** A builder of [RoutingActivityIntent] */
+    class Builder {
+        internal var cls: String
+        internal var bundle: Bundle? = null
+
+        internal constructor(intentMessage: IntentMessage) {
+            cls = intentMessage.class_
+            if (intentMessage.hasBundle()) {
+                bundle =
+                    ParcelableUtils.bytesToParcelable(
+                        intentMessage.bundle.toByteArray(),
+                        Bundle.CREATOR,
+                    )
+            }
+        }
+
+        internal constructor(cls: String) {
+            this.cls = cls
+            bundle = null
+        }
+
+        /**
+         * Set [Bundle] for the [RoutingActivityIntent]
+         *
+         * This bundle's contents must be serializable
+         */
+        fun setBundle(bundle: Bundle): Builder {
+            this.bundle = bundle
+            return this
+        }
+
+        /** @return [RoutingActivityIntent] built using this builder */
+        fun build(): RoutingActivityIntent {
+            return RoutingActivityIntent(builder = this)
+        }
     }
-  }
 
-  companion object {
-    /**
-     * @return instance of [Builder]
-     */
-    @JvmStatic
-    fun newBuilder(cls: String) = Builder(cls)
+    companion object {
+        /** @return instance of [Builder] */
+        @JvmStatic fun newBuilder(cls: String) = Builder(cls)
 
-    /**
-     * @return an instance of [RoutingActivityIntent] from [IntentMessage]
-     */
-    @JvmStatic
-    fun fromMessage(intentMessage: IntentMessage) = Builder(intentMessage).build()
-  }
+        /** @return an instance of [RoutingActivityIntent] from [IntentMessage] */
+        @JvmStatic fun fromMessage(intentMessage: IntentMessage) = Builder(intentMessage).build()
+    }
 }

@@ -22,43 +22,43 @@ import android.os.Handler
 import android.util.Log
 
 internal class AppCardObserver(handler: Handler?, private val callback: AppCardObserverCallback) :
-  ContentObserver(handler) {
-  private val lock = Any()
-  override fun onChange(selfChange: Boolean, uri: Uri?) {
-    super.onChange(selfChange, uri)
+    ContentObserver(handler) {
+    private val lock = Any()
 
-    uri ?: run {
-      Log.e(TAG, "Null URI not supported")
-      return
+    override fun onChange(selfChange: Boolean, uri: Uri?) {
+        super.onChange(selfChange, uri)
+
+        uri
+            ?: run {
+                Log.e(TAG, "Null URI not supported")
+                return
+            }
+
+        val authority =
+            uri.getAuthority()
+                ?: run {
+                    Log.e(TAG, "Null authority not supported")
+                    return
+                }
+
+        val paths = uri.getPathSegments()
+        if (paths.size != MAX_PATH_SIZE) {
+            Log.e(TAG, "Path must contain only 2 segments")
+            return
+        }
+
+        val id = paths[0]
+        val componentId = paths[1]
+
+        synchronized(lock) { callback.handleAppCardAppComponentRequest(authority, id, componentId) }
     }
 
-    val authority = uri.getAuthority() ?: run {
-      Log.e(TAG, "Null authority not supported")
-      return
+    interface AppCardObserverCallback {
+        fun handleAppCardAppComponentRequest(authority: String, id: String, componentId: String)
     }
 
-    val paths = uri.getPathSegments()
-    if (paths.size != MAX_PATH_SIZE) {
-      Log.e(TAG, "Path must contain only 2 segments")
-      return
+    companion object {
+        private const val TAG = "AppCardObserver"
+        private const val MAX_PATH_SIZE = 2
     }
-
-    val id = paths[0]
-    val componentId = paths[1]
-
-    synchronized(lock) { callback.handleAppCardAppComponentRequest(authority, id, componentId) }
-  }
-
-  interface AppCardObserverCallback {
-    fun handleAppCardAppComponentRequest(
-      authority: String,
-      id: String,
-      componentId: String
-    )
-  }
-
-  companion object {
-    private const val TAG = "AppCardObserver"
-    private const val MAX_PATH_SIZE = 2
-  }
 }

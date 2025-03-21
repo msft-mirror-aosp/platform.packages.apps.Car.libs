@@ -45,57 +45,51 @@ import com.example.appcard.samplehost.R
 /** A component to show all [AppCard] */
 class Picker(val viewModel: HostViewModel) {
 
-  @Composable
-  fun CreatePickerFromAllAppCards() {
-    val appCardStateMap = viewModel.allAppCards
-    val size = appCardStateMap.size
+    @Composable
+    fun CreatePickerFromAllAppCards() {
+        val appCardStateMap = viewModel.allAppCards
+        val size = appCardStateMap.size
 
-    if (size > 0) {
-      LazyHorizontalGrid(
-        modifier = Modifier.background(MaterialTheme.colorScheme.background)
-          .verticalScroll(rememberScrollState())
-          .height(LocalConfiguration.current.screenHeightDp.pxToDp())
-          .fillMaxWidth()
-          .padding(vertical = dimensionResource(R.dimen.grid_content_padding)),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalArrangement = Arrangement.Center,
-        rows = GridCells.FixedSize(dimensionResource(R.dimen.card_height)),
-        contentPadding = PaddingValues(
-          horizontal = dimensionResource(R.dimen.grid_content_padding)
-        )
-      ) {
-        val keyList = appCardStateMap.keys.toMutableList()
+        if (size > 0) {
+            LazyHorizontalGrid(
+                modifier =
+                    Modifier.background(MaterialTheme.colorScheme.background)
+                        .verticalScroll(rememberScrollState())
+                        .height(LocalConfiguration.current.screenHeightDp.pxToDp())
+                        .fillMaxWidth()
+                        .padding(vertical = dimensionResource(R.dimen.grid_content_padding)),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalArrangement = Arrangement.Center,
+                rows = GridCells.FixedSize(dimensionResource(R.dimen.card_height)),
+                contentPadding =
+                    PaddingValues(horizontal = dimensionResource(R.dimen.grid_content_padding)),
+            ) {
+                val keyList = appCardStateMap.keys.toMutableList()
 
-        items(
-          count = keyList.size,
-          key = { index ->
-            keyList[index]
-          },
-        ) {
-          appCardStateMap[keyList[it]]?.AppCard()
+                items(count = keyList.size, key = { index -> keyList[index] }) {
+                    appCardStateMap[keyList[it]]?.AppCard()
+                }
+            }
+        } else {
+            Box(
+                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = NO_APP_CARDS,
+                    style = MaterialTheme.typography.displayLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
-      }
-    } else {
-      Box(
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center
-      ) {
-        Text(
-          modifier = Modifier.fillMaxWidth(),
-          text = NO_APP_CARDS,
-          style = MaterialTheme.typography.displayLarge,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-          textAlign = TextAlign.Center
-        )
-      }
     }
-  }
 
-  @Composable
-  fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
+    @Composable fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
 
-  companion object {
-    private const val NO_APP_CARDS = "No available app cards!"
-  }
+    companion object {
+        private const val NO_APP_CARDS = "No available app cards!"
+    }
 }

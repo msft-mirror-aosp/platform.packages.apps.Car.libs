@@ -22,12 +22,11 @@ import androidx.appcompat.app.AppCompatActivity
 
 /** An sample routing activity that re-routes the intent sent from the app card host. */
 class SampleRoutingActivity : AppCompatActivity() {
-  override fun onStart() {
-    super.onStart()
-    val intent = Intent(ACTION_LOCATION_SOURCE_SETTINGS).apply {
-      setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+    override fun onStart() {
+        super.onStart()
+        val intent =
+            Intent(ACTION_LOCATION_SOURCE_SETTINGS).apply { setFlags(FLAG_ACTIVITY_CLEAR_TOP) }
+        startActivity(intent)
+        finish()
     }
-    startActivity(intent)
-    finish()
-  }
 }

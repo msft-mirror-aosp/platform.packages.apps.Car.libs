@@ -23,53 +23,55 @@ import com.android.car.appcard.AppCardContext
 
 /** An [AppCardContentProvider] that supplies a sample now playing media app card */
 class SimpleAppCardContentProvider : AppCardContentProvider() {
-  private var appContext: Context? = null
-  private var mediaAppCard: MediaAppCardProvider? = null
-  private val updater = object : AppCardUpdater {
-    override fun sendUpdate(appCard: AppCard) {
-      sendAppCardUpdate(appCard)
+    private var appContext: Context? = null
+    private var mediaAppCard: MediaAppCardProvider? = null
+    private val updater =
+        object : AppCardUpdater {
+            override fun sendUpdate(appCard: AppCard) {
+                sendAppCardUpdate(appCard)
+            }
+        }
+
+    override val authority: String
+        get() = AUTHORITY
+
+    /** Setup [AppCardContentProvider] and its constituents */
+    override fun onCreate(): Boolean {
+        super.onCreate()
+        appContext = context?.applicationContext
+
+        // We can use the [AppCardContentProvider] as a lifecycle owner
+        mediaAppCard =
+            MediaAppCardProvider(APP_CARD_ID, appContext!!, updater, lifecycleOwner = this)
+        return true
     }
-  }
 
-  override val authority: String
-    get() = AUTHORITY
+    /** Setup an [AppCard] that is being requested */
+    override fun onAppCardAdded(id: String, ctx: AppCardContext): AppCard {
+        return mediaAppCard!!.getAppCard(ctx)
+    }
 
-  /** Setup [AppCardContentProvider] and its constituents */
-  override fun onCreate(): Boolean {
-    super.onCreate()
-    appContext = context?.applicationContext
+    /** List of supported [AppCard] IDs */
+    override val appCardIds: List<String>
+        get() = listOf(APP_CARD_ID)
 
-    // We can use the [AppCardContentProvider] as a lifecycle owner
-    mediaAppCard = MediaAppCardProvider(APP_CARD_ID, appContext!!, updater, lifecycleOwner = this)
-    return true
-  }
+    /** Clean up when an [AppCard] is removed */
+    override fun onAppCardRemoved(id: String) {
+        if (id == APP_CARD_ID) mediaAppCard?.appCardRemoved()
+    }
 
-  /** Setup an [AppCard] that is being requested */
-  override fun onAppCardAdded(id: String, ctx: AppCardContext): AppCard {
-    return mediaAppCard!!.getAppCard(ctx)
-  }
+    /** Handle an [AppCardContext] change for a particular [AppCard] ID */
+    override fun onAppCardContextChanged(id: String, appCardContext: AppCardContext) {
+        if (id == APP_CARD_ID) mediaAppCard?.updateAppCardContext(appCardContext)
+    }
 
-  /** List of supported [AppCard] IDs */
-  override val appCardIds: List<String>
-    get() = listOf(APP_CARD_ID)
+    companion object {
+        private const val APP_CARD_ID = "mediaAppCard"
+        private const val AUTHORITY = "com.example.appcard.sample.media"
+    }
 
-  /** Clean up when an [AppCard] is removed */
-  override fun onAppCardRemoved(id: String) {
-    if (id == APP_CARD_ID) mediaAppCard?.appCardRemoved()
-  }
-
-  /** Handle an [AppCardContext] change for a particular [AppCard] ID */
-  override fun onAppCardContextChanged(id: String, appCardContext: AppCardContext) {
-    if (id == APP_CARD_ID) mediaAppCard?.updateAppCardContext(appCardContext)
-  }
-
-  companion object {
-    private const val APP_CARD_ID = "mediaAppCard"
-    private const val AUTHORITY = "com.example.appcard.sample.media"
-  }
-
-  internal interface AppCardUpdater {
-    /** Queue up a full [AppCard] update */
-    fun sendUpdate(appCard: AppCard)
-  }
+    internal interface AppCardUpdater {
+        /** Queue up a full [AppCard] update */
+        fun sendUpdate(appCard: AppCard)
+    }
 }
