@@ -17,6 +17,6 @@
 package com.example.appcard.sample.weather.model
 
 data class PolygonLocationGeometry(
-  val type: String? = null,
-  val coordinates: List<List<List<Double>?>?>? = null,
+    val type: String? = null,
+    val coordinates: List<List<List<Double>?>?>? = null,
 )

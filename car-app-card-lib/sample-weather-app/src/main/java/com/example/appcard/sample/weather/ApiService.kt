@@ -23,20 +23,20 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface ApiService {
-  @GET("points/{latitude},{longitude}")
-  fun getPoints(
-    @Path("latitude") latitude: Double,
-    @Path("longitude") longitude: Double,
-  ): Single<PointsResponse>
+    @GET("points/{latitude},{longitude}")
+    fun getPoints(
+        @Path("latitude") latitude: Double,
+        @Path("longitude") longitude: Double,
+    ): Single<PointsResponse>
 
-  @GET("gridpoints/{gridId}/{gridX},{gridY}/forecast")
-  fun getForecast(
-    @Path("gridId") gridId: String,
-    @Path("gridX") gridX: Int,
-    @Path("gridY") longitude: Int,
-  ): Single<ForecastResponse>
+    @GET("gridpoints/{gridId}/{gridX},{gridY}/forecast")
+    fun getForecast(
+        @Path("gridId") gridId: String,
+        @Path("gridX") gridX: Int,
+        @Path("gridY") longitude: Int,
+    ): Single<ForecastResponse>
 
-  companion object {
-    const val URL = "https://api.weather.gov/"
-  }
+    companion object {
+        const val URL = "https://api.weather.gov/"
+    }
 }

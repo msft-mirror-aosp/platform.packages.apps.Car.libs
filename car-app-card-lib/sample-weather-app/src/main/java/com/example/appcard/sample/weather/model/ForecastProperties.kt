@@ -17,12 +17,12 @@
 package com.example.appcard.sample.weather.model
 
 data class ForecastProperties(
-  val updated: String? = null,
-  val units: String? = null,
-  val forecastGenerator: String? = null,
-  val generatedAt: String? = null,
-  val updateTime: String? = null,
-  val validTimes: String? = null,
-  val elevation: DoubleUnitValue? = null,
-  val periods: List<Period?>? = null,
+    val updated: String? = null,
+    val units: String? = null,
+    val forecastGenerator: String? = null,
+    val generatedAt: String? = null,
+    val updateTime: String? = null,
+    val validTimes: String? = null,
+    val elevation: DoubleUnitValue? = null,
+    val periods: List<Period?>? = null,
 )
