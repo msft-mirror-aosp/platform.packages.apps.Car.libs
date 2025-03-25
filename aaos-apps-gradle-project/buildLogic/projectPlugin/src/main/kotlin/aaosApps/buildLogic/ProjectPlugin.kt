@@ -29,7 +29,7 @@ class ProjectPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         val extension =
-            project.extensions.create("aaosAppsBuildCfg", aaosAppsBuildCfgExt::class.java)
+            project.extensions.create("aaosAppsBuildCfg", AaosAppsBuildCfgExt::class.java)
         // Set the default value of the toolchain to the value set in the Gradle properties
         val mappedToolChainVersionProvider =
             project.providers.gradleProperty("aaosApps.buildCfg.defaultJdkToolchain").map {

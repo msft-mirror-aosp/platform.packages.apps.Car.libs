@@ -23,7 +23,7 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 
-internal fun Project.setJDK(buildCfg: aaosAppsBuildCfgExt) {
+internal fun Project.setJDK(buildCfg: AaosAppsBuildCfgExt) {
 
     plugins.withType(JavaBasePlugin::class.java) {
         extensions.getByType(JavaPluginExtension::class.java).apply {

@@ -64,6 +64,7 @@ plugins {
     id("aaosApps.buildLogic") apply false
     alias(libs.plugins.compose.compiler) apply false
 }
+apply from: "buildLogic/setBuildDir.build.gradle.kts"
 
 allprojects {
     tasks.withType(JavaCompile) {
