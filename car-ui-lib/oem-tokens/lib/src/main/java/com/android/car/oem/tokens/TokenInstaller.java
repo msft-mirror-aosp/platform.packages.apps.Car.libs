@@ -97,41 +97,7 @@ public class TokenInstaller extends ContentProvider {
                             return;
                         }
 
-                        Log.i(TAG, "Setting OEM token default values");
-                        if (Token.isLightTheme(activity)) {
-                            activity.getTheme().applyStyle(R.style.OemTokensBaseLight, true);
-                        } else {
-                            activity.getTheme().applyStyle(R.style.OemTokensBaseDark, true);
-                        }
-
-                        int useOemTokenId = activity.getResources().getIdentifier(
-                                "enable_oem_tokens",
-                                "bool", Token.getTokenSharedLibraryName());
-                        boolean useOemToken =
-                                useOemTokenId != 0 && activity.getResources().getBoolean(
-                                        useOemTokenId);
-
-                        if (useOemToken && Token.isTokenSharedLibInstalled(
-                                activity.getPackageManager())) {
-                            Log.i(TAG, "Setting shared lib OEM token default values");
-                            activity.getTheme().applyStyle(R.style.OemTokens, true);
-                            if (Token.isLightTheme(activity)) {
-                                activity.getTheme().applyStyle(R.style.OemTokensLight, true);
-                            } else {
-                                activity.getTheme().applyStyle(R.style.OemTokensDark, true);
-                            }
-                            int oemStyleOverride = activity.getResources().getIdentifier("OemStyle",
-                                    "style", Token.getTokenSharedLibraryName());
-                            if (oemStyleOverride == 0) {
-                                Log.e(TAG,
-                                        "Unable to apply OEM design token overrides. Style with "
-                                                + "name OemStyle not found.");
-                                return;
-                            }
-
-                            Log.i(TAG, "Overriding OEM tokens with OEM values");
-                            activity.getTheme().applyStyle(oemStyleOverride, true);
-                        }
+                        Token.applyOemTokenStyle(activity);
                     }
 
                     @Override

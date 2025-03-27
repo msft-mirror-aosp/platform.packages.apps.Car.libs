@@ -15,7 +15,7 @@
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="OemTokensParent">
+    <style name="OemTokensBase">
         <item name="oemTokenOverrideEnabled">true</item>
 
         <item name="oemColorPrimaryPalette100">@color/oem_default_color_primary_palette_100</item>
@@ -127,7 +127,7 @@
         <item name="oemShapeCornerFull">1000dp</item>
     </style>
 
-    <style name="OemTokensBaseLight" parent="OemTokensParent">
+    <style name="OemTokensBase.Light">
         <item name="oemColorPrimary">?attr/oemColorPrimaryPalette40</item>
         <item name="oemColorOnPrimary">?attr/oemColorPrimaryPalette100</item>
         <item name="oemColorPrimaryContainer">?attr/oemColorPrimaryPalette90</item>
@@ -178,7 +178,7 @@
         <item name="oemColorOnYellowContainer">@color/oem_color_on_yellow_container</item>
     </style>
 
-    <style name="OemTokensBaseDark" parent="OemTokensParent">
+    <style name="OemTokensBase.Dark">
         <item name="oemColorPrimary">?attr/oemColorPrimaryPalette80</item>
         <item name="oemColorOnPrimary">?attr/oemColorPrimaryPalette20</item>
         <item name="oemColorPrimaryContainer">?attr/oemColorPrimaryPalette30</item>
@@ -229,7 +229,7 @@
         <item name="oemColorOnYellowContainer">#FFDDB6</item>
     </style>
 
-    <style name="OemTokens">
+    <style name="OemTokenSharedLibraryOverlay">
         <item name="oemColorPrimary">?com.android.oem.tokens:attr/colorPrimary</item>
         <item name="oemColorOnPrimary">?com.android.oem.tokens:attr/colorOnPrimary</item>
         <item name="oemColorPrimaryContainer">?com.android.oem.tokens:attr/colorPrimaryContainer</item>
@@ -363,6 +363,33 @@
         <item name="oemColorNeutralVariantPalette10">?com.android.oem.tokens:attr/colorNeutralVariantPalette10</item>
         <item name="oemColorNeutralVariantPalette0">?com.android.oem.tokens:attr/colorNeutralVariantPalette0</item>
 
+        <item name="oemTextAppearanceDisplayLarge">?com.android.oem.tokens:attr/textAppearanceDisplayLarge</item>
+        <item name="oemTextAppearanceDisplayMedium">?com.android.oem.tokens:attr/textAppearanceDisplayMedium</item>
+        <item name="oemTextAppearanceDisplaySmall">?com.android.oem.tokens:attr/textAppearanceDisplaySmall</item>
+        <item name="oemTextAppearanceHeadlineLarge">?com.android.oem.tokens:attr/textAppearanceHeadlineLarge</item>
+        <item name="oemTextAppearanceHeadlineMedium">?com.android.oem.tokens:attr/textAppearanceHeadlineMedium</item>
+        <item name="oemTextAppearanceHeadlineSmall">?com.android.oem.tokens:attr/textAppearanceHeadlineSmall</item>
+        <item name="oemTextAppearanceTitleLarge">?com.android.oem.tokens:attr/textAppearanceTitleLarge</item>
+        <item name="oemTextAppearanceTitleMedium">?com.android.oem.tokens:attr/textAppearanceTitleMedium</item>
+        <item name="oemTextAppearanceTitleSmall">?com.android.oem.tokens:attr/textAppearanceTitleSmall</item>
+        <item name="oemTextAppearanceLabelLarge">?com.android.oem.tokens:attr/textAppearanceLabelLarge</item>
+        <item name="oemTextAppearanceLabelMedium">?com.android.oem.tokens:attr/textAppearanceLabelMedium</item>
+        <item name="oemTextAppearanceLabelSmall">?com.android.oem.tokens:attr/textAppearanceLabelSmall</item>
+        <item name="oemTextAppearanceBodyLarge">?com.android.oem.tokens:attr/textAppearanceBodyLarge</item>
+        <item name="oemTextAppearanceBodyMedium">?com.android.oem.tokens:attr/textAppearanceBodyMedium</item>
+        <item name="oemTextAppearanceBodySmall">?com.android.oem.tokens:attr/textAppearanceBodySmall</item>
+
+        <item name="oemShapeCornerNone">?com.android.oem.tokens:attr/shapeCornerNone</item>
+        <item name="oemShapeCornerExtraSmall">?com.android.oem.tokens:attr/shapeCornerExtraSmall</item>
+        <item name="oemShapeCornerSmall">?com.android.oem.tokens:attr/shapeCornerSmall</item>
+        <item name="oemShapeCornerMedium">?com.android.oem.tokens:attr/shapeCornerMedium</item>
+        <item name="oemShapeCornerLarge">?com.android.oem.tokens:attr/shapeCornerLarge</item>
+        <item name="oemShapeCornerExtraLarge">?com.android.oem.tokens:attr/shapeCornerExtraLarge</item>
+        <item name="oemShapeCornerFull">?com.android.oem.tokens:attr/shapeCornerFull</item>
+
+    </style>
+
+    <style name="OemTokenSharedLibraryOverlay.Base">
         <item name="com.android.oem.tokens:colorPrimaryPalette100">@color/oem_default_color_primary_palette_100</item>
         <item name="com.android.oem.tokens:colorPrimaryPalette99">@color/oem_default_color_primary_palette_99</item>
         <item name="com.android.oem.tokens:colorPrimaryPalette95">@color/oem_default_color_primary_palette_95</item>
@@ -447,22 +474,6 @@
         <item name="com.android.oem.tokens:colorNeutralVariantPalette10">@color/oem_default_color_neutral_variant_palette_10</item>
         <item name="com.android.oem.tokens:colorNeutralVariantPalette0">@color/oem_default_color_neutral_variant_palette_0</item>
 
-        <item name="oemTextAppearanceDisplayLarge">?com.android.oem.tokens:attr/textAppearanceDisplayLarge</item>
-        <item name="oemTextAppearanceDisplayMedium">?com.android.oem.tokens:attr/textAppearanceDisplayMedium</item>
-        <item name="oemTextAppearanceDisplaySmall">?com.android.oem.tokens:attr/textAppearanceDisplaySmall</item>
-        <item name="oemTextAppearanceHeadlineLarge">?com.android.oem.tokens:attr/textAppearanceHeadlineLarge</item>
-        <item name="oemTextAppearanceHeadlineMedium">?com.android.oem.tokens:attr/textAppearanceHeadlineMedium</item>
-        <item name="oemTextAppearanceHeadlineSmall">?com.android.oem.tokens:attr/textAppearanceHeadlineSmall</item>
-        <item name="oemTextAppearanceTitleLarge">?com.android.oem.tokens:attr/textAppearanceTitleLarge</item>
-        <item name="oemTextAppearanceTitleMedium">?com.android.oem.tokens:attr/textAppearanceTitleMedium</item>
-        <item name="oemTextAppearanceTitleSmall">?com.android.oem.tokens:attr/textAppearanceTitleSmall</item>
-        <item name="oemTextAppearanceLabelLarge">?com.android.oem.tokens:attr/textAppearanceLabelLarge</item>
-        <item name="oemTextAppearanceLabelMedium">?com.android.oem.tokens:attr/textAppearanceLabelMedium</item>
-        <item name="oemTextAppearanceLabelSmall">?com.android.oem.tokens:attr/textAppearanceLabelSmall</item>
-        <item name="oemTextAppearanceBodyLarge">?com.android.oem.tokens:attr/textAppearanceBodyLarge</item>
-        <item name="oemTextAppearanceBodyMedium">?com.android.oem.tokens:attr/textAppearanceBodyMedium</item>
-        <item name="oemTextAppearanceBodySmall">?com.android.oem.tokens:attr/textAppearanceBodySmall</item>
-
         <item name="com.android.oem.tokens:textAppearanceDisplayLarge">@style/TextAppearance.Display.Large</item>
         <item name="com.android.oem.tokens:textAppearanceDisplayMedium">@style/TextAppearance.Display.Medium</item>
         <item name="com.android.oem.tokens:textAppearanceDisplaySmall">@style/TextAppearance.Display.Small</item>
@@ -479,14 +490,6 @@
         <item name="com.android.oem.tokens:textAppearanceBodyMedium">@style/TextAppearance.Body.Medium</item>
         <item name="com.android.oem.tokens:textAppearanceBodySmall">@style/TextAppearance.Body.Small</item>
 
-        <item name="oemShapeCornerNone">?com.android.oem.tokens:attr/shapeCornerNone</item>
-        <item name="oemShapeCornerExtraSmall">?com.android.oem.tokens:attr/shapeCornerExtraSmall</item>
-        <item name="oemShapeCornerSmall">?com.android.oem.tokens:attr/shapeCornerSmall</item>
-        <item name="oemShapeCornerMedium">?com.android.oem.tokens:attr/shapeCornerMedium</item>
-        <item name="oemShapeCornerLarge">?com.android.oem.tokens:attr/shapeCornerLarge</item>
-        <item name="oemShapeCornerExtraLarge">?com.android.oem.tokens:attr/shapeCornerExtraLarge</item>
-        <item name="oemShapeCornerFull">?com.android.oem.tokens:attr/shapeCornerFull</item>
-
         <item name="com.android.oem.tokens:shapeCornerNone">0dp</item>
         <item name="com.android.oem.tokens:shapeCornerExtraSmall">8dp</item>
         <item name="com.android.oem.tokens:shapeCornerSmall">16dp</item>
@@ -497,7 +500,7 @@
         <item name="com.android.oem.tokens:shapeCornerFull">1000dp</item>
     </style>
 
-    <style name="OemTokensLight">
+    <style name="OemTokenSharedLibraryOverlay.Base.Light">
         <item name="com.android.oem.tokens:colorPrimary">?attr/com.android.oem.tokens:colorPrimaryPalette40</item>
         <item name="com.android.oem.tokens:colorOnPrimary">?attr/com.android.oem.tokens:colorPrimaryPalette100</item>
         <item name="com.android.oem.tokens:colorPrimaryContainer">?attr/com.android.oem.tokens:colorPrimaryPalette90</item>
@@ -548,7 +551,7 @@
         <item name="com.android.oem.tokens:colorOnYellowContainer">@color/oem_color_on_yellow_container</item>
     </style>
 
-    <style name="OemTokensDark">
+    <style name="OemTokenSharedLibraryOverlay.Base.Dark">
         <item name="com.android.oem.tokens:colorPrimary">?attr/com.android.oem.tokens:colorPrimaryPalette80</item>
         <item name="com.android.oem.tokens:colorOnPrimary">?attr/com.android.oem.tokens:colorPrimaryPalette20</item>
         <item name="com.android.oem.tokens:colorPrimaryContainer">?attr/com.android.oem.tokens:colorPrimaryPalette30</item>
@@ -677,6 +680,5 @@
     <style name="TextAppearance.Body.Small">
         <item name="android:textSize">24sp</item>
     </style>
-
 </resources>
 
