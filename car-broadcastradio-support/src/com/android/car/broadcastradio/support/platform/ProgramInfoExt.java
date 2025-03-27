@@ -323,13 +323,26 @@ public class ProgramInfoExt {
     }
 
     /**
-     * Compares if two {@link MediaMetadataCompat} objects contains the same string and integer
-     * type radio metadata values.
+     * Compares if two {@link MediaMetadataCompat} objects contains the same string, integer
+     * and {@link RatingCompat} type radio metadata values.
      */
-    public static boolean containsSameRadioMetadata(@NonNull MediaMetadataCompat metadata1,
-                                                    @NonNull MediaMetadataCompat metadata2) {
+    public static boolean containsSameRadioMetadata(@Nullable MediaMetadataCompat metadata1,
+                                                    @Nullable MediaMetadataCompat metadata2) {
         if (Objects.equals(metadata1, metadata2)) {
             return true;
+        }
+        if (metadata1 == null || metadata2 == null) {
+            return false;
+        }
+        if (!Objects.equals(metadata1.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI),
+                metadata2.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI))) {
+            return false;
+        }
+        RatingCompat rating1 = metadata1.getRating(MediaMetadataCompat.METADATA_KEY_USER_RATING);
+        RatingCompat rating2 = metadata2.getRating(MediaMetadataCompat.METADATA_KEY_USER_RATING);
+        if (!Objects.equals(rating1 != null ? rating1.hasHeart() : null,
+                rating2 != null ? rating2.hasHeart() : null)) {
+            return false;
         }
         for (int i = 0; i < RADIO_METADATA_INT_TYPE.size(); i++) {
             String intTypeKey = RADIO_METADATA_INT_TYPE.get(i);
