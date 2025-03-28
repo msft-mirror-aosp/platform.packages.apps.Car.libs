@@ -19,34 +19,48 @@ package aaosApps.buildLogic
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.gradle.api.AndroidBasePlugin
-import com.ncorti.ktfmt.gradle.KtfmtExtension
-import com.ncorti.ktfmt.gradle.KtfmtPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import org.gradle.api.tasks.CompileClasspathNormalizer
+import org.gradle.api.tasks.compile.JavaCompile
+
+private fun Project.configureJavaCompile(extension: AaosAppsBuildCfgExt) {
+    val systemStubsSdk = project.properties["aaosApps.buildCfg.systemStubsSdk"]
+
+    val systemStubs = extension.repoRoot.file("prebuilts/sdk/$systemStubsSdk/system/android.jar")
+
+    tasks.withType(JavaCompile::class.java).configureEach { task ->
+        val objectFactory = project.objects
+
+        task.inputs.files(systemStubs).withNormalizer(CompileClasspathNormalizer::class.java)
+        task.doFirst {
+            task.classpath = objectFactory.fileCollection().from(systemStubs, task.classpath)
+        }
+
+        // Enable some lints
+        // TODO: just pass -Xlint, to enable all the supported types of warnings.
+        task.options.compilerArgs.add("-Xlint:unchecked")
+        task.options.compilerArgs.add("-Xlint:deprecation")
+    }
+}
 
 class ProjectPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
+        // Set up the extension for the plugin
         val extension =
             project.extensions.create("aaosAppsBuildCfg", AaosAppsBuildCfgExt::class.java)
-        // Set the default value of the toolchain to the value set in the Gradle properties
-        val mappedToolChainVersionProvider =
-            project.providers.gradleProperty("aaosApps.buildCfg.defaultJdkToolchain").map {
-                it.toString().toInt()
-            }
-        extension.jdkToolchain.convention(mappedToolChainVersionProvider)
+        extension.setDefaults(project)
 
+        // Set the JDK to use for the project
         project.setJDK(extension)
 
-        // If the project has the Kotlin base plugin, apply the Ktfmt plugin and set it to
-        // kotlinLangStyle
-        project.plugins.withType(KotlinBasePlugin::class.java) {
-            project.plugins.apply(KtfmtPlugin::class.java)
-            project.extensions.getByType(KtfmtExtension::class.java).apply { kotlinLangStyle() }
-        }
-
+        // This block will trigger after an Android plugin is loaded
         project.plugins.withType(AndroidBasePlugin::class.java) {
+
+            // Add in the System stubs and other Java compile configuration
+            project.configureJavaCompile(extension)
+
             project.extensions.getByType(CommonExtension::class.java).apply {
                 val ace = project.extensions.getByType(AndroidComponentsExtension::class.java)
 
