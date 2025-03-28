@@ -17,25 +17,25 @@
 package com.example.appcard.sample.weather
 
 internal class TemperatureConverter {
-  companion object {
-    /**
-     * Converts temperature value from Celsius to Fahrenheit
-     *
-     * @param temperatureInCelsius temperature value in Celsius
-     * @return temperature value in Fahrenheit
-     */
-    fun convertCelsiusToFahrenheit(temperatureInCelsius: Float): Float {
-      return temperatureInCelsius * 9f / 5f + 32
-    }
+    companion object {
+        /**
+         * Converts temperature value from Celsius to Fahrenheit
+         *
+         * @param temperatureInCelsius temperature value in Celsius
+         * @return temperature value in Fahrenheit
+         */
+        fun convertCelsiusToFahrenheit(temperatureInCelsius: Float): Float {
+            return temperatureInCelsius * 9f / 5f + 32
+        }
 
-    /**
-     * Converts temperature value from Fahrenheit to Celsius
-     *
-     * @param temperatureInFahrenheit temperature value in Fahrenheit
-     * @return temperature value in Celsius
-     */
-    fun convertFahrenheitToCelsius(temperatureInFahrenheit: Float): Float {
-      return (temperatureInFahrenheit - 32) * 5f / 9f
+        /**
+         * Converts temperature value from Fahrenheit to Celsius
+         *
+         * @param temperatureInFahrenheit temperature value in Fahrenheit
+         * @return temperature value in Celsius
+         */
+        fun convertFahrenheitToCelsius(temperatureInFahrenheit: Float): Float {
+            return (temperatureInFahrenheit - 32) * 5f / 9f
+        }
     }
-  }
 }

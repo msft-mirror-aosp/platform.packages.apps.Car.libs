@@ -22,14 +22,14 @@ import com.android.car.appcard.host.AppCardContainer
 
 /** A factory that creates [AppCardContainerState] */
 class AppCardContainerStateFactory(
-  private val context: Context,
-  private val viewModel: HostViewModel,
+    private val context: Context,
+    private val viewModel: HostViewModel,
 ) {
-  fun getState(appCardContainer: AppCardContainer): AppCardContainerState? {
-    if (appCardContainer.appCard is ImageAppCard) {
-      return ImageAppCardContainerState(appCardContainer, context, viewModel)
-    }
+    fun getState(appCardContainer: AppCardContainer): AppCardContainerState? {
+        if (appCardContainer.appCard is ImageAppCard) {
+            return ImageAppCardContainerState(appCardContainer, context, viewModel)
+        }
 
-    return null
-  }
+        return null
+    }
 }

@@ -23,12 +23,12 @@ import com.android.car.appcard.component.Component
  * component belongs in.
  */
 class AppCardComponentContainer(
-  /** [ApplicationIdentifier] related to this component */
-  val appId: ApplicationIdentifier,
+    /** [ApplicationIdentifier] related to this component */
+    val appId: ApplicationIdentifier,
 
-  /** App card ID related to this component */
-  val appCardId: String,
+    /** App card ID related to this component */
+    val appCardId: String,
 
-  /** [Component] housed in this container */
-  var component: Component,
+    /** [Component] housed in this container */
+    var component: Component,
 )

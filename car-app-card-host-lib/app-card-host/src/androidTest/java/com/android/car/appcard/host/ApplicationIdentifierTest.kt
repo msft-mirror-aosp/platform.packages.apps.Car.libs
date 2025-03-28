@@ -23,67 +23,67 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ApplicationIdentifierTest {
-  @Test
-  fun testEquals_notSameType_returnFalse() {
-    val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
+    @Test
+    fun testEquals_notSameType_returnFalse() {
+        val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
 
-    assertThat(id.equals(Any())).isFalse()
-  }
+        assertThat(id.equals(Any())).isFalse()
+    }
 
-  @Test
-  fun testEquals_notEqualPackageName_returnFalse() {
-    val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
-    val other = ApplicationIdentifier(TEST_AUTHORITY, TEST_AUTHORITY)
+    @Test
+    fun testEquals_notEqualPackageName_returnFalse() {
+        val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
+        val other = ApplicationIdentifier(TEST_AUTHORITY, TEST_AUTHORITY)
 
-    assertThat(id.equals(other)).isFalse()
-  }
+        assertThat(id.equals(other)).isFalse()
+    }
 
-  @Test
-  fun testEquals_notEqualAuthority_returnFalse() {
-    val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
-    val other = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_PACKAGE_NAME)
+    @Test
+    fun testEquals_notEqualAuthority_returnFalse() {
+        val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
+        val other = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_PACKAGE_NAME)
 
-    assertThat(id.equals(other)).isFalse()
-  }
+        assertThat(id.equals(other)).isFalse()
+    }
 
-  @Test
-  fun testEquals_isEqual_returnTrue() {
-    val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
-    val other = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
+    @Test
+    fun testEquals_isEqual_returnTrue() {
+        val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
+        val other = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
 
-    assertThat(id.equals(other)).isTrue()
-  }
+        assertThat(id.equals(other)).isTrue()
+    }
 
-  @Test
-  fun testContainsPackage_isEqual_returnTrue() {
-    val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
+    @Test
+    fun testContainsPackage_isEqual_returnTrue() {
+        val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
 
-    assertThat(id.containsPackage(TEST_PACKAGE_NAME)).isTrue()
-  }
+        assertThat(id.containsPackage(TEST_PACKAGE_NAME)).isTrue()
+    }
 
-  @Test
-  fun testContainsPackage_isNotEqual_returnTrue() {
-    val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
+    @Test
+    fun testContainsPackage_isNotEqual_returnTrue() {
+        val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
 
-    assertThat(id.containsPackage(TEST_AUTHORITY)).isFalse()
-  }
+        assertThat(id.containsPackage(TEST_AUTHORITY)).isFalse()
+    }
 
-  @Test
-  fun testContainsAuthority_isEqual_returnTrue() {
-    val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
+    @Test
+    fun testContainsAuthority_isEqual_returnTrue() {
+        val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
 
-    assertThat(id.containsAuthority(TEST_AUTHORITY)).isTrue()
-  }
+        assertThat(id.containsAuthority(TEST_AUTHORITY)).isTrue()
+    }
 
-  @Test
-  fun testContainsAuthority_isNotEqual_returnTrue() {
-    val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
+    @Test
+    fun testContainsAuthority_isNotEqual_returnTrue() {
+        val id = ApplicationIdentifier(TEST_PACKAGE_NAME, TEST_AUTHORITY)
 
-    assertThat(id.containsAuthority(TEST_PACKAGE_NAME)).isFalse()
-  }
+        assertThat(id.containsAuthority(TEST_PACKAGE_NAME)).isFalse()
+    }
 
-  companion object {
-    private const val TEST_PACKAGE_NAME = "TEST_PACKAGE_NAME"
-    private const val TEST_AUTHORITY = "TEST_AUTHORITY"
-  }
+    companion object {
+        private const val TEST_PACKAGE_NAME = "TEST_PACKAGE_NAME"
+        private const val TEST_AUTHORITY = "TEST_AUTHORITY"
+    }
 }
