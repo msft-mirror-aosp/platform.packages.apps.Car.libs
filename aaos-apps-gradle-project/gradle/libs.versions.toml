@@ -26,6 +26,7 @@ gson = "2.12.1"
 guava = "33.4.0-android"
 hamcrest = "2.2"
 hilt = "2.51.1"
+interpolator = "1.0.0"
 junit = "4.13.2"
 kotlin = "2.1.10"
 ksp = "2.1.10-1.0.30"
@@ -37,6 +38,7 @@ mockitoCore = "5.16.0"
 mockitoKotlin = "5.4.0"
 okhttp3-loggingInterceptor = "3.8.1"
 opencensusApi = "0.31.0"
+orchestrator = "1.5.1"
 preference = "1.2.1"
 protobuf = "4.29.3"
 protobufGradlePlugin = "0.9.4"
@@ -65,6 +67,7 @@ androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", vers
 androidx-espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espressoCore" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "androidx-hiltCompiler" }
 androidx-hilt-lifecycle-viewmodel = { module = "androidx.hilt:hilt-lifecycle-viewmodel", version.ref = "androidx-hiltLifecycleViewmodel" }
+androidx-interpolator = { module = "androidx.interpolator:interpolator", version.ref = "interpolator" }
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
 androidx-lifecycle-common = { module = "androidx.lifecycle:lifecycle-common", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-common-java8 = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "androidx-lifecycle" }
@@ -74,6 +77,7 @@ androidx-lifecycle-runtime-android = { module = "androidx.lifecycle:lifecycle-ru
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-viewmodel-android = { module = "androidx.lifecycle:lifecycle-viewmodel-android", version.ref = "androidx-lifecycle" }
 androidx-media = { module = "androidx.media:media", version.ref = "media" }
+androidx-orchestrator = { module = "androidx.test:orchestrator", version.ref = "orchestrator" }
 androidx-preference = { module = "androidx.preference:preference", version.ref = "preference" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "androidx-recyclerview" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
