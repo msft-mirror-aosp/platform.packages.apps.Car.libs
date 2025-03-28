@@ -24,9 +24,9 @@ buildscript {
         classpath(libs.protobuf.gradle.plugin)
     }
 
-    gradle.ext.aaosLatestSDK = 34
+    gradle.ext.aaosLatestSDK = ext.properties["aaosApps.buildCfg.systemStubsSdk"]
 
-    gradle.ext.repoRootPath = rootDir.parentFile.parentFile.parentFile.parentFile.parent
+    gradle.ext.repoRootPath = gradle.ext.androidRepoRoot.getAbsolutePath()
     gradle.ext.lib_car_system_stubs = gradle.ext.repoRootPath + "/prebuilts/sdk/" + gradle.ext.aaosLatestSDK + "/system/android.car-system-stubs.jar"
     gradle.ext.lib_system_stubs = gradle.ext.repoRootPath + "/prebuilts/sdk/" + gradle.ext.aaosLatestSDK + "/system/android.jar"
     gradle.ext.unbundledCertPath = gradle.ext.repoRootPath + "/packages/apps/Car/libs/certs/com_android_car_apps_test.jks"
@@ -67,13 +67,6 @@ plugins {
 apply from: "buildLogic/setBuildDir.build.gradle.kts"
 
 allprojects {
-    tasks.withType(JavaCompile) {
-        // Compile with prebuilt android.jar.
-        options.compilerArgs.add('-Xbootclasspath/p:' + gradle.ext.lib_system_stubs)
-        // TODO: just pass -Xlint, to enable all the supported types of warnings.
-        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-    }
-
     // Re-exports for Kotlin build scripts
     ext.aaosLatestSDK = gradle.ext.aaosLatestSDK
     ext.lib_car_system_stubs = gradle.ext.lib_car_system_stubs
