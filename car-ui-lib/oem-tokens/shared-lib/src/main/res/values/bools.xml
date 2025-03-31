@@ -15,6 +15,6 @@
 -->
 
 <resources>
-    <bool name="enable_oem_tokens">true</bool>
+    <bool name="enable_oem_tokens">false</bool>
 </resources>
 

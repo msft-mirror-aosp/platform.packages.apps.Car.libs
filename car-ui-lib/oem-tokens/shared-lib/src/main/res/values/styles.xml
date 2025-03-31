@@ -14,6 +14,79 @@
  limitations under the License.
 -->
 <resources>
-    <style name="OemStyle">
-    </style>
+  <color name="color_primary">@android:color/holo_orange_dark</color>
+  <color name="color_on_primary">@android:color/holo_orange_dark</color>
+  <color name="color_primary_container">@android:color/holo_orange_dark</color>
+  <color name="color_on_primary_container">@android:color/holo_orange_dark</color>
+  <color name="color_secondary">@android:color/holo_orange_dark</color>
+  <color name="color_on_secondary">@android:color/holo_orange_dark</color>
+  <color name="color_secondary_container">@android:color/holo_orange_dark</color>
+  <color name="color_on_secondary_container">@android:color/holo_orange_dark</color>
+  <color name="color_tertiary">@android:color/holo_orange_dark</color>
+  <color name="color_on_tertiary">@android:color/holo_orange_dark</color>
+  <color name="color_tertiary_container">@android:color/holo_orange_dark</color>
+  <color name="color_on_tertiary_container">@android:color/holo_orange_dark</color>
+  <color name="color_error">@android:color/holo_orange_dark</color>
+  <color name="color_on_error">@android:color/holo_orange_dark</color>
+  <color name="color_error_container">@android:color/holo_orange_dark</color>
+  <color name="color_on_error_container">@android:color/holo_orange_dark</color>
+  <color name="color_background">@android:color/holo_orange_dark</color>
+  <color name="color_on_background">@android:color/holo_orange_dark</color>
+  <color name="color_surface">@android:color/holo_orange_dark</color>
+  <color name="color_on_surface">@android:color/holo_orange_dark</color>
+  <color name="color_surface_variant">@android:color/holo_orange_dark</color>
+  <color name="color_on_surface_variant">@android:color/holo_orange_dark</color>
+  <color name="color_surface_inverse">@android:color/holo_orange_dark</color>
+  <color name="color_on_surface_inverse">@android:color/holo_orange_dark</color>
+  <color name="color_primary_inverse">@android:color/holo_orange_dark</color>
+  <color name="color_outline">@android:color/holo_orange_dark</color>
+  <color name="color_scrim">@android:color/holo_orange_dark</color>
+  <color name="color_outline_variant">@android:color/holo_orange_dark</color>
+  <color name="color_surface_tint">@android:color/holo_orange_dark</color>
+  <color name="color_surface_dim">@android:color/holo_orange_dark</color>
+  <color name="color_surface_bright">@android:color/holo_orange_dark</color>
+  <color name="color_surface_container">@android:color/holo_orange_dark</color>
+  <color name="color_surface_container_low">@android:color/holo_orange_dark</color>
+  <color name="color_surface_container_lowest">@android:color/holo_orange_dark</color>
+  <color name="color_surface_container_high">@android:color/holo_orange_dark</color>
+  <color name="color_surface_container_highest">@android:color/holo_orange_dark</color>
+
+  <style name="OemStyle">
+    <item name="com.android.oem.tokens:colorPrimary">@color/color_primary</item>
+    <item name="com.android.oem.tokens:colorOnPrimary">@color/color_on_primary</item>
+    <item name="com.android.oem.tokens:colorPrimaryContainer">@color/color_primary_container</item>
+    <item name="com.android.oem.tokens:colorOnPrimaryContainer">@color/color_on_primary_container</item>
+    <item name="com.android.oem.tokens:colorSecondary">@color/color_secondary</item>
+    <item name="com.android.oem.tokens:colorOnSecondary">@color/color_on_secondary</item>
+    <item name="com.android.oem.tokens:colorSecondaryContainer">@color/color_secondary_container</item>
+    <item name="com.android.oem.tokens:colorOnSecondaryContainer">@color/color_on_secondary_container</item>
+    <item name="com.android.oem.tokens:colorTertiary">@color/color_tertiary</item>
+    <item name="com.android.oem.tokens:colorOnTertiary">@color/color_on_tertiary</item>
+    <item name="com.android.oem.tokens:colorTertiaryContainer">@color/color_tertiary_container</item>
+    <item name="com.android.oem.tokens:colorOnTertiaryContainer">@color/color_on_tertiary_container</item>
+    <item name="com.android.oem.tokens:colorError">@color/color_error</item>
+    <item name="com.android.oem.tokens:colorOnError">@color/color_on_error</item>
+    <item name="com.android.oem.tokens:colorErrorContainer">@color/color_error_container</item>
+    <item name="com.android.oem.tokens:colorOnErrorContainer">@color/color_on_error_container</item>
+    <item name="com.android.oem.tokens:colorOutline">@color/color_outline</item>
+    <item name="com.android.oem.tokens:colorBackground">@color/color_background</item>
+    <item name="com.android.oem.tokens:colorOnBackground">@color/color_on_background</item>
+    <item name="com.android.oem.tokens:colorSurface">@color/color_surface</item>
+    <item name="com.android.oem.tokens:colorOnSurface">@color/color_on_surface</item>
+    <item name="com.android.oem.tokens:colorSurfaceVariant">@color/color_surface_variant</item>
+    <item name="com.android.oem.tokens:colorOnSurfaceVariant">@color/color_on_surface_variant</item>
+    <item name="com.android.oem.tokens:colorSurfaceInverse">@color/color_surface_inverse</item>
+    <item name="com.android.oem.tokens:colorOnSurfaceInverse">@color/color_on_surface_inverse</item>
+    <item name="com.android.oem.tokens:colorPrimaryInverse">@color/color_primary_inverse</item>
+    <item name="com.android.oem.tokens:colorSurfaceTint">@color/color_surface_tint</item>
+    <item name="com.android.oem.tokens:colorOutlineVariant">@color/color_outline_variant</item>
+    <item name="com.android.oem.tokens:colorScrim">@color/color_scrim</item>
+    <item name="com.android.oem.tokens:colorSurfaceDim">@color/color_surface_dim</item>
+    <item name="com.android.oem.tokens:colorSurfaceBright">@color/color_surface_bright</item>
+    <item name="com.android.oem.tokens:colorSurfaceContainer">@color/color_surface_container</item>
+    <item name="com.android.oem.tokens:colorSurfaceContainerLow">@color/color_surface_container_low</item>
+    <item name="com.android.oem.tokens:colorSurfaceContainerLowest">@color/color_surface_container_lowest</item>
+    <item name="com.android.oem.tokens:colorSurfaceContainerHigh">@color/color_surface_container_high</item>
+    <item name="com.android.oem.tokens:colorSurfaceContainerHighest">@color/color_surface_container_highest</item>
+  </style>
 </resources>
