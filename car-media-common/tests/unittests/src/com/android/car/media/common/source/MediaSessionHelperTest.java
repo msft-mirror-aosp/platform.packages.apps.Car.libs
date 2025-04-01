@@ -34,11 +34,11 @@ import android.service.notification.StatusBarNotification;
 import android.support.v4.media.session.MediaControllerCompat;
 
 import androidx.annotation.NonNull;
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.android.car.media.common.MediaTestUtils;
-import com.android.car.testing.common.InstantTaskExecutorRule;
 import com.android.car.testing.common.TestLifecycleOwner;
 
 import org.junit.Before;

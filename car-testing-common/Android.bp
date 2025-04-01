@@ -20,6 +20,7 @@ package {
 
 car_testing_common_static_libs = [
     "androidx.annotation_annotation",
+    "androidx.arch.core_core-testing",
     "androidx.lifecycle_lifecycle-common-java8",
     "androidx.lifecycle_lifecycle-extensions",
     "junit",
