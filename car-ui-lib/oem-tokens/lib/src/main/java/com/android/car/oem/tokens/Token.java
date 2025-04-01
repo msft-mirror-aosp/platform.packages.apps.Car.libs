@@ -146,6 +146,20 @@ public class Token {
             }
 
             context.getTheme().applyStyle(oemStyleOverride, true);
+
+            // Apply framework-res theme overlay
+            int themeOverlayNameId = context.getResources().getIdentifier("theme_overlay",
+                    "string", sharedLibName);
+            if (themeOverlayNameId == 0) {
+                return;
+            }
+            String overlayName = context.getResources().getString(themeOverlayNameId);
+            int themeOverlayId = context.getResources().getIdentifier(overlayName, null, null);
+
+            if (themeOverlayId == 0) {
+                return;
+            }
+            context.getTheme().applyStyle(themeOverlayId, true);
         }
     }
 

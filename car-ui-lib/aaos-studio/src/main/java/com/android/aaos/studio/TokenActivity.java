@@ -64,9 +64,9 @@ public class TokenActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.token_activity);
-
         Token.applyOemTokenStyle(this);
+
+        setContentView(R.layout.token_activity);
 
         mOverlayManager = getSystemService(android.content.om.OverlayManager.class);
 

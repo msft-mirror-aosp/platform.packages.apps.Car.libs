@@ -14,6 +14,8 @@
  limitations under the License.
 -->
 <resources>
+  <string name="theme_overlay">@null</string>
+
   <color name="color_primary">@android:color/holo_orange_dark</color>
   <color name="color_on_primary">@android:color/holo_orange_dark</color>
   <color name="color_primary_container">@android:color/holo_orange_dark</color>
