@@ -247,6 +247,10 @@ public class TokenActivity extends Activity {
                         TypedValue.TYPE_INT_COLOR_ARGB8, mScheme.getSurfaceVariant(), null)
                 .setResourceValue("com.android.oem.tokens:color/color_on_surface_variant",
                         TypedValue.TYPE_INT_COLOR_ARGB8, mScheme.getOnSurfaceVariant(), null)
+                .setResourceValue("com.android.oem.tokens:color/color_surface_inverse",
+                        TypedValue.TYPE_INT_COLOR_ARGB8, mScheme.getInverseSurface(), null)
+                .setResourceValue("com.android.oem.tokens:color/color_on_surface_inverse",
+                        TypedValue.TYPE_INT_COLOR_ARGB8, mScheme.getInverseOnSurface(), null)
                 .setResourceValue("com.android.oem.tokens:color/color_outline",
                         TypedValue.TYPE_INT_COLOR_ARGB8, mScheme.getOutline(), null)
                 .setResourceValue("com.android.oem.tokens:color/color_outline_variant",
