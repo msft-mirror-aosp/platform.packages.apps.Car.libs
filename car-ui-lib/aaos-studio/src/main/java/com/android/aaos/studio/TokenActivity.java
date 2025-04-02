@@ -50,7 +50,7 @@ public class TokenActivity extends Activity {
     private static final String TAG = "TokenActivity";
     private static final String OWNING_PACKAGE = "com.android.aaos.studio";
     private static final String TARGET_PACKAGE = "oem.demo.sharedlib";
-    private static final String OVERLAY_NAME = "FabricatedThemeTokenLib27";
+    private static final String OVERLAY_NAME = "AaosStudioFrro";
 
     private OverlayManager mOverlayManager;
 
@@ -65,7 +65,6 @@ public class TokenActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Token.applyOemTokenStyle(this);
-
         setContentView(R.layout.token_activity);
 
         mOverlayManager = getSystemService(android.content.om.OverlayManager.class);
@@ -200,6 +199,9 @@ public class TokenActivity extends Activity {
 
         FabricatedOverlay overlay = new FabricatedOverlay.Builder(OWNING_PACKAGE, OVERLAY_NAME,
                 TARGET_PACKAGE)
+                .setResourceValue("com.android.oem.tokens:string/theme_overlay",
+                        TypedValue.TYPE_STRING, "oem.brand.model.android.rro:style/OemThemeOverlay",
+                        null)
                 .setResourceValue("com.android.oem.tokens:bool/enable_oem_tokens",
                         TypedValue.TYPE_INT_BOOLEAN, 1, null)
                 // Set color resources
