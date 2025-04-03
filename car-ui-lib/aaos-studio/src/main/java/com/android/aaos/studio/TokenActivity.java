@@ -27,6 +27,7 @@ import android.util.Pair;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.android.car.oem.tokens.Token;
@@ -53,13 +54,12 @@ public class TokenActivity extends Activity {
     private static final String OVERLAY_NAME = "AaosStudioFrro";
 
     private OverlayManager mOverlayManager;
-
     private int mPrimaryRed;
     private int mPrimaryGreen;
     private int mPrimaryBlue;
     private View mPrimaryColorView;
-
     private SchemeVibrant mScheme;
+    private boolean mIsLightMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +68,8 @@ public class TokenActivity extends Activity {
         setContentView(R.layout.token_activity);
 
         mOverlayManager = getSystemService(android.content.om.OverlayManager.class);
+        mIsLightMode = isLightMode(Token.getColor(this, R.attr.oemColorBackground),
+                Token.getColor(this, R.attr.oemColorOnBackground));
 
         CarUiRecyclerView list = requireViewById(R.id.list);
         TokenDemoAdapter adapter = new TokenDemoAdapter(createColorList());
@@ -108,7 +110,10 @@ public class TokenActivity extends Activity {
         SeekBar seekBar1 = findViewById(R.id.seekbar1);
         SeekBar seekBar2 = findViewById(R.id.seekbar2);
         SeekBar seekBar3 = findViewById(R.id.seekbar3);
+        Switch lightSwitch = findViewById(R.id.light_switch);
         mPrimaryColorView = findViewById(R.id.primary_color);
+
+        lightSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> mIsLightMode = isChecked);
 
         List<MenuItem> menuItems = new ArrayList<>();
         menuItems.add(MenuItem.builder(this)
@@ -116,7 +121,7 @@ public class TokenActivity extends Activity {
                 .setOnClickListener(i -> {
                     int seedColor = Color.argb(255, mPrimaryRed, mPrimaryGreen, mPrimaryBlue);
                     Hct seed = Hct.fromInt(seedColor);
-                    mScheme = new SchemeVibrant(seed, true, 0.0);
+                    mScheme = new SchemeVibrant(seed, !mIsLightMode, 0.0);
                     updateOverlay();
                 })
                 .build());
@@ -179,6 +184,16 @@ public class TokenActivity extends Activity {
 
             }
         });
+    }
+
+    private boolean isLightMode(int background, int foreground) {
+        float[] hsvA = new float[3];
+        float[] hsvB = new float[3];
+
+        Color.colorToHSV(background, hsvA);
+        Color.colorToHSV(foreground, hsvB);
+
+        return hsvA[2] > hsvB[2];
     }
 
     private void updatePrimary() {
