@@ -22,12 +22,18 @@ import org.gradle.api.provider.Property
 import org.jetbrains.kotlin.gradle.plugin.extraProperties
 
 interface AaosAppsBuildCfgExt {
+    val currentSdk: Property<Int>
     val jdkToolchain: Property<Int>
     // Path to the root of the checkout
     val repoRoot: DirectoryProperty
 }
 
 fun AaosAppsBuildCfgExt.setDefaults(project: Project) {
+
+    currentSdk.convention(
+        project.providers.gradleProperty("aaosApps.buildCfg.currentSdk").map { it.toInt() }
+    )
+
     // Set the default value of the toolchain to the value set in the Gradle properties
     jdkToolchain.convention(
         project.providers.gradleProperty("aaosApps.buildCfg.defaultJdkToolchain").map {
