@@ -35,7 +35,7 @@ buildscript {
     gradle.ext.platformGoogleCertPath = gradle.ext.repoRootPath + "/vendor/google/certs/devkeys/platform.keystore"
     gradle.ext.platformAospCertPath = gradle.ext.repoRootPath + "/packages/apps/Car/libs/certs/platform.keystore"
 
-    gradle.ext.platformSdkVersion = "34" // Change this to the most recent android API level.
+    gradle.ext.platformSdkVersion = "35" // Change this to the most recent android API level.
 
     // If the checkout includes Soong bash and `PLATFORM_SDK_VERSION` is set then use that instead.
     gradle.ext.soongBash = gradle.ext.repoRootPath + "/build/soong/soong_ui.bash"
