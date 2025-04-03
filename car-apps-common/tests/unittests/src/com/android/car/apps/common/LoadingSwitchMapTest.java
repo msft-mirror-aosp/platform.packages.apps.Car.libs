@@ -20,13 +20,13 @@ import static com.android.car.apps.common.util.LiveDataFunctions.loadingSwitchMa
 
 import static com.google.common.truth.Truth.assertThat;
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.android.car.apps.common.util.FutureData;
 import com.android.car.testing.common.CaptureObserver;
-import com.android.car.testing.common.InstantTaskExecutorRule;
 import com.android.car.testing.common.TestLifecycleOwner;
 
 import org.junit.Before;

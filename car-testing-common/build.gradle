@@ -46,13 +46,10 @@ android {
 
 dependencies {
 
-    implementation "androidx.annotation:annotation:1.2.0"
-
-    def lifecycle_version = "2.2.0"
-    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
-    // Not available in 2.3+
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
-
-    implementation "junit:junit:4.12"
-    implementation 'androidx.test.ext:junit:1.1.4'
+    implementation libs.androidx.annotation
+    implementation libs.androidx.lifecycle.common.java8
+    implementation libs.androidx.lifecycle.livedata.core
+    implementation libs.androidx.lifecycle.runtime.android
+    implementation libs.androidx.junit
+    implementation libs.junit
 }
