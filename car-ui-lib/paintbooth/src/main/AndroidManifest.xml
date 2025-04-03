@@ -45,7 +45,7 @@
       android:supportsRtl="true"
       android:icon="@drawable/ic_launcher"
       android:label="@string/app_name"
-      android:theme="@style/Theme.CarUi.WithToolbar">
+      android:theme="@style/PaintBoothTheme">
 
     <!-- TODO(b/288120202):  keep "com.chassis.car.ui.plugin" as the first shared library. -->
     <!-- This shared library has a dependency on static library. For resources to be loaded -->
@@ -134,7 +134,6 @@
     <activity
         android:name=".TokenActivity"
         android:exported="false"
-        android:theme="@style/TokenTheme"
         android:parentActivityName=".MainActivity"/>
     <activity android:name=".shortcutspopup.ShortcutsPopupSamples"
         android:exported="false"
