@@ -70,5 +70,4 @@ dependencies {
     implementation project(":car-app-card-lib")
     implementation project(":car-apps-common")
     implementation project(":car-media-common")
-    implementation project(":car-media-extensions")
 }

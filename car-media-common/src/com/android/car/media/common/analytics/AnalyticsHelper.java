@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 /**
  * Analytics related helper methods.
  */
-@OptIn(markerClass = androidx.car.app.annotations2.ExperimentalCarApi.class)
+@OptIn(markerClass = androidx.car.app.annotations.ExperimentalCarApi.class)
 public class AnalyticsHelper {
 
     static IAnalyticsManager sIAnalyticsManagerStub = new IAnalyticsManager() {};
