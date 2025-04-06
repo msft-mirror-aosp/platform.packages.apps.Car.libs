@@ -60,6 +60,7 @@ public class TokenActivity extends Activity {
     private View mPrimaryColorView;
     private SchemeVibrant mScheme;
     private boolean mIsLightMode;
+    private boolean mSquareCorners;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +69,6 @@ public class TokenActivity extends Activity {
         setContentView(R.layout.token_activity);
 
         mOverlayManager = getSystemService(android.content.om.OverlayManager.class);
-        mIsLightMode = isLightMode(Token.getColor(this, R.attr.oemColorBackground),
-                Token.getColor(this, R.attr.oemColorOnBackground));
 
         CarUiRecyclerView list = requireViewById(R.id.list);
         TokenDemoAdapter adapter = new TokenDemoAdapter(createColorList());
@@ -107,13 +106,23 @@ public class TokenActivity extends Activity {
             return;
         }
 
-        SeekBar seekBar1 = findViewById(R.id.seekbar1);
-        SeekBar seekBar2 = findViewById(R.id.seekbar2);
-        SeekBar seekBar3 = findViewById(R.id.seekbar3);
-        Switch lightSwitch = findViewById(R.id.light_switch);
-        mPrimaryColorView = findViewById(R.id.primary_color);
+        SeekBar seekBar1 = requireViewById(R.id.seekbar1);
+        SeekBar seekBar2 = requireViewById(R.id.seekbar2);
+        SeekBar seekBar3 = requireViewById(R.id.seekbar3);
+        Switch lightSwitch = requireViewById(R.id.light_switch);
+        Switch cornerSwitch = requireViewById(R.id.corner_switch);
 
+        mPrimaryColorView = requireViewById(R.id.primary_color);
+
+        mIsLightMode = isLightMode(Token.getColor(this, R.attr.oemColorBackground),
+                Token.getColor(this, R.attr.oemColorOnBackground));
+        lightSwitch.setChecked(mIsLightMode);
         lightSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> mIsLightMode = isChecked);
+
+        mSquareCorners = Token.getCornerRadius(this, R.attr.oemShapeCornerFull) == 0;
+        cornerSwitch.setChecked(mSquareCorners);
+        cornerSwitch.setOnCheckedChangeListener(
+                (buttonView, isChecked) -> mSquareCorners = isChecked);
 
         List<MenuItem> menuItems = new ArrayList<>();
         menuItems.add(MenuItem.builder(this)
@@ -290,6 +299,23 @@ public class TokenActivity extends Activity {
                         TypedValue.TYPE_INT_COLOR_ARGB8, mScheme.getSurfaceContainerHighest(), null)
                 .build();
 
+        if (mSquareCorners) {
+            overlay.setResourceValue("com.android.oem.tokens:dimen/corner_none",
+                    0f, TypedValue.COMPLEX_UNIT_DIP, null);
+            overlay.setResourceValue("com.android.oem.tokens:dimen/corner_extra_small",
+                    0f, TypedValue.COMPLEX_UNIT_DIP, null);
+            overlay.setResourceValue("com.android.oem.tokens:dimen/corner_small",
+                    0f, TypedValue.COMPLEX_UNIT_DIP, null);
+            overlay.setResourceValue("com.android.oem.tokens:dimen/corner_medium",
+                    0f, TypedValue.COMPLEX_UNIT_DIP, null);
+            overlay.setResourceValue("com.android.oem.tokens:dimen/corner_large",
+                    0f, TypedValue.COMPLEX_UNIT_DIP, null);
+            overlay.setResourceValue("com.android.oem.tokens:dimen/corner_extra_large",
+                    0f, TypedValue.COMPLEX_UNIT_DIP, null);
+            overlay.setResourceValue("com.android.oem.tokens:dimen/corner_full",
+                    0f, TypedValue.COMPLEX_UNIT_DIP, null);
+        }
+
         OverlayManagerTransaction.Builder transaction =
                 new OverlayManagerTransaction.Builder()
                         .registerFabricatedOverlay(overlay)
@@ -297,11 +323,6 @@ public class TokenActivity extends Activity {
                         .setEnabled(overlay.getIdentifier(), true, 0);
 
         mOverlayManager.commit(transaction.build());
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
     }
 
     private List<Pair<String, Integer>> createColorList() {

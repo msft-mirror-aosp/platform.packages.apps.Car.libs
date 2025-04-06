@@ -53,6 +53,14 @@
   <color name="color_surface_container_high">@android:color/holo_orange_dark</color>
   <color name="color_surface_container_highest">@android:color/holo_orange_dark</color>
 
+  <dimen name="corner_none">0dp</dimen>
+  <dimen name="corner_extra_small">8dp</dimen>
+  <dimen name="corner_small">16dp</dimen>
+  <dimen name="corner_medium">24dp</dimen>
+  <dimen name="corner_large">48dp</dimen>
+  <dimen name="corner_extra_large">48dp</dimen>
+  <dimen name="corner_full">1000dp</dimen>
+
   <style name="OemStyle">
     <item name="com.android.oem.tokens:colorPrimary">@color/color_primary</item>
     <item name="com.android.oem.tokens:colorOnPrimary">@color/color_on_primary</item>
@@ -90,5 +98,13 @@
     <item name="com.android.oem.tokens:colorSurfaceContainerLowest">@color/color_surface_container_lowest</item>
     <item name="com.android.oem.tokens:colorSurfaceContainerHigh">@color/color_surface_container_high</item>
     <item name="com.android.oem.tokens:colorSurfaceContainerHighest">@color/color_surface_container_highest</item>
+
+    <item name="com.android.oem.tokens:shapeCornerNone">@dimen/corner_small</item>
+    <item name="com.android.oem.tokens:shapeCornerExtraSmall">@dimen/corner_extra_small</item>
+    <item name="com.android.oem.tokens:shapeCornerSmall">@dimen/corner_small</item>
+    <item name="com.android.oem.tokens:shapeCornerMedium">@dimen/corner_medium</item>
+    <item name="com.android.oem.tokens:shapeCornerLarge">@dimen/corner_large</item>
+    <item name="com.android.oem.tokens:shapeCornerExtraLarge">@dimen/corner_extra_large</item>
+    <item name="com.android.oem.tokens:shapeCornerFull">@dimen/corner_full</item>
   </style>
 </resources>
