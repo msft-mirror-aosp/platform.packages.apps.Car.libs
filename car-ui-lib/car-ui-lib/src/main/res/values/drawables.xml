@@ -21,8 +21,6 @@
 
     <!-- Toolbar -->
 
-    <!-- Toolbar background color -->
-    <drawable name="car_ui_toolbar_background">#E0000000</drawable>
     <!-- Search icon shown inside the search box in the toolbar -->
     <drawable name="car_ui_toolbar_search_search_icon">@drawable/car_ui_icon_search</drawable>
     <!-- Icon used for clearing the search box in toolbar -->
