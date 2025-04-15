@@ -43,6 +43,7 @@ import com.google.ux.material.libmonet.scheme.SchemeVibrant;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Activity that shows displays the values of OEM design tokens.
@@ -52,6 +53,7 @@ public class TokenActivity extends Activity {
     private static final String OWNING_PACKAGE = "com.android.aaos.studio";
     private static final String TARGET_PACKAGE = "oem.demo.sharedlib";
     private static final String OVERLAY_NAME = "AaosStudioFrro";
+    private static final String ANDROID_OVERLAY_NAME = "AaosStudioFrameworkResFrro";
 
     private OverlayManager mOverlayManager;
     private int mPrimaryRed;
@@ -132,11 +134,15 @@ public class TokenActivity extends Activity {
                     Hct seed = Hct.fromInt(seedColor);
                     mScheme = new SchemeVibrant(seed, !mIsLightMode, 0.0);
                     updateOverlay();
+                    updateFrameworkOverlay();
                 })
                 .build());
         menuItems.add(MenuItem.builder(this)
                 .setTitle("Disable RRO")
-                .setOnClickListener(i -> disableOverlay())
+                .setOnClickListener(i -> {
+                    disableOverlay();
+                    disableFrameworkOverlay();
+                })
                 .build());
         toolbar.setMenuItems(menuItems);
 
@@ -215,6 +221,14 @@ public class TokenActivity extends Activity {
                 new OverlayManagerTransaction.Builder()
                         .unregisterFabricatedOverlay(
                                 new OverlayIdentifier(OWNING_PACKAGE, OVERLAY_NAME));
+        mOverlayManager.commit(transaction.build());
+    }
+
+    private void disableFrameworkOverlay() {
+        OverlayManagerTransaction.Builder transaction =
+                new OverlayManagerTransaction.Builder()
+                        .unregisterFabricatedOverlay(
+                                new OverlayIdentifier(OWNING_PACKAGE, ANDROID_OVERLAY_NAME));
         mOverlayManager.commit(transaction.build());
     }
 
@@ -315,6 +329,33 @@ public class TokenActivity extends Activity {
             overlay.setResourceValue("com.android.oem.tokens:dimen/corner_full",
                     0f, TypedValue.COMPLEX_UNIT_DIP, null);
         }
+
+        OverlayManagerTransaction.Builder transaction =
+                new OverlayManagerTransaction.Builder()
+                        .registerFabricatedOverlay(overlay)
+                        .setEnabled(overlay.getIdentifier(), true)
+                        .setEnabled(overlay.getIdentifier(), true, 0);
+
+        mOverlayManager.commit(transaction.build());
+    }
+
+    private void updateFrameworkOverlay() {
+        FabricatedOverlay overlay = new FabricatedOverlay.Builder(OWNING_PACKAGE,
+                ANDROID_OVERLAY_NAME, "android")
+                .build();
+
+        int corner = 1000;
+        int isRoundCorner = 1;
+        if (mSquareCorners) {
+            corner = 0;
+            isRoundCorner = 0;
+        }
+
+        overlay.setResourceValue("android:string/config_icon_mask",
+                TypedValue.TYPE_STRING, createRoundedRectPath(corner),
+                null);
+        overlay.setResourceValue("android:bool/config_useRoundIcon",
+                TypedValue.TYPE_INT_BOOLEAN, isRoundCorner, null);
 
         OverlayManagerTransaction.Builder transaction =
                 new OverlayManagerTransaction.Builder()
@@ -460,5 +501,29 @@ public class TokenActivity extends Activity {
                 R.attr.oemShapeCornerFull));
 
         return list;
+    }
+
+    private static String createRoundedRectPath(float corner) {
+        // Clamp the radius: must be >= 0 and <= half the shortest side (100 / 2 = 50)
+        float r = Math.max(0f, Math.min(corner, 50f));
+
+        // Handle the non-rounded case
+        if (r <= 0.001f) {
+            return "M 0 0 H 100 V 100 H 0 Z"; // Simple rectangle
+        }
+        return String.format(
+                Locale.US,
+                "M %f 0 L %f 0 A %f %f 0 0 1 100 %f L 100 %f A %f %f 0 0 1 %f 100 L %f 100 A %f "
+                        + "%f 0 0 1 0 %f L 0 %f A %f %f 0 0 1 %f 0 Z",
+                r,       // M x=r, y=0               (Start middle of top edge)
+                100f - r,       // L x=100-r, y=0           (Line to top-right corner start)
+                r, r, r,        // A rx=r ry=r rot=0 lrg=0 swp=1 x=100, y=r (Top-right arc)
+                100f - r,       // L x=100, y=100-r         (Line to bottom-right corner start)
+                r, r, 100f - r, // A rx=r ry=r rot=0 lrg=0 swp=1 x=100-r, y=100(Bottom-right arc)
+                r,              // L x=r, y=100             (Line to bottom-left corner start)
+                r, r, 100f - r, // A rx=r ry=r rot=0 lrg=0 swp=1 x=0, y=100-r  (Bottom-left arc)
+                r,              // L x=0, y=r               (Line to top-left corner start)
+                r, r, r    // A rx=r ry=r rot=0 lrg=0 swp=1 x=r, y=0    (Top-left arc back to start)
+        );
     }
 }
