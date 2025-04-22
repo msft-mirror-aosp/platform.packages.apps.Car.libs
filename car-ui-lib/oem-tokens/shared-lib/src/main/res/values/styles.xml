@@ -52,6 +52,18 @@
   <color name="color_surface_container_lowest">@android:color/holo_orange_dark</color>
   <color name="color_surface_container_high">@android:color/holo_orange_dark</color>
   <color name="color_surface_container_highest">@android:color/holo_orange_dark</color>
+  <color name="color_blue">@android:color/holo_orange_dark</color>
+  <color name="color_on_blue">@android:color/holo_orange_dark</color>
+  <color name="color_blue_container">@android:color/holo_orange_dark</color>
+  <color name="color_on_blue_container">@android:color/holo_orange_dark</color>
+  <color name="color_green">@android:color/holo_orange_dark</color>
+  <color name="color_on_green">@android:color/holo_orange_dark</color>
+  <color name="color_green_container">@android:color/holo_orange_dark</color>
+  <color name="color_on_green_container">@android:color/holo_orange_dark</color>
+  <color name="color_yellow">@android:color/holo_orange_dark</color>
+  <color name="color_on_yellow">@android:color/holo_orange_dark</color>
+  <color name="color_yellow_container">@android:color/holo_orange_dark</color>
+  <color name="color_on_yellow_container">@android:color/holo_orange_dark</color>
 
   <dimen name="corner_none">0dp</dimen>
   <dimen name="corner_extra_small">8dp</dimen>
@@ -98,6 +110,18 @@
     <item name="com.android.oem.tokens:colorSurfaceContainerLowest">@color/color_surface_container_lowest</item>
     <item name="com.android.oem.tokens:colorSurfaceContainerHigh">@color/color_surface_container_high</item>
     <item name="com.android.oem.tokens:colorSurfaceContainerHighest">@color/color_surface_container_highest</item>
+    <item name="com.android.oem.tokens:colorBlue">@color/color_blue</item>
+    <item name="com.android.oem.tokens:colorOnBlue">@color/color_on_blue</item>
+    <item name="com.android.oem.tokens:colorBlueContainer">@color/color_blue_container</item>
+    <item name="com.android.oem.tokens:colorOnBlueContainer">@color/color_on_blue_container</item>
+    <item name="com.android.oem.tokens:colorGreen">@color/color_green</item>
+    <item name="com.android.oem.tokens:colorOnGreen">@color/color_on_green</item>
+    <item name="com.android.oem.tokens:colorGreenContainer">@color/color_green_container</item>
+    <item name="com.android.oem.tokens:colorOnGreenContainer">@color/color_on_green_container</item>
+    <item name="com.android.oem.tokens:colorYellow">@color/color_yellow</item>
+    <item name="com.android.oem.tokens:colorOnYellow">@color/color_on_yellow</item>
+    <item name="com.android.oem.tokens:colorYellowContainer">@color/color_yellow_container</item>
+    <item name="com.android.oem.tokens:colorOnYellowContainer">@color/color_on_yellow_container</item>
 
     <item name="com.android.oem.tokens:shapeCornerNone">@dimen/corner_small</item>
     <item name="com.android.oem.tokens:shapeCornerExtraSmall">@dimen/corner_extra_small</item>

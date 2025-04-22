@@ -38,6 +38,7 @@ import com.android.car.ui.toolbar.NavButtonMode;
 import com.android.car.ui.toolbar.Tab;
 import com.android.car.ui.toolbar.ToolbarController;
 
+import com.google.ux.material.libmonet.blend.Blend;
 import com.google.ux.material.libmonet.hct.Hct;
 import com.google.ux.material.libmonet.scheme.SchemeVibrant;
 
@@ -311,6 +312,54 @@ public class TokenActivity extends Activity {
                         TypedValue.TYPE_INT_COLOR_ARGB8, mScheme.getSurfaceContainerHigh(), null)
                 .setResourceValue("com.android.oem.tokens:color/color_surface_container_highest",
                         TypedValue.TYPE_INT_COLOR_ARGB8, mScheme.getSurfaceContainerHighest(), null)
+                .setResourceValue("com.android.oem.tokens:color/color_blue",
+                        TypedValue.TYPE_INT_COLOR_ARGB8,
+                        Blend.harmonize(getColor(R.color.oem_color_blue_dark),
+                                mScheme.getPrimary()), null)
+                .setResourceValue("com.android.oem.tokens:color/color_on_blue",
+                        TypedValue.TYPE_INT_COLOR_ARGB8,
+                        Blend.harmonize(getColor(R.color.oem_color_on_blue_dark),
+                                mScheme.getPrimary()), null)
+                .setResourceValue("com.android.oem.tokens:color/color_blue_container",
+                        TypedValue.TYPE_INT_COLOR_ARGB8,
+                        Blend.harmonize(getColor(R.color.oem_color_blue_container_dark),
+                                mScheme.getPrimary()), null)
+                .setResourceValue("com.android.oem.tokens:color/color_on_blue_container",
+                        TypedValue.TYPE_INT_COLOR_ARGB8,
+                        Blend.harmonize(getColor(R.color.oem_color_on_blue_container_dark),
+                                mScheme.getPrimary()), null)
+                .setResourceValue("com.android.oem.tokens:color/color_green",
+                        TypedValue.TYPE_INT_COLOR_ARGB8,
+                        Blend.harmonize(getColor(R.color.oem_color_green_dark),
+                                mScheme.getPrimary()), null)
+                .setResourceValue("com.android.oem.tokens:color/color_on_green",
+                        TypedValue.TYPE_INT_COLOR_ARGB8,
+                        Blend.harmonize(getColor(R.color.oem_color_on_green_dark),
+                                mScheme.getPrimary()), null)
+                .setResourceValue("com.android.oem.tokens:color/color_green_container",
+                        TypedValue.TYPE_INT_COLOR_ARGB8,
+                        Blend.harmonize(getColor(R.color.oem_color_green_container_dark),
+                                mScheme.getPrimary()), null)
+                .setResourceValue("com.android.oem.tokens:color/color_on_green_container",
+                        TypedValue.TYPE_INT_COLOR_ARGB8,
+                        Blend.harmonize(getColor(R.color.oem_color_on_green_container_dark),
+                                mScheme.getPrimary()), null)
+                .setResourceValue("com.android.oem.tokens:color/color_yellow",
+                        TypedValue.TYPE_INT_COLOR_ARGB8,
+                        Blend.harmonize(getColor(R.color.oem_color_yellow_dark),
+                                mScheme.getPrimary()), null)
+                .setResourceValue("com.android.oem.tokens:color/color_on_yellow",
+                        TypedValue.TYPE_INT_COLOR_ARGB8,
+                        Blend.harmonize(getColor(R.color.oem_color_on_yellow_dark),
+                                mScheme.getPrimary()), null)
+                .setResourceValue("com.android.oem.tokens:color/color_yellow_container",
+                        TypedValue.TYPE_INT_COLOR_ARGB8,
+                        Blend.harmonize(getColor(R.color.oem_color_yellow_container_dark),
+                                mScheme.getPrimary()), null)
+                .setResourceValue("com.android.oem.tokens:color/color_on_yellow_container",
+                        TypedValue.TYPE_INT_COLOR_ARGB8,
+                        Blend.harmonize(getColor(R.color.oem_color_on_yellow_container_dark),
+                                mScheme.getPrimary()), null)
                 .build();
 
         if (mSquareCorners) {

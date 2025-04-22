@@ -215,18 +215,18 @@
         <item name="oemColorSurfaceContainerLowest">#0A0F12</item>
         <item name="oemColorSurfaceContainerHigh">#262B2E</item>
         <item name="oemColorSurfaceContainerHighest">#313539</item>
-        <item name="oemColorBlue">#86A9FF</item>
-        <item name="oemColorOnBlue">#001945</item>
-        <item name="oemColorBlueContainer">#00419C</item>
-        <item name="oemColorOnBlueContainer">#D9E2FF</item>
-        <item name="oemColorGreen">#5BBF6B</item>
-        <item name="oemColorOnGreen">#002107</item>
-        <item name="oemColorGreenContainer">#00531D</item>
-        <item name="oemColorOnGreenContainer">#92F99D</item>
-        <item name="oemColorYellow">#EB9A00</item>
-        <item name="oemColorOnYellow">#2A1800</item>
-        <item name="oemColorYellowContainer">#643F00</item>
-        <item name="oemColorOnYellowContainer">#FFDDB6</item>
+        <item name="oemColorBlue">@color/oem_color_blue_dark</item>
+        <item name="oemColorOnBlue">@color/oem_color_on_blue_dark</item>
+        <item name="oemColorBlueContainer">@color/oem_color_blue_container_dark</item>
+        <item name="oemColorOnBlueContainer">@color/oem_color_on_blue_container_dark</item>
+        <item name="oemColorGreen">@color/oem_color_green_dark</item>
+        <item name="oemColorOnGreen">@color/oem_color_on_green_dark</item>
+        <item name="oemColorGreenContainer">@color/oem_color_green_container_dark</item>
+        <item name="oemColorOnGreenContainer">@color/oem_color_on_green_container_dark</item>
+        <item name="oemColorYellow">@color/oem_color_yellow_dark</item>
+        <item name="oemColorOnYellow">@color/oem_color_on_yellow_dark</item>
+        <item name="oemColorYellowContainer">@color/oem_color_yellow_container_dark</item>
+        <item name="oemColorOnYellowContainer">@color/oem_color_on_yellow_container_dark</item>
     </style>
 
     <style name="OemTokenSharedLibraryOverlay">
@@ -588,18 +588,18 @@
         <item name="com.android.oem.tokens:colorSurfaceContainerLowest">#0A0F12</item>
         <item name="com.android.oem.tokens:colorSurfaceContainerHigh">#262B2E</item>
         <item name="com.android.oem.tokens:colorSurfaceContainerHighest">#313539</item>
-        <item name="com.android.oem.tokens:colorBlue">#86A9FF</item>
-        <item name="com.android.oem.tokens:colorOnBlue">#001945</item>
-        <item name="com.android.oem.tokens:colorBlueContainer">#00419C</item>
-        <item name="com.android.oem.tokens:colorOnBlueContainer">#D9E2FF</item>
-        <item name="com.android.oem.tokens:colorGreen">#5BBF6B</item>
-        <item name="com.android.oem.tokens:colorOnGreen">#002107</item>
-        <item name="com.android.oem.tokens:colorGreenContainer">#00531D</item>
-        <item name="com.android.oem.tokens:colorOnGreenContainer">#92F99D</item>
-        <item name="com.android.oem.tokens:colorYellow">#EB9A00</item>
-        <item name="com.android.oem.tokens:colorOnYellow">#2A1800</item>
-        <item name="com.android.oem.tokens:colorYellowContainer">#643F00</item>
-        <item name="com.android.oem.tokens:colorOnYellowContainer">#FFDDB6</item>
+        <item name="com.android.oem.tokens:colorBlue">@color/oem_color_blue_dark</item>
+        <item name="com.android.oem.tokens:colorOnBlue">@color/oem_color_on_blue_dark</item>
+        <item name="com.android.oem.tokens:colorBlueContainer">@color/oem_color_blue_container_dark</item>
+        <item name="com.android.oem.tokens:colorOnBlueContainer">@color/oem_color_on_blue_container_dark</item>
+        <item name="com.android.oem.tokens:colorGreen">@color/oem_color_green_dark</item>
+        <item name="com.android.oem.tokens:colorOnGreen">@color/oem_color_on_green_dark</item>
+        <item name="com.android.oem.tokens:colorGreenContainer">@color/oem_color_green_container_dark</item>
+        <item name="com.android.oem.tokens:colorOnGreenContainer">@color/oem_color_on_green_container_dark</item>
+        <item name="com.android.oem.tokens:colorYellow">@color/oem_color_yellow_dark</item>
+        <item name="com.android.oem.tokens:colorOnYellow">@color/oem_color_on_yellow_dark</item>
+        <item name="com.android.oem.tokens:colorYellowContainer">@color/oem_color_yellow_container_dark</item>
+        <item name="com.android.oem.tokens:colorOnYellowContainer">@color/oem_color_on_yellow_container_dark</item>
     </style>
 
     <style name="BaseTextAppearance">
