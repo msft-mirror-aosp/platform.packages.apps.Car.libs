@@ -57,13 +57,11 @@ public class TokenActivity extends Activity {
     private static final String ANDROID_OVERLAY_NAME = "AaosStudioFrameworkResFrro";
 
     private OverlayManager mOverlayManager;
-    private int mPrimaryRed;
-    private int mPrimaryGreen;
-    private int mPrimaryBlue;
-    private View mPrimaryColorView;
+    private View mColorPreview;
     private SchemeVibrant mScheme;
     private boolean mIsLightMode;
     private boolean mSquareCorners;
+    private SeekBar mSeekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,13 +107,10 @@ public class TokenActivity extends Activity {
             return;
         }
 
-        SeekBar seekBar1 = requireViewById(R.id.seekbar1);
-        SeekBar seekBar2 = requireViewById(R.id.seekbar2);
-        SeekBar seekBar3 = requireViewById(R.id.seekbar3);
         Switch lightSwitch = requireViewById(R.id.light_switch);
         Switch cornerSwitch = requireViewById(R.id.corner_switch);
-
-        mPrimaryColorView = requireViewById(R.id.primary_color);
+        mColorPreview = requireViewById(R.id.color_preview);
+        mSeekBar = requireViewById(R.id.color_seekbar);
 
         mIsLightMode = isLightMode(Token.getColor(this, R.attr.oemColorBackground),
                 Token.getColor(this, R.attr.oemColorOnBackground));
@@ -131,7 +126,7 @@ public class TokenActivity extends Activity {
         menuItems.add(MenuItem.builder(this)
                 .setTitle("Enable RRO")
                 .setOnClickListener(i -> {
-                    int seedColor = Color.argb(255, mPrimaryRed, mPrimaryGreen, mPrimaryBlue);
+                    int seedColor = getSeedColor();
                     Hct seed = Hct.fromInt(seedColor);
                     mScheme = new SchemeVibrant(seed, !mIsLightMode, 0.0);
                     updateOverlay();
@@ -147,47 +142,10 @@ public class TokenActivity extends Activity {
                 .build());
         toolbar.setMenuItems(menuItems);
 
-        seekBar1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mPrimaryRed = progress;
-                updatePrimary();
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-        seekBar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mPrimaryGreen = progress;
-                updatePrimary();
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-        seekBar3.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mPrimaryBlue = progress;
-                updatePrimary();
+                updateColorPreview();
             }
 
             @Override
@@ -212,9 +170,17 @@ public class TokenActivity extends Activity {
         return hsvA[2] > hsvB[2];
     }
 
-    private void updatePrimary() {
-        int color = Color.rgb(mPrimaryRed, mPrimaryGreen, mPrimaryBlue);
-        ((GradientDrawable) mPrimaryColorView.getBackground()).setColor(color);
+    private int getSeedColor() {
+        float hue = (float) mSeekBar.getProgress();
+
+        // Set saturation and value to max 1.0f
+        float[] hsv = {hue, 1.0f, 1.0f};
+        return Color.HSVToColor(hsv);
+    }
+
+    private void updateColorPreview() {
+        int color = getSeedColor();
+        ((GradientDrawable) mColorPreview.getBackground()).setColor(color);
     }
 
     private void disableOverlay() {
