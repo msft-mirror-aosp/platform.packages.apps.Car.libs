@@ -17,7 +17,7 @@
 package com.example.appcard.sample.weather.model
 
 data class RelativeLocation(
-  val type: String? = null,
-  val geometry: RelativeLocationGeometry? = null,
-  val properties: RelativeLocationProperties? = null
+    val type: String? = null,
+    val geometry: RelativeLocationGeometry? = null,
+    val properties: RelativeLocationProperties? = null,
 )

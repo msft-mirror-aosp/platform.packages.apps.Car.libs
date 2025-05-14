@@ -19,7 +19,7 @@ package androidx.car.app.mediaextensions.analytics.host;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import androidx.car.app.annotations2.ExperimentalCarApi;
+import androidx.car.app.annotations.ExperimentalCarApi;
 import androidx.car.app.mediaextensions.analytics.event.AnalyticsEvent;
 import androidx.car.app.mediaextensions.analytics.event.BrowseChangeEvent;
 

@@ -26,8 +26,9 @@ import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
 
+import com.android.car.oem.tokens.Token;
+
 import com.chassis.car.ui.plugin.CarUiProxyLayoutInflaterFactory;
-import com.chassis.car.ui.plugin.R;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
@@ -114,28 +115,7 @@ public final class PluginUiContextFactory {
         mRecentUiContext = new WeakReference<>(uiContext);
 
         // Add required theme attributes to support OEM Design Tokens
-        int oemStyleOverride = uiContext.getResources().getIdentifier("OemStyle",
-                "style", "com.android.oem.tokens");
-        if (oemStyleOverride == 0) {
-            if (isLightTheme(uiContext)) {
-                uiContext.getTheme().applyStyle(
-                        R.style.OemTokensBaseLight, true);
-            } else {
-                uiContext.getTheme().applyStyle(
-                        R.style.OemTokensBaseDark, true);
-            }
-        } else {
-            uiContext.getTheme().applyStyle(
-                    R.style.OemTokens, true);
-            if (isLightTheme(uiContext)) {
-                uiContext.getTheme().applyStyle(
-                        R.style.OemTokensLight, true);
-            } else {
-                uiContext.getTheme().applyStyle(
-                        R.style.OemTokensDark, true);
-            }
-            uiContext.getTheme().applyStyle(oemStyleOverride, true);
-        }
+        Token.applyOemTokenStyle(uiContext);
 
         return new ContextWrapper(sourceContext) {
             @Override

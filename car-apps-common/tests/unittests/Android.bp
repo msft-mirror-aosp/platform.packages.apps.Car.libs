@@ -43,6 +43,7 @@ android_test {
         "androidx.test.espresso.core",
         "androidx.test.espresso.contrib",
         "androidx.test.ext.junit",
+        "androidx.arch.core_core-testing",
         "androidx.lifecycle_lifecycle-common-java8",
         "androidx.lifecycle_lifecycle-extensions",
         "car-apps-common-prebuilt",

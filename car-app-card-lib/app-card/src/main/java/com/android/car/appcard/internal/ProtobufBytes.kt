@@ -17,8 +17,6 @@ package com.android.car.appcard.internal
 
 /** Defines classes that can be converted to protobuf bytes. */
 interface ProtobufBytes {
-  /**
-   * @return protobuf byte array
-   */
-  fun toByteArray(): ByteArray
+    /** @return protobuf byte array */
+    fun toByteArray(): ByteArray
 }

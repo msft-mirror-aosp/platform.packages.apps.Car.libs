@@ -20,35 +20,35 @@ import android.os.Parcelable
 
 /** Utility class that provides helper methods for [Parcelable] conversion */
 object ParcelableUtils {
-  /** Convert bytes to [Parcelable] */
-  @JvmStatic
-  fun <T> bytesToParcelable(bytes: ByteArray, creator: Parcelable.Creator<T>): T {
-    val parcel = bytesToParcel(bytes)
-    val result = creator.createFromParcel(parcel)
-    parcel.recycle()
+    /** Convert bytes to [Parcelable] */
+    @JvmStatic
+    fun <T> bytesToParcelable(bytes: ByteArray, creator: Parcelable.Creator<T>): T {
+        val parcel = bytesToParcel(bytes)
+        val result = creator.createFromParcel(parcel)
+        parcel.recycle()
 
-    return result
-  }
+        return result
+    }
 
-  /** Convert [Parcelable] to bytes */
-  @JvmStatic
-  fun parcelableToBytes(parcelable: Parcelable): ByteArray {
-    val parcel = Parcel.obtain()
-    parcelable.writeToParcel(parcel, PARCEL_FLAGS)
-    val bytes = parcel.marshall()
-    parcel.recycle()
+    /** Convert [Parcelable] to bytes */
+    @JvmStatic
+    fun parcelableToBytes(parcelable: Parcelable): ByteArray {
+        val parcel = Parcel.obtain()
+        parcelable.writeToParcel(parcel, PARCEL_FLAGS)
+        val bytes = parcel.marshall()
+        parcel.recycle()
 
-    return bytes
-  }
+        return bytes
+    }
 
-  private fun bytesToParcel(bytes: ByteArray): Parcel {
-    val parcel = Parcel.obtain()
-    parcel.unmarshall(bytes, START_OFFSET, bytes.size)
-    parcel.setDataPosition(START_OFFSET) // do not remove, needed for re-read
+    private fun bytesToParcel(bytes: ByteArray): Parcel {
+        val parcel = Parcel.obtain()
+        parcel.unmarshall(bytes, START_OFFSET, bytes.size)
+        parcel.setDataPosition(START_OFFSET) // do not remove, needed for re-read
 
-    return parcel
-  }
+        return parcel
+    }
 
-  private const val START_OFFSET = 0
-  private const val PARCEL_FLAGS = 0
+    private const val START_OFFSET = 0
+    private const val PARCEL_FLAGS = 0
 }

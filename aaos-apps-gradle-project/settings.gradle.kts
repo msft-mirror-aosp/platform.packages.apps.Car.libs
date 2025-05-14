@@ -36,9 +36,9 @@ pluginManagement {
 }
 
 plugins {
-    id("aaosApps.buildLogic.settings")
     id("org.gradle.toolchains.foojay-resolver-convention").version("0.9.0")
 }
+apply(from = "buildLogic/findRepoRoot.settings.gradle.kts")
 
 dependencyResolutionManagement {
     // Fail the build if any project tries to declare it's own repositories

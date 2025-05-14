@@ -74,588 +74,588 @@ import com.android.car.appcard.host.ApplicationIdentifier
 
 /** Jetpack compose specific stateful representation of [ImageAppCard] */
 class ImageAppCardContainerState(
-  appCardContainer: AppCardContainer,
-  private val context: Context,
-  private val viewModel: HostViewModel,
+    appCardContainer: AppCardContainer,
+    private val context: Context,
+    private val viewModel: HostViewModel,
 ) : AppCardContainerState {
-  override var identifier: MutableState<ApplicationIdentifier> =
-    mutableStateOf(appCardContainer.appId)
+    override var identifier: MutableState<ApplicationIdentifier> =
+        mutableStateOf(appCardContainer.appId)
 
-  override val appCardId: String
-    get() = imageAppCard.id
+    override val appCardId: String
+        get() = imageAppCard.id
 
-  private var imageAppCard = appCardContainer.appCard as ImageAppCard
-  private var primaryText: MutableState<String?> =
-    mutableStateOf(imageAppCard.primaryText)
-  private var secondaryText: MutableState<String?> =
-    mutableStateOf(imageAppCard.secondaryText)
-  private var image: MutableState<Image?> = mutableStateOf(imageAppCard.image)
-  private var header: MutableState<Header?> = mutableStateOf(imageAppCard.header)
-  private var progressBar: MutableState<ProgressBar?> =
-    mutableStateOf(imageAppCard.progressBar)
-  private var buttons = imageAppCard.buttons.map { button ->
-    mutableStateOf(button)
-  }.toMutableStateList()
+    private var imageAppCard = appCardContainer.appCard as ImageAppCard
+    private var primaryText: MutableState<String?> = mutableStateOf(imageAppCard.primaryText)
+    private var secondaryText: MutableState<String?> = mutableStateOf(imageAppCard.secondaryText)
+    private var image: MutableState<Image?> = mutableStateOf(imageAppCard.image)
+    private var header: MutableState<Header?> = mutableStateOf(imageAppCard.header)
+    private var progressBar: MutableState<ProgressBar?> = mutableStateOf(imageAppCard.progressBar)
+    private var buttons =
+        imageAppCard.buttons.map { button -> mutableStateOf(button) }.toMutableStateList()
 
-  override fun update(other: AppCardContainer): Boolean {
-    if (identifier.value != other.appId) {
-      viewModel.logIfDebuggable(
-        TAG,
-        msg = "Unable to update App Card: Application identifier mismatch"
-      )
-      return false
-    }
-    if (imageAppCard.id != other.appCard.id) {
-      viewModel.logIfDebuggable(
-        TAG,
-        msg = "Unable to update App Card: App card ID mismatch"
-      )
-      return false
-    }
-
-    imageAppCard = other.appCard as ImageAppCard
-    primaryText.value = imageAppCard.primaryText
-    secondaryText.value = imageAppCard.secondaryText
-    image.value = imageAppCard.image
-    header.value = imageAppCard.header
-    progressBar.value = imageAppCard.progressBar
-
-    buttons.clear()
-    buttons.addAll(imageAppCard.buttons.map { button -> mutableStateOf(button) })
-
-    return true
-  }
-
-  override fun update(other: AppCardComponentContainer): Boolean {
-    if (identifier.value != other.appId) {
-      viewModel.logIfDebuggable(
-        TAG,
-        msg = "Unable to update App Card Component: Application identifier mismatch"
-      )
-      return false
-    }
-    if (imageAppCard.id != other.appCardId) {
-      viewModel.logIfDebuggable(
-        TAG,
-        msg = "Unable to update App Card Component: App Card ID mismatch"
-      )
-      return false
-    }
-
-    return update(other.component)
-  }
-
-  override fun update(component: Component): Boolean {
-    if (component is Image) {
-      var orig: Image? = null
-      image.value?.let {
-        orig = Image.fromMessage(it.toMessage())
-      }
-      orig?.let {
-        if (it != component && it.updateComponent(component)) {
-          image.value = it
-          return true
+    override fun update(other: AppCardContainer): Boolean {
+        if (identifier.value != other.appId) {
+            viewModel.logIfDebuggable(
+                TAG,
+                msg = "Unable to update App Card: Application identifier mismatch",
+            )
+            return false
         }
-      }
-    }
+        if (imageAppCard.id != other.appCard.id) {
+            viewModel.logIfDebuggable(TAG, msg = "Unable to update App Card: App card ID mismatch")
+            return false
+        }
 
-    if (component is Button || component is Image) {
-      var orig: Button? = null
-      var matchedIndex = -1
-      buttons.forEachIndexed { index, button ->
-        orig = Button.fromMessage(button.value.toMessage())
-        orig?.let {
-          if (it != component && it.updateComponent(component)) {
-            matchedIndex = index
-            return@forEachIndexed
-          }
-        }
-      }
-      if (matchedIndex != -1) {
-        orig?.let {
-          buttons[matchedIndex].value = it
-        }
+        imageAppCard = other.appCard as ImageAppCard
+        primaryText.value = imageAppCard.primaryText
+        secondaryText.value = imageAppCard.secondaryText
+        image.value = imageAppCard.image
+        header.value = imageAppCard.header
+        progressBar.value = imageAppCard.progressBar
+
+        buttons.clear()
+        buttons.addAll(imageAppCard.buttons.map { button -> mutableStateOf(button) })
+
         return true
-      }
     }
 
-    if (component is Header) {
-      var orig: Header? = null
-      header.value?.let {
-        orig = Header.fromMessage(it.toMessage())
-      }
-      orig?.let {
-        if (it != component && it.updateComponent(component)) {
-          header.value = it
-          return true
-        }
-      }
-    }
-
-    if (component is ProgressBar) {
-      var orig: ProgressBar? = null
-      progressBar.value?.let {
-        orig = ProgressBar.fromMessage(it.toMessage())
-      }
-      orig?.let {
-        if (it != component && it.updateComponent(component)) {
-          progressBar.value = it
-          return true
-        }
-      }
-    }
-
-    viewModel.logIfDebuggable(
-      TAG,
-      msg = "Unable to update App Card Component: Component update conditions not met"
-    )
-    return false
-  }
-
-  @Composable
-  override fun AppCard() {
-    val logMsg = "createAppCard: $identifier + ${imageAppCard.id}"
-    viewModel.logIfDebuggable(TAG, logMsg)
-
-    ElevatedCard(
-      elevation = CardDefaults.cardElevation(
-        defaultElevation = dimensionResource(R.dimen.card_elevation)
-      ),
-      modifier = Modifier
-        .size(
-          width = dimensionResource(R.dimen.card_width),
-          height = dimensionResource(R.dimen.card_height)
-        )
-        .padding(dimensionResource(R.dimen.card_padding)),
-      colors = CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.primary.copy(
-          alpha = SURFACE_3_PRIMARY_ALPHA
-        ).compositeOver(MaterialTheme.colorScheme.surface)
-      ),
-      shape = MaterialTheme.shapes.medium
-    ) {
-      val header = remember { header }
-      val image = remember { image }
-      val primaryText = remember { primaryText }
-      val secondaryText = remember { secondaryText }
-      val buttons = remember { buttons }
-      val buttonsExist = buttons.size > 0
-      val imageExists = image.value != null
-      val progressBarExists = progressBar.value != null
-
-      Column(
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.size(
-          width = dimensionResource(R.dimen.card_width),
-          height = dimensionResource(R.dimen.card_height)
-        )
-      ) {
-        CreateHeader(
-          imageAppCard.id,
-          identifier.value,
-          header.value,
-          identifier.value.packageName
-        )
-
-        image.value?.let {
-          Box(
-            modifier = Modifier
-              .weight(floatResource(R.dimen.image_box_weight))
-              .padding(all = dimensionResource(R.dimen.image_padding))
-          ) {
-            GetImage(
-              imageAppCard.id,
-              identifier.value,
-              it
+    override fun update(other: AppCardComponentContainer): Boolean {
+        if (identifier.value != other.appId) {
+            viewModel.logIfDebuggable(
+                TAG,
+                msg = "Unable to update App Card Component: Application identifier mismatch",
             )
-          }
+            return false
         }
-
-        Column(
-          verticalArrangement = Arrangement.Center,
-          horizontalAlignment = Alignment.CenterHorizontally,
-          modifier = Modifier.width(dimensionResource(R.dimen.card_width))
-        ) {
-          primaryText.value?.let {
-            Text(
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                  start = dimensionResource(R.dimen.primary_text_horizontal_padding),
-                  end = dimensionResource(R.dimen.primary_text_horizontal_padding),
-                  bottom = dimensionResource(R.dimen.primary_text_bottom_padding)
-                ),
-              style = MaterialTheme.typography.headlineLarge,
-              text = it,
-              color = MaterialTheme.colorScheme.onBackground,
-              maxLines = integerResource(R.integer.primary_text_max_lines),
-              overflow = TextOverflow.Ellipsis,
-              textAlign = TextAlign.Start
+        if (imageAppCard.id != other.appCardId) {
+            viewModel.logIfDebuggable(
+                TAG,
+                msg = "Unable to update App Card Component: App Card ID mismatch",
             )
-          }
-
-          secondaryText.value?.let {
-            Text(
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                  start = dimensionResource(R.dimen.secondary_text_horizontal_padding),
-                  end = dimensionResource(R.dimen.secondary_text_horizontal_padding),
-                  bottom = dimensionResource(R.dimen.secondary_text_bottom_padding)
-                ),
-              style = MaterialTheme.typography.titleLarge,
-              text = it,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
-              maxLines = integerResource(R.integer.secondary_text_max_lines),
-              overflow = TextOverflow.Ellipsis,
-              textAlign = TextAlign.Start
-            )
-          }
-
-          if (progressBarExists) {
-            CreateProgressBar(
-              imageAppCard.id,
-              identifier.value,
-              progressBar
-            )
-          } else if (buttonsExist) {
-            HorizontalDivider(
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                  start = dimensionResource(R.dimen.progressbar_horizontal_padding),
-                  end = dimensionResource(R.dimen.progressbar_horizontal_padding),
-                  top = dimensionResource(R.dimen.progressbar_top_padding),
-                  bottom = dimensionResource(R.dimen.progressbar_bottom_padding)
-                )
-            )
-          }
-
-          if (buttonsExist) {
-            CreateButtonRow(mutableStateOf(buttons.size))
-          } else if (!imageExists && progressBarExists) {
-            Box(
-              modifier = Modifier
-                .fillMaxWidth()
-                .height(dimensionResource(R.dimen.button_height))
-            ) {}
-          }
-        }
-      }
-    }
-  }
-
-  @Composable
-  private fun CreateButtonRow(numButtons: MutableState<Int>) {
-    viewModel.logIfDebuggable(
-      TAG,
-      msg = "createButtonRow: $identifier + $appCardId + ${buttons.size}"
-    )
-
-    Row(
-      horizontalArrangement = Arrangement.SpaceAround,
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(
-          bottom = dimensionResource(R.dimen.button_row_padding)
-        ),
-    ) {
-      buttons.forEachIndexed { index, button ->
-        if (index == 0) {
-          Spacer(modifier = Modifier.width(dimensionResource(R.dimen.button_row_padding)))
+            return false
         }
 
-        Box(
-          modifier = Modifier.weight(
-            floatResource(R.dimen.button_box_weight) / numButtons.value.toFloat()
-          )
-        ) {
-          CreateButton(button, numButtons)
-        }
-
-        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.button_row_padding)))
-      }
-    }
-  }
-
-  @Composable
-  private fun CreateButton(button: MutableState<Button>, numButtons: MutableState<Int>) {
-    viewModel.logIfDebuggable(
-      TAG,
-      msg = "createButton: $identifier + $appCardId + ${button.value.componentId}"
-    )
-
-    val onClick: () -> Unit = {
-      viewModel.logIfDebuggable(
-        TAG,
-        msg = "clicked: $identifier + $appCardId + ${button.value.componentId}"
-      )
-
-      viewModel.sendInteraction(
-        identifier.value,
-        appCardId,
-        button.value.componentId,
-        MSG_INTERACTION_ON_CLICK
-      )
-
-      button.value.intent?.let {
-        val packageName = identifier.value.packageName
-        val intent = Intent().apply {
-          setClassName(packageName, it.cls)
-          extras?.putAll(it.bundle)
-          setFlags(FLAG_ACTIVITY_NEW_TASK)
-        }
-        context.startActivity(intent)
-      }
+        return update(other.component)
     }
 
-    var colorFilter: ColorFilter? = null
-
-    button.value.image?.let {
-      if (it.colorFilter == Image.ColorFilter.TINT) {
-        colorFilter = if (button.value.buttonType == Button.ButtonType.PRIMARY) {
-          ColorFilter.tint(
-            color = MaterialTheme.colorScheme.onPrimary,
-            blendMode = BlendMode.SrcIn
-          )
-        } else {
-          ColorFilter.tint(
-            color = MaterialTheme.colorScheme.secondary,
-            blendMode = BlendMode.SrcIn
-          )
-        }
-      }
-    }
-
-    if (button.value.buttonType == Button.ButtonType.NO_BACKGROUND) {
-      TextButton(
-        onClick = onClick,
-        contentPadding = PaddingValues(),
-        modifier = Modifier
-          .height(dimensionResource(R.dimen.button_height))
-          .fillMaxWidth(),
-      ) {
-        button.value.image?.imageData?.let {
-          Image(
-            bitmap = it.asImageBitmap(),
-            contentDescription = stringResource(R.string.button_icon_content_desc),
-            modifier = Modifier.size(
-              width = dimensionResource(R.dimen.card_button_icon_size),
-              height = dimensionResource(R.dimen.card_button_icon_size),
-            ),
-            contentScale = ContentScale.Fit,
-            colorFilter = colorFilter,
-          )
-        }
-      }
-      return
-    }
-
-    val tooManyButtonsForText =
-      numButtons.value > integerResource(R.integer.number_buttons_to_show_text_with_image)
-    val shouldShowText = !tooManyButtonsForText || button.value.image?.imageData == null
-    val contentPadding = if (shouldShowText) {
-      PaddingValues(horizontal = dimensionResource(R.dimen.button_content_padding))
-    } else {
-      PaddingValues()
-    }
-
-    Button(
-      onClick = onClick,
-      colors = getButtonStyling(button.value.buttonType),
-      contentPadding = contentPadding,
-      modifier = Modifier
-        .height(dimensionResource(R.dimen.button_height))
-        .fillMaxWidth(),
-    ) {
-      button.value.image?.imageData?.let {
-        Image(
-          bitmap = it.asImageBitmap(),
-          contentDescription = stringResource(R.string.button_icon_content_desc),
-          modifier = Modifier.size(
-            width = dimensionResource(R.dimen.card_button_icon_size),
-            height = dimensionResource(R.dimen.card_button_icon_size),
-          ),
-          contentScale = ContentScale.Fit,
-          colorFilter = colorFilter,
-        )
-      }
-
-      if (shouldShowText) {
-        button.value.text?.let {
-          val maxLines = integerResource(R.integer.button_text_max_lines)
-
-          Text(
-            modifier = Modifier
-              .fillMaxWidth()
-              .align(Alignment.CenterVertically),
-            text = it,
-            style = MaterialTheme.typography.titleLarge,
-            color = if (button.value.buttonType == Button.ButtonType.PRIMARY) {
-              MaterialTheme.colorScheme.onPrimary
-            } else {
-              MaterialTheme.colorScheme.secondary
-            },
-            maxLines = maxLines,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center
-          )
-        }
-      }
-    }
-  }
-
-  @Composable
-  private fun getButtonStyling(type: Button.ButtonType): ButtonColors {
-    val backgroundColor = if (type == Button.ButtonType.PRIMARY) {
-      MaterialTheme.colorScheme.primary
-    } else {
-      MaterialTheme.colorScheme.secondaryContainer
-    }
-
-    val contentColor = if (type == Button.ButtonType.PRIMARY) {
-      MaterialTheme.colorScheme.onPrimary
-    } else {
-      MaterialTheme.colorScheme.secondary
-    }
-
-    return ButtonDefaults.buttonColors(
-      containerColor = backgroundColor,
-      contentColor = contentColor,
-      disabledContainerColor = backgroundColor,
-      disabledContentColor = contentColor,
-    )
-  }
-
-  @Composable
-  fun CreateProgressBar(
-    appCardId: String,
-    identifier: ApplicationIdentifier,
-    progressBarState: MutableState<ProgressBar?>,
-  ) {
-    val progressBar = progressBarState.value ?: return
-    val componentId = progressBarState.value?.componentId
-    viewModel.logIfDebuggable(
-      TAG,
-      msg = "createProgressBar: $identifier + $appCardId + $componentId"
-    )
-
-    val current = progressBar.progress.toFloat() - progressBar.min.toFloat()
-    val max = progressBar.max.toFloat() - progressBar.min.toFloat()
-    val progress = current / max
-
-    LinearProgressIndicator(
-      progress = progress,
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(
-          start = dimensionResource(R.dimen.progressbar_horizontal_padding),
-          end = dimensionResource(R.dimen.progressbar_horizontal_padding),
-          top = dimensionResource(R.dimen.progressbar_top_padding),
-          bottom = dimensionResource(R.dimen.progressbar_bottom_padding)
-        )
-        .height(dimensionResource(id = R.dimen.progress_bar_track_height)),
-    )
-  }
-
-  @Composable
-  private fun CreateHeader(
-    appCardId: String,
-    identifier: ApplicationIdentifier,
-    header: Header?,
-    packageName: String,
-  ) {
-    viewModel.logIfDebuggable(
-      TAG,
-      msg = "createAppCard: $identifier + $appCardId + ${header?.componentId}"
-    )
-
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(
-          start = dimensionResource(R.dimen.header_padding),
-          end = dimensionResource(R.dimen.header_padding),
-          top = dimensionResource(R.dimen.header_padding)
-        ),
-      horizontalArrangement = Arrangement.Start,
-      verticalAlignment = Alignment.CenterVertically,
-    ) {
-      val text = header?.title ?: ""
-      Text(
-        text = text,
-        color = MaterialTheme.colorScheme.onBackground,
-        modifier = Modifier.weight(floatResource(R.dimen.header_text_weight)),
-        style = MaterialTheme.typography.titleLarge,
-        maxLines = integerResource(R.integer.header_text_max_lines),
-        overflow = TextOverflow.Ellipsis,
-        textAlign = TextAlign.Start
-      )
-
-      header?.logo?.let {
-        it.imageData?.let { bitmap ->
-          Image(
-            bitmap = bitmap.asImageBitmap(),
-            contentDescription = stringResource(R.string.app_icon_content_desc),
-            modifier = Modifier.size(dimensionResource(R.dimen.card_header_icon_size)),
-            contentScale = ContentScale.Fit,
-            colorFilter = if (it.colorFilter == Image.ColorFilter.TINT) {
-              ColorFilter.tint(color = MaterialTheme.colorScheme.primary)
-            } else {
-              null
+    override fun update(component: Component): Boolean {
+        if (component is Image) {
+            var orig: Image? = null
+            image.value?.let { orig = Image.fromMessage(it.toMessage()) }
+            orig?.let {
+                if (it != component && it.updateComponent(component)) {
+                    image.value = it
+                    return true
+                }
             }
-          )
         }
-      } ?: GetAppIcon(packageName)
-    }
-  }
 
-  @Composable
-  private fun GetAppIcon(packageName: String) {
-    context.packageManager?.getApplicationIcon(packageName)?.toBitmap()?.asImageBitmap()?.let {
-      Image(
-        bitmap = it,
-        contentDescription = stringResource(R.string.app_icon_content_desc),
-        modifier = Modifier.size(dimensionResource(R.dimen.card_header_icon_size)),
-        contentScale = ContentScale.Fit
-      )
-    }
-  }
-
-  @Composable
-  private fun GetImage(
-    appCardId: String,
-    identifier: ApplicationIdentifier,
-    image: Image,
-  ) {
-    viewModel.logIfDebuggable(
-      TAG,
-      msg = "getImage: $identifier + $appCardId + ${image.componentId}"
-    )
-
-    image.imageData?.asImageBitmap()?.let { bitmap ->
-      Image(
-        bitmap = bitmap,
-        contentDescription = stringResource(R.string.image_content_desc),
-        modifier = Modifier.fillMaxSize(),
-        contentScale = ContentScale.Fit,
-        colorFilter = if (image.colorFilter == Image.ColorFilter.TINT) {
-          ColorFilter.tint(
-            color = MaterialTheme.colorScheme.primary
-          )
-        } else {
-          null
+        if (component is Button || component is Image) {
+            var orig: Button? = null
+            var matchedIndex = -1
+            buttons.forEachIndexed { index, button ->
+                orig = Button.fromMessage(button.value.toMessage())
+                orig?.let {
+                    if (it != component && it.updateComponent(component)) {
+                        matchedIndex = index
+                        return@forEachIndexed
+                    }
+                }
+            }
+            if (matchedIndex != -1) {
+                orig?.let { buttons[matchedIndex].value = it }
+                return true
+            }
         }
-      )
-    }
-  }
 
-  companion object {
-    private const val TAG = "ImageAppCardContainerState"
-    private const val SURFACE_3_PRIMARY_ALPHA = 0.11f
+        if (component is Header) {
+            var orig: Header? = null
+            header.value?.let { orig = Header.fromMessage(it.toMessage()) }
+            orig?.let {
+                if (it != component && it.updateComponent(component)) {
+                    header.value = it
+                    return true
+                }
+            }
+        }
+
+        if (component is ProgressBar) {
+            var orig: ProgressBar? = null
+            progressBar.value?.let { orig = ProgressBar.fromMessage(it.toMessage()) }
+            orig?.let {
+                if (it != component && it.updateComponent(component)) {
+                    progressBar.value = it
+                    return true
+                }
+            }
+        }
+
+        viewModel.logIfDebuggable(
+            TAG,
+            msg = "Unable to update App Card Component: Component update conditions not met",
+        )
+        return false
+    }
 
     @Composable
-    private fun floatResource(resId: Int): Float = LocalContext.current.resources.getFloat(resId)
-  }
+    override fun AppCard() {
+        val logMsg = "createAppCard: $identifier + ${imageAppCard.id}"
+        viewModel.logIfDebuggable(TAG, logMsg)
+
+        ElevatedCard(
+            elevation =
+                CardDefaults.cardElevation(
+                    defaultElevation = dimensionResource(R.dimen.card_elevation)
+                ),
+            modifier =
+                Modifier.size(
+                        width = dimensionResource(R.dimen.card_width),
+                        height = dimensionResource(R.dimen.card_height),
+                    )
+                    .padding(dimensionResource(R.dimen.card_padding)),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor =
+                        MaterialTheme.colorScheme.primary
+                            .copy(alpha = SURFACE_3_PRIMARY_ALPHA)
+                            .compositeOver(MaterialTheme.colorScheme.surface)
+                ),
+            shape = MaterialTheme.shapes.medium,
+        ) {
+            val header = remember { header }
+            val image = remember { image }
+            val primaryText = remember { primaryText }
+            val secondaryText = remember { secondaryText }
+            val buttons = remember { buttons }
+            val buttonsExist = buttons.size > 0
+            val imageExists = image.value != null
+            val progressBarExists = progressBar.value != null
+
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier =
+                    Modifier.size(
+                        width = dimensionResource(R.dimen.card_width),
+                        height = dimensionResource(R.dimen.card_height),
+                    ),
+            ) {
+                CreateHeader(
+                    imageAppCard.id,
+                    identifier.value,
+                    header.value,
+                    identifier.value.packageName,
+                )
+
+                image.value?.let {
+                    Box(
+                        modifier =
+                            Modifier.weight(floatResource(R.dimen.image_box_weight))
+                                .padding(all = dimensionResource(R.dimen.image_padding))
+                    ) {
+                        GetImage(imageAppCard.id, identifier.value, it)
+                    }
+                }
+
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+                ) {
+                    primaryText.value?.let {
+                        Text(
+                            modifier =
+                                Modifier.fillMaxWidth()
+                                    .padding(
+                                        start =
+                                            dimensionResource(
+                                                R.dimen.primary_text_horizontal_padding
+                                            ),
+                                        end =
+                                            dimensionResource(
+                                                R.dimen.primary_text_horizontal_padding
+                                            ),
+                                        bottom =
+                                            dimensionResource(R.dimen.primary_text_bottom_padding),
+                                    ),
+                            style = MaterialTheme.typography.headlineLarge,
+                            text = it,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            maxLines = integerResource(R.integer.primary_text_max_lines),
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Start,
+                        )
+                    }
+
+                    secondaryText.value?.let {
+                        Text(
+                            modifier =
+                                Modifier.fillMaxWidth()
+                                    .padding(
+                                        start =
+                                            dimensionResource(
+                                                R.dimen.secondary_text_horizontal_padding
+                                            ),
+                                        end =
+                                            dimensionResource(
+                                                R.dimen.secondary_text_horizontal_padding
+                                            ),
+                                        bottom =
+                                            dimensionResource(R.dimen.secondary_text_bottom_padding),
+                                    ),
+                            style = MaterialTheme.typography.titleLarge,
+                            text = it,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = integerResource(R.integer.secondary_text_max_lines),
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Start,
+                        )
+                    }
+
+                    if (progressBarExists) {
+                        CreateProgressBar(imageAppCard.id, identifier.value, progressBar)
+                    } else if (buttonsExist) {
+                        HorizontalDivider(
+                            modifier =
+                                Modifier.fillMaxWidth()
+                                    .padding(
+                                        start =
+                                            dimensionResource(
+                                                R.dimen.progressbar_horizontal_padding
+                                            ),
+                                        end =
+                                            dimensionResource(
+                                                R.dimen.progressbar_horizontal_padding
+                                            ),
+                                        top = dimensionResource(R.dimen.progressbar_top_padding),
+                                        bottom =
+                                            dimensionResource(R.dimen.progressbar_bottom_padding),
+                                    )
+                        )
+                    }
+
+                    if (buttonsExist) {
+                        CreateButtonRow(mutableStateOf(buttons.size))
+                    } else if (!imageExists && progressBarExists) {
+                        Box(
+                            modifier =
+                                Modifier.fillMaxWidth()
+                                    .height(dimensionResource(R.dimen.button_height))
+                        ) {}
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun CreateButtonRow(numButtons: MutableState<Int>) {
+        viewModel.logIfDebuggable(
+            TAG,
+            msg = "createButtonRow: $identifier + $appCardId + ${buttons.size}",
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceAround,
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(bottom = dimensionResource(R.dimen.button_row_padding)),
+        ) {
+            buttons.forEachIndexed { index, button ->
+                if (index == 0) {
+                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.button_row_padding)))
+                }
+
+                Box(
+                    modifier =
+                        Modifier.weight(
+                            floatResource(R.dimen.button_box_weight) / numButtons.value.toFloat()
+                        )
+                ) {
+                    CreateButton(button, numButtons)
+                }
+
+                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.button_row_padding)))
+            }
+        }
+    }
+
+    @Composable
+    private fun CreateButton(button: MutableState<Button>, numButtons: MutableState<Int>) {
+        viewModel.logIfDebuggable(
+            TAG,
+            msg = "createButton: $identifier + $appCardId + ${button.value.componentId}",
+        )
+
+        val onClick: () -> Unit = {
+            viewModel.logIfDebuggable(
+                TAG,
+                msg = "clicked: $identifier + $appCardId + ${button.value.componentId}",
+            )
+
+            viewModel.sendInteraction(
+                identifier.value,
+                appCardId,
+                button.value.componentId,
+                MSG_INTERACTION_ON_CLICK,
+            )
+
+            button.value.intent?.let {
+                val packageName = identifier.value.packageName
+                val intent =
+                    Intent().apply {
+                        setClassName(packageName, it.cls)
+                        extras?.putAll(it.bundle)
+                        setFlags(FLAG_ACTIVITY_NEW_TASK)
+                    }
+                context.startActivity(intent)
+            }
+        }
+
+        var colorFilter: ColorFilter? = null
+
+        button.value.image?.let {
+            if (it.colorFilter == Image.ColorFilter.TINT) {
+                colorFilter =
+                    if (button.value.buttonType == Button.ButtonType.PRIMARY) {
+                        ColorFilter.tint(
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            blendMode = BlendMode.SrcIn,
+                        )
+                    } else {
+                        ColorFilter.tint(
+                            color = MaterialTheme.colorScheme.secondary,
+                            blendMode = BlendMode.SrcIn,
+                        )
+                    }
+            }
+        }
+
+        if (button.value.buttonType == Button.ButtonType.NO_BACKGROUND) {
+            TextButton(
+                onClick = onClick,
+                contentPadding = PaddingValues(),
+                modifier = Modifier.height(dimensionResource(R.dimen.button_height)).fillMaxWidth(),
+            ) {
+                button.value.image?.imageData?.let {
+                    Image(
+                        bitmap = it.asImageBitmap(),
+                        contentDescription = stringResource(R.string.button_icon_content_desc),
+                        modifier =
+                            Modifier.size(
+                                width = dimensionResource(R.dimen.card_button_icon_size),
+                                height = dimensionResource(R.dimen.card_button_icon_size),
+                            ),
+                        contentScale = ContentScale.Fit,
+                        colorFilter = colorFilter,
+                    )
+                }
+            }
+            return
+        }
+
+        val tooManyButtonsForText =
+            numButtons.value > integerResource(R.integer.number_buttons_to_show_text_with_image)
+        val shouldShowText = !tooManyButtonsForText || button.value.image?.imageData == null
+        val contentPadding =
+            if (shouldShowText) {
+                PaddingValues(horizontal = dimensionResource(R.dimen.button_content_padding))
+            } else {
+                PaddingValues()
+            }
+
+        Button(
+            onClick = onClick,
+            colors = getButtonStyling(button.value.buttonType),
+            contentPadding = contentPadding,
+            modifier = Modifier.height(dimensionResource(R.dimen.button_height)).fillMaxWidth(),
+        ) {
+            button.value.image?.imageData?.let {
+                Image(
+                    bitmap = it.asImageBitmap(),
+                    contentDescription = stringResource(R.string.button_icon_content_desc),
+                    modifier =
+                        Modifier.size(
+                            width = dimensionResource(R.dimen.card_button_icon_size),
+                            height = dimensionResource(R.dimen.card_button_icon_size),
+                        ),
+                    contentScale = ContentScale.Fit,
+                    colorFilter = colorFilter,
+                )
+            }
+
+            if (shouldShowText) {
+                button.value.text?.let {
+                    val maxLines = integerResource(R.integer.button_text_max_lines)
+
+                    Text(
+                        modifier = Modifier.fillMaxWidth().align(Alignment.CenterVertically),
+                        text = it,
+                        style = MaterialTheme.typography.titleLarge,
+                        color =
+                            if (button.value.buttonType == Button.ButtonType.PRIMARY) {
+                                MaterialTheme.colorScheme.onPrimary
+                            } else {
+                                MaterialTheme.colorScheme.secondary
+                            },
+                        maxLines = maxLines,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun getButtonStyling(type: Button.ButtonType): ButtonColors {
+        val backgroundColor =
+            if (type == Button.ButtonType.PRIMARY) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.secondaryContainer
+            }
+
+        val contentColor =
+            if (type == Button.ButtonType.PRIMARY) {
+                MaterialTheme.colorScheme.onPrimary
+            } else {
+                MaterialTheme.colorScheme.secondary
+            }
+
+        return ButtonDefaults.buttonColors(
+            containerColor = backgroundColor,
+            contentColor = contentColor,
+            disabledContainerColor = backgroundColor,
+            disabledContentColor = contentColor,
+        )
+    }
+
+    @Composable
+    fun CreateProgressBar(
+        appCardId: String,
+        identifier: ApplicationIdentifier,
+        progressBarState: MutableState<ProgressBar?>,
+    ) {
+        val progressBar = progressBarState.value ?: return
+        val componentId = progressBarState.value?.componentId
+        viewModel.logIfDebuggable(
+            TAG,
+            msg = "createProgressBar: $identifier + $appCardId + $componentId",
+        )
+
+        val current = progressBar.progress.toFloat() - progressBar.min.toFloat()
+        val max = progressBar.max.toFloat() - progressBar.min.toFloat()
+        val progress = current / max
+
+        LinearProgressIndicator(
+            progress = progress,
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(
+                        start = dimensionResource(R.dimen.progressbar_horizontal_padding),
+                        end = dimensionResource(R.dimen.progressbar_horizontal_padding),
+                        top = dimensionResource(R.dimen.progressbar_top_padding),
+                        bottom = dimensionResource(R.dimen.progressbar_bottom_padding),
+                    )
+                    .height(dimensionResource(id = R.dimen.progress_bar_track_height)),
+        )
+    }
+
+    @Composable
+    private fun CreateHeader(
+        appCardId: String,
+        identifier: ApplicationIdentifier,
+        header: Header?,
+        packageName: String,
+    ) {
+        viewModel.logIfDebuggable(
+            TAG,
+            msg = "createAppCard: $identifier + $appCardId + ${header?.componentId}",
+        )
+
+        Row(
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(
+                        start = dimensionResource(R.dimen.header_padding),
+                        end = dimensionResource(R.dimen.header_padding),
+                        top = dimensionResource(R.dimen.header_padding),
+                    ),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            val text = header?.title ?: ""
+            Text(
+                text = text,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.weight(floatResource(R.dimen.header_text_weight)),
+                style = MaterialTheme.typography.titleLarge,
+                maxLines = integerResource(R.integer.header_text_max_lines),
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Start,
+            )
+
+            header?.logo?.let {
+                it.imageData?.let { bitmap ->
+                    Image(
+                        bitmap = bitmap.asImageBitmap(),
+                        contentDescription = stringResource(R.string.app_icon_content_desc),
+                        modifier = Modifier.size(dimensionResource(R.dimen.card_header_icon_size)),
+                        contentScale = ContentScale.Fit,
+                        colorFilter =
+                            if (it.colorFilter == Image.ColorFilter.TINT) {
+                                ColorFilter.tint(color = MaterialTheme.colorScheme.primary)
+                            } else {
+                                null
+                            },
+                    )
+                }
+            } ?: GetAppIcon(packageName)
+        }
+    }
+
+    @Composable
+    private fun GetAppIcon(packageName: String) {
+        context.packageManager?.getApplicationIcon(packageName)?.toBitmap()?.asImageBitmap()?.let {
+            Image(
+                bitmap = it,
+                contentDescription = stringResource(R.string.app_icon_content_desc),
+                modifier = Modifier.size(dimensionResource(R.dimen.card_header_icon_size)),
+                contentScale = ContentScale.Fit,
+            )
+        }
+    }
+
+    @Composable
+    private fun GetImage(appCardId: String, identifier: ApplicationIdentifier, image: Image) {
+        viewModel.logIfDebuggable(
+            TAG,
+            msg = "getImage: $identifier + $appCardId + ${image.componentId}",
+        )
+
+        image.imageData?.asImageBitmap()?.let { bitmap ->
+            Image(
+                bitmap = bitmap,
+                contentDescription = stringResource(R.string.image_content_desc),
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit,
+                colorFilter =
+                    if (image.colorFilter == Image.ColorFilter.TINT) {
+                        ColorFilter.tint(color = MaterialTheme.colorScheme.primary)
+                    } else {
+                        null
+                    },
+            )
+        }
+    }
+
+    companion object {
+        private const val TAG = "ImageAppCardContainerState"
+        private const val SURFACE_3_PRIMARY_ALPHA = 0.11f
+
+        @Composable
+        private fun floatResource(resId: Int): Float =
+            LocalContext.current.resources.getFloat(resId)
+    }
 }

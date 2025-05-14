@@ -34,294 +34,316 @@ import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class AppCardTimerTest {
-  private var actualIdentifier: ApplicationIdentifier? = null
-  private var actualAppCardId: String? = null
-  private val updateReadyListener = object : AppCardTimer.UpdateReadyListener {
-    override fun appCardIsReadyForUpdate(
-      identifier: ApplicationIdentifier?,
-      appCardId: String?
-    ) {
-      actualIdentifier = identifier
-      actualAppCardId = appCardId
+    private var actualIdentifier: ApplicationIdentifier? = null
+    private var actualAppCardId: String? = null
+    private val updateReadyListener =
+        object : AppCardTimer.UpdateReadyListener {
+            override fun appCardIsReadyForUpdate(
+                identifier: ApplicationIdentifier?,
+                appCardId: String?,
+            ) {
+                actualIdentifier = identifier
+                actualAppCardId = appCardId
+            }
+        }
+    private lateinit var appCardTimer: AppCardTimer
+    private val timer: Timer = mock<Timer>()
+    private val identifier = ApplicationIdentifier(TEST_AUTHORITY, TEST_PACKAGE)
+    private val timerFactory =
+        object : AppCardTimer.TimerFactory {
+            override fun getTimer() = timer
+        }
+
+    @Before
+    fun setup() {
+        appCardTimer =
+            AppCardTimer(
+                updateReadyListener,
+                TEST_UPDATE_RATE_MS,
+                TEST_FAST_UPDATE_RATE_MS,
+                timerFactory,
+            )
     }
-  }
-  private lateinit var appCardTimer: AppCardTimer
-  private val timer: Timer = mock<Timer>()
-  private val identifier = ApplicationIdentifier(TEST_AUTHORITY, TEST_PACKAGE)
-  private val timerFactory = object : AppCardTimer.TimerFactory {
-    override fun getTimer() = timer
-  }
 
-  @Before
-  fun setup() {
-    appCardTimer = AppCardTimer(
-      updateReadyListener,
-      TEST_UPDATE_RATE_MS,
-      TEST_FAST_UPDATE_RATE_MS,
-      timerFactory
-    )
-  }
+    @Test
+    fun testUpdateAppCard_imageAppCard_timerCancelled() {
+        appCardTimer.updateAppCard(AppCardContainer(identifier, ImageAppCardUtility.imageAppCard))
 
-  @Test
-  fun testUpdateAppCard_imageAppCard_timerCancelled() {
-    appCardTimer.updateAppCard(AppCardContainer(identifier, ImageAppCardUtility.imageAppCard))
+        verify(timer).cancel()
+    }
 
-    verify(timer).cancel()
-  }
+    @Test
+    fun testUpdateAppCard_imageAppCard_withProgressBar_componentTimerScheduled() {
+        appCardTimer.updateAppCard(
+            AppCardContainer(identifier, ImageAppCardUtility.progressBarButtonCard)
+        )
 
-  @Test
-  fun testUpdateAppCard_imageAppCard_withProgressBar_componentTimerScheduled() {
-    appCardTimer.updateAppCard(
-      AppCardContainer(identifier, ImageAppCardUtility.progressBarButtonCard)
-    )
+        val captor = argumentCaptor<TimerTask>()
+        verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
+        captor.firstValue.run()
+        assertThat(
+                appCardTimer.isComponentReadyForUpdate(
+                    ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
+                )
+            )
+            .isTrue()
+    }
 
-    val captor = argumentCaptor<TimerTask>()
-    verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
-    captor.firstValue.run()
-    assertThat(
-      appCardTimer.isComponentReadyForUpdate(ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID)
-    ).isTrue()
-  }
+    @Test
+    fun testUpdateAppCard_imageAppCard_withProgressBar_appCardTimerScheduled() {
+        appCardTimer.updateAppCard(AppCardContainer(identifier, ImageAppCardUtility.imageAppCard))
 
-  @Test
-  fun testUpdateAppCard_imageAppCard_withProgressBar_appCardTimerScheduled() {
-    appCardTimer.updateAppCard(AppCardContainer(identifier, ImageAppCardUtility.imageAppCard))
+        val captor = argumentCaptor<TimerTask>()
+        verify(timer)
+            .schedule(
+                captor.capture(),
+                eq(TEST_UPDATE_RATE_MS.toLong()),
+                eq(TEST_UPDATE_RATE_MS.toLong()),
+            )
+        captor.firstValue.run()
+        assertThat(actualIdentifier).isEqualTo(identifier)
+        assertThat(actualAppCardId).isEqualTo(ImageAppCardUtility.TEST_ID)
+    }
 
-    val captor = argumentCaptor<TimerTask>()
-    verify(timer).schedule(
-      captor.capture(),
-      eq(TEST_UPDATE_RATE_MS.toLong()),
-      eq(TEST_UPDATE_RATE_MS.toLong())
-    )
-    captor.firstValue.run()
-    assertThat(actualIdentifier).isEqualTo(identifier)
-    assertThat(actualAppCardId).isEqualTo(ImageAppCardUtility.TEST_ID)
-  }
+    @Test
+    fun testUpdateAppCard_imageAppCard_withoutProgressBar_componentTimerNotScheduled() {
+        val imageAppCard =
+            ImageAppCard.newBuilder(ImageAppCardUtility.TEST_ID)
+                .setImage(ImageAppCardUtility.image)
+                .setHeader(ImageAppCardUtility.header)
+                .setPrimaryText(ImageAppCardUtility.TEST_PRIMARY_TEXT)
+                .setSecondaryText(ImageAppCardUtility.TEST_SECONDARY_TEXT)
+                .build()
 
-  @Test
-  fun testUpdateAppCard_imageAppCard_withoutProgressBar_componentTimerNotScheduled() {
-    val imageAppCard = ImageAppCard.newBuilder(ImageAppCardUtility.TEST_ID)
-      .setImage(ImageAppCardUtility.image)
-      .setHeader(ImageAppCardUtility.header)
-      .setPrimaryText(ImageAppCardUtility.TEST_PRIMARY_TEXT)
-      .setSecondaryText(ImageAppCardUtility.TEST_SECONDARY_TEXT)
-      .build()
+        appCardTimer.updateAppCard(AppCardContainer(identifier, imageAppCard))
 
-    appCardTimer.updateAppCard(AppCardContainer(identifier, imageAppCard))
+        verify(timer, never()).schedule(any<TimerTask>(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
+    }
 
-    verify(timer, never()).schedule(any<TimerTask>(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
-  }
+    @Test
+    fun testIsComponentReadyForUpdate_nonExistingComponent_returnFalse() {
+        assertThat(appCardTimer.isComponentReadyForUpdate(TEST_COMPONENT_ID)).isFalse()
+    }
 
-  @Test
-  fun testIsComponentReadyForUpdate_nonExistingComponent_returnFalse() {
-    assertThat(appCardTimer.isComponentReadyForUpdate(TEST_COMPONENT_ID)).isFalse()
-  }
+    @Test
+    fun testIsComponentReadyForUpdate_existingComponent_returnTrue() {
+        appCardTimer.updateAppCard(
+            AppCardContainer(identifier, ImageAppCardUtility.progressBarButtonCard)
+        )
+        val captor = argumentCaptor<TimerTask>()
+        verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
+        captor.firstValue.run()
 
-  @Test
-  fun testIsComponentReadyForUpdate_existingComponent_returnTrue() {
-    appCardTimer.updateAppCard(
-      AppCardContainer(identifier, ImageAppCardUtility.progressBarButtonCard)
-    )
-    val captor = argumentCaptor<TimerTask>()
-    verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
-    captor.firstValue.run()
+        assertThat(
+                appCardTimer.isComponentReadyForUpdate(
+                    ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
+                )
+            )
+            .isTrue()
+    }
 
-    assertThat(
-      appCardTimer.isComponentReadyForUpdate(
-        ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
-      )
-    ).isTrue()
-  }
+    @Test
+    fun testDestroy_timerCancelled() {
+        appCardTimer.destroy()
 
-  @Test
-  fun testDestroy_timerCancelled() {
-    appCardTimer.destroy()
+        verify(timer).cancel()
+    }
 
-    verify(timer).cancel()
-  }
+    @Test
+    fun testResetAppCardTimerAndRequestUpdate_noAppCard_timerCancelNotCalled() {
+        appCardTimer.resetAppCardTimerAndRequestUpdate()
 
-  @Test
-  fun testResetAppCardTimerAndRequestUpdate_noAppCard_timerCancelNotCalled() {
-    appCardTimer.resetAppCardTimerAndRequestUpdate()
+        verify(timer, never()).cancel()
+    }
 
-    verify(timer, never()).cancel()
-  }
+    @Test
+    fun testResetAppCardTimerAndRequestUpdate_noAppCard_listenerNotCalled() {
+        appCardTimer.resetAppCardTimerAndRequestUpdate()
 
-  @Test
-  fun testResetAppCardTimerAndRequestUpdate_noAppCard_listenerNotCalled() {
-    appCardTimer.resetAppCardTimerAndRequestUpdate()
+        assertThat(actualIdentifier).isNull()
+    }
 
-    assertThat(actualIdentifier).isNull()
-  }
+    @Test
+    fun testResetAppCardTimerAndRequestUpdate_noAppCard_timerScheduleNotCalled() {
+        appCardTimer.resetAppCardTimerAndRequestUpdate()
 
-  @Test
-  fun testResetAppCardTimerAndRequestUpdate_noAppCard_timerScheduleNotCalled() {
-    appCardTimer.resetAppCardTimerAndRequestUpdate()
+        verify(timer, never()).schedule(any<TimerTask>(), any<Long>())
+    }
 
-    verify(timer, never()).schedule(any<TimerTask>(), any<Long>())
-  }
+    @Test
+    fun testResetAppCardTimerAndRequestUpdate_appCard_timerCancelled() {
+        appCardTimer.updateAppCard(AppCardContainer(identifier, ImageAppCardUtility.imageAppCard))
+        reset(timer)
 
-  @Test
-  fun testResetAppCardTimerAndRequestUpdate_appCard_timerCancelled() {
-    appCardTimer.updateAppCard(AppCardContainer(identifier, ImageAppCardUtility.imageAppCard))
-    reset(timer)
+        appCardTimer.resetAppCardTimerAndRequestUpdate()
 
-    appCardTimer.resetAppCardTimerAndRequestUpdate()
+        verify(timer).cancel()
+    }
 
-    verify(timer).cancel()
-  }
+    @Test
+    fun testResetAppCardTimerAndRequestUpdate_appCard_componentStatusFalse() {
+        appCardTimer.updateAppCard(
+            AppCardContainer(identifier, ImageAppCardUtility.progressBarButtonCard)
+        )
+        assertThat(
+                appCardTimer.isComponentReadyForUpdate(
+                    ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
+                )
+            )
+            .isFalse()
+        val captor = argumentCaptor<TimerTask>()
+        verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
+        reset(timer)
+        captor.firstValue.run()
+        assertThat(
+                appCardTimer.isComponentReadyForUpdate(
+                    ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
+                )
+            )
+            .isTrue()
 
-  @Test
-  fun testResetAppCardTimerAndRequestUpdate_appCard_componentStatusFalse() {
-    appCardTimer.updateAppCard(
-      AppCardContainer(identifier, ImageAppCardUtility.progressBarButtonCard)
-    )
-    assertThat(
-      appCardTimer.isComponentReadyForUpdate(
-        ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
-      )
-    ).isFalse()
-    val captor = argumentCaptor<TimerTask>()
-    verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
-    reset(timer)
-    captor.firstValue.run()
-    assertThat(
-      appCardTimer.isComponentReadyForUpdate(
-        ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
-      )
-    ).isTrue()
+        appCardTimer.resetAppCardTimerAndRequestUpdate()
 
-    appCardTimer.resetAppCardTimerAndRequestUpdate()
+        assertThat(
+                appCardTimer.isComponentReadyForUpdate(
+                    ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
+                )
+            )
+            .isFalse()
+    }
 
-    assertThat(
-      appCardTimer.isComponentReadyForUpdate(
-        ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
-      )
-    ).isFalse()
-  }
+    @Test
+    fun testResetAppCardTimerAndRequestUpdate_appCard_componentTimerTaskSetStatusToTrue() {
+        appCardTimer.updateAppCard(
+            AppCardContainer(identifier, ImageAppCardUtility.progressBarButtonCard)
+        )
+        assertThat(
+                appCardTimer.isComponentReadyForUpdate(
+                    ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
+                )
+            )
+            .isFalse()
+        val captor = argumentCaptor<TimerTask>()
+        verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
+        reset(timer)
+        captor.firstValue.run()
+        assertThat(
+                appCardTimer.isComponentReadyForUpdate(
+                    ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
+                )
+            )
+            .isTrue()
 
-  @Test
-  fun testResetAppCardTimerAndRequestUpdate_appCard_componentTimerTaskSetStatusToTrue() {
-    appCardTimer.updateAppCard(
-      AppCardContainer(identifier, ImageAppCardUtility.progressBarButtonCard)
-    )
-    assertThat(
-      appCardTimer.isComponentReadyForUpdate(
-        ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
-      )
-    ).isFalse()
-    val captor = argumentCaptor<TimerTask>()
-    verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
-    reset(timer)
-    captor.firstValue.run()
-    assertThat(
-      appCardTimer.isComponentReadyForUpdate(
-        ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
-      )
-    ).isTrue()
+        appCardTimer.resetAppCardTimerAndRequestUpdate()
 
-    appCardTimer.resetAppCardTimerAndRequestUpdate()
+        verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
+        captor.secondValue.run()
+        assertThat(
+                appCardTimer.isComponentReadyForUpdate(
+                    ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
+                )
+            )
+            .isTrue()
+    }
 
-    verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
-    captor.secondValue.run()
-    assertThat(
-      appCardTimer.isComponentReadyForUpdate(
-        ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
-      )
-    ).isTrue()
-  }
+    @Test
+    fun testResetAppCardTimerAndRequestUpdate_appCard_appCardTimerTaskCorrectlySet() {
+        appCardTimer.updateAppCard(AppCardContainer(identifier, ImageAppCardUtility.imageAppCard))
+        reset(timer)
 
-  @Test
-  fun testResetAppCardTimerAndRequestUpdate_appCard_appCardTimerTaskCorrectlySet() {
-    appCardTimer.updateAppCard(AppCardContainer(identifier, ImageAppCardUtility.imageAppCard))
-    reset(timer)
+        appCardTimer.resetAppCardTimerAndRequestUpdate()
 
-    appCardTimer.resetAppCardTimerAndRequestUpdate()
+        val captor = argumentCaptor<TimerTask>()
+        verify(timer)
+            .schedule(
+                captor.capture(),
+                eq(TEST_UPDATE_RATE_MS.toLong()),
+                eq(TEST_UPDATE_RATE_MS.toLong()),
+            )
+        captor.firstValue.run()
+        assertThat(actualIdentifier).isEqualTo(identifier)
+        assertThat(actualAppCardId).isEqualTo(ImageAppCardUtility.TEST_ID)
+    }
 
-    val captor = argumentCaptor<TimerTask>()
-    verify(timer).schedule(
-      captor.capture(),
-      eq(TEST_UPDATE_RATE_MS.toLong()),
-      eq(TEST_UPDATE_RATE_MS.toLong())
-    )
-    captor.firstValue.run()
-    assertThat(actualIdentifier).isEqualTo(identifier)
-    assertThat(actualAppCardId).isEqualTo(ImageAppCardUtility.TEST_ID)
-  }
+    @Test
+    fun testComponentUpdate_nonExistingComponent_timerNotScheduled() {
+        appCardTimer.componentUpdate(TEST_COMPONENT_ID)
 
-  @Test
-  fun testComponentUpdate_nonExistingComponent_timerNotScheduled() {
-    appCardTimer.componentUpdate(TEST_COMPONENT_ID)
+        verify(timer, never()).schedule(any<TimerTask>(), any<Long>())
+    }
 
-    verify(timer, never()).schedule(any<TimerTask>(), any<Long>())
-  }
+    @Test
+    fun testComponentUpdate_existingComponent_timerScheduled() {
+        appCardTimer.updateAppCard(
+            AppCardContainer(identifier, ImageAppCardUtility.progressBarButtonCard)
+        )
+        assertThat(
+                appCardTimer.isComponentReadyForUpdate(
+                    ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
+                )
+            )
+            .isFalse()
+        val captor = argumentCaptor<TimerTask>()
+        verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
+        reset(timer)
+        captor.firstValue.run()
+        assertThat(
+                appCardTimer.isComponentReadyForUpdate(
+                    ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
+                )
+            )
+            .isTrue()
 
-  @Test
-  fun testComponentUpdate_existingComponent_timerScheduled() {
-    appCardTimer.updateAppCard(
-      AppCardContainer(identifier, ImageAppCardUtility.progressBarButtonCard)
-    )
-    assertThat(
-      appCardTimer.isComponentReadyForUpdate(
-        ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
-      )
-    ).isFalse()
-    val captor = argumentCaptor<TimerTask>()
-    verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
-    reset(timer)
-    captor.firstValue.run()
-    assertThat(
-      appCardTimer.isComponentReadyForUpdate(
-        ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
-      )
-    ).isTrue()
+        appCardTimer.componentUpdate(ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID)
 
-    appCardTimer.componentUpdate(ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID)
+        verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
+        captor.secondValue.run()
+        assertThat(
+                appCardTimer.isComponentReadyForUpdate(
+                    ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
+                )
+            )
+            .isTrue()
+    }
 
-    verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
-    captor.secondValue.run()
-    assertThat(
-      appCardTimer.isComponentReadyForUpdate(
-        ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
-      )
-    ).isTrue()
-  }
+    @Test
+    fun testComponentUpdate_existingComponent_componentUpdateStatusIsFalse() {
+        appCardTimer.updateAppCard(
+            AppCardContainer(identifier, ImageAppCardUtility.progressBarButtonCard)
+        )
+        assertThat(
+                appCardTimer.isComponentReadyForUpdate(
+                    ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
+                )
+            )
+            .isFalse()
+        val captor = argumentCaptor<TimerTask>()
+        verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
+        reset(timer)
+        captor.firstValue.run()
+        assertThat(
+                appCardTimer.isComponentReadyForUpdate(
+                    ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
+                )
+            )
+            .isTrue()
 
-  @Test
-  fun testComponentUpdate_existingComponent_componentUpdateStatusIsFalse() {
-    appCardTimer.updateAppCard(
-      AppCardContainer(identifier, ImageAppCardUtility.progressBarButtonCard)
-    )
-    assertThat(
-      appCardTimer.isComponentReadyForUpdate(
-        ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
-      )
-    ).isFalse()
-    val captor = argumentCaptor<TimerTask>()
-    verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
-    reset(timer)
-    captor.firstValue.run()
-    assertThat(
-      appCardTimer.isComponentReadyForUpdate(
-        ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
-      )
-    ).isTrue()
+        appCardTimer.componentUpdate(ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID)
 
-    appCardTimer.componentUpdate(ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID)
+        verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
+        assertThat(
+                appCardTimer.isComponentReadyForUpdate(
+                    ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
+                )
+            )
+            .isFalse()
+    }
 
-    verify(timer).schedule(captor.capture(), eq(TEST_FAST_UPDATE_RATE_MS.toLong()))
-    assertThat(
-      appCardTimer.isComponentReadyForUpdate(
-        ImageAppCardUtility.TEST_PROGRESS_BAR_COMPONENT_ID
-      )
-    ).isFalse()
-  }
-
-  companion object {
-    private const val TEST_UPDATE_RATE_MS = 5000
-    private const val TEST_FAST_UPDATE_RATE_MS = 500
-    private const val TEST_COMPONENT_ID = "TEST_COMPONENT_ID"
-    private const val TEST_AUTHORITY = "TEST_AUTHORITY"
-    private const val TEST_PACKAGE = "TEST_PACKAGE"
-  }
+    companion object {
+        private const val TEST_UPDATE_RATE_MS = 5000
+        private const val TEST_FAST_UPDATE_RATE_MS = 500
+        private const val TEST_COMPONENT_ID = "TEST_COMPONENT_ID"
+        private const val TEST_AUTHORITY = "TEST_AUTHORITY"
+        private const val TEST_PACKAGE = "TEST_PACKAGE"
+    }
 }

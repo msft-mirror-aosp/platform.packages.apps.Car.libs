@@ -49,7 +49,7 @@ import java.util.Objects;
  * This is a CarControlBar used for displaying Media content, including metadata for the currently
  * playing song and basic controls.
  */
-@OptIn(markerClass = androidx.car.app.annotations2.ExperimentalCarApi.class)
+@OptIn(markerClass = androidx.car.app.annotations.ExperimentalCarApi.class)
 public class MinimizedPlaybackControlBar extends MinimizedControlBar {
 
     private static final String TAG = "MiniPlaybackControlBar";

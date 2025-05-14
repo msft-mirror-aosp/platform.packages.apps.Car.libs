@@ -26,55 +26,55 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ParcelableUtilsTest {
-  @Test
-  fun testBytesToParcelable() {
-    val expected = TestParcelable(TEST_DATA)
-    val source = byteArrayOf(4, 0, 0, 0, 68, 0, 65, 0, 84, 0, 65, 0, 0, 0, 0, 0)
+    @Test
+    fun testBytesToParcelable() {
+        val expected = TestParcelable(TEST_DATA)
+        val source = byteArrayOf(4, 0, 0, 0, 68, 0, 65, 0, 84, 0, 65, 0, 0, 0, 0, 0)
 
-    val result = bytesToParcelable(source, TestParcelable.CREATOR)
+        val result = bytesToParcelable(source, TestParcelable.CREATOR)
 
-    assertThat(result).isEqualTo(expected)
-  }
-
-  @Test
-  fun testParcelableToBytes() {
-    val expected = byteArrayOf(4, 0, 0, 0, 68, 0, 65, 0, 84, 0, 65, 0, 0, 0, 0, 0)
-    val source = TestParcelable(TEST_DATA)
-
-    val result = parcelableToBytes(source)
-
-    assertThat(result).isEqualTo(expected)
-  }
-
-  private class TestParcelable(private val mData: String?) : Parcelable {
-    override fun describeContents(): Int = 0
-
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-      dest.writeString(mData)
+        assertThat(result).isEqualTo(expected)
     }
 
-    override fun equals(other: Any?): Boolean {
-      if (other is TestParcelable) {
-        return mData == other.mData
-      }
-      return false
+    @Test
+    fun testParcelableToBytes() {
+        val expected = byteArrayOf(4, 0, 0, 0, 68, 0, 65, 0, 84, 0, 65, 0, 0, 0, 0, 0)
+        val source = TestParcelable(TEST_DATA)
+
+        val result = parcelableToBytes(source)
+
+        assertThat(result).isEqualTo(expected)
     }
 
-    override fun hashCode(): Int = mData?.hashCode() ?: 0
+    private class TestParcelable(private val mData: String?) : Parcelable {
+        override fun describeContents(): Int = 0
 
-    companion object {
-      @JvmField
-      val CREATOR: Parcelable.Creator<TestParcelable> =
-        object : Parcelable.Creator<TestParcelable> {
-          override fun createFromParcel(source: Parcel): TestParcelable =
-            TestParcelable(source.readString())
+        override fun writeToParcel(dest: Parcel, flags: Int) {
+            dest.writeString(mData)
+        }
 
-          override fun newArray(size: Int): Array<TestParcelable?> = arrayOfNulls(size)
+        override fun equals(other: Any?): Boolean {
+            if (other is TestParcelable) {
+                return mData == other.mData
+            }
+            return false
+        }
+
+        override fun hashCode(): Int = mData?.hashCode() ?: 0
+
+        companion object {
+            @JvmField
+            val CREATOR: Parcelable.Creator<TestParcelable> =
+                object : Parcelable.Creator<TestParcelable> {
+                    override fun createFromParcel(source: Parcel): TestParcelable =
+                        TestParcelable(source.readString())
+
+                    override fun newArray(size: Int): Array<TestParcelable?> = arrayOfNulls(size)
+                }
         }
     }
-  }
 
-  companion object {
-    private const val TEST_DATA = "DATA"
-  }
+    companion object {
+        private const val TEST_DATA = "DATA"
+    }
 }

@@ -23,36 +23,36 @@ import androidx.lifecycle.LifecycleRegistry
 
 internal class ProviderLifecycleDispatcher(provider: LifecycleOwner) {
 
-  private val registry: LifecycleRegistry
-  private val handler: Handler
-  private var desiredState: Lifecycle.Event? = null
+    private val registry: LifecycleRegistry
+    private val handler: Handler
+    private var desiredState: Lifecycle.Event? = null
 
-  init {
-    registry = LifecycleRegistry(provider)
-    handler = Handler(Looper.getMainLooper())
-  }
+    init {
+        registry = LifecycleRegistry(provider)
+        handler = Handler(Looper.getMainLooper())
+    }
 
-  private fun postDispatchRunnable(event: Lifecycle.Event) {
-    desiredState = event
-    handler.post { registry.handleLifecycleEvent(event) }
-  }
+    private fun postDispatchRunnable(event: Lifecycle.Event) {
+        desiredState = event
+        handler.post { registry.handleLifecycleEvent(event) }
+    }
 
-  fun queueOnCreate() = postDispatchRunnable(Lifecycle.Event.ON_CREATE)
+    fun queueOnCreate() = postDispatchRunnable(Lifecycle.Event.ON_CREATE)
 
-  fun queueOnStart() = postDispatchRunnable(Lifecycle.Event.ON_START)
+    fun queueOnStart() = postDispatchRunnable(Lifecycle.Event.ON_START)
 
-  fun queueOnDestroy() = postDispatchRunnable(Lifecycle.Event.ON_DESTROY)
+    fun queueOnDestroy() = postDispatchRunnable(Lifecycle.Event.ON_DESTROY)
 
-  fun queueOnStop() = postDispatchRunnable(Lifecycle.Event.ON_STOP)
+    fun queueOnStop() = postDispatchRunnable(Lifecycle.Event.ON_STOP)
 
-  fun queueOnPause() = postDispatchRunnable(Lifecycle.Event.ON_PAUSE)
+    fun queueOnPause() = postDispatchRunnable(Lifecycle.Event.ON_PAUSE)
 
-  fun queueOnResume() = postDispatchRunnable(Lifecycle.Event.ON_RESUME)
+    fun queueOnResume() = postDispatchRunnable(Lifecycle.Event.ON_RESUME)
 
-  fun getDesiredState() = desiredState
+    fun getDesiredState() = desiredState
 
-  fun getCurrentState() = registry.currentState
+    fun getCurrentState() = registry.currentState
 
-  val lifecycle: Lifecycle
-    get() = registry
+    val lifecycle: Lifecycle
+        get() = registry
 }

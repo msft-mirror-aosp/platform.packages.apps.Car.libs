@@ -46,5 +46,5 @@ dependencies {
     // Adding dependencies here can cause library version conflicts at runtime
     // if both the app and the plugin are depending on the same library but with
     // different versions.
-    api 'androidx.annotation:annotation:1.4.0'
+    api libs.androidx.annotation
 }

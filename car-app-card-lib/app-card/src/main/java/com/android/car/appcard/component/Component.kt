@@ -21,34 +21,32 @@ import java.util.Objects
 
 /** Base class for App Card Components */
 abstract class Component(builder: Builder) : ProtobufBytes {
-  /**
-   * @return unique component ID within an AppCard
-   */
-  var componentId: String
-    private set
+    /** @return unique component ID within an AppCard */
+    var componentId: String
+        private set
 
-  init {
-    componentId = builder.componentId
-  }
+    init {
+        componentId = builder.componentId
+    }
 
-  override fun equals(other: Any?): Boolean {
-    if (other === this) return true
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
 
-    if (other !is Component) return false
+        if (other !is Component) return false
 
-    return Objects.equals(componentId, other.componentId)
-  }
+        return Objects.equals(componentId, other.componentId)
+    }
 
-  override fun hashCode() = componentId.hashCode()
+    override fun hashCode() = componentId.hashCode()
 
-  abstract override fun toByteArray(): ByteArray
+    abstract override fun toByteArray(): ByteArray
 
-  /**
-   * @return {@code true} If the component ID of the given component matches the component ID of
-   * the current component or its child component, and the component was successfully updated
-   */
-  abstract fun updateComponent(component: Component): Boolean
+    /**
+     * @return {@code true} If the component ID of the given component matches the component ID of
+     *   the current component or its child component, and the component was successfully updated
+     */
+    abstract fun updateComponent(component: Component): Boolean
 
-  /** Base class for app card component builders */
-  open class Builder internal constructor(internal val componentId: String)
+    /** Base class for app card component builders */
+    open class Builder internal constructor(internal val componentId: String)
 }

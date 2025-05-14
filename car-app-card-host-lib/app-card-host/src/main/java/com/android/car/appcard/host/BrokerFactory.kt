@@ -18,11 +18,11 @@ package com.android.car.appcard.host
 
 /** Helps connect to [AppCardBroker]s */
 internal interface BrokerFactory {
-  /** Connect to all available [AppCardBroker] */
-  fun connectToAllCompatibleApplications(): Map<ApplicationIdentifier, AppCardBroker>
+    /** Connect to all available [AppCardBroker] */
+    fun connectToAllCompatibleApplications(): Map<ApplicationIdentifier, AppCardBroker>
 
-  /** Add any new added [AppCardBroker] */
-  fun refreshCompatibleApplication(
-    identifierSet: Set<ApplicationIdentifier>,
-  ): Map<ApplicationIdentifier, AppCardBroker>
+    /** Add any new added [AppCardBroker] */
+    fun refreshCompatibleApplication(
+        identifierSet: Set<ApplicationIdentifier>
+    ): Map<ApplicationIdentifier, AppCardBroker>
 }

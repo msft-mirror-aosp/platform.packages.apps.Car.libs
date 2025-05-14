@@ -19,6 +19,7 @@ package com.android.car.media.common.ui;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.text.TextUtils;
 import android.util.Size;
@@ -39,6 +40,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.car.apps.common.imaging.ImageViewBinder;
+import com.android.car.apps.common.util.CarPackageManagerUtils;
 import com.android.car.apps.common.util.ViewUtils;
 import com.android.car.media.common.MediaItemMetadata;
 import com.android.car.media.common.R;
@@ -113,6 +115,7 @@ public class PlaybackHistoryController {
      */
     public class HistoryItemViewHolder extends RecyclerView.ViewHolder {
         private Context mContext;
+        private PackageManager mPackageManager;
         private MediaSource mMediaSource;
         private View mActiveView;
         private View mInactiveView;
@@ -129,6 +132,7 @@ public class PlaybackHistoryController {
         HistoryItemViewHolder(View itemView) {
             super(itemView);
             mContext = itemView.getContext();
+            mPackageManager = mContext.getPackageManager();
             mActiveView = itemView.findViewById(R.id.history_card_container_active);
             mInactiveView = itemView.findViewById(R.id.history_card_container_inactive);
             mMetadataTitleView = itemView.findViewById(R.id.history_card_title_active);
@@ -156,8 +160,7 @@ public class PlaybackHistoryController {
         }
 
         private void updateView(MediaItemMetadata mediaItemMetadata) {
-            if (mediaItemMetadata == null
-                    || mediaItemMetadata.shouldExcludeItemFromMixedAppList()) {
+            if (shouldExcludeMetadataFromHistoryList(mediaItemMetadata)) {
                 if (mAppTitleInactive != null) {
                     mAppTitleInactive.setText(mContext.getString(R.string.open_action_for_app_title,
                             mMediaSource.getDisplayName(mContext)));
@@ -186,9 +189,8 @@ public class PlaybackHistoryController {
         private void setClickAction(PlaybackViewModel playbackViewModel) {
             itemView.setOnClickListener(v -> {
                 if (playbackViewModel.getPlaybackController().getValue() != null
-                        && playbackViewModel.getMetadata().getValue() != null
-                        && !playbackViewModel.getMetadata().getValue()
-                        .shouldExcludeItemFromMixedAppList()) {
+                        && !shouldExcludeMetadataFromHistoryList(
+                                playbackViewModel.getMetadata().getValue())) {
                     playbackViewModel.getPlaybackController().getValue().play();
                 } else {
                     Intent intent = mMediaSource.getIntent();
@@ -210,6 +212,20 @@ public class PlaybackHistoryController {
             if (mAlbumArt != null) {
                 mAlbumArtBinder.maybeCancelLoading(itemView.getContext());
             }
+        }
+
+        private boolean shouldExcludeMetadataFromHistoryList(MediaItemMetadata mediaItemMetadata) {
+            if (mediaItemMetadata == null) {
+                return true;
+            }
+            if (mediaItemMetadata.shouldExcludeItemFromMixedAppList()) {
+                return true;
+            }
+            if (CarPackageManagerUtils.isPackageSuspended(
+                    mPackageManager, mMediaSource.getPackageName())) {
+                return true;
+            }
+            return false;
         }
     }
 

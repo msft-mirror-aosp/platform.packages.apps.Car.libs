@@ -20,10 +20,12 @@ import static android.util.TypedValue.TYPE_NULL;
 import static android.util.TypedValue.TYPE_REFERENCE;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.content.pm.SharedLibraryInfo;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 
@@ -46,8 +48,8 @@ import java.util.List;
 public class Token {
     private static final String TOKEN_SHARED_LIBRARY_NAME = "com.android.oem.tokens";
     private static final String TEST_TOKEN_SHARED_LIBRARY_NAME = "com.android.car.oem.tokens.test";
-
     private static boolean sTestingOverrideEnabled = false;
+    private static final String TAG = "Token";
 
     /**
      * Return the library name for the OEM design token shared library installed on device.
@@ -85,22 +87,6 @@ public class Token {
     }
 
     /**
-     * Return {@code true} if there is an OEM design token shared library installed on device.
-     */
-    public static boolean isTokenSharedLibInstalled(@NonNull PackageManager packageManager) {
-        String packageName = getTokenSharedLibPackageName(packageManager);
-        if (packageName == null) {
-            return false;
-        }
-
-        try {
-            return packageManager.getApplicationInfo(packageName, 0).enabled;
-        } catch (PackageManager.NameNotFoundException e) {
-            return false;
-        }
-    }
-
-    /**
      * Return a {@link ContextThemeWrapper} that includes OEM provided values for design tokens.
      * <p>
      * If OEM customized token values are unavailable on the system , the {@code Context} object is
@@ -108,38 +94,82 @@ public class Token {
      */
     @NonNull
     public static Context createOemStyledContext(@NonNull Context context) {
-        if (context instanceof OemContextWrapper) {
+        if (checkContextIsOemStyled(context)) {
             return context;
         }
 
-        int oemStyleOverride = context.getResources().getIdentifier("OemStyle",
-                "style", Token.getTokenSharedLibraryName());
-        if (oemStyleOverride == 0) {
-            if (isLightTheme(context)) {
-                return new OemContextWrapper(context, R.style.OemTokensBaseLight);
-            } else {
-                return new OemContextWrapper(context, R.style.OemTokensBaseDark);
-            }
-        }
+        Context tokenContext = new ContextWrapper(context);
+        applyOemTokenStyle(tokenContext);
 
-        OemContextWrapper oemContext = new OemContextWrapper(context, R.style.OemTokens);
-        if (isLightTheme(oemContext)) {
-            oemContext.getTheme().applyStyle(R.style.OemTokensLight, true);
-        } else {
-            oemContext.getTheme().applyStyle(R.style.OemTokensDark, true);
-        }
-        oemContext.getTheme().applyStyle(oemStyleOverride, true);
-
-        return oemContext;
+        return tokenContext;
     }
 
     /**
-     * Returns true if the current system default attribute is lightTheme.
+     * Apply OEM token theme attributes to the provided {@link Context}.
+     * <p>
+     * If OEM customized token values are unavailable on the system , the {@code Context} object is
+     * will have library default token values.
+     */
+    public static void applyOemTokenStyle(@NonNull Context context) {
+        boolean isLightTheme = isLightTheme(context);
+
+        // Apply token default values that are compiled into static library
+        if (isLightTheme) {
+            context.getTheme().applyStyle(R.style.OemTokensBase_Light, true);
+        } else {
+            context.getTheme().applyStyle(R.style.OemTokensBase_Dark, true);
+        }
+
+        String sharedLibName = getTokenSharedLibraryName();
+
+        int useOemTokenId = context.getResources().getIdentifier("enable_oem_tokens", "bool",
+                sharedLibName);
+        boolean useOemToken = useOemTokenId != 0 && context.getResources().getBoolean(
+                useOemTokenId);
+
+        if (useOemToken) {
+            int oemStyleOverride = context.getResources().getIdentifier("OemStyle",
+                    "style", sharedLibName);
+            if (oemStyleOverride == 0) {
+                Log.e(TAG,
+                        "Unable to apply OEM design token overrides. Style with "
+                                + "name OemStyle not found.");
+                return;
+            }
+
+            Log.i(TAG, "Overriding OEM tokens with OEM values");
+            if (isLightTheme) {
+                context.getTheme().applyStyle(R.style.OemTokenSharedLibraryOverlay_Base_Light,
+                        true);
+            } else {
+                context.getTheme().applyStyle(R.style.OemTokenSharedLibraryOverlay_Base_Dark, true);
+            }
+
+            context.getTheme().applyStyle(oemStyleOverride, true);
+
+            // Apply framework-res theme overlay
+            int themeOverlayNameId = context.getResources().getIdentifier("theme_overlay",
+                    "string", sharedLibName);
+            if (themeOverlayNameId == 0) {
+                return;
+            }
+            String overlayName = context.getResources().getString(themeOverlayNameId);
+            int themeOverlayId = context.getResources().getIdentifier(overlayName, null, null);
+
+            if (themeOverlayId == 0) {
+                return;
+            }
+            context.getTheme().applyStyle(themeOverlayId, true);
+        }
+    }
+
+    /**
+     * Returns true if the system {@code Theme.DeviceDefault.NoActionBar} theme
+     * {@code android:isLightTheme} attribute resolve to true
      */
     static boolean isLightTheme(@NonNull Context context) {
         Resources.Theme deviceDefaultTheme = context.getResources().newTheme();
         deviceDefaultTheme.applyStyle(android.R.style.Theme_DeviceDefault_NoActionBar, true);
-
 
         TypedValue value = new TypedValue();
         return deviceDefaultTheme.resolveAttribute(android.R.attr.isLightTheme,
@@ -155,7 +185,7 @@ public class Token {
      */
     @Px
     public static float getCornerRadius(@NonNull Context context, @AttrRes int attr) {
-        checkContext(context);
+        requireContextIsOemStyled(context);
         TypedValue tv = getThemeTypedValue(context, attr);
         return TypedValue.complexToDimension(tv.data,
                 context.getResources().getDisplayMetrics());
@@ -169,7 +199,7 @@ public class Token {
      */
     @StyleRes
     public static int getTextAppearance(@NonNull Context context, @AttrRes int attr) {
-        checkContext(context);
+        requireContextIsOemStyled(context);
         TypedValue tv = getThemeTypedValue(context, attr);
         return tv.resourceId;
     }
@@ -182,7 +212,7 @@ public class Token {
      */
     @ColorInt
     public static int getColor(@NonNull Context context, @AttrRes int attr) {
-        checkContext(context);
+        requireContextIsOemStyled(context);
         TypedValue tv = getThemeTypedValue(context, attr);
 
         if (tv.resourceId == 0) {
@@ -269,7 +299,8 @@ public class Token {
             return false;
         }
 
-        TypedArray libAttributes = context.getTheme().obtainStyledAttributes(R.style.OemTokens,
+        TypedArray libAttributes = context.getTheme().obtainStyledAttributes(
+                R.style.OemTokenSharedLibraryOverlay,
                 new int[]{attr});
         TypedValue tv = new TypedValue();
         if (libAttributes.getType(0) != TYPE_ATTRIBUTE) {
@@ -289,14 +320,23 @@ public class Token {
         return isOemStyled;
     }
 
-    private static void checkContext(@NonNull Context context) {
+    private static boolean checkContextIsOemStyled(@NonNull Context context) {
         TypedArray attributes = context.getTheme().obtainStyledAttributes(
-                new int[]{R.attr.oemColorPrimary});
+                new int[]{R.attr.oemTokenOverrideEnabled});
         if (attributes.getType(0) == (TypedValue.TYPE_NULL)) {
-            throw new IllegalArgumentException(
-                    "Context must be token compatible.");
+            attributes.recycle();
+            return false;
         }
         attributes.recycle();
+        return true;
+    }
+
+    private static void requireContextIsOemStyled(@NonNull Context context) {
+        if (!checkContextIsOemStyled(context)) {
+            throw new IllegalArgumentException(
+                    "Cannot access OEM token values in a context that has not had OEM token "
+                            + "styles applied");
+        }
     }
 
     @NonNull

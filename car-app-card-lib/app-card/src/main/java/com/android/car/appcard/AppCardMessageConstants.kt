@@ -18,37 +18,37 @@ package com.android.car.appcard
 /** Contains constants to be used for message identification in [AppCardContentProvider] */
 object AppCardMessageConstants {
 
-  /** Send all app cards supported by application */
-  const val MSG_SEND_ALL_APP_CARDS = "MSG_SEND_ALL_APP_CARDS"
+    /** Send all app cards supported by application */
+    const val MSG_SEND_ALL_APP_CARDS = "MSG_SEND_ALL_APP_CARDS"
 
-  /** A new app card has been added */
-  const val MSG_APP_CARD_ADDED = "MSG_APP_CARD_ADDED"
+    /** A new app card has been added */
+    const val MSG_APP_CARD_ADDED = "MSG_APP_CARD_ADDED"
 
-  /** An app card has been removed */
-  const val MSG_APP_CARD_REMOVED = "MSG_APP_CARD_REMOVED"
+    /** An app card has been removed */
+    const val MSG_APP_CARD_REMOVED = "MSG_APP_CARD_REMOVED"
 
-  /** An app card update is being requested */
-  const val MSG_APP_CARD_UPDATE = "MSG_APP_CARD_UPDATE"
+    /** An app card update is being requested */
+    const val MSG_APP_CARD_UPDATE = "MSG_APP_CARD_UPDATE"
 
-  /** An app card component update is being requested */
-  const val MSG_APP_CARD_COMPONENT_UPDATE = "MSG_APP_CARD_COMPONENT_UPDATE"
+    /** An app card component update is being requested */
+    const val MSG_APP_CARD_COMPONENT_UPDATE = "MSG_APP_CARD_COMPONENT_UPDATE"
 
-  /** An app card has been interacted with */
-  const val MSG_APP_CARD_INTERACTION = "MSG_APP_CARD_INTERACTION"
+    /** An app card has been interacted with */
+    const val MSG_APP_CARD_INTERACTION = "MSG_APP_CARD_INTERACTION"
 
-  /** An app card's [AppCardContext] has been updated */
-  const val MSG_APP_CARD_CONTEXT_UPDATE = "MSG_APP_CARD_CONTEXT_UPDATE"
+    /** An app card's [AppCardContext] has been updated */
+    const val MSG_APP_CARD_CONTEXT_UPDATE = "MSG_APP_CARD_CONTEXT_UPDATE"
 
-  /** An app card provider is being closed by host */
-  const val MSG_CLOSE_PROVIDER = "MSG_CLOSE_PROVIDER"
+    /** An app card provider is being closed by host */
+    const val MSG_CLOSE_PROVIDER = "MSG_CLOSE_PROVIDER"
 
-  /** Contains constants used to identify the type of interaction that needs to be handled */
-  object InteractionMessageConstants {
+    /** Contains constants used to identify the type of interaction that needs to be handled */
+    object InteractionMessageConstants {
 
-    /**
-     * An app card component's
-     * [com.android.car.appcard.component.interaction.OnClickListener] needs to be handled
-     */
-    const val MSG_INTERACTION_ON_CLICK = "MSG_INTERACTION_ON_CLICK"
-  }
+        /**
+         * An app card component's [com.android.car.appcard.component.interaction.OnClickListener]
+         * needs to be handled
+         */
+        const val MSG_INTERACTION_ON_CLICK = "MSG_INTERACTION_ON_CLICK"
+    }
 }

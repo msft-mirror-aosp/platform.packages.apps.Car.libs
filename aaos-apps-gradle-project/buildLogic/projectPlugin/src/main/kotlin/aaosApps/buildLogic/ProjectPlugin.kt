@@ -16,61 +16,35 @@
 
 package aaosApps.buildLogic
 
-import com.android.build.api.dsl.CommonExtension
-import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.api.AndroidBasePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 
 class ProjectPlugin : Plugin<Project> {
-
+    /**
+     * Applies the plugin to the given project.
+     *
+     * This function sets up the extension for the plugin, configures Java and Kotlin compilation,
+     * and configures common Android settings and Android app settings based on the project type.
+     *
+     * @param project The project to which the plugin is applied.
+     */
     override fun apply(project: Project) {
+        // Set up the extension for the plugin
         val extension =
-            project.extensions.create("aaosAppsBuildCfg", aaosAppsBuildCfgExt::class.java)
-        // Set the default value of the toolchain to the value set in the Gradle properties
-        val mappedToolChainVersionProvider =
-            project.providers.gradleProperty("aaosApps.buildCfg.defaultJdkToolchain").map {
-                it.toString().toInt()
-            }
-        extension.jdkToolchain.convention(mappedToolChainVersionProvider)
+            project.extensions.create("aaosAppsBuildCfg", AaosAppsBuildCfgExt::class.java)
+        extension.setDefaults(project)
 
-        project.setJDK(extension)
+        project.configureJava(extension)
 
-        project.plugins.withType(AndroidBasePlugin::class.java) {
-            project.extensions.getByType(CommonExtension::class.java).apply {
-                val ace = project.extensions.getByType(AndroidComponentsExtension::class.java)
-
-                compileSdk =
-                    project.findProperty("aaosApps.buildCfg.compileSdk")!!.toString().toInt()
-                buildToolsVersion =
-                    project.findProperty("aaosApps.buildCfg.buildToolsVersion")!!.toString()
-
-                // NDK: Check if we're using the prebuilt SDK, and if so set the path to the
-                // prebuilt NDK
-                val sdkDir = ace.sdkComponents.sdkDirectory.get().asFile
-                if (sdkDir.path.contains("prebuilts/fullsdk")) {
-                    ndkPath = sdkDir.resolve("ndk-bundle").absolutePath
-                }
-
-                // Load the NDK version from the Gradle properties.
-                // When building with the prebuilt NDK, this must match the prebuilt NDK's version
-                ndkVersion = project.findProperty("aaosApps.buildCfg.ndkVersion")!!.toString()
-
-                // The default location for the native build directory is relative to the module,
-                // which mucks up the git staging. We need to move it out of the module, but it
-                // can't be within the build directory, so the below line creates a
-                // cmake-build-staging directory in the same directory that holds the rest of the
-                // build directories (out/aaos-apps-gradle-build)
-                externalNativeBuild.cmake {
-                    // Load the CMake version from the Gradle properties.
-                    version = project.findProperty("aaosApps.buildCfg.cmakeVersion")!!.toString()
-                    buildStagingDirectory =
-                        project.rootProject.layout.buildDirectory
-                            .dir("../cmake-build-staging/${project.name}")
-                            .get()
-                            .asFile
-                }
-            }
+        project.plugins.withType(KotlinBasePlugin::class.java) {
+            project.configureKotlin(extension)
         }
+        project.plugins.withType(AndroidBasePlugin::class.java) {
+            project.configureCommonAndroid(extension)
+        }
+        project.plugins.withType(AppPlugin::class.java) { project.configureAndroidApp(extension) }
     }
 }

@@ -58,6 +58,7 @@ android_test {
         "hamcrest-library",
         "androidx.arch.core_core-runtime",
         "androidx.arch.core_core-common",
+        "androidx.arch.core_core-testing",
         "androidx.media3.media3-session",
         "androidx.mediarouter_mediarouter",
         "android.car-system-stubs",

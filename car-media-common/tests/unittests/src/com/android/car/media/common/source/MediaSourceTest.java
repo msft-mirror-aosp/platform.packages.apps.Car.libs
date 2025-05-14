@@ -33,10 +33,10 @@ import android.content.pm.ServiceInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.android.car.media.common.R;
-import com.android.car.testing.common.InstantTaskExecutorRule;
 import com.android.car.testing.common.TestLifecycleOwner;
 
 import org.junit.Before;

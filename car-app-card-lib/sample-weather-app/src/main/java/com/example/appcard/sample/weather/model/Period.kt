@@ -17,20 +17,20 @@
 package com.example.appcard.sample.weather.model
 
 class Period {
-  val number: Int? = null
-  val name: String? = null
-  val startTime: String? = null
-  val endTime: String? = null
-  val isDaytime: Boolean? = null
-  val temperature: Int? = null
-  val temperatureUnit: String? = null
-  val temperatureTrend: String? = null
-  val probabilityOfPrecipitation: IntUnitValue? = null
-  val dewpoint: DoubleUnitValue? = null
-  val relativeHumidity: IntUnitValue? = null
-  val windSpeed: String? = null
-  val windDirection: String? = null
-  val icon: String? = null
-  val shortForecast: String? = null
-  val detailedForecast: String? = null
+    val number: Int? = null
+    val name: String? = null
+    val startTime: String? = null
+    val endTime: String? = null
+    val isDaytime: Boolean? = null
+    val temperature: Int? = null
+    val temperatureUnit: String? = null
+    val temperatureTrend: String? = null
+    val probabilityOfPrecipitation: IntUnitValue? = null
+    val dewpoint: DoubleUnitValue? = null
+    val relativeHumidity: IntUnitValue? = null
+    val windSpeed: String? = null
+    val windDirection: String? = null
+    val icon: String? = null
+    val shortForecast: String? = null
+    val detailedForecast: String? = null
 }

@@ -29,6 +29,7 @@ import android.os.Looper;
 import android.support.v4.media.MediaBrowserCompat;
 
 import androidx.annotation.NonNull;
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MutableLiveData;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -36,7 +37,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.android.car.media.common.source.MediaBrowserConnector.BrowsingState;
 import com.android.car.media.common.source.MediaBrowserConnector.ConnectionStatus;
 import com.android.car.testing.common.CaptureObserver;
-import com.android.car.testing.common.InstantTaskExecutorRule;
 import com.android.car.testing.common.TestLifecycleOwner;
 
 import org.junit.Before;

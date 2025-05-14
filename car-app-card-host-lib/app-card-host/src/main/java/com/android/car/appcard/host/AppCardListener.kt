@@ -18,26 +18,26 @@ package com.android.car.appcard.host
 
 /** Any activity that wants to show/manage app cards must implement this listener. */
 interface AppCardListener {
-  /** An [AppCardContainer] has been received from an application */
-  fun onAppCardReceived(appCard: AppCardContainer)
+    /** An [AppCardContainer] has been received from an application */
+    fun onAppCardReceived(appCard: AppCardContainer)
 
-  /** An [AppCardComponentContainer] has been received from an application */
-  fun onComponentReceived(component: AppCardComponentContainer)
+    /** An [AppCardComponentContainer] has been received from an application */
+    fun onComponentReceived(component: AppCardComponentContainer)
 
-  /**
-   * A provider that supports app cards has been removed
-   *
-   * If authority is {@code null} then an entire package was removed
-   */
-  fun onProviderRemoved(packageName: String, authority: String?)
+    /**
+     * A provider that supports app cards has been removed
+     *
+     * If authority is {@code null} then an entire package was removed
+     */
+    fun onProviderRemoved(packageName: String, authority: String?)
 
-  /**
-   * A provider that supports app cards has been added
-   *
-   * If authority is {@code null} then an entire package was added
-   */
-  fun onProviderAdded(packageName: String, authority: String?)
+    /**
+     * A provider that supports app cards has been added
+     *
+     * If authority is {@code null} then an entire package was added
+     */
+    fun onProviderAdded(packageName: String, authority: String?)
 
-  /** There was an error when communicating with an application that supports app cards */
-  fun onPackageCommunicationError(identifier: ApplicationIdentifier, throwable: Throwable)
+    /** There was an error when communicating with an application that supports app cards */
+    fun onPackageCommunicationError(identifier: ApplicationIdentifier, throwable: Throwable)
 }

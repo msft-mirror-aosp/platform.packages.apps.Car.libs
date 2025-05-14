@@ -15,8 +15,35 @@
  */
 package aaosApps.buildLogic
 
+import java.io.File
+import org.gradle.api.Project
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
+import org.jetbrains.kotlin.gradle.plugin.extraProperties
 
-interface aaosAppsBuildCfgExt {
+interface AaosAppsBuildCfgExt {
+    val currentSdk: Property<Int>
     val jdkToolchain: Property<Int>
+    // Path to the root of the checkout
+    val repoRoot: DirectoryProperty
+}
+
+fun AaosAppsBuildCfgExt.setDefaults(project: Project) {
+
+    currentSdk.convention(
+        project.providers.gradleProperty("aaosApps.buildCfg.currentSdk").map { it.toInt() }
+    )
+
+    // Set the default value of the toolchain to the value set in the Gradle properties
+    jdkToolchain.convention(
+        project.providers.gradleProperty("aaosApps.buildCfg.defaultJdkToolchain").map {
+            it.toString().toInt()
+        }
+    )
+
+    // This property was set in the findRepoRoot.settings.gradle.kts file, which must be included
+    // in the build's settings.gradle.kts.
+    val androidRepoRoot: File = project.gradle.extraProperties["androidRepoRoot"] as File
+    // Set the default value of the repoRoot
+    repoRoot.convention(project.layout.dir(project.provider { androidRepoRoot }))
 }

@@ -49,6 +49,13 @@ import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.io.IOException
+import java.util.Timer
+import java.util.TimerTask
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.floor
+import kotlin.math.pow
+import kotlin.math.roundToInt
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.OkHttpClient
@@ -58,461 +65,484 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.IOException
-import java.util.Timer
-import java.util.TimerTask
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.floor
-import kotlin.math.pow
-import kotlin.math.roundToInt
 
 class WeatherAppCardProvider(
-  val context: Context,
-  val id: String,
-  val update: SimpleAppCardContentProvider.AppCardUpdater,
+    val context: Context,
+    val id: String,
+    val update: SimpleAppCardContentProvider.AppCardUpdater,
 ) {
-  private lateinit var latestAppCardContext: AppCardContext
-  private var locationManager: LocationManager? = null
-  private var timer = Timer()
-  private var timerSetup = AtomicBoolean(false)
-  private var currLocation: Location? = null
-  private var pointsResponse: PointsResponse? = null
-  private var pointsDisposable: Disposable? = null
-  private var forecastResponse: ForecastResponse? = null
-  private var forecastDisposable: Disposable? = null
-  private var carTemperatureUnit: MeasureUnit? = null
-  private var latestPeriod: Period? = null
-  private var isConnectedToInternet: Boolean = false
+    private lateinit var latestAppCardContext: AppCardContext
+    private var locationManager: LocationManager? = null
+    private var timer = Timer()
+    private var timerSetup = AtomicBoolean(false)
+    private var currLocation: Location? = null
+    private var pointsResponse: PointsResponse? = null
+    private var pointsDisposable: Disposable? = null
+    private var forecastResponse: ForecastResponse? = null
+    private var forecastDisposable: Disposable? = null
+    private var carTemperatureUnit: MeasureUnit? = null
+    private var latestPeriod: Period? = null
+    private var isConnectedToInternet: Boolean = false
 
-  init {
-    if (permissionGranted()) {
-      initLocationManager()
-    }
-
-    val connectivityManager = context.getSystemService<ConnectivityManager>()
-    connectivityManager?.registerNetworkCallback(getNetworkRequest(), getNetworkCallBack())
-  }
-
-  fun setTempUnit(newMeasureUnit: MeasureUnit) {
-    carTemperatureUnit = newMeasureUnit
-    latestPeriod?.let {
-      update.sendUpdate(getAppCard(it))
-    }
-  }
-
-  private fun permissionGranted(): Boolean {
-    val coarseLoc = ActivityCompat.checkSelfPermission(
-      context,
-      Manifest.permission.ACCESS_COARSE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
-    if (!coarseLoc) {
-      Log.e(TAG, "ACCESS_COARSE_LOCATION not granted")
-    }
-
-    val bgLoc = ActivityCompat.checkSelfPermission(
-      context,
-      Manifest.permission.ACCESS_BACKGROUND_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
-    if (!bgLoc) {
-      Log.e(TAG, "ACCESS_BACKGROUND_LOCATION not granted")
-    }
-
-    val fineLoc = ActivityCompat.checkSelfPermission(
-      context,
-      Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
-    if (!fineLoc) {
-      Log.e(TAG, "ACCESS_FINE_LOCATION not granted")
-    }
-
-    return coarseLoc && bgLoc && fineLoc
-  }
-
-  fun getAppCard(appCardContext: AppCardContext): ImageAppCard {
-    latestAppCardContext = appCardContext
-
-    if (!timerSetup.getAndSet(true)) {
-      timer.schedule(object : TimerTask() {
-        override fun run() {
-          latestAppCardContext.let {
-            update.sendUpdate(getAppCard(it))
-          }
-        }
-      }, MINUTE_IN_MS, MINUTE_IN_MS)
-    }
-
-    if (permissionGranted()) {
-      locationManager ?: initLocationManager()
-    } else {
-      return getGrantPermissionAppCard()
-    }
-
-    if (!isConnectedToInternet) {
-      logIfDebuggable("Internet connection isn't established")
-      return getErrorAppCard(INTERNET_CONNECTION_SECONDARY)
-    }
-
-    val loc = getCurrentLocation()
-    getWeatherPoints(location = loc)?.subscribeOn(Schedulers.newThread())?.subscribe(
-      object : SingleObserver<PointsResponse> {
-        override fun onSubscribe(d: Disposable) {
-          pointsDisposable?.dispose()
-          pointsDisposable = d
+    init {
+        if (permissionGranted()) {
+            initLocationManager()
         }
 
-        override fun onError(e: Throwable) {
-          logIfDebuggable("getWeatherPoints error: $e")
+        val connectivityManager = context.getSystemService<ConnectivityManager>()
+        connectivityManager?.registerNetworkCallback(getNetworkRequest(), getNetworkCallBack())
+    }
+
+    fun setTempUnit(newMeasureUnit: MeasureUnit) {
+        carTemperatureUnit = newMeasureUnit
+        latestPeriod?.let { update.sendUpdate(getAppCard(it)) }
+    }
+
+    private fun permissionGranted(): Boolean {
+        val coarseLoc =
+            ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+            ) == PackageManager.PERMISSION_GRANTED
+        if (!coarseLoc) {
+            Log.e(TAG, "ACCESS_COARSE_LOCATION not granted")
         }
 
-        override fun onSuccess(response: PointsResponse) {
-          logIfDebuggable("getWeatherPoints: $response")
-          pointsResponse = response
+        val bgLoc =
+            ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+            ) == PackageManager.PERMISSION_GRANTED
+        if (!bgLoc) {
+            Log.e(TAG, "ACCESS_BACKGROUND_LOCATION not granted")
+        }
 
-          val gridId = pointsResponse?.properties?.gridId ?: return
-          val gridY = pointsResponse?.properties?.gridY ?: return
-          val gridX = pointsResponse?.properties?.gridX ?: return
+        val fineLoc =
+            ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
+        if (!fineLoc) {
+            Log.e(TAG, "ACCESS_FINE_LOCATION not granted")
+        }
 
-          getWeatherForecast(gridId, gridX, gridY).subscribeOn(Schedulers.newThread()).subscribe(
-            object : SingleObserver<ForecastResponse> {
-              override fun onSubscribe(d: Disposable) {
-                forecastDisposable?.dispose()
-                forecastDisposable = d
-              }
+        return coarseLoc && bgLoc && fineLoc
+    }
 
-              override fun onError(e: Throwable) {
-                logIfDebuggable("getWeatherForecast error: $e")
-              }
+    fun getAppCard(appCardContext: AppCardContext): ImageAppCard {
+        latestAppCardContext = appCardContext
 
-              override fun onSuccess(response: ForecastResponse) {
-                logIfDebuggable("getWeatherForecast: $response")
-                forecastResponse = response
-                val periods = forecastResponse?.properties?.periods ?: run {
-                  update.sendUpdate(getErrorAppCard(ERROR_PERIODS))
-                  return
+        if (!timerSetup.getAndSet(true)) {
+            timer.schedule(
+                object : TimerTask() {
+                    override fun run() {
+                        latestAppCardContext.let { update.sendUpdate(getAppCard(it)) }
+                    }
+                },
+                MINUTE_IN_MS,
+                MINUTE_IN_MS,
+            )
+        }
+
+        if (permissionGranted()) {
+            locationManager ?: initLocationManager()
+        } else {
+            return getGrantPermissionAppCard()
+        }
+
+        if (!isConnectedToInternet) {
+            logIfDebuggable("Internet connection isn't established")
+            return getErrorAppCard(INTERNET_CONNECTION_SECONDARY)
+        }
+
+        val loc = getCurrentLocation()
+        getWeatherPoints(location = loc)
+            ?.subscribeOn(Schedulers.newThread())
+            ?.subscribe(
+                object : SingleObserver<PointsResponse> {
+                    override fun onSubscribe(d: Disposable) {
+                        pointsDisposable?.dispose()
+                        pointsDisposable = d
+                    }
+
+                    override fun onError(e: Throwable) {
+                        logIfDebuggable("getWeatherPoints error: $e")
+                    }
+
+                    override fun onSuccess(response: PointsResponse) {
+                        logIfDebuggable("getWeatherPoints: $response")
+                        pointsResponse = response
+
+                        val gridId = pointsResponse?.properties?.gridId ?: return
+                        val gridY = pointsResponse?.properties?.gridY ?: return
+                        val gridX = pointsResponse?.properties?.gridX ?: return
+
+                        getWeatherForecast(gridId, gridX, gridY)
+                            .subscribeOn(Schedulers.newThread())
+                            .subscribe(
+                                object : SingleObserver<ForecastResponse> {
+                                    override fun onSubscribe(d: Disposable) {
+                                        forecastDisposable?.dispose()
+                                        forecastDisposable = d
+                                    }
+
+                                    override fun onError(e: Throwable) {
+                                        logIfDebuggable("getWeatherForecast error: $e")
+                                    }
+
+                                    override fun onSuccess(response: ForecastResponse) {
+                                        logIfDebuggable("getWeatherForecast: $response")
+                                        forecastResponse = response
+                                        val periods =
+                                            forecastResponse?.properties?.periods
+                                                ?: run {
+                                                    update.sendUpdate(
+                                                        getErrorAppCard(ERROR_PERIODS)
+                                                    )
+                                                    return
+                                                }
+                                        val period =
+                                            periods[0]
+                                                ?: run {
+                                                    update.sendUpdate(
+                                                        getErrorAppCard(ERROR_FIRST_PERIOD)
+                                                    )
+                                                    return
+                                                }
+                                        update.sendUpdate(getAppCard(period))
+                                    }
+                                }
+                            )
+                    }
                 }
-                val period = periods[0] ?: run {
-                  update.sendUpdate(getErrorAppCard(ERROR_FIRST_PERIOD))
-                  return
+            )
+        return loading()
+    }
+
+    private fun Int.convertTemp(from: MeasureUnit, to: MeasureUnit): Int =
+        if (from == to) {
+            this
+        } else if (to == MeasureUnit.CELSIUS) {
+            TemperatureConverter.convertFahrenheitToCelsius(this.toFloat()).roundToInt()
+        } else {
+            TemperatureConverter.convertCelsiusToFahrenheit(this.toFloat()).roundToInt()
+        }
+
+    private fun getAppCard(period: Period): ImageAppCard {
+        period.temperature ?: return getErrorAppCard(INVALID_TEMP)
+        period.temperatureUnit ?: return getErrorAppCard(INVALID_TEMP)
+
+        latestPeriod = period
+        val temperatureUnit =
+            if (period.temperatureUnit == TEMP_F_UNIT) {
+                MeasureUnit.FAHRENHEIT
+            } else {
+                MeasureUnit.CELSIUS
+            }
+        val temperature =
+            carTemperatureUnit?.let { period.temperature.convertTemp(temperatureUnit, it) }
+                ?: period.temperature
+        val temperatureUnitText =
+            carTemperatureUnit?.let {
+                if (it == MeasureUnit.FAHRENHEIT) {
+                    TEMP_F_UNIT
+                } else {
+                    TEMP_C_UNIT
                 }
-                update.sendUpdate(getAppCard(period))
-              }
-            }
-          )
+            } ?: period.temperatureUnit
+        val primaryText =
+            period.temperatureTrend?.let {
+                if (it == TEMP_RISING) {
+                    "$temperature $temperatureUnitText $TEMP_RISING_ICON"
+                } else {
+                    "$temperature $temperatureUnitText $TEMP_FALLING_ICON"
+                }
+            } ?: "$temperature $temperatureUnit"
+        return ImageAppCard.newBuilder(id)
+            .setPrimaryText(primaryText)
+            .setSecondaryText(period.shortForecast ?: period.detailedForecast ?: FORECAST_NOT_FOUND)
+            .setHeader(getHeader())
+            .setImage(
+                Image.newBuilder(IMAGE_ID)
+                    .setContentScale(Image.ContentScale.FILL_BOUNDS)
+                    .setColorFilter(Image.ColorFilter.TINT)
+                    .setImageData(getImageAccordingToIconUri(period.icon, period.isDaytime))
+                    .build()
+            )
+            .build()
+    }
+
+    private fun getHeader(): Header {
+        val imageSize = latestAppCardContext.imageAppCardContext.getMaxImageSize(Header::class.java)
+        return Header.newBuilder(HEADER_ID)
+            .setTitle(WEATHER_HEADER)
+            .setImage(
+                Image.newBuilder(HEADER_IMAGE_ID)
+                    .setImageData(
+                        resToBitmap(R.drawable.ic_icon, imageSize.width, imageSize.height)
+                    )
+                    .setColorFilter(Image.ColorFilter.TINT)
+                    .setContentScale(Image.ContentScale.FILL_BOUNDS)
+                    .build()
+            )
+            .build()
+    }
+
+    private fun getImageAccordingToIconUri(icon: String?, isDaylight: Boolean?): Bitmap {
+        val imageSize =
+            latestAppCardContext.imageAppCardContext.getMaxImageSize(ImageAppCard::class.java)
+        icon ?: return resToBitmap(R.drawable.ic_error, imageSize.width, imageSize.height)
+        val uri = Uri.parse(icon)
+        logIfDebuggable("URI Paths: ${uri.pathSegments}")
+        val dayTime = isDaylight ?: (uri.pathSegments[2] == "day")
+        logIfDebuggable("isDaylight: $dayTime")
+        val code = uri.pathSegments[3].split(',')[0]
+        val resId = IconUriUtility.getRes(code, dayTime)
+        return resToBitmap(resId, imageSize.width, imageSize.height)
+    }
+
+    private fun getWeatherPoints(location: Location?): Single<PointsResponse>? {
+        val numDecimal = 4
+        val latitude = location?.latitude?.round(numDecimal) ?: return null
+        val longitude = location.longitude.round(numDecimal)
+        return getApiService().getPoints(latitude, longitude)
+    }
+
+    private fun getWeatherForecast(
+        gridId: String,
+        gridX: Int,
+        gridY: Int,
+    ): Single<ForecastResponse> {
+        return getApiService().getForecast(gridId, gridX, gridY)
+    }
+
+    private fun getErrorAppCard(errorMsg: String): ImageAppCard {
+        val imageSize =
+            latestAppCardContext.imageAppCardContext.getMaxImageSize(ImageAppCard::class.java)
+        return ImageAppCard.newBuilder(id)
+            .setHeader(getHeader())
+            .setPrimaryText(ERROR_PRIMARY)
+            .setSecondaryText(errorMsg)
+            .setImage(
+                Image.newBuilder(IMAGE_ID)
+                    .setContentScale(Image.ContentScale.FILL_BOUNDS)
+                    .setColorFilter(Image.ColorFilter.TINT)
+                    .setImageData(
+                        resToBitmap(R.drawable.ic_error, imageSize.width, imageSize.height)
+                    )
+                    .build()
+            )
+            .build()
+    }
+
+    private fun loading(): ImageAppCard {
+        val imageSize =
+            latestAppCardContext.imageAppCardContext.getMaxImageSize(ImageAppCard::class.java)
+        return ImageAppCard.newBuilder(id)
+            .setHeader(getHeader())
+            .setPrimaryText(LOADING_PRIMARY)
+            .setSecondaryText(LOADING_SECONDARY)
+            .setImage(
+                Image.newBuilder(IMAGE_ID)
+                    .setContentScale(Image.ContentScale.FILL_BOUNDS)
+                    .setColorFilter(Image.ColorFilter.TINT)
+                    .setImageData(
+                        resToBitmap(R.drawable.ic_loading, imageSize.width, imageSize.height)
+                    )
+                    .build()
+            )
+            .build()
+    }
+
+    private fun getGrantPermissionAppCard(): ImageAppCard {
+        val builder =
+            ImageAppCard.newBuilder(id)
+                .setHeader(getHeader())
+                .setPrimaryText(ERROR_PRIMARY)
+                .setSecondaryText(LOCATION_PERMISSION_SECONDARY)
+
+        if (latestAppCardContext.isInteractable) {
+            builder.addButton(
+                Button.newBuilder(
+                        SETTINGS_BUTTON_ID,
+                        Button.ButtonType.PRIMARY,
+                        object : OnClickListener {
+                            override fun onClick() {
+                                // no-op
+                            }
+                        },
+                    )
+                    .setText(SETTINGS_BUTTON_TEXT)
+                    .setIntent(RoutingActivityIntent.newBuilder(ROUTING_ACTIVITY_NAME).build())
+                    .build()
+            )
+        } else {
+            val imageSize =
+                latestAppCardContext.imageAppCardContext.getMaxImageSize(ImageAppCard::class.java)
+            builder.setImage(
+                Image.newBuilder(IMAGE_ID)
+                    .setContentScale(Image.ContentScale.FILL_BOUNDS)
+                    .setColorFilter(Image.ColorFilter.TINT)
+                    .setImageData(
+                        resToBitmap(R.drawable.ic_location_off, imageSize.width, imageSize.height)
+                    )
+                    .build()
+            )
         }
-      })
-    return loading()
-  }
-
-  private fun Int.convertTemp(from: MeasureUnit, to: MeasureUnit): Int = if (from == to) {
-    this
-  } else if (to == MeasureUnit.CELSIUS) {
-    TemperatureConverter.convertFahrenheitToCelsius(this.toFloat()).roundToInt()
-  } else {
-    TemperatureConverter.convertCelsiusToFahrenheit(this.toFloat()).roundToInt()
-  }
-
-  private fun getAppCard(period: Period): ImageAppCard {
-    period.temperature ?: return getErrorAppCard(INVALID_TEMP)
-    period.temperatureUnit ?: return getErrorAppCard(INVALID_TEMP)
-
-    latestPeriod = period
-    val temperatureUnit = if (period.temperatureUnit == TEMP_F_UNIT) {
-      MeasureUnit.FAHRENHEIT
-    } else {
-      MeasureUnit.CELSIUS
+        return builder.build()
     }
-    val temperature = carTemperatureUnit?.let {
-      period.temperature.convertTemp(temperatureUnit, it)
-    } ?: period.temperature
-    val temperatureUnitText = carTemperatureUnit?.let {
-      if (it == MeasureUnit.FAHRENHEIT) {
-        TEMP_F_UNIT
-      } else {
-        TEMP_C_UNIT
-      }
-    } ?: period.temperatureUnit
-    val primaryText = period.temperatureTrend?.let {
-      if (it == TEMP_RISING) {
-        "$temperature $temperatureUnitText $TEMP_RISING_ICON"
-      } else {
-        "$temperature $temperatureUnitText $TEMP_FALLING_ICON"
-      }
-    } ?: "$temperature $temperatureUnit"
-    return ImageAppCard.newBuilder(id)
-      .setPrimaryText(primaryText)
-      .setSecondaryText(period.shortForecast ?: period.detailedForecast ?: FORECAST_NOT_FOUND)
-      .setHeader(getHeader())
-      .setImage(
-        Image.newBuilder(IMAGE_ID)
-          .setContentScale(Image.ContentScale.FILL_BOUNDS)
-          .setColorFilter(Image.ColorFilter.TINT)
-          .setImageData(getImageAccordingToIconUri(period.icon, period.isDaytime))
-          .build()
-      )
-      .build()
-  }
 
-  private fun getHeader(): Header {
-    val imageSize = latestAppCardContext.imageAppCardContext.getMaxImageSize(Header::class.java)
-    return Header.newBuilder(HEADER_ID)
-      .setTitle(WEATHER_HEADER)
-      .setImage(
-        Image.newBuilder(HEADER_IMAGE_ID)
-          .setImageData(resToBitmap(R.drawable.ic_icon, imageSize.width, imageSize.height))
-          .setColorFilter(Image.ColorFilter.TINT)
-          .setContentScale(Image.ContentScale.FILL_BOUNDS)
-          .build()
-      )
-      .build()
-  }
-
-  private fun getImageAccordingToIconUri(icon: String?, isDaylight: Boolean?): Bitmap {
-    val imageSize =
-      latestAppCardContext.imageAppCardContext.getMaxImageSize(ImageAppCard::class.java)
-    icon ?: return resToBitmap(R.drawable.ic_error, imageSize.width, imageSize.height)
-    val uri = Uri.parse(icon)
-    logIfDebuggable("URI Paths: ${uri.pathSegments}")
-    val dayTime = isDaylight ?: (uri.pathSegments[2] == "day")
-    logIfDebuggable("isDaylight: $dayTime")
-    val code = uri.pathSegments[3].split(',')[0]
-    val resId = IconUriUtility.getRes(code, dayTime)
-    return resToBitmap(resId, imageSize.width, imageSize.height)
-  }
-
-  private fun getWeatherPoints(location: Location?): Single<PointsResponse>? {
-    val numDecimal = 4
-    val latitude = location?.latitude?.round(numDecimal) ?: return null
-    val longitude = location.longitude.round(numDecimal)
-    return getApiService().getPoints(latitude, longitude)
-  }
-
-  private fun getWeatherForecast(gridId: String, gridX: Int, gridY: Int): Single<ForecastResponse> {
-    return getApiService().getForecast(gridId, gridX, gridY)
-  }
-
-  private fun getErrorAppCard(errorMsg: String): ImageAppCard {
-    val imageSize =
-      latestAppCardContext.imageAppCardContext.getMaxImageSize(ImageAppCard::class.java)
-    return ImageAppCard.newBuilder(id)
-      .setHeader(getHeader())
-      .setPrimaryText(ERROR_PRIMARY)
-      .setSecondaryText(errorMsg)
-      .setImage(
-        Image.newBuilder(IMAGE_ID)
-          .setContentScale(Image.ContentScale.FILL_BOUNDS)
-          .setColorFilter(Image.ColorFilter.TINT)
-          .setImageData(resToBitmap(R.drawable.ic_error, imageSize.width, imageSize.height))
-          .build()
-      )
-      .build()
-  }
-
-  private fun loading(): ImageAppCard {
-    val imageSize =
-      latestAppCardContext.imageAppCardContext.getMaxImageSize(ImageAppCard::class.java)
-    return ImageAppCard.newBuilder(id)
-      .setHeader(getHeader())
-      .setPrimaryText(LOADING_PRIMARY)
-      .setSecondaryText(LOADING_SECONDARY)
-      .setImage(
-        Image.newBuilder(IMAGE_ID)
-          .setContentScale(Image.ContentScale.FILL_BOUNDS)
-          .setColorFilter(Image.ColorFilter.TINT)
-          .setImageData(resToBitmap(R.drawable.ic_loading, imageSize.width, imageSize.height))
-          .build()
-      )
-      .build()
-  }
-
-  private fun getGrantPermissionAppCard(): ImageAppCard {
-    val builder = ImageAppCard.newBuilder(id)
-      .setHeader(getHeader())
-      .setPrimaryText(ERROR_PRIMARY)
-      .setSecondaryText(LOCATION_PERMISSION_SECONDARY)
-
-    if (latestAppCardContext.isInteractable) {
-      builder.addButton(
-        Button.newBuilder(
-          SETTINGS_BUTTON_ID,
-          Button.ButtonType.PRIMARY,
-          object : OnClickListener {
-            override fun onClick() {
-              //no-op
+    private fun getOkHttpClient(): OkHttpClient {
+        val logger =
+            HttpLoggingInterceptor().also {
+                it.level =
+                    if (Log.isLoggable(TAG, Log.DEBUG)) {
+                        HttpLoggingInterceptor.Level.BASIC
+                    } else {
+                        HttpLoggingInterceptor.Level.NONE
+                    }
             }
-          }
-        )
-          .setText(SETTINGS_BUTTON_TEXT)
-          .setIntent(RoutingActivityIntent.newBuilder(ROUTING_ACTIVITY_NAME).build())
-          .build()
-      )
-    } else {
-      val imageSize =
-        latestAppCardContext.imageAppCardContext.getMaxImageSize(ImageAppCard::class.java)
-      builder.setImage(
-        Image.newBuilder(IMAGE_ID)
-          .setContentScale(Image.ContentScale.FILL_BOUNDS)
-          .setColorFilter(Image.ColorFilter.TINT)
-          .setImageData(resToBitmap(R.drawable.ic_location_off, imageSize.width, imageSize.height))
-          .build()
-      )
-    }
-    return builder.build()
-  }
 
-  private fun getOkHttpClient(): OkHttpClient {
-    val logger = HttpLoggingInterceptor().also {
-      it.level = if (Log.isLoggable(TAG, Log.DEBUG)) {
-        HttpLoggingInterceptor.Level.BASIC
-      } else {
-        HttpLoggingInterceptor.Level.NONE
-      }
+        return OkHttpClient.Builder()
+            .addInterceptor(logger)
+            .addNetworkInterceptor(UserAgentInterceptor())
+            .build()
     }
 
-    return OkHttpClient.Builder()
-      .addInterceptor(logger)
-      .addNetworkInterceptor(UserAgentInterceptor())
-      .build()
-  }
-
-  class UserAgentInterceptor : Interceptor {
-    @Throws(IOException::class)
-    override fun intercept(chain: Chain): Response {
-      val originalRequest: Request = chain.request()
-      val requestWithUserAgent: Request = originalRequest.newBuilder()
-        .header(USER_AGENT_HEADER, USER_AGENT_VALUE)
-        .build()
-      return chain.proceed(requestWithUserAgent)
-    }
-  }
-
-  private fun getApiService(): ApiService {
-    return Retrofit.Builder()
-      .client(getOkHttpClient())
-      .validateEagerly(true)
-      .baseUrl(ApiService.URL)
-      .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
-      .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-      .build()
-      .create(ApiService::class.java)
-  }
-
-  fun destroy() {
-    timer.cancel()
-    timer = Timer()
-    timerSetup.set(false)
-  }
-
-  @SuppressLint("MissingPermission")
-  private fun initLocationManager() {
-    locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
-  }
-
-  @SuppressLint("MissingPermission")
-  private fun getCurrentLocation(): Location? {
-    val cancellationSignal = null
-    val locationProvider = getLocationProvider()
-    currLocation = currLocation ?: locationManager?.getLastKnownLocation(locationProvider)
-    locationManager?.getCurrentLocation(
-      locationProvider,
-      cancellationSignal,
-      context.mainExecutor
-    ) {
-      currLocation?.let { curr ->
-        if (it.latitude != curr.latitude || it.longitude != curr.longitude) {
-          logIfDebuggable("Location received: $it")
-          currLocation = curr
-          update.sendUpdate(getAppCard(latestAppCardContext))
+    class UserAgentInterceptor : Interceptor {
+        @Throws(IOException::class)
+        override fun intercept(chain: Chain): Response {
+            val originalRequest: Request = chain.request()
+            val requestWithUserAgent: Request =
+                originalRequest.newBuilder().header(USER_AGENT_HEADER, USER_AGENT_VALUE).build()
+            return chain.proceed(requestWithUserAgent)
         }
-      } ?: run {
-        currLocation = it
-      }
-    }
-    return currLocation
-  }
-
-  private fun getLocationProvider(): String {
-    locationManager?.isProviderEnabled(LocationManager.FUSED_PROVIDER)?.let {
-      if (it) {
-        logIfDebuggable("Using fused provider for location")
-        return LocationManager.FUSED_PROVIDER
-      }
-    }
-    logIfDebuggable("Using passive provider for location")
-    return LocationManager.PASSIVE_PROVIDER
-  }
-
-  private fun getNetworkRequest() = NetworkRequest.Builder()
-    .addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-    .build()
-
-  private fun getNetworkCallBack() = object : ConnectivityManager.NetworkCallback() {
-    override fun onAvailable(network: Network) {
-      super.onAvailable(network)
-      isConnectedToInternet = true
     }
 
-    override fun onLost(network: Network) {
-      super.onLost(network)
-      isConnectedToInternet = false
+    private fun getApiService(): ApiService {
+        return Retrofit.Builder()
+            .client(getOkHttpClient())
+            .validateEagerly(true)
+            .baseUrl(ApiService.URL)
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .build()
+            .create(ApiService::class.java)
     }
-  }
 
-  private fun drawableToBitmap(drawable: Drawable, width: Int, height: Int): Bitmap {
-    val bitmap: Bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-
-    val canvas = Canvas(bitmap)
-    val left = 0
-    val top = 0
-    drawable.setBounds(left, top, canvas.width, canvas.height)
-    drawable.draw(canvas)
-
-    return bitmap
-  }
-
-  @SuppressLint("UseCompatLoadingForDrawables")
-  private fun resToBitmap(res: Int, width: Int, height: Int): Bitmap {
-    val drawable = context.getDrawable(res)
-
-    return drawableToBitmap(drawable!!, width, height)
-  }
-
-  private fun Double.round(numDecimal: Int): Double {
-    val multiplier = 10.0.pow(numDecimal.toDouble())
-    return floor(this * multiplier) / multiplier
-  }
-
-  private fun logIfDebuggable(msg: String) {
-    if (Log.isLoggable(TAG, Log.DEBUG)) {
-      Log.d(TAG, msg)
+    fun destroy() {
+        timer.cancel()
+        timer = Timer()
+        timerSetup.set(false)
     }
-  }
 
-  companion object {
-    private const val TAG = "WeatherAppCardProvider"
-    private const val MINUTE_IN_MS = 60000L
-    private const val HEADER_ID = "HEADER_ID"
-    private const val IMAGE_ID = "IMAGE_ID"
-    private const val SETTINGS_BUTTON_ID = "SETTINGS_BUTTON_ID"
-    private const val HEADER_IMAGE_ID = "HEADER_IMAGE_ID"
-    private const val ERROR_PERIODS = "Forecast periods not found"
-    private const val ERROR_FIRST_PERIOD = "First period not found"
-    private const val INVALID_TEMP = "Invalid temperature received"
-    private const val USER_AGENT_HEADER = "User-Agent"
-    private const val USER_AGENT_VALUE = "Sample Weather App Card"
-    private const val ERROR_PRIMARY = "Error"
-    private const val LOCATION_PERMISSION_SECONDARY = "Location permission required"
-    private const val INTERNET_CONNECTION_SECONDARY = "Internet connection required"
-    private const val LOADING_PRIMARY = "Loading..."
-    private const val LOADING_SECONDARY = ""
-    private const val WEATHER_HEADER = "Weather"
-    private const val SETTINGS_BUTTON_TEXT = "Open Settings"
-    private const val ROUTING_ACTIVITY_NAME =
-      "com.example.appcard.sample.weather.SampleRoutingActivity"
-    private const val TEMP_RISING = "rising"
-    private const val TEMP_RISING_ICON = "↑"
-    private const val TEMP_FALLING_ICON = "↓"
-    private const val TEMP_F_UNIT = "F"
-    private const val TEMP_C_UNIT = "C"
-    private const val FORECAST_NOT_FOUND = "Forecast Unavailable"
-  }
+    @SuppressLint("MissingPermission")
+    private fun initLocationManager() {
+        locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getCurrentLocation(): Location? {
+        val cancellationSignal = null
+        val locationProvider = getLocationProvider()
+        currLocation = currLocation ?: locationManager?.getLastKnownLocation(locationProvider)
+        locationManager?.getCurrentLocation(
+            locationProvider,
+            cancellationSignal,
+            context.mainExecutor,
+        ) {
+            currLocation?.let { curr ->
+                if (it.latitude != curr.latitude || it.longitude != curr.longitude) {
+                    logIfDebuggable("Location received: $it")
+                    currLocation = curr
+                    update.sendUpdate(getAppCard(latestAppCardContext))
+                }
+            } ?: run { currLocation = it }
+        }
+        return currLocation
+    }
+
+    private fun getLocationProvider(): String {
+        locationManager?.isProviderEnabled(LocationManager.FUSED_PROVIDER)?.let {
+            if (it) {
+                logIfDebuggable("Using fused provider for location")
+                return LocationManager.FUSED_PROVIDER
+            }
+        }
+        logIfDebuggable("Using passive provider for location")
+        return LocationManager.PASSIVE_PROVIDER
+    }
+
+    private fun getNetworkRequest() =
+        NetworkRequest.Builder().addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED).build()
+
+    private fun getNetworkCallBack() =
+        object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                isConnectedToInternet = true
+            }
+
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                isConnectedToInternet = false
+            }
+        }
+
+    private fun drawableToBitmap(drawable: Drawable, width: Int, height: Int): Bitmap {
+        val bitmap: Bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+
+        val canvas = Canvas(bitmap)
+        val left = 0
+        val top = 0
+        drawable.setBounds(left, top, canvas.width, canvas.height)
+        drawable.draw(canvas)
+
+        return bitmap
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun resToBitmap(res: Int, width: Int, height: Int): Bitmap {
+        val drawable = context.getDrawable(res)
+
+        return drawableToBitmap(drawable!!, width, height)
+    }
+
+    private fun Double.round(numDecimal: Int): Double {
+        val multiplier = 10.0.pow(numDecimal.toDouble())
+        return floor(this * multiplier) / multiplier
+    }
+
+    private fun logIfDebuggable(msg: String) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) {
+            Log.d(TAG, msg)
+        }
+    }
+
+    companion object {
+        private const val TAG = "WeatherAppCardProvider"
+        private const val MINUTE_IN_MS = 60000L
+        private const val HEADER_ID = "HEADER_ID"
+        private const val IMAGE_ID = "IMAGE_ID"
+        private const val SETTINGS_BUTTON_ID = "SETTINGS_BUTTON_ID"
+        private const val HEADER_IMAGE_ID = "HEADER_IMAGE_ID"
+        private const val ERROR_PERIODS = "Forecast periods not found"
+        private const val ERROR_FIRST_PERIOD = "First period not found"
+        private const val INVALID_TEMP = "Invalid temperature received"
+        private const val USER_AGENT_HEADER = "User-Agent"
+        private const val USER_AGENT_VALUE = "Sample Weather App Card"
+        private const val ERROR_PRIMARY = "Error"
+        private const val LOCATION_PERMISSION_SECONDARY = "Location permission required"
+        private const val INTERNET_CONNECTION_SECONDARY = "Internet connection required"
+        private const val LOADING_PRIMARY = "Loading..."
+        private const val LOADING_SECONDARY = ""
+        private const val WEATHER_HEADER = "Weather"
+        private const val SETTINGS_BUTTON_TEXT = "Open Settings"
+        private const val ROUTING_ACTIVITY_NAME =
+            "com.example.appcard.sample.weather.SampleRoutingActivity"
+        private const val TEMP_RISING = "rising"
+        private const val TEMP_RISING_ICON = "↑"
+        private const val TEMP_FALLING_ICON = "↓"
+        private const val TEMP_F_UNIT = "F"
+        private const val TEMP_C_UNIT = "C"
+        private const val FORECAST_NOT_FOUND = "Forecast Unavailable"
+    }
 }

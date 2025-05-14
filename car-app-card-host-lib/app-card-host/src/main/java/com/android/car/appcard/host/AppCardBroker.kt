@@ -22,24 +22,24 @@ import com.android.car.appcard.internal.AppCardTransport
 
 /** Communicates with an application that supports [AppCard]s */
 internal interface AppCardBroker {
-  /** Cleanup broker */
-  fun close()
+    /** Cleanup broker */
+    fun close()
 
-  /** Get multiple [AppCard]s using a message */
-  fun getAppCardTransports(
-    identifier: ApplicationIdentifier,
-    bundle: Bundle,
-    msg: String,
-  ): List<AppCardTransport>
+    /** Get multiple [AppCard]s using a message */
+    fun getAppCardTransports(
+        identifier: ApplicationIdentifier,
+        bundle: Bundle,
+        msg: String,
+    ): List<AppCardTransport>
 
-  /** Get a single [AppCard] using a message */
-  fun getAppCardTransport(
-    identifier: ApplicationIdentifier,
-    errorId: String,
-    bundle: Bundle,
-    msg: String,
-  ): AppCardTransport
+    /** Get a single [AppCard] using a message */
+    fun getAppCardTransport(
+        identifier: ApplicationIdentifier,
+        errorId: String,
+        bundle: Bundle,
+        msg: String,
+    ): AppCardTransport
 
-  /** Send a message without expecting a response */
-  fun sendMessage(msg: String, bundle: Bundle, errorId: String)
+    /** Send a message without expecting a response */
+    fun sendMessage(msg: String, bundle: Bundle, errorId: String)
 }

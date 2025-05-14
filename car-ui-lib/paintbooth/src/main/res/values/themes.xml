@@ -32,20 +32,8 @@
     <!--Theme for the dialog testing-->
     <style name="Theme.Testing.Dialog.Alert" parent="android:Theme.DeviceDefault.Dialog.Alert"></style>
 
-    <!--Theme for the app defaults for automotive tokens-->
-    <style name="TokenTheme" parent="Theme.CarUi.WithToolbar">
+    <!-- Opt into OEM Design Token styling -->
+    <style name="PaintBoothTheme" parent="Theme.CarUi.WithToolbar">
         <item name="oemTokenOverrideEnabled">true</item>
-        <item name="oemColorPrimary">@android:color/holo_blue_dark</item>
-        <item name="oemColorOnPrimary">@android:color/holo_blue_dark</item>
-        <item name="oemColorPrimaryContainer">@android:color/holo_blue_dark</item>
-        <item name="oemColorOnPrimaryContainer">@android:color/holo_blue_dark</item>
-        <item name="oemColorSecondary">@android:color/holo_blue_dark</item>
-        <item name="oemColorOnSecondary">@android:color/holo_blue_dark</item>
-        <item name="oemColorSecondaryContainer">@android:color/holo_blue_dark</item>
-        <item name="oemColorOnSecondaryContainer">@android:color/holo_blue_dark</item>
-        <item name="oemColorTertiary">@android:color/holo_blue_dark</item>
-        <item name="oemColorOnTertiary">@android:color/holo_blue_dark</item>
-        <item name="oemColorTertiaryContainer">@android:color/holo_blue_dark</item>
-        <item name="oemColorOnTertiaryContainer">@android:color/holo_blue_dark</item>
     </style>
 </resources>
