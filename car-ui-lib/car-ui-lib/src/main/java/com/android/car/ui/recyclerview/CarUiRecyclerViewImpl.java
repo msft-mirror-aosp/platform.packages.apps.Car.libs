@@ -344,7 +344,7 @@ public final class CarUiRecyclerViewImpl extends FrameLayout
 
     @Override
     public boolean hasFixedSize() {
-        return false;
+        return mRecyclerView.hasFixedSize();
     }
 
     @Override
