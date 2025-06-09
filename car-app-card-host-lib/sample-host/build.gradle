@@ -20,6 +20,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.android.application'
     id 'aaosApps.buildLogic'
+    alias(libs.plugins.compose.compiler)
+
 }
 
 android {
@@ -28,8 +30,6 @@ android {
     defaultConfig {
         minSdkVersion 31
         targetSdkVersion 34
-        versionCode gradle.ext.getVersionCode()
-        versionName gradle.ext.getVersionName()
     }
 
     signingConfigs {
@@ -76,10 +76,6 @@ android {
     buildFeatures {
         compose true
     }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = composeCompilerVersion
-    }
 }
 
 dependencies {
@@ -89,13 +85,12 @@ dependencies {
     implementation libs.androidx.annotation
     implementation libs.androidx.appcompat
     implementation libs.androidx.core.ktx
-    implementation libs.androidx.ui
-    implementation libs.androidx.material3
 
     // Compose dependencies
-    def composeBom = libs.compose.bom
-    implementation composeBom
+    implementation platform(libs.compose.bom)
+    implementation libs.compose.material3
     implementation libs.compose.runtime.livedata
+    implementation libs.compose.ui
 }
 
 // Disable the ':oem-token-lib:verifyReleaseResources' task as references from the shared library

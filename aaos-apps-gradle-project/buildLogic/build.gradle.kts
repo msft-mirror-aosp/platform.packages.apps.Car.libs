@@ -15,6 +15,12 @@
  */
 
 // Set up a check task that triggers the `check` task for all subprojects (that have it)
-val check by tasks.registering {
-    dependsOn(subprojects.map { it.tasks.named { name -> name == "check" } })
+val check by
+    tasks.registering { dependsOn(subprojects.map { it.tasks.named { name -> name == "check" } }) }
+
+// Sets the build directory for all projects in the build
+apply(from = "setBuildDir.build.gradle.kts")
+
+plugins {
+    alias(libs.plugins.kotlinJvm) apply false
 }

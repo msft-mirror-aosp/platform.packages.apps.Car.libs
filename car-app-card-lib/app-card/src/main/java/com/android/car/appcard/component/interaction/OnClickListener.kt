@@ -17,6 +17,6 @@ package com.android.car.appcard.component.interaction
 
 /** An interaction listener to handle clicks. */
 interface OnClickListener {
-  /** Will handle clicks on a component that it is defined in. */
-  fun onClick()
+    /** Will handle clicks on a component that it is defined in. */
+    fun onClick()
 }

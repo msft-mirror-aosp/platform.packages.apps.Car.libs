@@ -15,7 +15,7 @@ limitations under the License.-->
 <!-- THIS FILE WAS AUTO GENERATED, DO NOT EDIT MANUALLY. -->
 <resources>
   <overlayable name="rotary-ui">
-    <policy type="public">
+    <policy type="odm|oem|product|signature|system|vendor">
       <item type="bool" name="car_ui_clear_focus_area_history_when_rotating"/>
       <item type="bool" name="car_ui_enable_focus_area_background_highlight"/>
       <item type="bool" name="car_ui_enable_focus_area_foreground_highlight"/>

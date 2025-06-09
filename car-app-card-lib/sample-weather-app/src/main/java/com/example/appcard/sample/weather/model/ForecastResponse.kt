@@ -17,8 +17,8 @@
 package com.example.appcard.sample.weather.model
 
 data class ForecastResponse(
-  val context: List<String?>? = null,
-  val type: String? = null,
-  val geometry: PolygonLocationGeometry? = null,
-  val properties: ForecastProperties? = null
+    val context: List<String?>? = null,
+    val type: String? = null,
+    val geometry: PolygonLocationGeometry? = null,
+    val properties: ForecastProperties? = null,
 )

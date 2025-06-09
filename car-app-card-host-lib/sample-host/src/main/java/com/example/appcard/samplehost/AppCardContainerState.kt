@@ -24,20 +24,19 @@ import com.android.car.appcard.host.AppCardContainer
 import com.android.car.appcard.host.ApplicationIdentifier
 
 /**
- * An interface that represents a jetpack compose specific stateful representation
- * of an [AppCardContainer]
+ * An interface that represents a jetpack compose specific stateful representation of an
+ * [AppCardContainer]
  */
 interface AppCardContainerState {
-  var identifier: MutableState<ApplicationIdentifier>
+    var identifier: MutableState<ApplicationIdentifier>
 
-  val appCardId: String
+    val appCardId: String
 
-  fun update(other: AppCardContainer): Boolean
+    fun update(other: AppCardContainer): Boolean
 
-  fun update(other: AppCardComponentContainer): Boolean
+    fun update(other: AppCardComponentContainer): Boolean
 
-  fun update(component: Component): Boolean
+    fun update(component: Component): Boolean
 
-  @Composable
-  fun AppCard()
+    @Composable fun AppCard()
 }

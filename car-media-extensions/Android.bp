@@ -22,6 +22,7 @@ package {
 media_extensions_common_static_libs = [
     "androidx.annotation_annotation",
     "androidx.media_media",
+    "androidx.car.app_app",
     "junit",
 ]
 
@@ -32,8 +33,7 @@ android_library {
     min_sdk_version: "30",
     target_sdk_version: "34",
     sdk_version: "system_current",
-        // b/355695111: Remove this once we drop support for sc-car
-    java_version: "1.8", // sc-car only supports up to java 8.
+    java_version: "11", // tm-car only supports up to java 11.
     optimize: {
         enabled: false,
     },

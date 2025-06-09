@@ -19,8 +19,7 @@ android_app {
     min_sdk_version: "28",
     target_sdk_version: "current",
     sdk_version: "current",
-    // b/355695111: Remove this once we drop support for sc-car
-    java_version: "1.8", // sc-car only supports up to java 8.
+    java_version: "11", // tm-car only supports up to java 11.
 
     aaptflags: ["--shared-lib"],
     manifest: "src/main/AndroidManifest.xml",
@@ -57,8 +56,7 @@ android_library {
     min_sdk_version: "28",
     target_sdk_version: "current",
     sdk_version: "current",
-    // b/355695111: Remove this once we drop support for sc-car
-    java_version: "1.8", // sc-car only supports up to java 8.
+    java_version: "11", // tm-car only supports up to java 11.
 
     manifest: "src/main/AndroidManifest.xml",
 }

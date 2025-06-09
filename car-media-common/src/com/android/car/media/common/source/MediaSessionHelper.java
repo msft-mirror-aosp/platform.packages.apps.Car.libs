@@ -24,6 +24,7 @@ import android.car.media.CarMediaManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.media.session.MediaController;
 import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
@@ -38,6 +39,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+
+import com.android.car.apps.common.util.CarPackageManagerUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -85,6 +88,8 @@ public class MediaSessionHelper extends MediaController.Callback {
     final MediaSessionManager.OnActiveSessionsChangedListener mActiveSessionsListener =
             this::onMediaControllersChange;
     private static MediaSessionHelper sInstance;
+
+    private PackageManager mPackageManager;
 
     /**
      *  Returns the singleton.
@@ -190,6 +195,7 @@ public class MediaSessionHelper extends MediaController.Callback {
     MediaSessionHelper(Context context, NotificationProvider notificationProvider,
             InputFactory inputFactory) {
         mContext = new WeakReference<>(context);
+        mPackageManager = context.getPackageManager();
         mNotificationProvider = notificationProvider;
         mInputFactory = inputFactory;
         if (context.getApplicationContext() != null) {
@@ -288,17 +294,23 @@ public class MediaSessionHelper extends MediaController.Callback {
                 continue;
             }
 
+            // Since playback state changes don't trigger an active media session change, we
+            // need to listen to the other media sessions in case another one becomes active.
+            // This includes the active media session, which may be stopped and then resumed later.
+            registerForPlaybackChanges(mediaController);
+
+            if (CarPackageManagerUtils.isPackageSuspended(
+                    mPackageManager, mediaController.getPackageName())) {
+                maybePauseSuspendedMediaController(mediaController);
+                continue;
+            }
+
             if (isActive(playbackState.getState())) {
                 activeControllers.add(mediaController);
                 activeOrPausedControllers.add(mediaController);
             } else if (isPaused(playbackState.getState())) {
                 activeOrPausedControllers.add(mediaController);
             }
-
-            // Since playback state changes don't trigger an active media session change, we
-            // need to listen to the other media sessions in case another one becomes active.
-            // This includes the active media session, which may be stopped and then resumed later.
-            registerForPlaybackChanges(mediaController);
         }
     }
 
@@ -329,17 +341,19 @@ public class MediaSessionHelper extends MediaController.Callback {
     }
 
     private void updatePrimaryMediaSource(List<MediaController> activeMediaControllers) {
+        MediaSource mediaSource = mPrimaryMediaSource.getValue();
         // Only update when there are active media sources
         if (activeMediaControllers != null && !activeMediaControllers.isEmpty()) {
             MediaController primaryMediaController = activeMediaControllers.get(0);
-            MediaSource mediaSource = mInputFactory.getMediaSource(primaryMediaController);
-            if (Objects.equals(mediaSource, mPrimaryMediaSource.getValue())) {
-                // Prevent updating with the same media source
-                return;
-            }
-            saveLastActiveMediaSource(mediaSource);
-            mPrimaryMediaSource.setValue(mediaSource);
+            mediaSource = mInputFactory.getMediaSource(primaryMediaController);
         }
+        mediaSource = maybeReplacePrimaryMediaSource(mediaSource);
+        if (Objects.equals(mediaSource, mPrimaryMediaSource.getValue())) {
+            // Prevent updating with the same media source
+            return;
+        }
+        saveLastActiveMediaSource(mediaSource);
+        mPrimaryMediaSource.setValue(mediaSource);
     }
 
     private void updateActiveOrPausedMediaSources(List<MediaController> activeMediaControllers) {
@@ -373,6 +387,7 @@ public class MediaSessionHelper extends MediaController.Callback {
                 return;
             }
             savedMediaSource = createSavedMediaSource(savedMediaSourceName);
+            savedMediaSource = maybeReplacePrimaryMediaSource(savedMediaSource);
             mPrimaryMediaSource.setValue(savedMediaSource);
         } else {
             updatePrimaryMediaSource(activeMediaControllers);
@@ -426,10 +441,18 @@ public class MediaSessionHelper extends MediaController.Callback {
 
     private String getCarMediaServiceSession() {
         Car car = Car.createCar(mContext.get());
-        CarMediaManager carMediaManager =
+        ComponentName componentName = null;
+        if (car != null) {
+            CarMediaManager carMediaManager =
                     (CarMediaManager) car.getCarManager(Car.CAR_MEDIA_SERVICE);
-        ComponentName componentName = carMediaManager.getMediaSource(MEDIA_SOURCE_MODE_PLAYBACK);
-        car.disconnect();
+            try {
+                componentName = carMediaManager.getMediaSource(MEDIA_SOURCE_MODE_PLAYBACK);
+            } catch (SecurityException e) {
+                Log.e(TAG, "Unable to read CarMediaManager media source. Requires "
+                        + "android.permission.MEDIA_CONTENT_CONTROL " + e);
+            }
+            car.disconnect();
+        }
 
         // ComponentName may be null b/355078140
         return componentName == null ? "" : componentName.flattenToString();
@@ -481,5 +504,41 @@ public class MediaSessionHelper extends MediaController.Callback {
         }
 
         return mediaStyleNotificationPackages;
+    }
+
+    private MediaSource maybeReplacePrimaryMediaSource(MediaSource mediaSource) {
+        // Define primary media source replacement conditions
+        if (mediaSource == null) {
+            return null;
+        }
+        if (CarPackageManagerUtils.isPackageSuspended(
+                mPackageManager, mediaSource.getPackageName())) {
+            return getSuspendedMediaSourceReplacement();
+        }
+        return mediaSource;
+    }
+
+    private MediaSource getSuspendedMediaSourceReplacement() {
+        List<MediaController> filteredControllers = getMediaControllersWithMediaNotifications(
+                mMediaSessionManager.getActiveSessions(/* notificationListener = */ null));
+        MediaController mc =  filteredControllers.stream().filter(ctrl -> {
+            PlaybackState ps = ctrl.getPlaybackState();
+            if (ps == null) {
+                return false;
+            }
+            return !CarPackageManagerUtils.isPackageSuspended(
+                    mPackageManager, ctrl.getPackageName());
+        }).findFirst().orElse(null);
+        return mInputFactory.getMediaSource(mc);
+    }
+
+    private void maybePauseSuspendedMediaController(MediaController mediaController) {
+        PlaybackState playbackState = mediaController.getPlaybackState();
+        if (playbackState == null) {
+            return;
+        }
+        if (playbackState.getState() != PlaybackState.STATE_PAUSED) {
+            mediaController.getTransportControls().pause();
+        }
     }
 }

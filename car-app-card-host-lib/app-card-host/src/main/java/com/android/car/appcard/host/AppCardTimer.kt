@@ -24,141 +24,138 @@ import java.util.concurrent.ConcurrentMap
 import java.util.function.Consumer
 
 internal class AppCardTimer(
-  private val listener: UpdateReadyListener,
-  private val updateRateMs: Int,
-  private val fastUpdateRateMs: Int,
-  private val timerFactory: TimerFactory = object : TimerFactory {
-    override fun getTimer() = Timer()
-  }
+    private val listener: UpdateReadyListener,
+    private val updateRateMs: Int,
+    private val fastUpdateRateMs: Int,
+    private val timerFactory: TimerFactory =
+        object : TimerFactory {
+            override fun getTimer() = Timer()
+        },
 ) {
-  private val componentUpdateStatusMap: ConcurrentMap<String, Boolean>
-  private var identifier: ApplicationIdentifier? = null
-  private var appCardId: String? = null
-  private var refreshTimer = timerFactory.getTimer()
+    private val componentUpdateStatusMap: ConcurrentMap<String, Boolean>
+    private var identifier: ApplicationIdentifier? = null
+    private var appCardId: String? = null
+    private var refreshTimer = timerFactory.getTimer()
 
-  init {
-    componentUpdateStatusMap = ConcurrentHashMap()
-  }
+    init {
+        componentUpdateStatusMap = ConcurrentHashMap()
+    }
 
-  fun updateAppCard(appCardContainer: AppCardContainer) {
-    if (appCardContainer.appCard !is ImageAppCard) return
+    fun updateAppCard(appCardContainer: AppCardContainer) {
+        if (appCardContainer.appCard !is ImageAppCard) return
 
-    handleImageAppCardUpdate(
-      appCardContainer.appCard as ImageAppCard,
-      appCardContainer.appId
-    )
-  }
+        handleImageAppCardUpdate(appCardContainer.appCard as ImageAppCard, appCardContainer.appId)
+    }
 
-  private fun handleImageAppCardUpdate(
-    imageAppCard: ImageAppCard,
-    id: ApplicationIdentifier
-  ) {
-    synchronized(lock = this) {
-      refreshTimer.cancel()
-      refreshTimer = timerFactory.getTimer()
+    private fun handleImageAppCardUpdate(imageAppCard: ImageAppCard, id: ApplicationIdentifier) {
+        synchronized(lock = this) {
+            refreshTimer.cancel()
+            refreshTimer = timerFactory.getTimer()
 
-      componentUpdateStatusMap.clear()
+            componentUpdateStatusMap.clear()
 
-      identifier = id
-      appCardId = imageAppCard.id
+            identifier = id
+            appCardId = imageAppCard.id
 
-      imageAppCard.progressBar?.let {
-        componentUpdateStatusMap[it.componentId] = false
-        refreshTimer.schedule(
-          object : TimerTask() {
-            override fun run() {
-              componentUpdateStatusMap[it.componentId] = true
+            imageAppCard.progressBar?.let {
+                componentUpdateStatusMap[it.componentId] = false
+                refreshTimer.schedule(
+                    object : TimerTask() {
+                        override fun run() {
+                            componentUpdateStatusMap[it.componentId] = true
+                        }
+                    },
+                    fastUpdateRateMs.toLong(),
+                )
             }
-          },
-          fastUpdateRateMs.toLong()
-        )
-      }
 
-      refreshTimer.schedule(
-        object : TimerTask() {
-          override fun run() {
+            refreshTimer.schedule(
+                object : TimerTask() {
+                    override fun run() {
+                        listener.appCardIsReadyForUpdate(identifier, appCardId)
+                    }
+                },
+                updateRateMs.toLong(),
+                updateRateMs.toLong(),
+            )
+        }
+    }
+
+    fun resetAppCardTimerAndRequestUpdate() {
+        synchronized(lock = this) {
+            appCardId ?: return
+            identifier ?: return
+
+            refreshTimer.cancel()
+            refreshTimer = timerFactory.getTimer()
+
             listener.appCardIsReadyForUpdate(identifier, appCardId)
-          }
-        },
-        updateRateMs.toLong(),
-        updateRateMs.toLong()
-      )
+
+            componentUpdateStatusMap.replaceAll { _, _ -> false }
+
+            componentUpdateStatusMap.keys.forEach(
+                Consumer { componentId: String ->
+                    refreshTimer.schedule(
+                        object : TimerTask() {
+                            override fun run() {
+                                componentUpdateStatusMap[componentId] = true
+                            }
+                        },
+                        fastUpdateRateMs.toLong(),
+                    )
+                }
+            )
+
+            refreshTimer.schedule(
+                object : TimerTask() {
+                    override fun run() {
+                        listener.appCardIsReadyForUpdate(identifier, appCardId)
+                    }
+                },
+                updateRateMs.toLong(),
+                updateRateMs.toLong(),
+            )
+        }
     }
-  }
 
-  fun resetAppCardTimerAndRequestUpdate() {
-    synchronized(lock = this) {
-      appCardId ?: return
-      identifier ?: return
-
-      refreshTimer.cancel()
-      refreshTimer = timerFactory.getTimer()
-
-      listener.appCardIsReadyForUpdate(identifier, appCardId)
-
-      componentUpdateStatusMap.replaceAll { _, _ -> false }
-
-      componentUpdateStatusMap.keys.forEach(Consumer { componentId: String ->
-        refreshTimer.schedule(
-          object : TimerTask() {
-            override fun run() {
-              componentUpdateStatusMap[componentId] = true
-            }
-          },
-          fastUpdateRateMs.toLong()
-        )
-      })
-
-      refreshTimer.schedule(
-        object : TimerTask() {
-          override fun run() {
-            listener.appCardIsReadyForUpdate(identifier, appCardId)
-          }
-        },
-        updateRateMs.toLong(),
-        updateRateMs.toLong()
-      )
+    fun isComponentReadyForUpdate(componentId: String): Boolean {
+        synchronized(lock = this) {
+            val defaultValue = false
+            return componentUpdateStatusMap.getOrDefault(componentId, defaultValue)
+        }
     }
-  }
 
-  fun isComponentReadyForUpdate(componentId: String): Boolean {
-    synchronized(lock = this) {
-      val defaultValue = false
-      return componentUpdateStatusMap.getOrDefault(componentId, defaultValue)
+    fun destroy() {
+        synchronized(lock = this) {
+            refreshTimer.cancel()
+            refreshTimer = timerFactory.getTimer()
+
+            componentUpdateStatusMap.clear()
+        }
     }
-  }
 
-  fun destroy() {
-    synchronized(lock = this) {
-      refreshTimer.cancel()
-      refreshTimer = timerFactory.getTimer()
+    fun componentUpdate(componentId: String) {
+        synchronized(lock = this) {
+            if (!componentUpdateStatusMap.containsKey(componentId)) return
 
-      componentUpdateStatusMap.clear()
+            componentUpdateStatusMap[componentId] = false
+
+            refreshTimer.schedule(
+                object : TimerTask() {
+                    override fun run() {
+                        componentUpdateStatusMap[componentId] = true
+                    }
+                },
+                fastUpdateRateMs.toLong(),
+            )
+        }
     }
-  }
 
-  fun componentUpdate(componentId: String) {
-    synchronized(lock = this) {
-      if (!componentUpdateStatusMap.containsKey(componentId)) return
-
-      componentUpdateStatusMap[componentId] = false
-
-      refreshTimer.schedule(
-        object : TimerTask() {
-          override fun run() {
-            componentUpdateStatusMap[componentId] = true
-          }
-        },
-        fastUpdateRateMs.toLong()
-      )
+    internal interface UpdateReadyListener {
+        fun appCardIsReadyForUpdate(identifier: ApplicationIdentifier?, appCardId: String?)
     }
-  }
 
-  internal interface UpdateReadyListener {
-    fun appCardIsReadyForUpdate(identifier: ApplicationIdentifier?, appCardId: String?)
-  }
-
-  internal interface TimerFactory {
-    fun getTimer(): Timer
-  }
+    internal interface TimerFactory {
+        fun getTimer(): Timer
+    }
 }

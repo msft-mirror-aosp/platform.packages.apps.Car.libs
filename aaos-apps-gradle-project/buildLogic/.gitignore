@@ -1,3 +1,4 @@
 # Ignore Gradle project-specific cache directory
 .gradle
 local.properties
+backup_local.properties

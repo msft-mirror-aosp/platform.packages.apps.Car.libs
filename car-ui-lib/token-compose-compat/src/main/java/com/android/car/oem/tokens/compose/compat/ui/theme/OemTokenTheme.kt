@@ -97,72 +97,42 @@ fun oemColorScheme(oemContext: Context): ColorScheme {
         inversePrimary = Color(oemColorPrimaryInverse),
         outlineVariant = Color(oemColorOutlineVariant),
         scrim = Color(oemColorScrim),
-        surfaceTint = Color(oemColorSurfaceTint)
+        surfaceTint = Color(oemColorSurfaceTint),
     )
 }
 
 @Composable
 fun oemTypography(oemContext: Context): Typography {
-    val oemTextAppearanceDisplayLarge = Token.getTextAppearance(
-        oemContext,
-        R.attr.oemTextAppearanceDisplayLarge
-    )
-    val oemTextAppearanceDisplayMedium = Token.getTextAppearance(
-        oemContext,
-        R.attr.oemTextAppearanceDisplayMedium
-    )
-    val oemTextAppearanceDisplaySmall = Token.getTextAppearance(
-        oemContext,
-        R.attr.oemTextAppearanceDisplaySmall
-    )
-    val oemTextAppearanceHeadlineLarge = Token.getTextAppearance(
-        oemContext,
-        R.attr.oemTextAppearanceHeadlineLarge
-    )
-    val oemTextAppearanceHeadlineMedium = Token.getTextAppearance(
-        oemContext,
-        R.attr.oemTextAppearanceHeadlineMedium
-    )
-    val oemTextAppearanceHeadlineSmall = Token.getTextAppearance(
-        oemContext,
-        R.attr.oemTextAppearanceHeadlineSmall
-    )
-    val oemTextAppearanceTitleLarge = Token.getTextAppearance(
-        oemContext,
-        R.attr.oemTextAppearanceTitleLarge
-    )
-    val oemTextAppearanceTitleMedium = Token.getTextAppearance(
-        oemContext,
-        R.attr.oemTextAppearanceTitleMedium
-    )
-    val oemTextAppearanceTitleSmall = Token.getTextAppearance(
-        oemContext,
-        R.attr.oemTextAppearanceTitleSmall
-    )
-    val oemTextAppearanceBodyLarge = Token.getTextAppearance(
-        oemContext,
-        R.attr.oemTextAppearanceBodyLarge
-    )
-    val oemTextAppearanceBodyMedium = Token.getTextAppearance(
-        oemContext,
-        R.attr.oemTextAppearanceBodyMedium
-    )
-    val oemTextAppearanceBodySmall = Token.getTextAppearance(
-        oemContext,
-        R.attr.oemTextAppearanceBodySmall
-    )
-    val oemTextAppearanceLabelLarge = Token.getTextAppearance(
-        oemContext,
-        R.attr.oemTextAppearanceLabelLarge
-    )
-    val oemTextAppearanceLabelMedium = Token.getTextAppearance(
-        oemContext,
-        R.attr.oemTextAppearanceLabelMedium
-    )
-    val oemTextAppearanceLabelSmall = Token.getTextAppearance(
-        oemContext,
-        R.attr.oemTextAppearanceLabelSmall
-    )
+    val oemTextAppearanceDisplayLarge =
+        Token.getTextAppearance(oemContext, R.attr.oemTextAppearanceDisplayLarge)
+    val oemTextAppearanceDisplayMedium =
+        Token.getTextAppearance(oemContext, R.attr.oemTextAppearanceDisplayMedium)
+    val oemTextAppearanceDisplaySmall =
+        Token.getTextAppearance(oemContext, R.attr.oemTextAppearanceDisplaySmall)
+    val oemTextAppearanceHeadlineLarge =
+        Token.getTextAppearance(oemContext, R.attr.oemTextAppearanceHeadlineLarge)
+    val oemTextAppearanceHeadlineMedium =
+        Token.getTextAppearance(oemContext, R.attr.oemTextAppearanceHeadlineMedium)
+    val oemTextAppearanceHeadlineSmall =
+        Token.getTextAppearance(oemContext, R.attr.oemTextAppearanceHeadlineSmall)
+    val oemTextAppearanceTitleLarge =
+        Token.getTextAppearance(oemContext, R.attr.oemTextAppearanceTitleLarge)
+    val oemTextAppearanceTitleMedium =
+        Token.getTextAppearance(oemContext, R.attr.oemTextAppearanceTitleMedium)
+    val oemTextAppearanceTitleSmall =
+        Token.getTextAppearance(oemContext, R.attr.oemTextAppearanceTitleSmall)
+    val oemTextAppearanceBodyLarge =
+        Token.getTextAppearance(oemContext, R.attr.oemTextAppearanceBodyLarge)
+    val oemTextAppearanceBodyMedium =
+        Token.getTextAppearance(oemContext, R.attr.oemTextAppearanceBodyMedium)
+    val oemTextAppearanceBodySmall =
+        Token.getTextAppearance(oemContext, R.attr.oemTextAppearanceBodySmall)
+    val oemTextAppearanceLabelLarge =
+        Token.getTextAppearance(oemContext, R.attr.oemTextAppearanceLabelLarge)
+    val oemTextAppearanceLabelMedium =
+        Token.getTextAppearance(oemContext, R.attr.oemTextAppearanceLabelMedium)
+    val oemTextAppearanceLabelSmall =
+        Token.getTextAppearance(oemContext, R.attr.oemTextAppearanceLabelSmall)
 
     return Typography(
         displayLarge = oemTextStyle(oemContext, oemTextAppearanceDisplayLarge),
@@ -179,19 +149,20 @@ fun oemTypography(oemContext: Context): Typography {
         bodySmall = oemTextStyle(oemContext, oemTextAppearanceBodySmall),
         labelLarge = oemTextStyle(oemContext, oemTextAppearanceLabelLarge),
         labelMedium = oemTextStyle(oemContext, oemTextAppearanceLabelMedium),
-        labelSmall = oemTextStyle(oemContext, oemTextAppearanceLabelSmall)
+        labelSmall = oemTextStyle(oemContext, oemTextAppearanceLabelSmall),
     )
 }
 
 fun oemTextStyle(oemContext: Context, textStyle: Int): TextStyle {
     // keep these sorted by id
-    val attrs = intArrayOf(
+    val attrs =
+        intArrayOf(
             android.R.attr.textSize, // 16842901
             android.R.attr.textStyle, // 16842903
             android.R.attr.textColor, // 16842904
             android.R.attr.letterSpacing, // 16843958
-            android.R.attr.lineHeight // 16844159
-    )
+            android.R.attr.lineHeight, // 16844159
+        )
 
     val ta: TypedArray = oemContext.obtainStyledAttributes(textStyle, attrs)
     val textSize = ta.getDimension(0, 0f)
@@ -216,43 +187,36 @@ fun oemTextStyle(oemContext: Context, textStyle: Int): TextStyle {
         lineHeight = lineHeight.sp,
         fontStyle = fontStyle,
         fontWeight = fontWeight,
-        color = Color(textColor)
+        color = Color(textColor),
     )
 }
 
-@Composable
-fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
+@Composable fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
 
 @Composable
 fun oemShapes(oemContext: Context): Shapes {
-    val oemShapeCornerExtraSmall = Token.getCornerRadius(
-        oemContext,
-        R.attr.oemShapeCornerExtraSmall
-    )
+    val oemShapeCornerExtraSmall =
+        Token.getCornerRadius(oemContext, R.attr.oemShapeCornerExtraSmall)
     val oemShapeCornerSmall =
         Token.getCornerRadius(oemContext, R.attr.oemShapeCornerSmall).toInt().pxToDp()
     val oemShapeCornerMedium =
         Token.getCornerRadius(oemContext, R.attr.oemShapeCornerMedium).toInt().pxToDp()
     val oemShapeCornerLarge =
         Token.getCornerRadius(oemContext, R.attr.oemShapeCornerLarge).toInt().pxToDp()
-    val oemShapeCornerExtraLarge = Token.getCornerRadius(
-        oemContext,
-        R.attr.oemShapeCornerExtraLarge
-    ).toInt().pxToDp()
+    val oemShapeCornerExtraLarge =
+        Token.getCornerRadius(oemContext, R.attr.oemShapeCornerExtraLarge).toInt().pxToDp()
 
     return Shapes(
         extraSmall = RoundedCornerShape(oemShapeCornerExtraSmall),
         small = RoundedCornerShape(oemShapeCornerSmall),
         medium = RoundedCornerShape(oemShapeCornerMedium),
         large = RoundedCornerShape(oemShapeCornerLarge),
-        extraLarge = RoundedCornerShape(oemShapeCornerExtraLarge)
+        extraLarge = RoundedCornerShape(oemShapeCornerExtraLarge),
     )
 }
 
 @Composable
-fun OemTokenTheme(
-    content: @Composable() () -> Unit
-) {
+fun OemTokenTheme(content: @Composable() () -> Unit) {
     val view = LocalView.current
     val context = view.context as Activity
     val oemContext = Token.createOemStyledContext(context)
@@ -261,6 +225,6 @@ fun OemTokenTheme(
         colorScheme = oemColorScheme(oemContext),
         typography = oemTypography(oemContext),
         shapes = oemShapes(oemContext),
-        content = content
+        content = content,
     )
 }

@@ -20,32 +20,28 @@ import com.android.car.appcard.internal.ProtobufBytes
 
 /** Base template for all App Card templates */
 abstract class AppCard protected constructor(id: String) : ProtobufBytes {
-  /**
-   * @return application specific ID of template
-   */
-  val id: String
+    /** @return application specific ID of template */
+    val id: String
 
-  init {
-    this.id = id
-  }
+    init {
+        this.id = id
+    }
 
-  override fun equals(other: Any?): Boolean {
-    if (other === this) return true
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
 
-    if (other !is AppCard) return false
+        if (other !is AppCard) return false
 
-    return id == other.id
-  }
+        return id == other.id
+    }
 
-  abstract override fun toByteArray(): ByteArray
+    abstract override fun toByteArray(): ByteArray
 
-  /**
-   * @return `true` if there are no conflicting component Ids inside a supported App Card
-   */
-  abstract fun verifyUniquenessOfComponentIds(): Boolean
+    /** @return `true` if there are no conflicting component Ids inside a supported App Card */
+    abstract fun verifyUniquenessOfComponentIds(): Boolean
 
-  /** Update with given component only if component's ID matches a pre-existing component */
-  abstract fun updateComponent(component: Component)
+    /** Update with given component only if component's ID matches a pre-existing component */
+    abstract fun updateComponent(component: Component)
 
-  override fun hashCode(): Int = id.hashCode()
+    override fun hashCode(): Int = id.hashCode()
 }

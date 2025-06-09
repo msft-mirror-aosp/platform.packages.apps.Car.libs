@@ -22,8 +22,10 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 /**
  * Utility class to access CarPackageManager
@@ -65,5 +67,18 @@ public class CarPackageManagerUtils {
                 intent, PackageManager.MATCH_DEFAULT_ONLY);
         return (info != null) ? isDistractionOptimized(carPackageManager, info.activityInfo)
                 : false;
+    }
+
+    /** Returns true if the given package is suspended. */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public static boolean isPackageSuspended(PackageManager packageManager, String packageName) {
+        if (packageName == null) {
+            return false;
+        }
+        try {
+            return packageManager.isPackageSuspended(packageName);
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
     }
 }

@@ -16,7 +16,4 @@
 
 package com.example.appcard.sample.weather.model
 
-data class IntUnitValue(
-  val unitCode: String? = null,
-  val value: Int? = null
-)
+data class IntUnitValue(val unitCode: String? = null, val value: Int? = null)

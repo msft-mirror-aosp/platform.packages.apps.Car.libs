@@ -18,27 +18,23 @@ package com.android.car.appcard.host
 
 /** An object containing an app card application's package name & authority */
 class ApplicationIdentifier(val packageName: String, val authority: String) {
-  override fun equals(other: Any?): Boolean {
-    if (other !is ApplicationIdentifier) return false
+    override fun equals(other: Any?): Boolean {
+        if (other !is ApplicationIdentifier) return false
 
-    return packageName == other.packageName && authority == other.authority
-  }
+        return packageName == other.packageName && authority == other.authority
+    }
 
-  /**
-   * @return `true` if given package name matches package name inside [ApplicationIdentifier]
-   */
-  fun containsPackage(packageName: String) = this.packageName == packageName
+    /** @return `true` if given package name matches package name inside [ApplicationIdentifier] */
+    fun containsPackage(packageName: String) = this.packageName == packageName
 
-  /**
-   * @return `true` if given authority matches authority inside [ApplicationIdentifier]
-   */
-  fun containsAuthority(authority: String) = this.authority == authority
+    /** @return `true` if given authority matches authority inside [ApplicationIdentifier] */
+    fun containsAuthority(authority: String) = this.authority == authority
 
-  override fun hashCode(): Int {
-    var result = packageName.hashCode()
-    result = 31 * result + authority.hashCode()
-    return result
-  }
+    override fun hashCode(): Int {
+        var result = packageName.hashCode()
+        result = 31 * result + authority.hashCode()
+        return result
+    }
 
-  override fun toString() = "$authority : $packageName"
+    override fun toString() = "$authority : $packageName"
 }

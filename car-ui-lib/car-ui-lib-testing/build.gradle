@@ -48,7 +48,7 @@ android {
 dependencies {
     api project(':car-ui-lib')
 
-    implementation('androidx.test.espresso:espresso-core:3.5.1')
-    implementation('androidx.test.espresso:espresso-contrib:3.5.1')
-    implementation 'androidx.test.ext:junit:1.1.4'
+    implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.espresso.contrib)
+    implementation libs.androidx.junit
 }

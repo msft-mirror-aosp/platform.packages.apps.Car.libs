@@ -20,9 +20,9 @@ import com.android.car.appcard.AppCard
 
 /** An object that contains an [AppCard] and an associated [ApplicationIdentifier] */
 class AppCardContainer(
-  /** An [ApplicationIdentifier] associated with the [AppCard] */
-  val appId: ApplicationIdentifier,
+    /** An [ApplicationIdentifier] associated with the [AppCard] */
+    val appId: ApplicationIdentifier,
 
-  /** An [Appcard] housed in this container */
-  var appCard: AppCard,
+    /** An [Appcard] housed in this container */
+    var appCard: AppCard,
 )

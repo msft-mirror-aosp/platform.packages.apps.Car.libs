@@ -55,222 +55,204 @@ import com.example.appcard.samplehost.R
 import kotlin.math.roundToInt
 
 /** Settings component to change parameters of [AppCardContext] */
-class Settings(
-  private val viewModel: HostViewModel,
-) {
+class Settings(private val viewModel: HostViewModel) {
 
-  @OptIn(ExperimentalMaterial3Api::class)
-  @Composable
-  fun CreateSettings() {
-    val appCardContextState = viewModel.appCardContextState ?: AppCardContextState.getState()
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun CreateSettings() {
+        val appCardContextState = viewModel.appCardContextState ?: AppCardContextState.getState()
 
-    Scaffold(
-      topBar = {
-        TopAppBar(
-          title = {
-            Text(
-              text = "Settings",
-              style = MaterialTheme.typography.headlineMedium
-            )
-          },
-        )
-      },
-      modifier = Modifier.background(MaterialTheme.colorScheme.surface),
-    ) {
-      Column(
-        modifier = Modifier
-          .verticalScroll(rememberScrollState())
-          .padding(it)
-          .padding(dimensionResource(R.dimen.settings_root_column_padding))
-      ) {
-        SettingsSwitch(
-          name = "Interaction",
-          state = appCardContextState.isInteractable,
-          onValueChange = {
-            appCardContextState.isInteractable.value = it
-            viewModel.sendContextUpdate(appCardContextState)
-          },
-        )
-
-        SettingsSlider(
-          name = "Maximum Buttons",
-          sliderPosition = appCardContextState.minGuaranteedButtons,
-          isInt = true,
-          onValueChange = {
-            appCardContextState.minGuaranteedButtons.value = it
-            viewModel.sendContextUpdate(appCardContextState)
-          },
-          steps = 9,
-          valueRange = 0f..10f
-        )
-
-        SettingsSlider(
-          name = "Large Image Width",
-          sliderPosition = appCardContextState.largeImageWidth,
-          onValueChange = {
-            appCardContextState.largeImageWidth.value = it
-            viewModel.sendContextUpdate(appCardContextState)
-          },
-          steps = 989,
-          valueRange = 10f..1000f
-        )
-
-        SettingsSlider(
-          name = "Large Image Height",
-          sliderPosition = appCardContextState.largeImageHeight,
-          onValueChange = {
-            appCardContextState.largeImageHeight.value = it
-            viewModel.sendContextUpdate(appCardContextState)
-          },
-          steps = 989,
-          valueRange = 10f..1000f
-        )
-
-        SettingsSlider(
-          name = "Header Image Width",
-          sliderPosition = appCardContextState.headerImageWidth,
-          onValueChange = {
-            appCardContextState.headerImageWidth.value = it
-            viewModel.sendContextUpdate(appCardContextState)
-          },
-          steps = 89,
-          valueRange = 10f..100f
-        )
-
-        SettingsSlider(
-          name = "Header Image Height",
-          sliderPosition = appCardContextState.headerImageHeight,
-          onValueChange = {
-            appCardContextState.headerImageHeight.value = it
-            viewModel.sendContextUpdate(appCardContextState)
-          },
-          steps = 89,
-          valueRange = 10f..100f
-        )
-
-        SettingsSlider(
-          name = "Button Image Width",
-          sliderPosition = appCardContextState.buttonImageWidth,
-          onValueChange = {
-            appCardContextState.buttonImageWidth.value = it
-            viewModel.sendContextUpdate(appCardContextState)
-          },
-          steps = 89,
-          valueRange = 10f..100f
-        )
-
-        SettingsSlider(
-          name = "Button Image Height",
-          sliderPosition = appCardContextState.buttonImageHeight,
-          onValueChange = {
-            appCardContextState.buttonImageHeight.value = it
-            viewModel.sendContextUpdate(appCardContextState)
-          },
-          steps = 89,
-          valueRange = 10f..100f
-        )
-
-        SettingsSwitch(
-          name = "Debug Log",
-          state = viewModel.isDebuggable.observeAsState(initial = true),
-          onValueChange = {
-            viewModel.isDebuggable.value = it
-          },
-        )
-      }
-    }
-  }
-
-  @Composable
-  fun SettingsSwitch(
-    name: String,
-    state: State<Boolean>,
-    onValueChange: (Boolean) -> Unit,
-  ) {
-    Surface(
-      color = Color.Transparent,
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(dimensionResource(R.dimen.settings_surface_padding)),
-    ) {
-      Column {
-        Row(
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.SpaceBetween
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(text = "Settings", style = MaterialTheme.typography.headlineMedium)
+                    }
+                )
+            },
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface),
         ) {
-          Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-              text = name,
-              modifier = Modifier.padding(dimensionResource(R.dimen.settings_text_padding)),
-              style = MaterialTheme.typography.bodyMedium,
-              textAlign = TextAlign.Start,
-            )
-          }
+            Column(
+                modifier =
+                    Modifier.verticalScroll(rememberScrollState())
+                        .padding(it)
+                        .padding(dimensionResource(R.dimen.settings_root_column_padding))
+            ) {
+                SettingsSwitch(
+                    name = "Interaction",
+                    state = appCardContextState.isInteractable,
+                    onValueChange = {
+                        appCardContextState.isInteractable.value = it
+                        viewModel.sendContextUpdate(appCardContextState)
+                    },
+                )
 
-          Spacer(modifier = Modifier.weight(1f))
+                SettingsSlider(
+                    name = "Maximum Buttons",
+                    sliderPosition = appCardContextState.minGuaranteedButtons,
+                    isInt = true,
+                    onValueChange = {
+                        appCardContextState.minGuaranteedButtons.value = it
+                        viewModel.sendContextUpdate(appCardContextState)
+                    },
+                    steps = 9,
+                    valueRange = 0f..10f,
+                )
 
-          Switch(
-            checked = state.value,
-            onCheckedChange = {
-              onValueChange(it)
+                SettingsSlider(
+                    name = "Large Image Width",
+                    sliderPosition = appCardContextState.largeImageWidth,
+                    onValueChange = {
+                        appCardContextState.largeImageWidth.value = it
+                        viewModel.sendContextUpdate(appCardContextState)
+                    },
+                    steps = 989,
+                    valueRange = 10f..1000f,
+                )
+
+                SettingsSlider(
+                    name = "Large Image Height",
+                    sliderPosition = appCardContextState.largeImageHeight,
+                    onValueChange = {
+                        appCardContextState.largeImageHeight.value = it
+                        viewModel.sendContextUpdate(appCardContextState)
+                    },
+                    steps = 989,
+                    valueRange = 10f..1000f,
+                )
+
+                SettingsSlider(
+                    name = "Header Image Width",
+                    sliderPosition = appCardContextState.headerImageWidth,
+                    onValueChange = {
+                        appCardContextState.headerImageWidth.value = it
+                        viewModel.sendContextUpdate(appCardContextState)
+                    },
+                    steps = 89,
+                    valueRange = 10f..100f,
+                )
+
+                SettingsSlider(
+                    name = "Header Image Height",
+                    sliderPosition = appCardContextState.headerImageHeight,
+                    onValueChange = {
+                        appCardContextState.headerImageHeight.value = it
+                        viewModel.sendContextUpdate(appCardContextState)
+                    },
+                    steps = 89,
+                    valueRange = 10f..100f,
+                )
+
+                SettingsSlider(
+                    name = "Button Image Width",
+                    sliderPosition = appCardContextState.buttonImageWidth,
+                    onValueChange = {
+                        appCardContextState.buttonImageWidth.value = it
+                        viewModel.sendContextUpdate(appCardContextState)
+                    },
+                    steps = 89,
+                    valueRange = 10f..100f,
+                )
+
+                SettingsSlider(
+                    name = "Button Image Height",
+                    sliderPosition = appCardContextState.buttonImageHeight,
+                    onValueChange = {
+                        appCardContextState.buttonImageHeight.value = it
+                        viewModel.sendContextUpdate(appCardContextState)
+                    },
+                    steps = 89,
+                    valueRange = 10f..100f,
+                )
+
+                SettingsSwitch(
+                    name = "Debug Log",
+                    state = viewModel.isDebuggable.observeAsState(initial = true),
+                    onValueChange = { viewModel.isDebuggable.value = it },
+                )
             }
-          )
         }
-
-        HorizontalDivider()
-      }
     }
-  }
 
-  @Composable
-  fun SettingsSlider(
-    isInt: Boolean = false,
-    name: String,
-    sliderPosition: MutableState<Float>,
-    onValueChange: (Float) -> Unit,
-    @IntRange steps: Int,
-    valueRange: ClosedFloatingPointRange<Float>,
-  ) {
-    var pos by remember { mutableFloatStateOf(sliderPosition.value) }
+    @Composable
+    fun SettingsSwitch(name: String, state: State<Boolean>, onValueChange: (Boolean) -> Unit) {
+        Surface(
+            color = Color.Transparent,
+            modifier =
+                Modifier.fillMaxWidth().padding(dimensionResource(R.dimen.settings_surface_padding)),
+        ) {
+            Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = name,
+                            modifier =
+                                Modifier.padding(dimensionResource(R.dimen.settings_text_padding)),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Start,
+                        )
+                    }
 
-    Surface(
-      color = Color.Transparent,
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(dimensionResource(R.dimen.settings_surface_padding)),
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Switch(checked = state.value, onCheckedChange = { onValueChange(it) })
+                }
+
+                HorizontalDivider()
+            }
+        }
+    }
+
+    @Composable
+    fun SettingsSlider(
+        isInt: Boolean = false,
+        name: String,
+        sliderPosition: MutableState<Float>,
+        onValueChange: (Float) -> Unit,
+        @IntRange steps: Int,
+        valueRange: ClosedFloatingPointRange<Float>,
     ) {
-      Column {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-          Text(
-            text = name,
-            modifier = Modifier.padding(dimensionResource(R.dimen.settings_text_padding)),
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Start,
-          )
-        }
+        var pos by remember { mutableFloatStateOf(sliderPosition.value) }
 
-        Slider(
-          value = pos,
-          onValueChange = {
-            pos = it
-          },
-          onValueChangeFinished = {
-            if (isInt) {
-              pos = pos.roundToInt().toFloat()
+        Surface(
+            color = Color.Transparent,
+            modifier =
+                Modifier.fillMaxWidth().padding(dimensionResource(R.dimen.settings_surface_padding)),
+        ) {
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = name,
+                        modifier =
+                            Modifier.padding(dimensionResource(R.dimen.settings_text_padding)),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Start,
+                    )
+                }
+
+                Slider(
+                    value = pos,
+                    onValueChange = { pos = it },
+                    onValueChangeFinished = {
+                        if (isInt) {
+                            pos = pos.roundToInt().toFloat()
+                        }
+                        onValueChange(pos)
+                    },
+                    steps = steps,
+                    valueRange = valueRange,
+                )
+
+                Text(
+                    text = if (isInt) pos.roundToInt().toString() else pos.toString(),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+
+                HorizontalDivider()
             }
-            onValueChange(pos)
-          },
-          steps = steps,
-          valueRange = valueRange
-        )
-
-        Text(
-          text = if (isInt) pos.roundToInt().toString() else pos.toString(),
-          style = MaterialTheme.typography.bodyMedium
-        )
-
-        HorizontalDivider()
-      }
+        }
     }
-  }
 }
